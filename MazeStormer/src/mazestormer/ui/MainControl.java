@@ -288,7 +288,7 @@ public class MainControl extends JFrame {
 		else
 			UISound.setEnable(false);
 		
-		// TODO: TEMP
+		// TODO: TEMPORARY
 		UISound.playIntroSound();
 	}
 	
