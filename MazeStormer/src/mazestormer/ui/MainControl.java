@@ -154,7 +154,7 @@ public class MainControl extends JFrame {
 		// CONTENT PANE
 		this.contentPane = new JPanel();
 		this.contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		this.setContentPane(contentPane);
+		setContentPane(contentPane);
 		this.contentPane.setLayout(null);
 		
 		// FONT
