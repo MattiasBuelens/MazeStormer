@@ -1,15 +1,14 @@
 # Java
 *.class
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# Windows
+*.db
 
 # Eclipse
 *.pydevproject
 .project
 .metadata
+bin/
 bin/**
 tmp/**
 tmp/**/*
