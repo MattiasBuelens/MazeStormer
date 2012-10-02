@@ -193,10 +193,6 @@ public class MainControl extends JFrame {
 		// INITIAL STATE
 		setFeedback(null);
 		setInitial();
-		
-		// TODO: TEMP
-		UISound.setEnable(true);
-		UISound.playIntroSound();
 	}
 	
 	IFacade getFacade() {
@@ -291,6 +287,9 @@ public class MainControl extends JFrame {
 			UISound.setEnable(true);
 		else
 			UISound.setEnable(false);
+		
+		// TODO: TEMP
+		UISound.playIntroSound();
 	}
 	
 	private void showTextColor(){
