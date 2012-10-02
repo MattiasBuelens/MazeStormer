@@ -6,9 +6,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
-import javax.swing.SwingConstants;
-import javax.swing.JCheckBox;
-import javax.swing.JToggleButton;
 
 /**
  * The control panel of the NXT.
@@ -19,7 +16,7 @@ import javax.swing.JToggleButton;
  */
 public class KeyControl extends JPanel{
 
-	private static final long serialVersionUID = 13L;
+	private static final long serialVersionUID = 15L;
 
 	public KeyControl(){
 		setLayout(null);

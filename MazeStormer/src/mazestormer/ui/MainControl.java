@@ -34,7 +34,7 @@ import mazestormer.facade.IFacade;
  */
 public class MainControl extends JFrame {
 	
-	private static final long serialVersionUID = 12L;
+	private static final long serialVersionUID = 14L;
 
 	private IFacade facade;
 
