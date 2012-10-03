@@ -23,6 +23,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
+import mazestormer.board.Board;
 import mazestormer.facade.IFacade;
 
 /**
@@ -37,6 +38,7 @@ public class MainControl extends JFrame {
 	private static final long serialVersionUID = 14L;
 
 	private IFacade facade;
+	private Board board;
 
 	private JPanel contentPane;
 	private JPanel workPane;
@@ -61,6 +63,7 @@ public class MainControl extends JFrame {
 	
 	public MainControl(IFacade facade){
 		this.facade = facade;
+		this.board = facade.createBoard(1000, 1000);
 		
 		// FRAME
 		//TODO setIconImage(Toolkit.getDefaultToolkit().getImage(MainControl.class.getResource("/res/images/ui/---.png")));
@@ -160,7 +163,7 @@ public class MainControl extends JFrame {
 		// FONT
 		Font font = new Font("Verdana", Font.BOLD, 11);
 		
-		// UPPER & LOWER BARS+LABELS
+		// UPPER & LOWER BARS+PANES
 		this.upperBar = new JLabel();
 		this.upperBar.setFont(font);
 		this.upperPane = new JPanel();
@@ -197,6 +200,10 @@ public class MainControl extends JFrame {
 	
 	IFacade getFacade() {
 		return this.facade;
+	}
+	
+	Board getBoard(){
+		return this.board;
 	}
 	
 	// -- STATE --
