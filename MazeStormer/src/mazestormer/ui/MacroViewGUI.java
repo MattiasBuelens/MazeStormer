@@ -50,8 +50,8 @@ public class MacroViewGUI extends JPanel{
 		this.borderColor = Color.BLACK;
 		
 		try {
-			robotImage = ImageIO.read(getClass().getClassLoader().getResource("res/images/Android_Black 1.jpg"));
-			wallImage = ImageIO.read(getClass().getClassLoader().getResource("res/images/wood2.jpg"));
+			robotImage = ImageIO.read(getClass().getClassLoader().getResource("res/images/models/Android_Black 1.jpg"));
+			wallImage = ImageIO.read(getClass().getClassLoader().getResource("res/images/models/wood2.png"));
 		} catch(IOException e) {
 			System.out.println("error reading images");
 			System.exit(ERROR);

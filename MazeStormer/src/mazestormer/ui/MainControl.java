@@ -196,6 +196,9 @@ public class MainControl extends JFrame {
 		// INITIAL STATE
 		setFeedback(null);
 		setInitial();
+		
+		//TODO: temp
+		setWorkPane(new MacroViewPanel(this));
 	}
 	
 	IFacade getFacade() {
