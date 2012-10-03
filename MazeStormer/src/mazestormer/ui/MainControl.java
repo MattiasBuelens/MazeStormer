@@ -1,6 +1,7 @@
 package mazestormer.ui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -29,11 +30,13 @@ import mazestormer.facade.IFacade;
 /**
  * The main frame of the UI architecture.
  * 
- * @author 	Team Bronze
  * @version	
+ * @author 	Team Bronze
  *
  */
 public class MainControl extends JFrame {
+	
+	public static final Font STANDARD_FONT = new Font("Verdana", Font.BOLD, 11);
 	
 	private static final long serialVersionUID = 14L;
 
@@ -160,23 +163,20 @@ public class MainControl extends JFrame {
 		setContentPane(contentPane);
 		this.contentPane.setLayout(null);
 		
-		// FONT
-		Font font = new Font("Verdana", Font.BOLD, 11);
-		
 		// UPPER & LOWER BARS+PANES
 		this.upperBar = new JLabel();
-		this.upperBar.setFont(font);
+		this.upperBar.setFont(STANDARD_FONT);
 		this.upperPane = new JPanel();
 		this.upperPane.setBounds(0, 0, 854, 22);
 		this.upperPane.add(upperBar);
 		contentPane.add(upperPane);
 		this.lowerBar = new JLabel();
-		this.lowerBar.setFont(font);
+		this.lowerBar.setFont(STANDARD_FONT);
 		this.lowerPane = new JPanel();
 		this.lowerPane.setBounds(0, 566, 854, 22);
 		this.lowerPane.add(lowerBar);
 		contentPane.add(lowerPane);
-		this.upperBar.setFont(font);
+		this.upperBar.setFont(STANDARD_FONT);
 		
 		// FEEDBACK TEXT AREA
 		this.feedback = new JTextArea();
@@ -187,7 +187,7 @@ public class MainControl extends JFrame {
 		this.feedback.setEditable(false);  
 		this.feedback.setCursor(null);  
 		this.feedback.setFocusable(false);
-		this.feedback.setFont(font);
+		this.feedback.setFont(STANDARD_FONT);
 		JScrollPane sbrText = new JScrollPane(feedback);
 		sbrText.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		sbrText.setBounds(563, 26, 279, 529);
@@ -300,7 +300,7 @@ public class MainControl extends JFrame {
 	}
 	
 	private void showTextColor(){
-		Color c = showColor();
+		Color c = showColor(this);
 		if(c != null){
 			this.feedback.setForeground(c);
 			this.upperBar.setForeground(c);
@@ -309,7 +309,7 @@ public class MainControl extends JFrame {
 	}
 	
 	private void showTextBackgroundColor(){
-		Color c = showColor();
+		Color c = showColor(this);
 		if(c != null){
 			this.feedback.setBackground(c);
 			this.upperPane.setBackground(c);
@@ -318,16 +318,16 @@ public class MainControl extends JFrame {
 	}
 	
 	private void showBackgroundColor(){
-		Color c = showColor();
+		Color c = showColor(this);
 		if(c != null)
 			this.contentPane.setBackground(c);
 	}
 	
-	private Color showColor(){
+	static Color showColor(Component parent){
 		Color[] colors = {Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY, Color.GRAY, Color.GREEN, Color.LIGHT_GRAY, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED, Color.WHITE, Color.YELLOW};
 		String[] possibleValues = {"Black", "Blue", "Cyan", "Dark Grey", "Gray", "Green", "Light Gray", "Magenta", "Orange", "Pink", "Red", "White", "Yellow"};
 		assert(colors.length != possibleValues.length);
-		Object selectedValue = JOptionPane.showInputDialog(this, "Select a color:", "Color",
+		Object selectedValue = JOptionPane.showInputDialog(parent, "Select a color:", "Color",
 				JOptionPane.INFORMATION_MESSAGE, new ImageIcon(MainControl.class.getResource("/res/images/ui/question.png")), possibleValues, possibleValues[0]);
 		
 		if(selectedValue == null)
