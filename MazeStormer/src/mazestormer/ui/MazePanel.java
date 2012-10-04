@@ -17,24 +17,24 @@ import javax.swing.JMenuItem;
  * @author 	Team Bronze
  *
  */
-public class MacroViewPanel extends JPanel{
+public class MazePanel extends JPanel{
 	
 	private static final long serialVersionUID = 16L;
 	
 	private MainControl mc;
-	private MacroViewGUI mvg;
+	private MazeGUI mvg;
 
 	private JLabel modelStatus;
 	private JPanel modelPane;
 
-	public MacroViewPanel(final MainControl mc){
+	public MazePanel(final MainControl mc){
 		this.mc = mc;
 		
 		setLayout(null);
 		setBounds(10, 26, 548, 529);
 		
 		// MVG
-		this.mvg = new MacroViewGUI(this);
+		this.mvg = new MazeGUI(this);
 		this.mvg.setBounds(10, 43, 528, 441);
 		add(mvg);
 		

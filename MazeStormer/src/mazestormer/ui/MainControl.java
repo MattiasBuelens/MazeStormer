@@ -195,7 +195,7 @@ public class MainControl extends JFrame {
 		setInitial();
 		
 		//TODO: temp
-		setWorkPane(new MacroViewPanel(this));
+		setWorkPane(new MazePanel(this));
 	}
 	
 	IModelViewController getModelViewController() {

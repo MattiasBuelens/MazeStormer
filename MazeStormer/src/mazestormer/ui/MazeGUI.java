@@ -14,8 +14,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import mazestormer.model.BoardModel;
-
 /**
  * A class with the graphical user interface for the board.
  * 
@@ -23,12 +21,12 @@ import mazestormer.model.BoardModel;
  * @author 	Team Bronze
  *
  */
-public class MacroViewGUI extends JPanel{
+public class MazeGUI extends JPanel{
 
 	private static final long serialVersionUID = -5412856771873196193L;
 	private final static int TILE_SIZE = 50;
 	
-	private final MacroViewPanel mvp;
+	private final MazePanel mvp;
 	private boolean showGrid = true;
 	
 	private int prePressOriginX = 0;
@@ -43,7 +41,7 @@ public class MacroViewGUI extends JPanel{
 	private Color backGroundColor;
 	private Color borderColor;
 	
-	public MacroViewGUI(final MacroViewPanel mvp){
+	public MazeGUI(final MazePanel mvp){
 		this.mvp = mvp;
 		this.backGroundColor = Color.WHITE;
 		this.borderColor = Color.BLACK;
@@ -64,10 +62,10 @@ public class MacroViewGUI extends JPanel{
 			
 			@Override
 			public void mousePressed(MouseEvent e){
-				MacroViewGUI.this.clickX = e.getX();
-				MacroViewGUI.this.clickY = e.getY();
-				MacroViewGUI.this.prePressOriginX = MacroViewGUI.this.originX;
-				MacroViewGUI.this.prePressOriginY = MacroViewGUI.this.originY;
+				MazeGUI.this.clickX = e.getX();
+				MazeGUI.this.clickY = e.getY();
+				MazeGUI.this.prePressOriginX = MazeGUI.this.originX;
+				MazeGUI.this.prePressOriginY = MazeGUI.this.originY;
 			}
 			
 			@Override
@@ -105,8 +103,8 @@ public class MacroViewGUI extends JPanel{
 			
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				MacroViewGUI.this.originX = MacroViewGUI.this.prePressOriginX - (clickX - e.getX());
-				MacroViewGUI.this.originY = MacroViewGUI.this.prePressOriginY - (clickY - e.getY());
+				MazeGUI.this.originX = MazeGUI.this.prePressOriginX - (clickX - e.getX());
+				MazeGUI.this.originY = MazeGUI.this.prePressOriginY - (clickY - e.getY());
 				repaint();
 			}
 		});
