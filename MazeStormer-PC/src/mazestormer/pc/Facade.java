@@ -1,4 +1,4 @@
-package mazestormer.facade;
+package mazestormer.pc;
 
 import be.kuleuven.cs.som.annotate.*;
 

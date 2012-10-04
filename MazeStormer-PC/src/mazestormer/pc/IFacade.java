@@ -1,4 +1,4 @@
-package mazestormer.facade;
+package mazestormer.pc;
 
 /**
  * An interface that should be implemented by all classes
