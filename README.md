@@ -15,4 +15,3 @@ Our code name may be Team Bronze, but we're going for gold!
 - [Dennis Frett](https://github.com/dennis-frett)
 - [Stijn Hoskes](https://github.com/stijnhoskens)
 - [Matthias Moulin](http://github.com/matt77hias)
-- Wout Scheepers
