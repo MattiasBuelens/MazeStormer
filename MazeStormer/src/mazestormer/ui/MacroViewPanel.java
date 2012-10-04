@@ -5,8 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JPanel;
-
-import mazestormer.board.Board;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -100,9 +98,10 @@ public class MacroViewPanel extends JPanel{
 		return this.mc.getModelViewController();
 	}
 
-	Board getBoard() {
-		return this.mc.getBoard();
-	}
+	//TODO
+	//Board getBoard() {
+	//	return this.mc.getBoard();
+	//}
 
 	void setModelStatus(String msg){
 		this.modelStatus.setText(msg);	

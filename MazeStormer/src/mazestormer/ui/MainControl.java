@@ -24,8 +24,6 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
-import mazestormer.board.Board;
-
 /**
  * The main frame of the UI architecture.
  * 
@@ -40,7 +38,7 @@ public class MainControl extends JFrame {
 	private static final long serialVersionUID = 14L;
 
 	private IModelViewController mvc;
-	private Board board;
+	//TODO private Board board;
 
 	private JPanel contentPane;
 	private JPanel workPane;
@@ -65,7 +63,7 @@ public class MainControl extends JFrame {
 	
 	public MainControl(IModelViewController mvc){
 		this.mvc = mvc;
-		this.board = mvc.createBoard(1000, 1000);
+		//TODO: this.board = mvc.createBoard(1000, 1000);
 		
 		// FRAME
 		//TODO setIconImage(Toolkit.getDefaultToolkit().getImage(MainControl.class.getResource("/res/images/ui/---.png")));
@@ -204,9 +202,10 @@ public class MainControl extends JFrame {
 		return this.mvc;
 	}
 	
-	Board getBoard(){
-		return this.board;
-	}
+	//TODO
+	//Board getBoard(){
+	//	return this.board;
+	//}
 	
 	// -- STATE --
 	
