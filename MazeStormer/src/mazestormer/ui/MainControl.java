@@ -41,8 +41,8 @@ public class MainControl extends JFrame {
 	//TODO private Board board;
 
 	private JPanel contentPane;
-	private JPanel graphPane;
-	private JPanel controlPane;
+	private WorkPanel workPane;
+	private ControlPanel controlPane;
 	private JTextArea feedback;
 	private JLabel upperBar;
 	private JPanel upperPane;
@@ -204,15 +204,15 @@ public class MainControl extends JFrame {
 		setUpperBar(null);
 	}
 	
-	void setGraphPane(JPanel panel) throws NullPointerException{
+	void setWorkPane(WorkPanel panel) throws NullPointerException{
 		if(panel == null)
 			throw new NullPointerException("The work pane may not refer the null reference.");
-		this.graphPane = panel;
-		this.graphPane.setBounds(10, 26, 548, 529);
-		this.contentPane.add(graphPane);
+		this.workPane = panel;
+		this.workPane.setBounds(10, 26, 548, 529);
+		this.contentPane.add(workPane);
 	}
 	
-	void setControlPane(JPanel panel) throws NullPointerException{
+	void setControlPane(ControlPanel panel) throws NullPointerException{
 		if(panel == null)
 			throw new NullPointerException("The control pane may not refer the null reference.");
 		this.controlPane = panel;
