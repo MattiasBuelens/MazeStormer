@@ -1,0 +1,195 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%                                                                     %%%
+%%%   LaTeX template voor het verslag van P&O: Computerwetenschappen.   %%%
+%%%                                                                     %%%
+%%%   Opties:                                                           %%%
+%%%     tt1     Tussentijdsverslag 1                                    %%%
+%%%     tt2     Tussentijdsverslag 2                                    %%%
+%%%     tt3     Tussentijdsverslag 3                                    %%%
+%%%     eind    Eindverslag                                             %%%
+%%%                                                                     %%%
+%%%   2 oktober 2012                                                    %%%
+%%%   Versie 1.0                                                        %%%
+%%%                                                                     %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[tt1]{penoverslag}
+
+%%% PACKAGES
+\usepackage{lipsum}
+
+
+\begin{document}
+
+\team{Assistenten} % teamkleur
+\members{Rutger Claes\\
+         Jeroen De Vlieger\\
+         Micol Ferranti\\
+         Jelle Peeters\\
+         Arun Ramakrishnan\\
+         Steven Van Acker\\
+         Roel Van Beeumen\\
+         Zubair Wadood Bhatti} % teamleden
+
+\maketitlepage
+
+\begin{abstract}
+\lipsum[1-2]
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+% == INLEIDING == %
+\section{Inleiding}
+\lipsum[1-2]
+
+\section{Bouw robot}
+\lipsum[3]
+
+\subsection{Fysieke bouw}
+\begin{itemize}
+\item Algemene beschrijving van de evolutie van de bouw van de robot met verantwoording.
+\item \ldots
+\end{itemize}
+
+\subsection{Meetresultaten}
+Meetresultaten van de nauwkeurigheid van de robot:
+\begin{itemize}
+\item rechtdoor rijden (geplande afstand versus werkelijke afstand),
+\item rotaties (idem),
+\item \ldots
+\end{itemize}
+
+\subsection{\ldots}
+\ldots
+
+
+% == ALGORITMES == %
+\section{Algoritmes}
+\lipsum[4]
+
+\subsection{Rechtzetten robot op witte lijn}
+\begin{itemize}
+\item Beschrijving van het algoritme voor het rechtzetten van de robot op de lijn.
+\end{itemize}
+
+\subsection{Lezen barcodes}
+\begin{itemize}
+\item Beschrijving van het algoritme om de robot een barcode te laten lezen.
+\end{itemize}
+
+\subsection{Sturing van de robot}
+\begin{itemize}
+\item Beschrijving van het algoritme dat de robot stuurt.
+\end{itemize}
+
+\subsection{Navigatie door doolhof}
+\begin{itemize}
+\item Beschrijving van het algoritme dat selecteert welk navigatiesysteem gebruikt wordt om de robot het doolhof te laten verkennen.
+\end{itemize}
+
+\subsection{\ldots}
+\ldots
+
+
+% == SOFTWARE == %
+\section{Software}
+\lipsum[5]
+
+\subsection{Bluetooth}
+\ldots
+
+\subsection{GUI}
+\begin{itemize}
+\item Geef hier een duidelijk beeld van het design van de user interface (welke beslissingen, waarom?, enz.) en een overzicht van de functionaliteiten.
+\end{itemize}
+
+\subsection{Simulator}
+\begin{itemize}
+\item Beschrijving van de simulator.
+\end{itemize}
+
+\subsection{Software design}
+\begin{itemize}
+\item Geef hier een klassediagramma en een overzicht van de verschillende methodes.
+\end{itemize}
+
+\subsection{\ldots}
+\ldots
+
+
+% == BESLUIT == %
+\section{Besluit}
+\lipsum[6-7]
+
+
+
+\newpage
+\makeappendix
+
+\section{Demo 1}
+
+\subsection{Resultaten}
+\ldots
+
+\subsection{Conclusies}
+\ldots
+
+\subsection{Oplijsting aanpassingen verslag}
+Hier komt een summiere weergave van welke secties uit het vorige verslag gewijzigd werden.
+
+
+\section{Demo 2}
+
+\subsection{Resultaten}
+\ldots
+
+\subsection{Conclusies}
+\ldots
+
+\subsection{Oplijsting aanpassingen verslag}
+Hier komt een summiere weergave van welke secties uit het vorige verslag gewijzigd werden.
+
+
+\section{Demo 3}
+
+\subsection{Resultaten}
+\ldots
+
+\subsection{Conclusies}
+\ldots
+
+\subsection{Oplijsting aanpassingen verslag}
+Hier komt een summiere weergave van welke secties uit het vorige verslag gewijzigd werden.
+
+
+\section{Beschrijving van het proces}
+\begin{itemize}
+\item Welke moeilijkheden heb je ondervonden tijdens de uitwerking?
+\item Welke lessen heb je getrokken uit de manier waarop je het project hebt aangepakt?
+\item Hoe verliep het werken in team? Op welke manier werd de teamco\"ordinatie en planning aangepakt?
+\end{itemize}
+
+
+\section{Beschrijving van de werkverdeling}
+\begin{itemize}
+\item Geef voor elk van de groepsleden aan aan welke delen ze hebben meegewerkt en welke andere taken ze op zich hebben genomen.
+\item Rapporteer in tabelvorm hoeveel uur elk groepslid elke week aan het project gewerkt heeft, zowel tijdens als buiten de begeleide sessies. Geef ook totalen per groepslid voor het volledige semester.
+\end{itemize}
+
+
+\section{Kritisch analyse}
+\begin{itemize}
+\item Maak een analyse van de sterke en zwakke punten van het project. Welke punten zijn vatbaar voor verbetering. Wat zou je, met je huidige kennis, anders aangepakt hebben?
+\end{itemize}
+
+
+
+\newpage
+\bibliographystyle{siam}
+\bibliography{biblio.bib}
+
+
+\end{document}
