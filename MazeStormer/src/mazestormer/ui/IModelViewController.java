@@ -1,4 +1,4 @@
-package mazestormer.facade;
+package mazestormer.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import mazestormer.model.Wall;
  * @version	
  *
  */
-public interface IFacade{
+public interface IModelViewController{
 
 	public String getFeedback();
 

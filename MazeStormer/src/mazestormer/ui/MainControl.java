@@ -25,7 +25,6 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
 import mazestormer.board.Board;
-import mazestormer.facade.IFacade;
 
 /**
  * The main frame of the UI architecture.
@@ -40,7 +39,7 @@ public class MainControl extends JFrame {
 	
 	private static final long serialVersionUID = 14L;
 
-	private IFacade facade;
+	private IModelViewController mvc;
 	private Board board;
 
 	private JPanel contentPane;
@@ -55,7 +54,7 @@ public class MainControl extends JFrame {
 		EventQueue.invokeLater(new Runnable(){
 			public void run(){
 				try{
-					MainControl frame = new MainControl(new mazestormer.facade.Facade());
+					MainControl frame = new MainControl(new ModelViewController());
 					frame.setVisible(true);
 				}catch(Exception e){
 					e.printStackTrace();
@@ -64,9 +63,9 @@ public class MainControl extends JFrame {
 		});
 	}
 	
-	public MainControl(IFacade facade){
-		this.facade = facade;
-		this.board = facade.createBoard(1000, 1000);
+	public MainControl(IModelViewController mvc){
+		this.mvc = mvc;
+		this.board = mvc.createBoard(1000, 1000);
 		
 		// FRAME
 		//TODO setIconImage(Toolkit.getDefaultToolkit().getImage(MainControl.class.getResource("/res/images/ui/---.png")));
@@ -201,8 +200,8 @@ public class MainControl extends JFrame {
 		setWorkPane(new MacroViewPanel(this));
 	}
 	
-	IFacade getFacade() {
-		return this.facade;
+	IModelViewController getModelViewController() {
+		return this.mvc;
 	}
 	
 	Board getBoard(){
@@ -238,8 +237,8 @@ public class MainControl extends JFrame {
 	}
 	
 	private void updateFeedback(){
-		if(getFacade().getFeedback() != null)
-			setFeedback(getFacade().getFeedback());
+		if(getModelViewController().getFeedback() != null)
+			setFeedback(getModelViewController().getFeedback());
 	}
 	
 	// -- FILE --

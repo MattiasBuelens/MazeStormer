@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 
 import mazestormer.board.Board;
-import mazestormer.facade.IFacade;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -97,8 +96,8 @@ public class MacroViewPanel extends JPanel{
 		mnWindow.add(mntmTextBackgroundColor);
 	}
 	
-	IFacade getFacade(){
-		return this.mc.getFacade();
+	IModelViewController getModelViewController(){
+		return this.mc.getModelViewController();
 	}
 
 	Board getBoard() {

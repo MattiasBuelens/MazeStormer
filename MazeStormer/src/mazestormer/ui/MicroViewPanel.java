@@ -11,7 +11,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import mazestormer.board.Board;
-import mazestormer.facade.IFacade;
 
 /**
  * A control panel for 'micro view gui's.
@@ -85,8 +84,8 @@ public class MicroViewPanel extends JPanel{
 		mnWindow.add(mntmTextBackgroundColor);
 	}
 	
-	IFacade getFacade(){
-		return this.mc.getFacade();
+	IModelViewController getModelViewController(){
+		return this.mc.getModelViewController();
 	}
 
 	Board getBoard() {

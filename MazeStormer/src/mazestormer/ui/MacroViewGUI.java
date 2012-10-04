@@ -14,7 +14,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import mazestormer.facade.IFacade;
 import mazestormer.model.BoardModel;
 
 /**
@@ -91,11 +90,11 @@ public class MacroViewGUI extends JPanel{
 				Point point = e.getPoint();
 				int x = (int) ((-originX + point.getX()) / (TILE_SIZE + 1));
 				int y = (int) ((-originY + point.getY()) / (TILE_SIZE + 1));
-				IFacade facade = mvp.getFacade();
-				for(BoardModel model : facade.getAllBoardModelsClass(mvp.getBoard(), BoardModel.class)){
+				IModelViewController mvc = mvp.getModelViewController();
+				for(BoardModel model : mvc.getAllBoardModelsClass(mvp.getBoard(), BoardModel.class)){
 					long xr, yr;
-					xr = facade.getBoardModelX(model);
-					yr = facade.getBoardModelY(model);
+					xr = mvc.getBoardModelX(model);
+					yr = mvc.getBoardModelY(model);
 					if(xr == x && yr == y){
 						mvp.setModelStatus(model.toString());
 						return;
@@ -134,7 +133,7 @@ public class MacroViewGUI extends JPanel{
 			}
 		}
 		
-		IFacade facade = this.mvp.getFacade();
+		IModelViewController facade = this.mvp.getModelViewController();
 		for(BoardModel model : facade.getAllBoardModelsClass(this.mvp.getBoard(), BoardModel.class)) {
 			long x = facade.getBoardModelX(model);
 			long y = facade.getBoardModelY(model);
@@ -146,7 +145,7 @@ public class MacroViewGUI extends JPanel{
 			g.drawImage(getImage(model), tileXRoot, tileYRoot, null);
 			// draw orientation
 			if(mazestormer.model.Robot.class.isInstance(model)){
-				paintOrientation(g, this.mvp.getFacade().getOrientation((mazestormer.model.Robot) model), tileXRoot, tileYRoot, Color.RED);
+				paintOrientation(g, this.mvp.getModelViewController().getOrientation((mazestormer.model.Robot) model), tileXRoot, tileYRoot, Color.RED);
 			}
 		}	
 	}

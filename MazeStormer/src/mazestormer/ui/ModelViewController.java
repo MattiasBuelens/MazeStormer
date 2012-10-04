@@ -1,4 +1,4 @@
-package mazestormer.facade;
+package mazestormer.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,7 @@ import mazestormer.model.BoardModel;
 import mazestormer.model.Direction;
 import mazestormer.model.Robot;
 import mazestormer.model.Wall;
+import mazestormer.ui.IModelViewController;
 import be.kuleuven.cs.som.annotate.*;
 
 /**
@@ -22,7 +23,7 @@ import be.kuleuven.cs.som.annotate.*;
  * @version	
  *
  */
-public class Facade implements IFacade{
+public class ModelViewController implements IModelViewController{
 	
 	/**
 	 * Sets the feedback of this front to the given request.
