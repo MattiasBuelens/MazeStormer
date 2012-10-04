@@ -41,12 +41,11 @@ public class MainControl extends JFrame {
 	//TODO private Board board;
 
 	private JPanel contentPane;
-	private JPanel workPane;
+	private JPanel graphPane;
+	private JPanel controlPane;
 	private JTextArea feedback;
 	private JLabel upperBar;
-	private JLabel lowerBar;
 	private JPanel upperPane;
-	private JPanel lowerPane;
 
 	public static void main(String[] args){
 		EventQueue.invokeLater(new Runnable(){
@@ -160,19 +159,13 @@ public class MainControl extends JFrame {
 		setContentPane(contentPane);
 		this.contentPane.setLayout(null);
 		
-		// UPPER & LOWER BARS+PANES
+		// UPPER BAR+PANE
 		this.upperBar = new JLabel();
 		this.upperBar.setFont(STANDARD_FONT);
 		this.upperPane = new JPanel();
-		this.upperPane.setBounds(0, 0, 854, 22);
+		this.upperPane.setBounds(10, 0, 832, 22);
 		this.upperPane.add(upperBar);
-		contentPane.add(upperPane);
-		this.lowerBar = new JLabel();
-		this.lowerBar.setFont(STANDARD_FONT);
-		this.lowerPane = new JPanel();
-		this.lowerPane.setBounds(0, 566, 854, 22);
-		this.lowerPane.add(lowerBar);
-		contentPane.add(lowerPane);
+		this.contentPane.add(upperPane);
 		this.upperBar.setFont(STANDARD_FONT);
 		
 		// FEEDBACK TEXT AREA
@@ -187,15 +180,12 @@ public class MainControl extends JFrame {
 		this.feedback.setFont(STANDARD_FONT);
 		JScrollPane sbrText = new JScrollPane(feedback);
 		sbrText.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		sbrText.setBounds(563, 26, 279, 529);
+		sbrText.setBounds(563, 26, 279, 435);
 		contentPane.add(sbrText);
 		
 		// INITIAL STATE
 		setFeedback(null);
 		setInitial();
-		
-		//TODO: temp
-		setWorkPane(new MazePanel(this));
 	}
 	
 	IModelViewController getModelViewController() {
@@ -212,23 +202,26 @@ public class MainControl extends JFrame {
 	private void setInitial(){
 		//TODO setWorkPane(null);
 		setUpperBar(null);
-		setLowerBar(null);
 	}
 	
-	void setWorkPane(JPanel panel) throws NullPointerException{
+	void setGraphPane(JPanel panel) throws NullPointerException{
 		if(panel == null)
 			throw new NullPointerException("The work pane may not refer the null reference.");
-		this.workPane = panel;
-		this.workPane.setBounds(10, 26, 548, 529);
-		this.contentPane.add(workPane);
+		this.graphPane = panel;
+		this.graphPane.setBounds(10, 26, 548, 529);
+		this.contentPane.add(graphPane);
+	}
+	
+	void setControlPane(JPanel panel) throws NullPointerException{
+		if(panel == null)
+			throw new NullPointerException("The control pane may not refer the null reference.");
+		this.controlPane = panel;
+		this.controlPane.setBounds(10, 465, 832, 134);
+		this.contentPane.add(controlPane);
 	}
 	
 	void setUpperBar(String msg){
 		this.upperBar.setText(msg);	
-	}
-	
-	void setLowerBar(String msg){
-		this.lowerBar.setText(msg);	
 	}
 	
 	void setFeedback(String msg){
@@ -305,7 +298,6 @@ public class MainControl extends JFrame {
 		if(c != null){
 			this.feedback.setForeground(c);
 			this.upperBar.setForeground(c);
-			this.lowerBar.setForeground(c);
 		}
 	}
 	
@@ -314,7 +306,6 @@ public class MainControl extends JFrame {
 		if(c != null){
 			this.feedback.setBackground(c);
 			this.upperPane.setBackground(c);
-			this.lowerPane.setBackground(c);
 		}
 	}
 	
@@ -340,6 +331,4 @@ public class MainControl extends JFrame {
 				break;
 		return colors[i];
 	}
-	
-	// --
 }
