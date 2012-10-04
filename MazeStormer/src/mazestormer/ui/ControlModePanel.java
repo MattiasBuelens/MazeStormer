@@ -3,7 +3,6 @@ package mazestormer.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 
@@ -14,16 +13,16 @@ import javax.swing.ImageIcon;
  * @version	
  *
  */
-public class KeyControl extends JPanel{
+public class ControlModePanel extends ControlPanel{
 
 	private static final long serialVersionUID = 15L;
 
-	public KeyControl(){
+	public ControlModePanel(){
 		setLayout(null);
 		setBounds(10, 26, 548, 529);
 		
 		JButton move = new JButton("");
-		move.setIcon(new ImageIcon(KeyControl.class.getResource("/res/images/ui/arrow_up.png")));
+		move.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_up.png")));
 		move.setBounds(126, 247, 89, 53);
 		move.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { showMove(); }
@@ -31,7 +30,7 @@ public class KeyControl extends JPanel{
 		add(move);
 		
 		JButton turnCounterClockwise = new JButton("");
-		turnCounterClockwise.setIcon(new ImageIcon(KeyControl.class.getResource("/res/images/ui/Repeat.png")));
+		turnCounterClockwise.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/Repeat.png")));
 		turnCounterClockwise.setBounds(27, 247, 89, 53);
 		turnCounterClockwise.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { showTurnCounterClockwise(); }
@@ -39,7 +38,7 @@ public class KeyControl extends JPanel{
 		add(turnCounterClockwise);
 		
 		JButton turnClockwise = new JButton("");
-		turnClockwise.setIcon(new ImageIcon(KeyControl.class.getResource("/res/images/ui/Repeat_01.png")));
+		turnClockwise.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/Repeat_01.png")));
 		turnClockwise.setBounds(225, 247, 89, 53);
 		turnClockwise.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) { showTurnClockwise(); }
