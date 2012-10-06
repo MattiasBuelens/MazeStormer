@@ -1,38 +1,6 @@
 <class-diagram version="1.0.8" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.WorkPanel" project="MazeStormer" 
-    file="/MazeStormer/src/mazestormer/ui/WorkPanel.java" binary="false">    
-    <position height="-1" width="-1" x="464" y="118"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.PolygonModePanel" project="MazeStormer" 
-    file="/MazeStormer/src/mazestormer/ui/PolygonModePanel.java" binary="false">    
-    <position height="-1" width="-1" x="678" y="310"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ControlPanel" project="MazeStormer" 
-    file="/MazeStormer/src/mazestormer/ui/ControlPanel.java" binary="false">    
-    <position height="-1" width="-1" x="468" y="387"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ControlModePanel" project="MazeStormer" 
-    file="/MazeStormer/src/mazestormer/ui/ControlModePanel.java" binary="false">    
-    <position height="-1" width="-1" x="680" y="453"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="true" package="true" protected="true" private="true"/>      
-      <operations public="true" package="true" protected="true" private="false"/>    
-    </display>  
-  </class>  
-  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.MainControl" project="MazeStormer" 
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.MainControl" project="MazeStormer" 
     file="/MazeStormer/src/mazestormer/ui/MainControl.java" binary="false">    
     <position height="-1" width="-1" x="163" y="275"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -40,28 +8,118 @@
       <operations public="true" package="true" protected="true" private="false"/>    
     </display>  
   </class>  
-  <association id="6">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="7" name="controlPane"/>      
-      <multiplicity id="8" minimum="0" maximum="1"/>    
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="javax.swing.JPanel" project="01TotalProgramming" 
+    file="C:/Program Files (x86)/Java/jdk1.6.0_04/jre/lib/rt.jar" binary="true">    
+    <position height="-1" width="-1" x="469" y="153"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="javax.swing.JFrame" project="01TotalProgramming" 
+    file="C:/Program Files (x86)/Java/jdk1.6.0_04/jre/lib/rt.jar" binary="true">    
+    <position height="-1" width="-1" x="164" y="61"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ControlModePanel" project="MazeStormer" 
+    file="/MazeStormer/src/mazestormer/ui/ControlModePanel.java" binary="false">    
+    <position height="-1" width="-1" x="785" y="85"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.PolygonModePanel" project="MazeStormer" 
+    file="/MazeStormer/src/mazestormer/ui/PolygonModePanel.java" binary="false">    
+    <position height="-1" width="-1" x="789" y="235"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ModelViewController" project="MazeStormer" 
+    file="/MazeStormer/src/mazestormer/ui/ModelViewController.java" binary="false">    
+    <position height="-1" width="-1" x="160" y="619"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.IModelViewController" 
+    project="MazeStormer" file="/MazeStormer/src/mazestormer/ui/IModelViewController.java" binary="false">    
+    <position height="-1" width="-1" x="161" y="493"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <association id="8">    
+    <bendpoint x="450" y="275"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="9" name="workPane">        
+        <position height="14" width="53" x="464" y="209"/>      
+      </attribute>      
+      <multiplicity id="10" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="9">    
+  <realization id="11">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="7"/>  
+  </realization>  
+  <generalization id="12">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="2"/>  
+  </generalization>  
+  <generalization id="13">    
     <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="2"/>  
+  </generalization>  
+  <generalization id="14">    
+    <end type="SOURCE" refId="1"/>    
     <end type="TARGET" refId="3"/>  
   </generalization>  
-  <generalization id="10">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <association id="11">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="12" name="workPane"/>      
-      <multiplicity id="13" minimum="0" maximum="1"/>    
+  <association id="15">    
+    <bendpoint x="332" y="154"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="16" name="upperPane"/>      
+      <multiplicity id="17" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="18">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="19" name="controlPane">        
+        <position height="14" width="61" x="365" y="194"/>      
+      </attribute>      
+      <multiplicity id="20" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="21">    
+    <bendpoint x="321" y="85"/>    
+    <bendpoint x="435" y="126"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="22" name="contentPane">        
+        <position height="14" width="64" x="364" y="88"/>      
+      </attribute>      
+      <multiplicity id="23" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="24">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="25" name="mvc"/>      
+      <multiplicity id="26" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 

@@ -38,11 +38,12 @@ public class MainControl extends JFrame {
 	private static final long serialVersionUID = 14L;
 
 	private IModelViewController mvc;
-	//TODO private Board board;
+	
+	//TODO private Maze maze;
 
 	private JPanel contentPane;
-	private WorkPanel workPane;
-	private ControlPanel controlPane;
+	private JPanel workPane;
+	private JPanel controlPane;
 	private JTextArea feedback;
 	private JLabel upperBar;
 	private JPanel upperPane;
@@ -62,7 +63,6 @@ public class MainControl extends JFrame {
 	
 	public MainControl(IModelViewController mvc){
 		this.mvc = mvc;
-		//TODO: this.board = mvc.createBoard(1000, 1000);
 		
 		// FRAME
 		//TODO setIconImage(Toolkit.getDefaultToolkit().getImage(MainControl.class.getResource("/res/images/ui/---.png")));
@@ -188,23 +188,18 @@ public class MainControl extends JFrame {
 		setInitial();
 	}
 	
-	IModelViewController getModelViewController() {
+	IModelViewController getModelViewController(){
 		return this.mvc;
 	}
-	
-	//TODO
-	//Board getBoard(){
-	//	return this.board;
-	//}
 	
 	// -- STATE --
 	
 	private void setInitial(){
-		//TODO setWorkPane(null);
+		//TODO panes
 		setUpperBar(null);
 	}
 	
-	void setWorkPane(WorkPanel panel) throws NullPointerException{
+	void setWorkPane(JPanel panel) throws NullPointerException{
 		if(panel == null)
 			throw new NullPointerException("The work pane may not refer the null reference.");
 		this.workPane = panel;
@@ -212,7 +207,7 @@ public class MainControl extends JFrame {
 		this.contentPane.add(workPane);
 	}
 	
-	void setControlPane(ControlPanel panel) throws NullPointerException{
+	void setControlPane(JPanel panel) throws NullPointerException{
 		if(panel == null)
 			throw new NullPointerException("The control pane may not refer the null reference.");
 		this.controlPane = panel;
@@ -226,6 +221,10 @@ public class MainControl extends JFrame {
 	
 	void setFeedback(String msg){
 		this.feedback.setText(msg);	
+	}
+	
+	void addFeeback(String msg){
+		this.feedback.append(msg);
 	}
 	
 	private void updateFeedback(){

@@ -26,7 +26,7 @@ public class MazeGUI extends JPanel{
 	private static final long serialVersionUID = -5412856771873196193L;
 	private final static int TILE_SIZE = 50;
 	
-	private final MazePanel mvp;
+	private final MazePanel mp;
 	private boolean showGrid = true;
 	
 	private int prePressOriginX = 0;
@@ -42,7 +42,7 @@ public class MazeGUI extends JPanel{
 	private Color borderColor;
 	
 	public MazeGUI(final MazePanel mvp){
-		this.mvp = mvp;
+		this.mp = mvp;
 		this.backGroundColor = Color.WHITE;
 		this.borderColor = Color.BLACK;
 		
@@ -131,8 +131,8 @@ public class MazeGUI extends JPanel{
 			}
 		}
 		
-		IModelViewController facade = this.mvp.getModelViewController();
-		for(BoardModel model : facade.getAllBoardModelsClass(this.mvp.getBoard(), BoardModel.class)) {
+		IModelViewController facade = this.mp.getModelViewController();
+		for(BoardModel model : facade.getAllBoardModelsClass(this.mp.getBoard(), BoardModel.class)) {
 			long x = facade.getBoardModelX(model);
 			long y = facade.getBoardModelY(model);
 			if(x < Integer.MIN_VALUE + 2 * TILE_SIZE || x > Integer.MAX_VALUE - 2 * TILE_SIZE || y < Integer.MIN_VALUE + 2 * TILE_SIZE || y > Integer.MAX_VALUE - 2 * TILE_SIZE)
@@ -143,7 +143,7 @@ public class MazeGUI extends JPanel{
 			g.drawImage(getImage(model), tileXRoot, tileYRoot, null);
 			// draw orientation
 			if(mazestormer.model.Robot.class.isInstance(model)){
-				paintOrientation(g, this.mvp.getModelViewController().getOrientation((mazestormer.model.Robot) model), tileXRoot, tileYRoot, Color.RED);
+				paintOrientation(g, this.mp.getModelViewController().getOrientation((mazestormer.model.Robot) model), tileXRoot, tileYRoot, Color.RED);
 			}
 		}	
 	}

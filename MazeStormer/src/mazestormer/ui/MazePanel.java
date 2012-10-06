@@ -22,7 +22,7 @@ public class MazePanel extends JPanel{
 	private static final long serialVersionUID = 16L;
 	
 	private MainControl mc;
-	private MazeGUI mvg;
+	private MazeGUI mg;
 
 	private JLabel modelStatus;
 	private JPanel modelPane;
@@ -34,9 +34,9 @@ public class MazePanel extends JPanel{
 		setBounds(10, 26, 548, 529);
 		
 		// MVG
-		this.mvg = new MazeGUI(this);
-		this.mvg.setBounds(10, 43, 528, 441);
-		add(mvg);
+		this.mg = new MazeGUI(this);
+		this.mg.setBounds(10, 43, 528, 441);
+		add(mg);
 		
 		// MODEL BAR & PANE
 		this.modelStatus = new JLabel();
@@ -128,14 +128,14 @@ public class MazePanel extends JPanel{
 	private void showBorderColor(){
 		Color c = MainControl.showColor(this);
 		if(c != null){
-			this.mvg.setBorderColor(c);
+			this.mg.setBorderColor(c);
 		}
 	}
 	
 	private void showGridColor(){
 		Color c = MainControl.showColor(this);
 		if(c != null){
-			this.mvg.setBackgroundColor(c);
+			this.mg.setBackgroundColor(c);
 		}
 	}
 	
