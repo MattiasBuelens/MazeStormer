@@ -195,6 +195,8 @@ public class MainControl extends JFrame {
 		// INITIAL STATE
 		setFeedback(null);
 		setInitial();
+		
+		setControlPane(new ControlModePanel());
 	}
 	
 	IModelViewController getModelViewController(){

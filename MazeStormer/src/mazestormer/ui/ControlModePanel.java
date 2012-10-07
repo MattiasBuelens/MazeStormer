@@ -2,17 +2,20 @@ package mazestormer.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputMethodEvent;
-import java.awt.event.InputMethodListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import com.javarichclient.icon.tango.actions.*;
 
 /**
  * The manual control panel of the NXT.
@@ -43,38 +46,50 @@ public class ControlModePanel extends JPanel{
 		// -- BUTTONS --
 		JButton up = new JButton("");
 		up.setBounds(59,31,32,32);
-		up.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_up.png")));
+		up.setIcon(new GoUpIcon(32,32));
 		up.addActionListener(new ActionListener(){
 			@Override
             public void actionPerformed(ActionEvent e){ moveUp(); }
         });
+		up.registerKeyboardAction(up.getActionListeners()[0],
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0, false),  
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(up);
 		
 		JButton left = new JButton("");
 		left.setBounds(28,61,32,32);
-		left.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_left.png")));
+		left.setIcon(new GoPreviousIcon(32,32));
 		left.addActionListener(new ActionListener(){
 			@Override
             public void actionPerformed(ActionEvent e){ moveLeft(); }
         });
+		left.registerKeyboardAction(left.getActionListeners()[0],
+                KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, false),  
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(left);
 		
 		JButton right = new JButton("");
 		right.setBounds(90,61,32,32);
-		right.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_right.png")));
+		right.setIcon(new GoNextIcon(32,32));
 		right.addActionListener(new ActionListener(){
 			@Override
             public void actionPerformed(ActionEvent e){ moveRight(); }
         });
+		right.registerKeyboardAction(right.getActionListeners()[0],
+                KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false),  
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(right);
 		
 		JButton down = new JButton("");
 		down.setBounds(59,90,32,32);
-		down.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_down.png")));
+		down.setIcon(new GoDownIcon(32,32));
 		down.addActionListener(new ActionListener(){
 			@Override
             public void actionPerformed(ActionEvent e){ moveDown(); }
         });
+		down.registerKeyboardAction(down.getActionListeners()[0],
+                KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false),  
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(down);
 		
 		JButton clockwise = new JButton("");
@@ -174,13 +189,9 @@ public class ControlModePanel extends JPanel{
 		inputA = new JTextField();
 		inputA.setHorizontalAlignment(SwingConstants.CENTER);
 		inputA.setBounds(668, 18, 49, 20);
-		inputA.addInputMethodListener(new InputMethodListener(){
+		inputA.addActionListener(new ActionListener(){
 			@Override
-			public void inputMethodTextChanged(InputMethodEvent event){
-				changeSpeedThroughInput(Motor.A, inputA.getText());
-			}
-			@Override
-			public void caretPositionChanged(InputMethodEvent event){
+			public void actionPerformed(ActionEvent e) {
 				changeSpeedThroughInput(Motor.A, inputA.getText());
 			}
 		});
@@ -190,13 +201,9 @@ public class ControlModePanel extends JPanel{
 		inputB = new JTextField();
 		inputB.setHorizontalAlignment(SwingConstants.CENTER);
 		inputB.setBounds(668, 61, 49, 20);
-		inputB.addInputMethodListener(new InputMethodListener(){
+		inputB.addActionListener(new ActionListener(){
 			@Override
-			public void inputMethodTextChanged(InputMethodEvent event){
-				changeSpeedThroughInput(Motor.B, inputB.getText());
-			}
-			@Override
-			public void caretPositionChanged(InputMethodEvent event){
+			public void actionPerformed(ActionEvent e) {
 				changeSpeedThroughInput(Motor.B, inputB.getText());
 			}
 		});
@@ -206,13 +213,9 @@ public class ControlModePanel extends JPanel{
 		inputC = new JTextField();
 		inputC.setHorizontalAlignment(SwingConstants.CENTER);
 		inputC.setBounds(668, 102, 49, 20);
-		inputC.addInputMethodListener(new InputMethodListener(){
+		inputC.addActionListener(new ActionListener(){
 			@Override
-			public void inputMethodTextChanged(InputMethodEvent event){
-				changeSpeedThroughInput(Motor.C, inputC.getText());
-			}
-			@Override
-			public void caretPositionChanged(InputMethodEvent event){
+			public void actionPerformed(ActionEvent e) {
 				changeSpeedThroughInput(Motor.C, inputC.getText());
 			}
 		});
@@ -266,10 +269,18 @@ public class ControlModePanel extends JPanel{
 		textMotorC.setColumns(10);
 		textMotorC.setBounds(350, 102, 32, 20);
 		add(textMotorC);
+		
+		setInitial();
+	}
+	
+	private void setInitial(){
+		this.inputA.setText("");
+		this.inputB.setText("");
+		this.inputC.setText("");
 	}
 	
 	private void moveUp(){
-		
+		System.out.println("u");
 	}
 	
 	private void moveLeft(){
@@ -277,7 +288,7 @@ public class ControlModePanel extends JPanel{
 	}
 	
 	private void moveRight(){
-		
+		System.out.println("r");
 	}
 
 	private void moveDown(){
@@ -317,18 +328,25 @@ public class ControlModePanel extends JPanel{
 			this.currentC.setText(""+speed);
 	}
 	
-	private void changeSpeedThroughInput(Motor m, String input){
+	private void changeSpeedThroughInput(Motor m, String input){		
 		Integer s = changeToDigit(input);
-		int speed = 50;
-		if(s != null && s.intValue() >= sliderA.getMinimum() && s.intValue() <= sliderA.getMaximum())
+		int speed = 0;
+		boolean change = false;
+		if(s != null && s.intValue() >= sliderA.getMinimum() && s.intValue() <= sliderA.getMaximum()){
+			change = true;
 			speed = s.intValue();
+		}
 		
-		if(m == Motor.A)
-			this.sliderA.setValue(speed);
-		else if(m == Motor.B)
-			this.sliderB.setValue(speed);
-		else if(m == Motor.C)
-			this.sliderC.setValue(speed);
+		setInitial();
+		
+		if(change){
+			if(m == Motor.A)
+				this.sliderA.setValue(speed);
+			else if(m == Motor.B)
+				this.sliderB.setValue(speed);
+			else if(m == Motor.C)
+				this.sliderC.setValue(speed);
+		}
 	}
 	
 	private static Integer changeToDigit(String request) throws NullPointerException{
