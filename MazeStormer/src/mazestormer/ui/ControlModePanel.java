@@ -21,7 +21,7 @@ import javax.swing.event.ChangeListener;
 import com.javarichclient.icon.tango.actions.*;
 
 /**
- * The manual control panel of the NXT.
+ * The manual control mode panel of the NXT.
  * 
  * @author 	Team Bronze
  * @version	
@@ -171,6 +171,7 @@ public class ControlModePanel extends JPanel{
 		textMotorC.setBounds(350, 102, 50, 20);
 		add(textMotorC);
 		
+		// -- SPINNERS --
 		speedA = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
 		speedA.setBounds(412, 18, 50, 20);
 		speedA.addChangeListener(new ChangeListener(){
