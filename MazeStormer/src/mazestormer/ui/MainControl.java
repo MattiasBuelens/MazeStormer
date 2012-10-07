@@ -85,8 +85,9 @@ public class MainControl extends JFrame {
 		
 		JMenuItem mntmClose = new JMenuItem("Close");
 		mntmClose.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.CTRL_MASK));
-		mntmClose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { showClose(); }
+		mntmClose.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ showClose(); }
         });
 		mnGame.add(mntmClose);
 		
@@ -94,38 +95,43 @@ public class MainControl extends JFrame {
 		menuBar.add(mnOptions);
 		
 		JMenuItem mntmSound = new JMenuItem("Sound");
-		mntmSound.addActionListener(new ActionListener() {
-	           public void actionPerformed(ActionEvent e) { showSound(); }
-	        });
+		mntmSound.addActionListener(new ActionListener(){
+			@Override
+	          public void actionPerformed(ActionEvent e){ showSound(); }
+	    });
 		mnOptions.add(mntmSound);
 		
 		JSeparator separator_2 = new JSeparator();
 		mnOptions.add(separator_2);
 		
 		JMenuItem mntmTextColor = new JMenuItem("Text Color");
-		mntmTextColor.addActionListener(new ActionListener() {
-	           public void actionPerformed(ActionEvent e) { showTextColor(); }
-	        });
+		mntmTextColor.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){ showTextColor(); }
+	    });
 		mnOptions.add(mntmTextColor);
 		
 		JMenuItem mntmTextBackgroundColor = new JMenuItem("Text Background Color");
-		mntmTextBackgroundColor.addActionListener(new ActionListener() {
-	           public void actionPerformed(ActionEvent e) { showTextBackgroundColor(); }
-	        });
+		mntmTextBackgroundColor.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){ showTextBackgroundColor(); }
+	    });
 		mnOptions.add(mntmTextBackgroundColor);
 		
 		JMenuItem mntmBackgroundColor = new JMenuItem("Background Color");
-		mntmBackgroundColor.addActionListener(new ActionListener() {
-	           public void actionPerformed(ActionEvent e) { showBackgroundColor(); }
-	        });
+		mntmBackgroundColor.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){ showBackgroundColor(); }
+        });
 		mnOptions.add(mntmBackgroundColor);
 		
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 		
 		JMenuItem mntmManual = new JMenuItem("Manual");
-		mntmManual.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { showManual(); }
+		mntmManual.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ showManual(); }
         });
 		mnHelp.add(mntmManual);
 		
@@ -133,14 +139,16 @@ public class MainControl extends JFrame {
 		mnHelp.add(separator);
 		
 		JMenuItem mntmAboutRoborally = new JMenuItem("About MazeStormer");
-		mntmAboutRoborally.addActionListener(new ActionListener() {
+		mntmAboutRoborally.addActionListener(new ActionListener(){
+			@Override
             public void actionPerformed(ActionEvent e) { showAbout(); }
         });
 		mnHelp.add(mntmAboutRoborally);
 		
 		JMenuItem mntmCredits = new JMenuItem("Credits");
-		mntmCredits.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { showCredits(); }
+		mntmCredits.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ showCredits(); }
         });
 		mnHelp.add(mntmCredits);
 		
@@ -148,8 +156,9 @@ public class MainControl extends JFrame {
 		mnHelp.add(separator_3);
 		
 		JMenuItem mntmContact = new JMenuItem("Contact");
-		mntmContact.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { showContact(); }
+		mntmContact.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ showContact(); }
         });
 		mnHelp.add(mntmContact);
 		

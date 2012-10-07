@@ -2,15 +2,20 @@ package mazestormer.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.JCheckBox;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
- * The control panel of the NXT.
+ * The manual control panel of the NXT.
  * 
  * @author 	Team Bronze
  * @version	
@@ -19,6 +24,16 @@ import javax.swing.JCheckBox;
 public class ControlModePanel extends JPanel{
 
 	private static final long serialVersionUID = 15L;
+	
+	private JSlider sliderA;
+	private JSlider sliderB;
+	private JSlider sliderC;
+	private JTextField inputA;
+	private JTextField inputB;
+	private JTextField inputC;
+	private JTextField currentA;
+	private JTextField currentB;
+	private JTextField currentC;
 
 	public ControlModePanel(){
 		setLayout(null);
@@ -27,73 +42,230 @@ public class ControlModePanel extends JPanel{
 		
 		// -- BUTTONS --
 		JButton up = new JButton("");
-		up.setLocation(59, 31);
-		up.setSize(32, 32);
+		up.setBounds(59,31,32,32);
 		up.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_up.png")));
-		up.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { moveUp(); }
+		up.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ moveUp(); }
         });
 		add(up);
 		
 		JButton left = new JButton("");
-		left.setLocation(28, 61);
-		left.setSize(32, 32);
+		left.setBounds(28,61,32,32);
 		left.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_left.png")));
-		left.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { moveLeft(); }
+		left.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ moveLeft(); }
         });
 		add(left);
 		
 		JButton right = new JButton("");
-		right.setLocation(90, 61);
-		right.setSize(32, 32);
+		right.setBounds(90,61,32,32);
 		right.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_right.png")));
-		right.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { moveRight(); }
+		right.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ moveRight(); }
         });
 		add(right);
 		
 		JButton down = new JButton("");
-		down.setLocation(59, 90);
-		down.setSize(32, 32);
+		down.setBounds(59,90,32,32);
 		down.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/arrow_down.png")));
-		down.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { moveDown(); }
+		down.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ moveDown(); }
         });
 		add(down);
 		
 		JButton clockwise = new JButton("");
-		clockwise.setLocation(215, 31);
-		clockwise.setSize(32, 32);
+		clockwise.setBounds(215,31,32,32);
 		clockwise.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/Repeat_01.png")));
-		clockwise.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { turnClockwise(); }
+		clockwise.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ turnClockwise(); }
         });
 		add(clockwise);
 		
 		JButton counterClockwise = new JButton("");
-		counterClockwise.setLocation(171, 31);
-		counterClockwise.setSize(32, 32);
+		counterClockwise.setBounds(171,31,32,32);
 		counterClockwise.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/Repeat.png")));
-		counterClockwise.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) { turnCounterClockwise(); }
+		counterClockwise.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ turnCounterClockwise(); }
         });
 		add(counterClockwise);
 		
+		JButton ultraSonicSensor = new JButton("");
+		ultraSonicSensor.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/earth.png")));
+		ultraSonicSensor.setBounds(171, 75, 32, 32);
+		ultraSonicSensor.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ scanUltraSonicSensor(); }
+        });
+		add(ultraSonicSensor);
+		
+		JButton lightSensor = new JButton("");
+		lightSensor.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/object_15.png")));
+		lightSensor.setBounds(215, 75, 32, 32);
+		lightSensor.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ scanLightSensor(); }
+        });
+		add(lightSensor);
+		
+		JButton soundSensor = new JButton("");
+		soundSensor.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/music_01.png")));
+		soundSensor.setBounds(259, 75, 32, 32);
+		soundSensor.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ scanSoundSensor(); }
+        });
+		add(soundSensor);
+		
+		JButton action = new JButton("");
+		action.setIcon(new ImageIcon(ControlModePanel.class.getResource("/res/images/ui/star.png")));
+		action.setBounds(259, 31, 32, 32);
+		action.addActionListener(new ActionListener(){
+			@Override
+            public void actionPerformed(ActionEvent e){ showActions(); }
+        });
+		add(action);
+		
 		// -- SLIDERS --
-		JSlider sliderA = new JSlider();
+		sliderA = new JSlider();
+		sliderA.setPaintTicks(true);
+		sliderA.setPaintLabels(true);
+		sliderA.setMajorTickSpacing(50);
+		sliderA.setMinorTickSpacing(10);
 		sliderA.setToolTipText("");
-		sliderA.setBounds(445, 22, 200, 16);
+		sliderA.setBounds(445, 2, 200, 43);
+		sliderA.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.A, sliderA.getValue()); }
+		});
 		add(sliderA);
 		
-		JSlider sliderB = new JSlider();
+		sliderB = new JSlider();
+		sliderB.setMajorTickSpacing(50);
+		sliderB.setPaintLabels(true);
+		sliderB.setPaintTicks(true);
+		sliderB.setMinorTickSpacing(10);
 		sliderB.setToolTipText("");
-		sliderB.setBounds(445, 64, 200, 16);
+		sliderB.setBounds(445, 48, 200, 43);
+		sliderB.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.B, sliderB.getValue()); }
+		});
 		add(sliderB);
 		
-		JSlider sliderC = new JSlider();
-		sliderC.setBounds(445, 106, 200, 16);
+		sliderC = new JSlider();
+		sliderC.setMajorTickSpacing(50);
+		sliderC.setMinorTickSpacing(10);
+		sliderC.setPaintLabels(true);
+		sliderC.setPaintTicks(true);
+		sliderC.setBounds(445, 91, 200, 43);
+		sliderC.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.C, sliderC.getValue()); }
+		});
 		add(sliderC);
+		
+		// -- TEXTS --
+		inputA = new JTextField();
+		inputA.setHorizontalAlignment(SwingConstants.CENTER);
+		inputA.setBounds(668, 18, 49, 20);
+		inputA.addInputMethodListener(new InputMethodListener(){
+			@Override
+			public void inputMethodTextChanged(InputMethodEvent event){
+				changeSpeedThroughInput(Motor.A, inputA.getText());
+			}
+			@Override
+			public void caretPositionChanged(InputMethodEvent event){
+				changeSpeedThroughInput(Motor.A, inputA.getText());
+			}
+		});
+		add(inputA);
+		inputA.setColumns(10);
+		
+		inputB = new JTextField();
+		inputB.setHorizontalAlignment(SwingConstants.CENTER);
+		inputB.setBounds(668, 61, 49, 20);
+		inputB.addInputMethodListener(new InputMethodListener(){
+			@Override
+			public void inputMethodTextChanged(InputMethodEvent event){
+				changeSpeedThroughInput(Motor.B, inputB.getText());
+			}
+			@Override
+			public void caretPositionChanged(InputMethodEvent event){
+				changeSpeedThroughInput(Motor.B, inputB.getText());
+			}
+		});
+		add(inputB);
+		inputB.setColumns(10);
+		
+		inputC = new JTextField();
+		inputC.setHorizontalAlignment(SwingConstants.CENTER);
+		inputC.setBounds(668, 102, 49, 20);
+		inputC.addInputMethodListener(new InputMethodListener(){
+			@Override
+			public void inputMethodTextChanged(InputMethodEvent event){
+				changeSpeedThroughInput(Motor.C, inputC.getText());
+			}
+			@Override
+			public void caretPositionChanged(InputMethodEvent event){
+				changeSpeedThroughInput(Motor.C, inputC.getText());
+			}
+		});
+		add(inputC);
+		inputC.setColumns(10);
+		
+		currentA = new JTextField();
+		currentA.setHorizontalAlignment(SwingConstants.CENTER);
+		currentA.setText("50");
+		currentA.setEditable(false);
+		currentA.setColumns(10);
+		currentA.setBounds(394, 18, 49, 20);
+		add(currentA);
+		
+		currentB = new JTextField();
+		currentB.setHorizontalAlignment(SwingConstants.CENTER);
+		currentB.setText("50");
+		currentB.setEditable(false);
+		currentB.setColumns(10);
+		currentB.setBounds(394, 61, 49, 20);
+		add(currentB);
+		
+		currentC = new JTextField();
+		currentC.setHorizontalAlignment(SwingConstants.CENTER);
+		currentC.setText("50");
+		currentC.setEditable(false);
+		currentC.setColumns(10);
+		currentC.setBounds(394, 102, 49, 20);
+		add(currentC);
+		
+		JTextField textMotorA = new JTextField();
+		textMotorA.setHorizontalAlignment(SwingConstants.CENTER);
+		textMotorA.setEditable(false);
+		textMotorA.setText("A");
+		textMotorA.setColumns(10);
+		textMotorA.setBounds(350, 18, 32, 20);
+		add(textMotorA);
+		
+		JTextField textMotorB = new JTextField();
+		textMotorB.setHorizontalAlignment(SwingConstants.CENTER);
+		textMotorB.setEditable(false);
+		textMotorB.setText("B");
+		textMotorB.setColumns(10);
+		textMotorB.setBounds(350, 61, 32, 20);
+		add(textMotorB);
+		
+		JTextField textMotorC = new JTextField();
+		textMotorC.setHorizontalAlignment(SwingConstants.CENTER);
+		textMotorC.setEditable(false);
+		textMotorC.setText("C");
+		textMotorC.setColumns(10);
+		textMotorC.setBounds(350, 102, 32, 20);
+		add(textMotorC);
 	}
 	
 	private void moveUp(){
@@ -119,4 +291,57 @@ public class ControlModePanel extends JPanel{
 	private void turnCounterClockwise(){
 		
 	}
+	
+	private void scanUltraSonicSensor(){
+		
+	}
+	
+	private void scanLightSensor(){
+		
+	}
+	
+	private void scanSoundSensor(){
+		
+	}
+	
+	private void showActions(){
+		
+	}
+	
+	private void changeSpeedThroughSlider(Motor m, int speed){
+		if(m == Motor.A)
+			this.currentA.setText(""+speed);
+		else if(m == Motor.B)
+			this.currentB.setText(""+speed);
+		else if(m == Motor.C)
+			this.currentC.setText(""+speed);
+	}
+	
+	private void changeSpeedThroughInput(Motor m, String input){
+		Integer s = changeToDigit(input);
+		int speed = 50;
+		if(s != null && s.intValue() >= sliderA.getMinimum() && s.intValue() <= sliderA.getMaximum())
+			speed = s.intValue();
+		
+		if(m == Motor.A)
+			this.sliderA.setValue(speed);
+		else if(m == Motor.B)
+			this.sliderB.setValue(speed);
+		else if(m == Motor.C)
+			this.sliderC.setValue(speed);
+	}
+	
+	private static Integer changeToDigit(String request) throws NullPointerException{
+        if(request == null)
+        	throw new NullPointerException("The given request may not refer the null reference.");
+		String cleanedString = "";
+        for(int i=0; i<request.length(); i++){
+            char k = request.charAt(i);
+            if(Character.isDigit(k))
+                cleanedString += k;
+        }
+        if(cleanedString.length() == 0)
+          	return null;
+        return Integer.parseInt(cleanedString);
+    }
 }
