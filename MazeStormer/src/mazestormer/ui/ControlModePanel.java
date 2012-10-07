@@ -1,9 +1,11 @@
 package mazestormer.ui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -41,7 +43,7 @@ public class ControlModePanel extends JPanel{
 	public ControlModePanel(){
 		setLayout(null);
 		setBounds(10, 465, 832, 134);
-		
+		setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		
 		// -- BUTTONS --
 		JButton up = new JButton("");
@@ -166,7 +168,7 @@ public class ControlModePanel extends JPanel{
 		sliderB.setPaintTicks(true);
 		sliderB.setMinorTickSpacing(10);
 		sliderB.setToolTipText("");
-		sliderB.setBounds(445, 48, 200, 43);
+		sliderB.setBounds(445, 47, 200, 43);
 		sliderB.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.B, sliderB.getValue()); }
@@ -178,7 +180,7 @@ public class ControlModePanel extends JPanel{
 		sliderC.setMinorTickSpacing(10);
 		sliderC.setPaintLabels(true);
 		sliderC.setPaintTicks(true);
-		sliderC.setBounds(445, 91, 200, 43);
+		sliderC.setBounds(445, 90, 200, 43);
 		sliderC.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.C, sliderC.getValue()); }

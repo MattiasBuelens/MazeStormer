@@ -70,7 +70,7 @@ public class MainControl extends JFrame {
 		setResizable(false);
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 860, 648);
+		setBounds(100, 100, 860, 660);
 		setLocationRelativeTo(null);
 		
 		// MENU
