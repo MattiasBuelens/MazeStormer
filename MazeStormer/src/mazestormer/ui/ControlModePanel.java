@@ -10,9 +10,10 @@ import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -30,15 +31,12 @@ public class ControlModePanel extends JPanel{
 
 	private static final long serialVersionUID = 15L;
 	
-	private JSlider sliderA;
-	private JSlider sliderB;
-	private JSlider sliderC;
-	private JTextField inputA;
-	private JTextField inputB;
-	private JTextField inputC;
-	private JTextField currentA;
-	private JTextField currentB;
-	private JTextField currentC;
+	private static final int MOTOR_MIN = 0;
+	private static final int MOTOR_MAX = 100;
+	
+	private JSpinner speedA;
+	private JSpinner speedB;
+	private JSpinner speedC;
 
 	public ControlModePanel(){
 		setLayout(null);
@@ -54,7 +52,7 @@ public class ControlModePanel extends JPanel{
             public void actionPerformed(ActionEvent e){ moveUp(); }
         });
 		up.registerKeyboardAction(up.getActionListeners()[0],
-                KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0, false),  
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0, false),  
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(up);
 		
@@ -66,7 +64,7 @@ public class ControlModePanel extends JPanel{
             public void actionPerformed(ActionEvent e){ moveLeft(); }
         });
 		left.registerKeyboardAction(left.getActionListeners()[0],
-                KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, false),  
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0, false),  
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(left);
 		
@@ -78,7 +76,7 @@ public class ControlModePanel extends JPanel{
             public void actionPerformed(ActionEvent e){ moveRight(); }
         });
 		right.registerKeyboardAction(right.getActionListeners()[0],
-                KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false),  
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0, false),  
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(right);
 		
@@ -90,7 +88,7 @@ public class ControlModePanel extends JPanel{
             public void actionPerformed(ActionEvent e){ moveDown(); }
         });
 		down.registerKeyboardAction(down.getActionListeners()[0],
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false),  
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0, false),  
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(down);
 		
@@ -148,137 +146,54 @@ public class ControlModePanel extends JPanel{
         });
 		add(action);
 		
-		// -- SLIDERS --
-		sliderA = new JSlider();
-		sliderA.setPaintTicks(true);
-		sliderA.setPaintLabels(true);
-		sliderA.setMajorTickSpacing(50);
-		sliderA.setMinorTickSpacing(10);
-		sliderA.setToolTipText("");
-		sliderA.setBounds(445, 2, 200, 43);
-		sliderA.addChangeListener(new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.A, sliderA.getValue()); }
-		});
-		add(sliderA);
-		
-		sliderB = new JSlider();
-		sliderB.setMajorTickSpacing(50);
-		sliderB.setPaintLabels(true);
-		sliderB.setPaintTicks(true);
-		sliderB.setMinorTickSpacing(10);
-		sliderB.setToolTipText("");
-		sliderB.setBounds(445, 47, 200, 43);
-		sliderB.addChangeListener(new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.B, sliderB.getValue()); }
-		});
-		add(sliderB);
-		
-		sliderC = new JSlider();
-		sliderC.setMajorTickSpacing(50);
-		sliderC.setMinorTickSpacing(10);
-		sliderC.setPaintLabels(true);
-		sliderC.setPaintTicks(true);
-		sliderC.setBounds(445, 90, 200, 43);
-		sliderC.addChangeListener(new ChangeListener(){
-			@Override
-			public void stateChanged(ChangeEvent e) { changeSpeedThroughSlider(Motor.C, sliderC.getValue()); }
-		});
-		add(sliderC);
-		
 		// -- TEXTS --
-		inputA = new JTextField();
-		inputA.setHorizontalAlignment(SwingConstants.CENTER);
-		inputA.setBounds(668, 18, 49, 20);
-		inputA.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				changeSpeedThroughInput(Motor.A, inputA.getText());
-			}
-		});
-		add(inputA);
-		inputA.setColumns(10);
-		
-		inputB = new JTextField();
-		inputB.setHorizontalAlignment(SwingConstants.CENTER);
-		inputB.setBounds(668, 61, 49, 20);
-		inputB.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				changeSpeedThroughInput(Motor.B, inputB.getText());
-			}
-		});
-		add(inputB);
-		inputB.setColumns(10);
-		
-		inputC = new JTextField();
-		inputC.setHorizontalAlignment(SwingConstants.CENTER);
-		inputC.setBounds(668, 102, 49, 20);
-		inputC.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				changeSpeedThroughInput(Motor.C, inputC.getText());
-			}
-		});
-		add(inputC);
-		inputC.setColumns(10);
-		
-		currentA = new JTextField();
-		currentA.setHorizontalAlignment(SwingConstants.CENTER);
-		currentA.setText("50");
-		currentA.setEditable(false);
-		currentA.setColumns(10);
-		currentA.setBounds(394, 18, 49, 20);
-		add(currentA);
-		
-		currentB = new JTextField();
-		currentB.setHorizontalAlignment(SwingConstants.CENTER);
-		currentB.setText("50");
-		currentB.setEditable(false);
-		currentB.setColumns(10);
-		currentB.setBounds(394, 61, 49, 20);
-		add(currentB);
-		
-		currentC = new JTextField();
-		currentC.setHorizontalAlignment(SwingConstants.CENTER);
-		currentC.setText("50");
-		currentC.setEditable(false);
-		currentC.setColumns(10);
-		currentC.setBounds(394, 102, 49, 20);
-		add(currentC);
-		
 		JTextField textMotorA = new JTextField();
 		textMotorA.setHorizontalAlignment(SwingConstants.CENTER);
 		textMotorA.setEditable(false);
-		textMotorA.setText("A");
+		textMotorA.setText("Motor A");
 		textMotorA.setColumns(10);
-		textMotorA.setBounds(350, 18, 32, 20);
+		textMotorA.setBounds(350, 18, 50, 20);
 		add(textMotorA);
 		
 		JTextField textMotorB = new JTextField();
 		textMotorB.setHorizontalAlignment(SwingConstants.CENTER);
 		textMotorB.setEditable(false);
-		textMotorB.setText("B");
+		textMotorB.setText("Motor B");
 		textMotorB.setColumns(10);
-		textMotorB.setBounds(350, 61, 32, 20);
+		textMotorB.setBounds(350, 61, 50, 20);
 		add(textMotorB);
 		
 		JTextField textMotorC = new JTextField();
 		textMotorC.setHorizontalAlignment(SwingConstants.CENTER);
 		textMotorC.setEditable(false);
-		textMotorC.setText("C");
+		textMotorC.setText("Motor C");
 		textMotorC.setColumns(10);
-		textMotorC.setBounds(350, 102, 32, 20);
+		textMotorC.setBounds(350, 102, 50, 20);
 		add(textMotorC);
 		
-		setInitial();
-	}
-	
-	private void setInitial(){
-		this.inputA.setText("");
-		this.inputB.setText("");
-		this.inputC.setText("");
+		speedA = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
+		speedA.setBounds(412, 18, 50, 20);
+		speedA.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) { changeSpeed(Motor.A, ((Integer) speedA.getValue()).intValue()); }
+		});
+		add(speedA);
+		
+		speedB = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
+		speedB.setBounds(412, 61, 50, 20);
+		speedB.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) { changeSpeed(Motor.B, ((Integer) speedB.getValue()).intValue()); }
+		});
+		add(speedB);
+		
+		speedC = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
+		speedC.setBounds(412, 102, 50, 20);
+		speedC.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) { changeSpeed(Motor.C, ((Integer) speedC.getValue()).intValue()); }
+		});
+		add(speedC);
 	}
 	
 	private void moveUp(){
@@ -321,47 +236,6 @@ public class ControlModePanel extends JPanel{
 		
 	}
 	
-	private void changeSpeedThroughSlider(Motor m, int speed){
-		if(m == Motor.A)
-			this.currentA.setText(""+speed);
-		else if(m == Motor.B)
-			this.currentB.setText(""+speed);
-		else if(m == Motor.C)
-			this.currentC.setText(""+speed);
+	private void changeSpeed(Motor m, int input){
 	}
-	
-	private void changeSpeedThroughInput(Motor m, String input){		
-		Integer s = changeToDigit(input);
-		int speed = 0;
-		boolean change = false;
-		if(s != null && s.intValue() >= sliderA.getMinimum() && s.intValue() <= sliderA.getMaximum()){
-			change = true;
-			speed = s.intValue();
-		}
-		
-		setInitial();
-		
-		if(change){
-			if(m == Motor.A)
-				this.sliderA.setValue(speed);
-			else if(m == Motor.B)
-				this.sliderB.setValue(speed);
-			else if(m == Motor.C)
-				this.sliderC.setValue(speed);
-		}
-	}
-	
-	private static Integer changeToDigit(String request) throws NullPointerException{
-        if(request == null)
-        	throw new NullPointerException("The given request may not refer the null reference.");
-		String cleanedString = "";
-        for(int i=0; i<request.length(); i++){
-            char k = request.charAt(i);
-            if(Character.isDigit(k))
-                cleanedString += k;
-        }
-        if(cleanedString.length() == 0)
-          	return null;
-        return Integer.parseInt(cleanedString);
-    }
 }
