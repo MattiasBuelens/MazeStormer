@@ -26,7 +26,7 @@
   </class>  
   <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ControlModePanel" project="MazeStormer" 
     file="/MazeStormer/src/mazestormer/ui/ControlModePanel.java" binary="false">    
-    <position height="-1" width="-1" x="829" y="154"/>    
+    <position height="-1" width="-1" x="708" y="557"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="false"/>    
@@ -34,7 +34,7 @@
   </class>  
   <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.PolygonModePanel" project="MazeStormer" 
     file="/MazeStormer/src/mazestormer/ui/PolygonModePanel.java" binary="false">    
-    <position height="-1" width="-1" x="830" y="381"/>    
+    <position height="-1" width="-1" x="501" y="565"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="true" package="true" protected="true" private="false"/>    
@@ -56,70 +56,93 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <association id="8">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="9" name="mvc"/>      
-      <multiplicity id="10" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="7" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="11">    
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ModePanel" project="MazeStormer" 
+    file="/MazeStormer/src/mazestormer/ui/ModePanel.java" binary="false">    
+    <position height="-1" width="-1" x="601" y="372"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <association id="9">    
     <bendpoint x="450" y="275"/>    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="12" name="workPane">        
-        <position height="14" width="53" x="464" y="209"/>      
+      <attribute id="10" name="workPane">        
+        <position height="14" width="53" x="460" y="206"/>      
       </attribute>      
-      <multiplicity id="13" minimum="0" maximum="1"/>    
+      <multiplicity id="11" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="14">    
+  <generalization id="12">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="8"/>  
+  </generalization>  
+  <association id="13">    
+    <bendpoint x="323" y="372"/>    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="14" name="mc"/>      
+      <multiplicity id="15" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="16">    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="15" name="controlPane">        
+      <attribute id="17" name="controlPane">        
         <position height="14" width="61" x="365" y="194"/>      
       </attribute>      
-      <multiplicity id="16" minimum="0" maximum="1"/>    
+      <multiplicity id="18" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="17">    
-    <bendpoint x="321" y="85"/>    
-    <bendpoint x="435" y="126"/>    
+  <association id="19">    
+    <bendpoint x="332" y="154"/>    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="18" name="contentPane">        
-        <position height="14" width="64" x="364" y="88"/>      
-      </attribute>      
-      <multiplicity id="19" minimum="0" maximum="1"/>    
+      <attribute id="20" name="upperPane"/>      
+      <multiplicity id="21" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="20">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="2"/>  
-  </generalization>  
-  <generalization id="21">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="2"/>  
-  </generalization>  
   <generalization id="22">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="3"/>  
+    <bendpoint x="601" y="160"/>    
+    <bendpoint x="521" y="160"/>    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="2"/>  
   </generalization>  
-  <realization id="23">    
+  <generalization id="23">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="8"/>  
+  </generalization>  
+  <realization id="24">    
     <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="7"/>  
   </realization>  
-  <association id="24">    
-    <bendpoint x="332" y="154"/>    
+  <generalization id="25">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <association id="26">    
+    <bendpoint x="321" y="85"/>    
+    <bendpoint x="435" y="126"/>    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="25" name="upperPane"/>      
-      <multiplicity id="26" minimum="0" maximum="1"/>    
+      <attribute id="27" name="contentPane">        
+        <position height="14" width="64" x="364" y="88"/>      
+      </attribute>      
+      <multiplicity id="28" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="29">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="30" name="mvc"/>      
+      <multiplicity id="31" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 

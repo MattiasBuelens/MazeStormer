@@ -1,15 +1,12 @@
 package mazestormer.ui;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -27,7 +24,7 @@ import com.javarichclient.icon.tango.actions.*;
  * @version	
  *
  */
-public class ControlModePanel extends JPanel{
+public class ControlModePanel extends ModePanel{
 
 	private static final long serialVersionUID = 15L;
 	
@@ -38,10 +35,8 @@ public class ControlModePanel extends JPanel{
 	private JSpinner speedB;
 	private JSpinner speedC;
 
-	public ControlModePanel(){
-		setLayout(null);
-		setBounds(10, 465, 832, 134);
-		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+	public ControlModePanel(MainControl mainControl) throws NullPointerException{
+		super(mainControl);
 		
 		// -- BUTTONS --
 		JButton up = new JButton("");

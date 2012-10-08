@@ -1,16 +1,13 @@
 package mazestormer.ui;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 
-public class ConnectModePanel extends JPanel{
+public class ConnectModePanel extends ModePanel{
 	
 	private static final long serialVersionUID = 6293072438435084809L;
 	
@@ -25,10 +22,8 @@ public class ConnectModePanel extends JPanel{
 	/**
 	 * Create the panel.
 	 */
-	public ConnectModePanel() {
-		setLayout(null);
-		setBounds(10, 465, 832, 134);
-		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+	public ConnectModePanel(MainControl mainControl) throws NullPointerException{
+		super(mainControl);
 		
 		// -- BUTTONS --
 		this.searchButton = new JButton("Search");
@@ -69,6 +64,7 @@ public class ConnectModePanel extends JPanel{
 	}
 	
 	private void connect(){
+		
 	}
 	
 	private void showConnectList(){
