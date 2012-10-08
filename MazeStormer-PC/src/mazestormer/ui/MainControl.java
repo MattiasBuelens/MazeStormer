@@ -96,37 +96,6 @@ public class MainControl extends JFrame {
 		});
 		mnGame.add(mntmClose);
 
-		JMenu mnOptions = new JMenu("Options");
-		menuBar.add(mnOptions);
-
-		JMenuItem mntmTextColor = new JMenuItem("Text Color");
-		mntmTextColor.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showTextColor();
-			}
-		});
-		mnOptions.add(mntmTextColor);
-
-		JMenuItem mntmTextBackgroundColor = new JMenuItem(
-				"Text Background Color");
-		mntmTextBackgroundColor.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showTextBackgroundColor();
-			}
-		});
-		mnOptions.add(mntmTextBackgroundColor);
-
-		JMenuItem mntmBackgroundColor = new JMenuItem("Background Color");
-		mntmBackgroundColor.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showBackgroundColor();
-			}
-		});
-		mnOptions.add(mntmBackgroundColor);
-
 		JMenu mnTools = new JMenu("Tools");
 		menuBar.add(mnTools);
 
@@ -142,18 +111,6 @@ public class MainControl extends JFrame {
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 
-		JMenuItem mntmManual = new JMenuItem("Manual");
-		mntmManual.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showManual();
-			}
-		});
-		mnHelp.add(mntmManual);
-
-		JSeparator separator = new JSeparator();
-		mnHelp.add(separator);
-
 		JMenuItem mntmAboutRoborally = new JMenuItem("About MazeStormer");
 		mntmAboutRoborally.addActionListener(new ActionListener() {
 			@Override
@@ -162,27 +119,6 @@ public class MainControl extends JFrame {
 			}
 		});
 		mnHelp.add(mntmAboutRoborally);
-
-		JMenuItem mntmCredits = new JMenuItem("Credits");
-		mntmCredits.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showCredits();
-			}
-		});
-		mnHelp.add(mntmCredits);
-
-		JSeparator separator_3 = new JSeparator();
-		mnHelp.add(separator_3);
-
-		JMenuItem mntmContact = new JMenuItem("Contact");
-		mntmContact.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showContact();
-			}
-		});
-		mnHelp.add(mntmContact);
 
 		// CONTENT PANE
 		this.contentPane = new JPanel();
@@ -312,39 +248,6 @@ public class MainControl extends JFrame {
 
 	// -- HELP --
 
-	private void showCredits() {
-		String credits = "Default"; // TODO
-		setFeedback(credits);
-	}
-
-	private void showContact() {
-		int choice = JOptionPane.showConfirmDialog(
-				this,
-				"Do you want to open your mail client?",
-				"Contact",
-				0,
-				1,
-				new ImageIcon(MainControl.class
-						.getResource("/res/images/ui/email.png")));
-		if (choice == 0) {
-			Desktop desktop;
-			if (Desktop.isDesktopSupported()
-					&& (desktop = Desktop.getDesktop())
-							.isSupported(Desktop.Action.MAIL)) {
-				java.net.URI mailto;
-				try {
-					mailto = new java.net.URI(
-							"mailto:matthias.moulin@gmail.com?subject=MazeStormer");
-					desktop.mail(mailto);
-				} catch (java.net.URISyntaxException e) {
-					e.printStackTrace();
-				} catch (java.io.IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
 	private void showAbout() { // TODO
 		String about = "MazeStormer\n\n" + "Version: " + "Default Version"
 				+ "Author: " + "Team Bronze\n\n"
@@ -356,60 +259,5 @@ public class MainControl extends JFrame {
 				JOptionPane.INFORMATION_MESSAGE,
 				new ImageIcon(MainControl.class
 						.getResource("/res/images/ui/---.png")));
-	}
-
-	// -- OPTIONS --
-
-	private void showManual() {
-	}
-
-	private void showTextColor() {
-		Color c = showColor(this);
-		if (c != null) {
-			this.feedback.setForeground(c);
-			this.upperBar.setForeground(c);
-		}
-	}
-
-	private void showTextBackgroundColor() {
-		Color c = showColor(this);
-		if (c != null) {
-			this.feedback.setBackground(c);
-			this.upperPane.setBackground(c);
-		}
-	}
-
-	private void showBackgroundColor() {
-		Color c = showColor(this);
-		if (c != null)
-			this.contentPane.setBackground(c);
-	}
-
-	static Color showColor(Component parent) {
-		Color[] colors = { Color.BLACK, Color.BLUE, Color.CYAN,
-				Color.DARK_GRAY, Color.GRAY, Color.GREEN, Color.LIGHT_GRAY,
-				Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED,
-				Color.WHITE, Color.YELLOW };
-		String[] possibleValues = { "Black", "Blue", "Cyan", "Dark Grey",
-				"Gray", "Green", "Light Gray", "Magenta", "Orange", "Pink",
-				"Red", "White", "Yellow" };
-		assert (colors.length != possibleValues.length);
-		Object selectedValue = JOptionPane.showInputDialog(
-				parent,
-				"Select a color:",
-				"Color",
-				JOptionPane.INFORMATION_MESSAGE,
-				new ImageIcon(MainControl.class
-						.getResource("/res/images/ui/question.png")),
-				possibleValues, possibleValues[0]);
-
-		if (selectedValue == null)
-			return null;
-
-		int i = 0;
-		for (; i < possibleValues.length; i++)
-			if (possibleValues[i].equals((String) selectedValue))
-				break;
-		return colors[i];
 	}
 }
