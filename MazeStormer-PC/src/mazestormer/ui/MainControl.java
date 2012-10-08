@@ -99,18 +99,6 @@ public class MainControl extends JFrame {
 		JMenu mnOptions = new JMenu("Options");
 		menuBar.add(mnOptions);
 
-		JMenuItem mntmSound = new JMenuItem("Sound");
-		mntmSound.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				showSound();
-			}
-		});
-		mnOptions.add(mntmSound);
-
-		JSeparator separator_2 = new JSeparator();
-		mnOptions.add(separator_2);
-
 		JMenuItem mntmTextColor = new JMenuItem("Text Color");
 		mntmTextColor.addActionListener(new ActionListener() {
 			@Override
@@ -242,10 +230,11 @@ public class MainControl extends JFrame {
 		setControlPane(new ConnectModePanel(this));
 	}
 
-	void setWorkPane(ModePanel panel) throws NullPointerException{
+	void setWorkPane(ModePanel panel) throws NullPointerException {
 		if (panel == null)
-			throw new NullPointerException("The work pane may not refer the null reference.");
-		if(this.controlPane != null)
+			throw new NullPointerException(
+					"The work pane may not refer the null reference.");
+		if (this.controlPane != null)
 			this.contentPane.remove(this.controlPane);
 		this.workPane = panel;
 		this.workPane.setBounds(10, 26, 548, 529);
@@ -253,10 +242,11 @@ public class MainControl extends JFrame {
 		repaint();
 	}
 
-	void setControlPane(ModePanel panel) throws NullPointerException{
+	void setControlPane(ModePanel panel) throws NullPointerException {
 		if (panel == null)
-			throw new NullPointerException("The control pane may not refer the null reference.");
-		if(this.controlPane != null)
+			throw new NullPointerException(
+					"The control pane may not refer the null reference.");
+		if (this.controlPane != null)
 			this.contentPane.remove(this.controlPane);
 		this.controlPane = panel;
 		this.controlPane.setBounds(10, 465, 832, 134);
@@ -264,19 +254,19 @@ public class MainControl extends JFrame {
 		repaint();
 	}
 
-	void setUpperBar(String msg){
+	void setUpperBar(String msg) {
 		this.upperBar.setText(msg);
 	}
 
-	void setFeedback(String msg){
+	void setFeedback(String msg) {
 		this.feedback.setText(msg);
 	}
 
-	void addFeeback(String msg){
+	void addFeeback(String msg) {
 		this.feedback.append(msg);
 	}
 
-	private void updateFeedback(){
+	private void updateFeedback() {
 		if (getModelViewController().getFeedback() != null)
 			setFeedback(getModelViewController().getFeedback());
 	}
@@ -284,7 +274,14 @@ public class MainControl extends JFrame {
 	// -- FILE --
 
 	private void showClose() {
-		int choice = JOptionPane.showConfirmDialog(this,"Are you sure you want to quit MazeStormer?","Close",0,1,new ImageIcon(MainControl.class.getResource("/res/images/ui/close.png")));
+		int choice = JOptionPane.showConfirmDialog(
+				this,
+				"Are you sure you want to quit MazeStormer?",
+				"Close",
+				0,
+				1,
+				new ImageIcon(MainControl.class
+						.getResource("/res/images/ui/close.png")));
 		if (choice == 0) {
 			setVisible(false);
 			dispose();
@@ -295,7 +292,14 @@ public class MainControl extends JFrame {
 
 	private void showModes() {
 		Object[] possibleValues = { "Connect", "Control", "Polygon" };
-		Object selectedValue = JOptionPane.showInputDialog(this,"Select a mode:","Modes",JOptionPane.INFORMATION_MESSAGE,new ImageIcon(MainControl.class.getResource("/res/images/ui/flag.png")),possibleValues, possibleValues[0]);
+		Object selectedValue = JOptionPane.showInputDialog(
+				this,
+				"Select a mode:",
+				"Modes",
+				JOptionPane.INFORMATION_MESSAGE,
+				new ImageIcon(MainControl.class
+						.getResource("/res/images/ui/flag.png")),
+				possibleValues, possibleValues[0]);
 		if (selectedValue != null) {
 			if (selectedValue.equals("Connect"))
 				setControlPane(new ConnectModePanel(this));
@@ -314,10 +318,19 @@ public class MainControl extends JFrame {
 	}
 
 	private void showContact() {
-		int choice = JOptionPane.showConfirmDialog(this,"Do you want to open your mail client?","Contact",0,1,new ImageIcon(MainControl.class.getResource("/res/images/ui/email.png")));
-		if(choice == 0) {
+		int choice = JOptionPane.showConfirmDialog(
+				this,
+				"Do you want to open your mail client?",
+				"Contact",
+				0,
+				1,
+				new ImageIcon(MainControl.class
+						.getResource("/res/images/ui/email.png")));
+		if (choice == 0) {
 			Desktop desktop;
-			if(Desktop.isDesktopSupported() && (desktop = Desktop.getDesktop()).isSupported(Desktop.Action.MAIL)) {
+			if (Desktop.isDesktopSupported()
+					&& (desktop = Desktop.getDesktop())
+							.isSupported(Desktop.Action.MAIL)) {
 				java.net.URI mailto;
 				try {
 					mailto = new java.net.URI(
@@ -336,23 +349,18 @@ public class MainControl extends JFrame {
 		String about = "MazeStormer\n\n" + "Version: " + "Default Version"
 				+ "Author: " + "Team Bronze\n\n"
 				+ "(c) Copyright Team Bronze.\n" + "All rights reserved.";
-		JOptionPane.showMessageDialog(this,about,"About MazeStormer",JOptionPane.INFORMATION_MESSAGE,new ImageIcon(MainControl.class.getResource("/res/images/ui/---.png")));
+		JOptionPane.showMessageDialog(
+				this,
+				about,
+				"About MazeStormer",
+				JOptionPane.INFORMATION_MESSAGE,
+				new ImageIcon(MainControl.class
+						.getResource("/res/images/ui/---.png")));
 	}
 
 	// -- OPTIONS --
 
 	private void showManual() {
-	}
-
-	private void showSound() {
-		int choice = JOptionPane.showConfirmDialog(this,"Do you want to turn on the sound?","Sound",0,1,new ImageIcon(MainControl.class.getResource("/res/images/ui/music.png")));
-		if (choice == 0)
-			UISound.setEnable(true);
-		else
-			UISound.setEnable(false);
-
-		// TODO: TEMPORARY
-		UISound.playIntroSound();
 	}
 
 	private void showTextColor() {
@@ -378,10 +386,22 @@ public class MainControl extends JFrame {
 	}
 
 	static Color showColor(Component parent) {
-		Color[] colors = { Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_GRAY, Color.GRAY, Color.GREEN, Color.LIGHT_GRAY, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED, Color.WHITE, Color.YELLOW };
-		String[] possibleValues = { "Black", "Blue", "Cyan", "Dark Grey", "Gray", "Green", "Light Gray", "Magenta", "Orange", "Pink", "Red", "White", "Yellow" };
+		Color[] colors = { Color.BLACK, Color.BLUE, Color.CYAN,
+				Color.DARK_GRAY, Color.GRAY, Color.GREEN, Color.LIGHT_GRAY,
+				Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED,
+				Color.WHITE, Color.YELLOW };
+		String[] possibleValues = { "Black", "Blue", "Cyan", "Dark Grey",
+				"Gray", "Green", "Light Gray", "Magenta", "Orange", "Pink",
+				"Red", "White", "Yellow" };
 		assert (colors.length != possibleValues.length);
-		Object selectedValue = JOptionPane.showInputDialog(parent, "Select a color:", "Color", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(MainControl.class.getResource("/res/images/ui/question.png")), possibleValues, possibleValues[0]);
+		Object selectedValue = JOptionPane.showInputDialog(
+				parent,
+				"Select a color:",
+				"Color",
+				JOptionPane.INFORMATION_MESSAGE,
+				new ImageIcon(MainControl.class
+						.getResource("/res/images/ui/question.png")),
+				possibleValues, possibleValues[0]);
 
 		if (selectedValue == null)
 			return null;
