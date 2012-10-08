@@ -196,7 +196,7 @@ public class MainControl extends JFrame {
 		setFeedback(null);
 		setInitial();
 		
-		setControlPane(new PolygonModePanel());
+		setControlPane(new ConnectModePanel());
 	}
 	
 	IModelViewController getModelViewController(){

@@ -172,29 +172,29 @@ public class ControlModePanel extends JPanel{
 		add(textMotorC);
 		
 		// -- SPINNERS --
-		speedA = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
-		speedA.setBounds(412, 18, 50, 20);
-		speedA.addChangeListener(new ChangeListener(){
+		this.speedA = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
+		this.speedA.setBounds(412, 18, 50, 20);
+		this.speedA.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) { changeSpeed(Motor.A, ((Integer) speedA.getValue()).intValue()); }
 		});
-		add(speedA);
+		add(this.speedA);
 		
-		speedB = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
-		speedB.setBounds(412, 61, 50, 20);
-		speedB.addChangeListener(new ChangeListener(){
+		this.speedB = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
+		this.speedB.setBounds(412, 61, 50, 20);
+		this.speedB.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) { changeSpeed(Motor.B, ((Integer) speedB.getValue()).intValue()); }
 		});
-		add(speedB);
+		add(this.speedB);
 		
-		speedC = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
-		speedC.setBounds(412, 102, 50, 20);
-		speedC.addChangeListener(new ChangeListener(){
+		this.speedC = new JSpinner(new SpinnerNumberModel(50,MOTOR_MIN,MOTOR_MAX,1));
+		this.speedC.setBounds(412, 102, 50, 20);
+		this.speedC.addChangeListener(new ChangeListener(){
 			@Override
 			public void stateChanged(ChangeEvent e) { changeSpeed(Motor.C, ((Integer) speedC.getValue()).intValue()); }
 		});
-		add(speedC);
+		add(this.speedC);
 	}
 	
 	private void moveUp(){

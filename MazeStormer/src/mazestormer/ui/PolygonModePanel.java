@@ -41,7 +41,7 @@ public class PolygonModePanel extends JPanel{
 		
 		// -- TEXT FIELDS --
 		this.polygonSide = new JTextField();
-		polygonSide.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.polygonSide.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.polygonSide.setBounds(84, 24, 50, 20);
 		this.polygonSide.addActionListener(new ActionListener(){
 			@Override
@@ -52,7 +52,7 @@ public class PolygonModePanel extends JPanel{
 		add(this.polygonSide);
 		
 		this.polygonAngle = new JTextField();
-		polygonAngle.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.polygonAngle.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.polygonAngle.setBounds(84, 55, 50, 20);
 		this.polygonAngle.addActionListener(new ActionListener(){
 			@Override
@@ -63,7 +63,7 @@ public class PolygonModePanel extends JPanel{
 		add(this.polygonAngle);
 		
 		this.turnsField = new JTextField();
-		turnsField.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.turnsField.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.turnsField.setBounds(84, 86, 50, 20);
 		this.turnsField.addActionListener(new ActionListener(){
 			@Override
@@ -93,23 +93,23 @@ public class PolygonModePanel extends JPanel{
 		add(turnsLabel);
 		
 		// -- BUTTONS --
-		playButton = new JButton("");
-		playButton.setBounds(161, 24, 32, 32);
-		playButton.setIcon(new MediaPlaybackStartIcon(32,32));
-		playButton.addActionListener(new ActionListener(){
+		this.playButton = new JButton("");
+		this.playButton.setBounds(161, 24, 32, 32);
+		this.playButton.setIcon(new MediaPlaybackStartIcon(32,32));
+		this.playButton.addActionListener(new ActionListener(){
 			@Override
             public void actionPerformed(ActionEvent e){ play(); }
         });
-		add(playButton);
+		add(this.playButton);
 		
-		stopButton = new JButton("");
-		stopButton.setBounds(200, 24, 32, 32);
-		stopButton.setIcon(new MediaPlaybackStopIcon(32,32));
-		stopButton.addActionListener(new ActionListener(){
+		this.stopButton = new JButton("");
+		this.stopButton.setBounds(200, 24, 32, 32);
+		this.stopButton.setIcon(new MediaPlaybackStopIcon(32,32));
+		this.stopButton.addActionListener(new ActionListener(){
 			@Override
             public void actionPerformed(ActionEvent e){ stop(); }
         });
-		add(stopButton);
+		add(this.stopButton);
 		
 		setInitial();
 	}
@@ -118,6 +118,14 @@ public class PolygonModePanel extends JPanel{
 		this.polygonSide.setText(""+0);
 		this.polygonAngle.setText(""+0);
 		this.turnsField.setText(""+0);
+		this.stopButton.setVisible(false);
+		setTextFieldsEnabled(true);
+	}
+	
+	private void setTextFieldsEnabled(boolean request){
+		this.polygonSide.setEnabled(request);
+		this.polygonAngle.setEnabled(request);
+		this.turnsField.setEnabled(request);
 	}
 	
 	private void setPolygonSide(String input){
@@ -164,16 +172,10 @@ public class PolygonModePanel extends JPanel{
 	
 	private void play(){
 		setTextFieldsEnabled(false);
+		this.stopButton.setVisible(true);
 	}
 	
 	private void stop(){
-		setTextFieldsEnabled(true);
 		setInitial();
-	}
-	
-	private void setTextFieldsEnabled(boolean request){
-		this.polygonSide.setEnabled(request);
-		this.polygonAngle.setEnabled(request);
-		this.turnsField.setEnabled(request);
 	}
 }
