@@ -22,8 +22,8 @@ public abstract class ModePanel extends JPanel{
 	
 	@Model @Raw
 	protected ModePanel(MainControl mainControl) throws NullPointerException{
-		if(mainControl == null)
-			throw new NullPointerException("The given main control may not refer the null reference.");
+		//if(mainControl == null)
+		//	throw new NullPointerException("The given main control may not refer the null reference.");
 		setLayout(null);
 		setBounds(10, 465, 832, 134);
 		setBorder(BorderFactory.createLineBorder(Color.BLACK));

@@ -229,8 +229,6 @@ public class MainControl extends JFrame {
 		// INITIAL STATE
 		setFeedback(null);
 		setInitial();
-
-		setControlPane(new ConnectModePanel(this));
 	}
 
 	IModelViewController getModelViewController() {
@@ -240,8 +238,8 @@ public class MainControl extends JFrame {
 	// -- STATE --
 
 	private void setInitial() {
-		// TODO panes
 		setUpperBar(null);
+		setControlPane(new ConnectModePanel(this));
 	}
 
 	void setWorkPane(ModePanel panel) throws NullPointerException{
