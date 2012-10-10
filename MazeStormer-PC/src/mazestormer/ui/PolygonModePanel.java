@@ -56,7 +56,7 @@ public class PolygonModePanel extends ModePanel{
 		add(this.turnsField);
 		
 		// -- NOT EDITABLE TEXT FIELDS --
-		JTextField sideLabel = new JTextField("Sidelength [cm]:");
+		JTextField sideLabel = new JTextField("Side length [cm]:");
 		sideLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		sideLabel.setEditable(false);
 		sideLabel.setBounds(12, 24, 107, 20);
