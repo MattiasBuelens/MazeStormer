@@ -1,16 +1,21 @@
 package mazestormer.nxt;
 
-import mazestormer.nxt.model.Communicator;
+import lejos.nxt.comm.RConsole;
 
 public class Program {
 
 	public static void main(String[] args) {
-		// Start communicator
-		Communicator communicator = new Communicator();
-		communicator.startListening();
+		// Initiate remote console
+		RConsole.openAny(5000);
+		if (!RConsole.isOpen())
+			return;
 
-		// Close connection
-		// connection.close();
+		// Do stuff here
+		// You can send log messages such as:
+		RConsole.println("Hello from the NXT!");
+		
+		RConsole.close();
+
 	}
 
 }
