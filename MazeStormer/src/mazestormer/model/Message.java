@@ -1,4 +1,4 @@
-package mazestormer.comm;
+package mazestormer.model;
 
 import java.util.HashMap;
 import java.util.Map;

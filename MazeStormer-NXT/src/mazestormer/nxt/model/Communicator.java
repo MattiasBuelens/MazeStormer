@@ -1,9 +1,9 @@
-package mazestormer.nxt.comm;
+package mazestormer.nxt.model;
 
 import java.io.*;
 
 import lejos.nxt.comm.*;
-import mazestormer.comm.Message;
+import mazestormer.model.Message;
 
 public class Communicator implements Runnable {
 

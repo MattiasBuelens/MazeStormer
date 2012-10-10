@@ -1,6 +1,6 @@
 package mazestormer.nxt;
 
-import mazestormer.nxt.comm.Communicator;
+import mazestormer.nxt.model.Communicator;
 
 public class Program {
 
