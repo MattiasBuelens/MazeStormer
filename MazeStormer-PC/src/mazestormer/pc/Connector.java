@@ -8,6 +8,11 @@ import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTCommandConnector;
 import lejos.pc.comm.NXTConnector;
 
+/**
+ * 
+ * @author	Team Bronze
+ *
+ */
 public class Connector {
 
 	private static NXTComm comm;
