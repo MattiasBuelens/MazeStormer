@@ -33,7 +33,7 @@ public class PolygonConsolePanel extends ConsolePanel{
 
 	public PolygonConsolePanel(MainControl mainControl) throws NullPointerException{
 		super(mainControl);
-		setLayout(new MigLayout("", "[][]", "[][][][]"));
+		setLayout(new MigLayout("", "", ""));
 		initiateComponents();
 	}
 	
