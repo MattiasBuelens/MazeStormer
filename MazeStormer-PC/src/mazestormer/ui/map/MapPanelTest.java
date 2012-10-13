@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 
 public class MapPanelTest {
 
-	private JFrame frmMappaneltest;
+	private JFrame frame;
 
 	/**
 	 * Launch the application.
@@ -17,7 +17,7 @@ public class MapPanelTest {
 			public void run() {
 				try {
 					MapPanelTest window = new MapPanelTest();
-					window.frmMappaneltest.setVisible(true);
+					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -36,14 +36,14 @@ public class MapPanelTest {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frmMappaneltest = new JFrame();
-		frmMappaneltest.setTitle("MapPanelTest");
-		frmMappaneltest.setBounds(100, 100, 450, 300);
-		frmMappaneltest.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmMappaneltest.getContentPane().setLayout(new BorderLayout(0, 0));
+		frame = new JFrame();
+		frame.setTitle("MapPanelTest");
+		frame.setBounds(100, 100, 559, 485);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
 		MapPanel map = new MapPanel();
-		frmMappaneltest.getContentPane().add(map, BorderLayout.CENTER);
+		frame.getContentPane().add(map, BorderLayout.CENTER);
 	}
 
 }

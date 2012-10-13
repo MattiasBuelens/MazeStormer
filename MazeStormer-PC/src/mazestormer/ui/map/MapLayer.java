@@ -2,19 +2,54 @@ package mazestormer.ui.map;
 
 import java.util.Comparator;
 
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.apache.batik.dom.AbstractDocument;
+import org.w3c.dom.Element;
 
-public interface MapLayer {
+public abstract class MapLayer {
 
-	public int getZIndex();
+	public MapLayer() {
+		setVisible(true);
+	}
 
-	public Node build(Document document);
+	private Element element;
+	private boolean isVisible;
 
-	public void render(SVGGraphics2D engine);
+	protected Element getElement() {
+		return element;
+	}
 
-	public class ZIndexComparator implements Comparator<MapLayer> {
+	private void setElement(Element element) {
+		this.element = element;
+	}
+
+	public boolean isVisible() {
+		return isVisible;
+	}
+
+	public void setVisible(boolean visible) {
+		this.isVisible = visible;
+		update();
+	}
+
+	protected void update() {
+		Element element = getElement();
+		if (element != null) {
+			element.setAttributeNS(null, "display", isVisible() ? "inline"
+					: "none");
+		}
+	}
+
+	public Element build(AbstractDocument document) {
+		setElement(create(document));
+		update();
+		return getElement();
+	}
+
+	protected abstract Element create(AbstractDocument document);
+
+	public abstract int getZIndex();
+
+	public static class ZIndexComparator implements Comparator<MapLayer> {
 
 		@Override
 		public int compare(MapLayer left, MapLayer right) {

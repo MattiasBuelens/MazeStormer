@@ -9,33 +9,31 @@ import org.apache.batik.bridge.UserAgent;
 import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.svg.SVGDocument;
 
 public class SVGUtils {
 
-	public static final Document createSVGDocument() {
+	public static final SVGDocument createSVGDocument() {
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-		return impl.createDocument(svgNS, "svg", null);
+		return (SVGDocument) impl.createDocument(svgNS, "svg", null);
 	}
 
-	public static final Element loadSVGDocument(String svgUrl) {
+	public static final SVGDocument loadSVGDocument(String svgUrl) {
 		UserAgent ua = new UserAgentAdapter();
 		DocumentLoader loader = new DocumentLoader(ua);
 		try {
-			Document doc = loader.loadDocument(svgUrl);
-			return doc.getDocumentElement();
+			return (SVGDocument) loader.loadDocument(svgUrl);
 		} catch (IOException e) {
 			return null;
 		}
 	}
 
-	public static final Element loadSVGDocument(URI svgUri) {
+	public static final SVGDocument loadSVGDocument(URI svgUri) {
 		return loadSVGDocument(svgUri.toString());
 	}
 
-	public static final Element loadSVGDocument(URL svgUrl) {
+	public static final SVGDocument loadSVGDocument(URL svgUrl) {
 		return loadSVGDocument(svgUrl.toExternalForm());
 	}
 

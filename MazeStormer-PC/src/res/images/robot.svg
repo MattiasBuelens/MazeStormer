@@ -5,8 +5,7 @@
 ]>
 <svg version="1.1"
 	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
-	 x="0px" y="0px" width="490px" height="700px" viewBox="-37 -22 490 700" enable-background="new -37 -22 490 700"
-	 xml:space="preserve">
+	 x="0px" y="0px" width="420px" height="654px" viewBox="0 0 420 654" enable-background="new 0 0 420 654" xml:space="preserve">
 <defs>
 </defs>
 <linearGradient id="Back_2_" gradientUnits="userSpaceOnUse" x1="12" y1="327" x2="410" y2="327">
@@ -29,8 +28,12 @@
 	V123c0-6.627-5.373-12-12-12H86c-6.627,0-12,5.373-12,12v157c0,6.627,5.373,12,12,12h120v54c0,0,0.333,6-5,6s-17,0-17,0
 	c-6.627,0-12,5.373-12,12v109c0,6.627,5.373,12,12,12h49c6.627,0,12-5.373,12-12V364c0-6.627-5.373-12-12-12c0,0-10,0-16,0
 	c-5,0-5-6-5-6V292z"/>
-<path id="Screen_2_" fill="#82996B" stroke="#333333" stroke-width="4" stroke-miterlimit="10" d="M333,273c0,6.627-5.373,12-12,12
-	H95c-6.627,0-12-5.373-12-12V132c0-6.627,5.373-12,12-12h226c6.627,0,12,5.373,12,12V273z"/>
+<linearGradient id="Screen_3_" gradientUnits="userSpaceOnUse" x1="208.0005" y1="285" x2="208.0005" y2="120">
+	<stop  offset="0.75" style="stop-color:#82996B"/>
+	<stop  offset="1" style="stop-color:#ADCC8F"/>
+</linearGradient>
+<path id="Screen_2_" fill="url(#Screen_3_)" stroke="#333333" stroke-width="4" stroke-miterlimit="10" d="M333,273
+	c0,6.627-5.373,12-12,12H95c-6.627,0-12-5.373-12-12V132c0-6.627,5.373-12,12-12h226c6.627,0,12,5.373,12,12V273z"/>
 <g id="Inset_4_">
 	<path fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" d="M155,415.667c0,8.25-5.596,11.625-12.74,7.5
 		l-48.002-27.786c-7.145-4.125-7.082-10.875,0.063-15l47.909-27.786c7.145-4.125,12.771-0.75,12.771,7.5V415.667z"/>

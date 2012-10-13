@@ -1,80 +1,83 @@
 package mazestormer.ui.map;
 
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+
 import org.apache.batik.swing.JSVGCanvas;
-import org.apache.batik.swing.svg.SVGLoadEventDispatcherEvent;
-import org.apache.batik.swing.svg.SVGLoadEventDispatcherListener;
-import org.w3c.dom.Node;
-import org.w3c.dom.svg.SVGDocument;
+import org.apache.batik.swing.gvt.AbstractPanInteractor;
+import org.apache.batik.swing.gvt.Interactor;
 
-public class MapCanvas extends JSVGCanvas implements
-		SVGLoadEventDispatcherListener {
+public class MapCanvas extends JSVGCanvas {
 
-	private MapDocument document;
+	private static final long serialVersionUID = 1L;
 
 	public MapCanvas() {
-		this(new MapDocument());
+		setupInteractors();
 	}
 
-	public MapCanvas(MapDocument document) {
-		super();
-		setDocumentState(ALWAYS_DYNAMIC);
-		addSVGLoadEventDispatcherListener(this);
-		
-		this.document = document;
-		setSVGDocument(document.build());
+	private void setupInteractors() {
+		// Disable default interactors
+		setEnableImageZoomInteractor(false);
+		setEnablePanInteractor(false);
+		setEnableRotateInteractor(false);
+		setEnableResetTransformInteractor(false);
+
+		// Add interactors
+		addInteractor(new PanInteractor());
+		addMouseWheelListener(new ZoomListener());
 	}
 
-	/**
-	 * Indicates whether the canvas has finished its first render and is ready
-	 * for modification of the DOM.
-	 */
-	private boolean isReadyForModification = false;
+	@SuppressWarnings("unchecked")
+	private void addInteractor(Interactor interactor) {
+		getInteractors().add(interactor);
+	}
 
-	/**
-	 * Renew the document by replacing the root node with the one of the new
-	 * document.
-	 * 
-	 * @param doc
-	 *            The new document.
-	 */
-	public void renewDocument(final SVGDocument doc) {
-		if (isReadyForModification) {
-			getUpdateManager().getUpdateRunnableQueue().invokeLater(
-					new Runnable() {
-						@Override
-						public void run() {
-							// Get the root tags of the documents
-							Node oldRoot = getSVGDocument().getFirstChild();
-							Node newRoot = doc.getFirstChild();
-
-							// Make the new node suitable for the old
-							// document
-							newRoot = getSVGDocument()
-									.importNode(newRoot, true);
-
-							// Replace the nodes
-							getSVGDocument().replaceChild(newRoot, oldRoot);
-						}
-					});
-		} else {
-			setSVGDocument(doc);
+	private class PanInteractor extends AbstractPanInteractor {
+		@Override
+		public boolean startInteraction(InputEvent ie) {
+			int mods = ie.getModifiers();
+			boolean res = ie.getID() == MouseEvent.MOUSE_PRESSED
+					&& (mods & InputEvent.BUTTON1_MASK) != 0;
+			return res;
 		}
 	}
 
-	@Override
-	public void svgLoadEventDispatchStarted(SVGLoadEventDispatcherEvent e) {
+	private class ZoomListener implements MouseWheelListener {
+
+		private static final float defaultScaleFactor = 1.25f;
+		private static final int scaleLimit = 1 << 10;
+		private float scaleFactor;
+
+		public ZoomListener(float scaleFactor) {
+			this.scaleFactor = scaleFactor;
+		}
+
+		public ZoomListener() {
+			this(defaultScaleFactor);
+		}
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent ev) {
+			double scale = (ev.getWheelRotation() < 0) ? scaleFactor
+					: 1.0f / scaleFactor;
+
+			AffineTransform rat = getRenderingTransform();
+			double dx = -ev.getX() * (scale - 1.0);
+			double dy = -ev.getY() * (scale - 1.0);
+
+			AffineTransform at = new AffineTransform();
+			at.translate(dx, dy);
+			at.scale(scale, scale);
+			at.concatenate(rat);
+
+			if (at.getScaleX() <= scaleLimit
+					&& 1 <= at.getScaleX() * scaleLimit) {
+				setRenderingTransform(at);
+			}
+		}
 	}
 
-	@Override
-	public void svgLoadEventDispatchCompleted(SVGLoadEventDispatcherEvent e) {
-		isReadyForModification = true;
-	}
-
-	@Override
-	public void svgLoadEventDispatchCancelled(SVGLoadEventDispatcherEvent e) {
-	}
-
-	@Override
-	public void svgLoadEventDispatchFailed(SVGLoadEventDispatcherEvent e) {
-	}
 }
