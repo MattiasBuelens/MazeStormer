@@ -1,4 +1,4 @@
-package mazestormer.ui.map;
+package mazestormer.map;
 
 import java.awt.geom.Point2D;
 

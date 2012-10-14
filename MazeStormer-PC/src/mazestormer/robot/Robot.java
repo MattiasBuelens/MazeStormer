@@ -1,4 +1,4 @@
-package mazestormer.pc.robot;
+package mazestormer.robot;
 
 import lejos.robotics.navigation.ArcRotateMoveController;
 import lejos.robotics.navigation.MoveController;

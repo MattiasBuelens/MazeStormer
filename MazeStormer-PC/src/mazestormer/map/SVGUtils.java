@@ -1,4 +1,4 @@
-package mazestormer.ui.map;
+package mazestormer.map;
 
 import java.io.IOException;
 import java.net.URI;

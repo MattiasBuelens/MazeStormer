@@ -1,4 +1,4 @@
-package mazestormer.pc.console;
+package mazestormer.console;
 
 import java.io.PrintStream;
 

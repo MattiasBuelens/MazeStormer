@@ -1,4 +1,4 @@
-package mazestormer.pc.robot;
+package mazestormer.robot;
 
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.DifferentialPilot;

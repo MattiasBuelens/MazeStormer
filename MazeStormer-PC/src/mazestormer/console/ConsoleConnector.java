@@ -1,4 +1,4 @@
-package mazestormer.pc.console;
+package mazestormer.console;
 
 import java.util.HashSet;
 import java.util.Set;

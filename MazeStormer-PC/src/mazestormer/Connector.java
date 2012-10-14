@@ -1,4 +1,4 @@
-package mazestormer.pc;
+package mazestormer;
 
 import java.io.IOException;
 

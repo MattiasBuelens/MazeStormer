@@ -1,4 +1,4 @@
-package mazestormer.pc.model;
+package mazestormer.model;
 
 public interface Robot {
 

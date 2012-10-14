@@ -1,6 +1,6 @@
 package mazestormer.map.event;
 
-import mazestormer.ui.map.MapLayer;
+import mazestormer.map.MapLayer;
 
 public class MapLayerAddEvent {
 	private final MapLayer layer;
