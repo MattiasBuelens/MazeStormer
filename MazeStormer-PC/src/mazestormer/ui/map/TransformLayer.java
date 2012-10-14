@@ -22,7 +22,8 @@ public abstract class TransformLayer extends MapLayer {
 	private Point2D rotationCenter = new Point2D.Float();
 	private boolean rotationCenterRelative = false;
 
-	public TransformLayer(Element transformElement) {
+	public TransformLayer(String name, Element transformElement) {
+		super(name);
 		this.transformElement = transformElement;
 	}
 
@@ -52,8 +53,7 @@ public abstract class TransformLayer extends MapLayer {
 	}
 
 	public void setScale(Point2D scale) {
-		this.scale.setLocation(scale);
-		update();
+		setScale((float) scale.getX(), (float) scale.getY());
 	}
 
 	public float getX() {

@@ -13,28 +13,49 @@ import org.w3c.dom.svg.SVGDocument;
 
 public class SVGUtils {
 
+	/**
+	 * Creates a new SVG document.
+	 */
 	public static final SVGDocument createSVGDocument() {
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
 		return (SVGDocument) impl.createDocument(svgNS, "svg", null);
 	}
 
-	public static final SVGDocument loadSVGDocument(String svgUrl) {
+	/**
+	 * Loads an SVG file into a SVG document.
+	 * 
+	 * @param uri
+	 *            The URI of the SVG file.
+	 */
+	public static final SVGDocument loadSVGDocument(String uri) {
 		UserAgent ua = new UserAgentAdapter();
 		DocumentLoader loader = new DocumentLoader(ua);
 		try {
-			return (SVGDocument) loader.loadDocument(svgUrl);
+			return (SVGDocument) loader.loadDocument(uri);
 		} catch (IOException e) {
 			return null;
 		}
 	}
 
-	public static final SVGDocument loadSVGDocument(URI svgUri) {
-		return loadSVGDocument(svgUri.toString());
+	/**
+	 * Loads an SVG file into a SVG document.
+	 * 
+	 * @param uri
+	 *            The URI of the SVG file.
+	 */
+	public static final SVGDocument loadSVGDocument(URI uri) {
+		return loadSVGDocument(uri.toString());
 	}
 
-	public static final SVGDocument loadSVGDocument(URL svgUrl) {
-		return loadSVGDocument(svgUrl.toExternalForm());
+	/**
+	 * Loads an SVG file into a SVG document.
+	 * 
+	 * @param url
+	 *            The URL of the SVG file.
+	 */
+	public static final SVGDocument loadSVGDocument(URL url) {
+		return loadSVGDocument(url.toExternalForm());
 	}
 
 }

@@ -2,17 +2,43 @@ package mazestormer.ui.map;
 
 import java.util.Comparator;
 
+import mazestormer.map.event.MapLayerPropertyChangeEvent;
+import mazestormer.util.EventPublisher;
+
 import org.apache.batik.dom.AbstractDocument;
+import org.apache.batik.dom.svg.SVGStylableElement;
 import org.w3c.dom.Element;
+import org.w3c.dom.css.CSSStyleDeclaration;
 
-public abstract class MapLayer {
+import com.google.common.eventbus.EventBus;
 
-	public MapLayer() {
-		setVisible(true);
-	}
+public abstract class MapLayer implements EventPublisher {
+
+	private final String name;
+	protected EventBus eventBus;
 
 	private Element element;
 	private boolean isVisible;
+
+	public MapLayer(String name) {
+		this.name = name;
+		setVisible(true);
+	}
+
+	@Override
+	public void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
+		eventBus.register(this);
+	}
+
+	protected void postEvent(Object event) {
+		if (eventBus != null)
+			eventBus.post(event);
+	}
+
+	public String getName() {
+		return name;
+	}
 
 	protected Element getElement() {
 		return element;
@@ -27,15 +53,22 @@ public abstract class MapLayer {
 	}
 
 	public void setVisible(boolean visible) {
+		if (this.isVisible != visible) {
+			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible",
+					visible));
+		}
 		this.isVisible = visible;
+
 		update();
 	}
 
 	protected void update() {
 		Element element = getElement();
-		if (element != null) {
-			element.setAttributeNS(null, "display", isVisible() ? "inline"
-					: "none");
+		if (element != null && element instanceof SVGStylableElement) {
+			CSSStyleDeclaration css = ((SVGStylableElement) element)
+					.getOverrideStyle();
+			css.setProperty("display", isVisible() ? "inline" : "none",
+					"important");
 		}
 	}
 

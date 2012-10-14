@@ -7,6 +7,8 @@ import javax.swing.JFrame;
 
 public class MapPanelTest {
 
+	private MapPanelController controller;
+	private MapPanel mapPanel;
 	private JFrame frame;
 
 	/**
@@ -30,6 +32,8 @@ public class MapPanelTest {
 	 */
 	public MapPanelTest() {
 		initialize();
+
+		controller = new MapPanelController(mapPanel);
 	}
 
 	/**
@@ -42,8 +46,8 @@ public class MapPanelTest {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 
-		MapPanel map = new MapPanel();
-		frame.getContentPane().add(map, BorderLayout.CENTER);
+		mapPanel = new MapPanel();
+		frame.getContentPane().add(mapPanel, BorderLayout.CENTER);
 	}
 
 }

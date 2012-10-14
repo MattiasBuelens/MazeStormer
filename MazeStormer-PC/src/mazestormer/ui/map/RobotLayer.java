@@ -6,8 +6,9 @@ import org.w3c.dom.svg.SVGDocument;
 
 public class RobotLayer extends TransformLayer {
 
-	public RobotLayer() {
-		super(getRobot().getDocumentElement());
+	public RobotLayer(String name) {
+		super(name, getRobot().getDocumentElement());
+		setScale(0.5f);
 		setRotationCenter(0.5f, 0.5f);
 		setRotationCenterRelative(true);
 	}
