@@ -59,15 +59,16 @@ Enkele voordelen van de gekozen constructie zijn: de accu is eenvoudig loskoppel
 \end{itemize}
 
 \subsection{Meetresultaten}
-Meetresultaten van de nauwkeurigheid van de robot:
-\begin{itemize}
-\item De robot had al van bij het begin moeilijkheden met het rechtdoor rijden. Door schijnbaar verschillende snelheden van het linker- en rechterwiel
-had de robot steeds de intentie om in een bocht te rijden. Nadat we de banden hadden verwisseld van kant, leek de richting waarin de robot een bocht maakte veranderd. Het probleem ligt dus bij de banden. Als oplossing hiervoor zijn we per band de juiste parameterinstellingen aan het zoeken zodat de robot rechtdoor kan rijden.%TODO een oplossing voor dit probleem, klopt de ingestelde afstand?
-Ook wanneer de robot versnelde of vertraagde, leek hij te slippen. De gemeten afstand was daardoor verschillend van de theoretisch berekende afstand. Om dit op te lossen wordt er gewerkt aan een implementatie voor de acceleratiesnelheid in te stellen.
-\item De rotaties zijn het belangrijkste bij het beschrijven van de veelhoek. Na enkele tests met verscheidene veelhoeken bleken deze gemeten hoeken vrij dicht bij de theoretisch berekende waarde. Enkel was er zoals bij het rechtdoor rijden sprake van slipp bij het roteren, vandaar kleine afwijkingen in de gemeten hoek. De motoren slipten ook verschillend bij het vertrekken na een rotatieen. Hierdoor roteerde de robot nog een klein beetje meer. 
-Al deze afwijkingen leiden tot een kleine ruis op de gemeten hoek.
-\item \ldots %TODO als nog iemand iets weet %
-\end{itemize}
+De nauwkeurigheid van de robot wordt beoordeeld op basis van drie criteria: kromming wanneer hij  rechtdoor moet rijden, correctheid van gereden afstand, correctheid van geroteerde hoek.
+
+\subsubsection{Rechtdoor rijden}
+De robot had bij het begin moeilijkheden met het rechtdoor rijden, dit bleek aan de banden te liggen. Nadat we de grotere wielen vervingen door kleinere exemplaren, met dunnere banden, bleek het rechtdoor rijden beter te lukken. De afwijking die er nog was, was enkel te verklaren door een fout op de motor. We hebben dit kunnen oplossen door het linkerwiel een andere diameter te geven in de software dan het rechterwiel. Door veelvuldig te testen hebben we het optimale verschil tussen de diameters kunnen bepalen. In een finaal experiment werd de fout op een recht pad gemeten. De robot reed hierbij een afstand van 2.4m, op vier equidistante punten op dit pad werd de loodrechte afstand van de robot tot een rechte gemeten. %TODO: Grafieken! %
+
+\subsubsection{Gereden afstand}
+Om na te gaan of de afstand die de robot rijdt correct is, moest de robot een op voorhand-afgemeten afstand rijden. Aanvankelijk reed hij met een kleine afwijking. Door beide diameters van de wielen een klein beetje aan te passen in de software, waarbij we het verschil tussen de twee diameters gelijk hielden, reed hij uiteindelijk de gevraagde afstand correct.
+
+\subsubsection{Rotatie}
+Om een beeld te krijgen van hoe correct de robot roteerde, lieten we deze telkens 360 graden draaien en keken we of deze terug in dezelfde positie terecht kwam. Door kleine aanpassingen te maken in de breedte-parameter van de robot, kregen we betere resultaten. Als volgende test keken we na of de robot correct een vierkant met zijden 1m kon beschrijven. De afwijking hier op was iets groter dan bij de vorige test. Dit kwam doordat er nu ook gereden moest worden. Na elke rotatie moest de robot opnieuw accelereren, hierdoor kwam er telkens een kleine fout op de hoek. Door preciezer de breedte-parameter in te stellen, konden we deze afwijking minimaliseren.%TODO: Grafieken! %
 
 \subsection{\ldots}
 \ldots
