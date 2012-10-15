@@ -42,7 +42,7 @@ public class MapPanel extends JPanel implements EventPublisher {
 	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
 
 	public MapPanel(EventBus eventBus) {
-		setEventBus(eventBus);
+		registerEventBus(eventBus);
 		initialize();
 	}
 
@@ -51,11 +51,16 @@ public class MapPanel extends JPanel implements EventPublisher {
 	}
 
 	@Override
-	public void setEventBus(EventBus eventBus) {
+	public EventBus getEventBus() {
+		return eventBus;
+	}
+
+	@Override
+	public void registerEventBus(EventBus eventBus) {
 		this.eventBus = eventBus;
 		eventBus.register(this);
 	}
-	
+
 	protected void postEvent(Object event) {
 		if (eventBus != null)
 			eventBus.post(event);

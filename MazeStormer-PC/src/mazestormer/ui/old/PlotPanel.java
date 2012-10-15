@@ -1,8 +1,8 @@
-package mazestormer.ui;
+package mazestormer.ui.old;
 
 import javax.swing.JTabbedPane;
 
-import mazestormer.controller.ViewController;
+import mazestormer.controller.old.ViewController;
 
 public abstract class PlotPanel extends JTabbedPane{
 	

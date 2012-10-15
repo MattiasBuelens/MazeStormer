@@ -1,4 +1,4 @@
-package mazestormer.ui;
+package mazestormer.ui.old;
 
 import java.util.HashSet;
 import java.util.Set;

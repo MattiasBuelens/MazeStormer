@@ -1,4 +1,4 @@
-package mazestormer.ui;
+package mazestormer.ui.old;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,7 +7,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 
-import mazestormer.controller.PolygonViewController;
+import mazestormer.controller.old.PolygonViewController;
 import net.miginfocom.swing.MigLayout;
 
 import com.javarichclient.icon.tango.actions.*;

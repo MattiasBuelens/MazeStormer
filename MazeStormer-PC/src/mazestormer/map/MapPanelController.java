@@ -7,16 +7,16 @@ import java.util.Set;
 
 import mazestormer.map.event.MapChangeEvent;
 import mazestormer.map.event.MapLayerAddEvent;
+import mazestormer.util.AbstractEventPublisher;
 import mazestormer.util.EventPublisher;
 
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.EventBus;
 
-public class MapPanelController implements EventPublisher {
+public class MapPanelController extends AbstractEventPublisher {
 
 	private final MapPanel view;
-	private EventBus eventBus;
 
 	private MapDocument map;
 	private List<MapLayer> layers = new ArrayList<MapLayer>();
@@ -25,7 +25,7 @@ public class MapPanelController implements EventPublisher {
 		this.map = new MapDocument();
 		this.view = view;
 
-		setEventBus(eventBus);
+		registerEventBus(eventBus);
 
 		createMap();
 		createLayers();
@@ -36,20 +36,19 @@ public class MapPanelController implements EventPublisher {
 	}
 
 	@Override
-	public void setEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
-		eventBus.register(this);
+	public void registerEventBus(EventBus eventBus) {
+		super.registerEventBus(eventBus);
 
 		// Propagate to models and views
-		view.setEventBus(eventBus);
+		view.registerEventBus(eventBus);
 		for (MapLayer layer : getLayers()) {
-			layer.setEventBus(eventBus);
+			layer.registerEventBus(eventBus);
 		}
 	}
 
 	protected void postEvent(Object event) {
-		if (eventBus != null)
-			eventBus.post(event);
+		if (getEventBus() != null)
+			getEventBus().post(event);
 	}
 
 	private void createMap() {
@@ -64,7 +63,7 @@ public class MapPanelController implements EventPublisher {
 	}
 
 	private void addLayer(MapLayer layer) {
-		layer.setEventBus(eventBus);
+		layer.registerEventBus(getEventBus());
 		layers.add(layer);
 		map.addLayer(layer);
 		postEvent(new MapLayerAddEvent(layer));

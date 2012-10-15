@@ -1,7 +1,8 @@
-package mazestormer.ui;
+package mazestormer.ui.old;
 
 import javax.swing.JPanel;
-import mazestormer.controller.ViewController;
+
+import mazestormer.controller.old.ViewController;
 
 /**
  * A class of console panels.
@@ -17,8 +18,8 @@ public abstract class ConsolePanel extends JPanel{
 	private ViewController vc;
 	
 	protected ConsolePanel(ViewController vc) throws NullPointerException{
-		if(vc == null)
-			throw new NullPointerException("The given view controller may not refer the null reference.");
+		//if(vc == null)
+		//	throw new NullPointerException("The given view controller may not refer the null reference.");
 		this.vc = vc;
 	}
 	

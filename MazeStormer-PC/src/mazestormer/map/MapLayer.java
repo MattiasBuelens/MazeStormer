@@ -15,7 +15,7 @@ import com.google.common.eventbus.EventBus;
 public abstract class MapLayer implements EventPublisher {
 
 	private final String name;
-	protected EventBus eventBus;
+	private EventBus eventBus;
 
 	private Element element;
 	private boolean isVisible;
@@ -26,14 +26,19 @@ public abstract class MapLayer implements EventPublisher {
 	}
 
 	@Override
-	public void setEventBus(EventBus eventBus) {
+	public EventBus getEventBus() {
+		return eventBus;
+	}
+
+	@Override
+	public void registerEventBus(EventBus eventBus) {
 		this.eventBus = eventBus;
 		eventBus.register(this);
 	}
 
-	protected void postEvent(Object event) {
-		if (eventBus != null)
-			eventBus.post(event);
+	public void postEvent(Object event) {
+		if (getEventBus() != null)
+			getEventBus().post(event);
 	}
 
 	public String getName() {

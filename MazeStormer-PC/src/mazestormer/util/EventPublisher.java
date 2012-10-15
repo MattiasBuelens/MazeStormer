@@ -5,14 +5,16 @@ import com.google.common.eventbus.EventBus;
 public interface EventPublisher {
 
 	/**
-	 * Sets the event bus on which all events should be published.
-	 * 
-	 * The publisher may optionally register itself as listener on the given
-	 * event bus if it should also consume events from other sources.
+	 * Get the event bus on which this publisher posts its events.
+	 */
+	public EventBus getEventBus();
+
+	/**
+	 * Sets the event bus on which to publish events and to listen for events.
 	 * 
 	 * @param eventBus
-	 *            The event bus on which to publish.
+	 *            The event bus.
 	 */
-	public void setEventBus(EventBus eventBus);
+	public void registerEventBus(EventBus eventBus);
 
 }

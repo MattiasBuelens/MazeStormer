@@ -1,4 +1,4 @@
-package mazestormer.ui;
+package mazestormer.ui.old;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +16,7 @@ import javax.swing.event.ChangeListener;
 
 import com.javarichclient.icon.tango.actions.*;
 
-import mazestormer.controller.ControlViewController;
+import mazestormer.controller.old.ControlViewController;
 import net.miginfocom.swing.MigLayout;
 
 /**

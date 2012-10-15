@@ -1,4 +1,4 @@
-package mazestormer.ui;
+package mazestormer.ui.old;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
-import mazestormer.controller.ConnectViewController;
+import mazestormer.controller.old.ConnectViewController;
 import net.miginfocom.swing.MigLayout;
 
 /**
