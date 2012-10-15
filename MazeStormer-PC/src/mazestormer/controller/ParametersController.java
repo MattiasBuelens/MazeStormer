@@ -1,9 +1,6 @@
 package mazestormer.controller;
 
 import mazestormer.robot.Robot;
-import mazestormer.ui.event.RobotParameterChangeRequest;
-
-import com.google.common.eventbus.Subscribe;
 
 public class ParametersController extends SubController implements
 		IParametersController {
@@ -17,15 +14,38 @@ public class ParametersController extends SubController implements
 	}
 
 	@Override
-	@Subscribe
-	public void onParameterChangeRequest(RobotParameterChangeRequest e) {
-		switch (e.getParameter()) {
-		case "travelSpeed":
-			getRobot().setTravelSpeed(e.getValue());
-			break;
-		case "rotateSpeed":
-			getRobot().setRotateSpeed(e.getValue());
-			break;
-		}
+	public double getTravelSpeed() {
+		return getRobot().getTravelSpeed();
 	}
+
+	@Override
+	public double getMaxTravelSpeed() {
+		return getRobot().getMaxTravelSpeed();
+	}
+
+	@Override
+	public void setTravelSpeed(double travelSpeed) {
+		getRobot().setTravelSpeed(travelSpeed);
+		getEventBus().post(
+				new RobotParameterChangeEvent("travelSpeed", travelSpeed));
+	}
+
+	@Override
+	public double getRotateSpeed() {
+		return getRobot().getRotateSpeed();
+	}
+
+	@Override
+	public double getMaxRotateSpeed() {
+		return getRobot().getRotateMaxSpeed();
+	}
+
+	@Override
+	public void setRotateSpeed(double rotateSpeed) {
+		getRobot().setRotateSpeed(rotateSpeed);
+		getEventBus().post(
+				new RobotParameterChangeEvent("rotateSpeed", rotateSpeed));
+
+	}
+
 }

@@ -1,4 +1,4 @@
-package mazestormer.map.event;
+package mazestormer.ui.map.event;
 
 import org.w3c.dom.svg.SVGDocument;
 

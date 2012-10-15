@@ -1,6 +1,6 @@
-package mazestormer.map.event;
+package mazestormer.ui.map.event;
 
-import mazestormer.map.MapLayer;
+import mazestormer.ui.map.MapLayer;
 
 public class MapLayerPropertyChangeEvent {
 

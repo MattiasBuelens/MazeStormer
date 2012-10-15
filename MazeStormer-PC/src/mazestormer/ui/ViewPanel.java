@@ -4,9 +4,9 @@ import javax.swing.JPanel;
 
 import com.google.common.eventbus.EventBus;
 
-import mazestormer.util.EventPublisher;
+import mazestormer.util.EventSource;
 
-public abstract class ViewPanel extends JPanel implements EventPublisher {
+public abstract class ViewPanel extends JPanel implements EventSource {
 
 	private static final long serialVersionUID = 1L;
 

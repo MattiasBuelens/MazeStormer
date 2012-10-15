@@ -2,7 +2,7 @@ package mazestormer.util;
 
 import com.google.common.eventbus.EventBus;
 
-public interface EventPublisher {
+public interface EventSource {
 
 	/**
 	 * Get the event bus on which this publisher posts its events.

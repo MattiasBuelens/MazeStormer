@@ -1,9 +1,9 @@
-package mazestormer.map;
+package mazestormer.ui.map;
 
 import java.util.Comparator;
 
-import mazestormer.map.event.MapLayerPropertyChangeEvent;
-import mazestormer.util.EventPublisher;
+import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
+import mazestormer.util.EventSource;
 
 import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.svg.SVGStylableElement;
@@ -12,7 +12,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 
 import com.google.common.eventbus.EventBus;
 
-public abstract class MapLayer implements EventPublisher {
+public abstract class MapLayer implements EventSource {
 
 	private final String name;
 	private EventBus eventBus;

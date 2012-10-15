@@ -1,4 +1,4 @@
-package mazestormer.map;
+package mazestormer.ui.map;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;

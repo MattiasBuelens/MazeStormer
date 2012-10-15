@@ -1,21 +1,26 @@
 package mazestormer.ui;
 
+import java.awt.BorderLayout;
+
 import javax.swing.JFrame;
 
-import mazestormer.controller.MainController;
-import mazestormer.util.EventPublisher;
+import mazestormer.controller.IMainController;
+import mazestormer.util.EventSource;
 
 import com.google.common.eventbus.EventBus;
 
-public class MainView extends JFrame implements EventPublisher {
+public class MainView extends JFrame implements EventSource {
 
-	private MainController controller;
+	private static final long serialVersionUID = 1L;
+
+	private final IMainController controller;
 
 	private EventBus eventBus;
 	private ViewPanel controlPanel;
-	private ParametersPanel parametersPanel;
+	private ViewPanel controlPanel2;
+	private ViewPanel parametersPanel;
 
-	public MainView(MainController controller) {
+	public MainView(IMainController controller) {
 		this.controller = controller;
 
 		initialize();
@@ -25,13 +30,14 @@ public class MainView extends JFrame implements EventPublisher {
 		setBounds(100, 100, 450, 300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		controlPanel = new ManualControlPanel();
-		controlPanel.registerEventBus(eventBus);
-		add(controlPanel);
+		controlPanel = new ManualControlPanel(controller.manualControl());
+		getContentPane().add(controlPanel, BorderLayout.WEST);
 
-		parametersPanel = new ParametersPanel();
-		parametersPanel.registerEventBus(eventBus);
-		add(controlPanel);
+		controlPanel2 = new PolygonControlPanel(controller.polygonControl());
+		getContentPane().add(controlPanel2, BorderLayout.CENTER);
+
+		parametersPanel = new ParametersPanel(controller.parameters());
+		getContentPane().add(parametersPanel, BorderLayout.EAST);
 	}
 
 	@Override

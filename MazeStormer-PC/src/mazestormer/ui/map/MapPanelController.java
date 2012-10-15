@@ -1,20 +1,19 @@
-package mazestormer.map;
+package mazestormer.ui.map;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import mazestormer.map.event.MapChangeEvent;
-import mazestormer.map.event.MapLayerAddEvent;
-import mazestormer.util.AbstractEventPublisher;
-import mazestormer.util.EventPublisher;
+import mazestormer.ui.map.event.MapChangeEvent;
+import mazestormer.ui.map.event.MapLayerAddEvent;
+import mazestormer.util.AbstractEventSource;
 
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.EventBus;
 
-public class MapPanelController extends AbstractEventPublisher {
+public class MapPanelController extends AbstractEventSource {
 
 	private final MapPanel view;
 

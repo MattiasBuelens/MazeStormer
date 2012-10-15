@@ -1,12 +1,19 @@
 package mazestormer.controller;
 
-import com.google.common.eventbus.Subscribe;
+import mazestormer.util.EventSource;
 
-import mazestormer.ui.event.RobotParameterChangeRequest;
+public interface IParametersController extends EventSource {
 
-public interface IParametersController {
+	public double getTravelSpeed();
 
-	@Subscribe
-	public void onParameterChangeRequest(RobotParameterChangeRequest e);
+	public double getMaxTravelSpeed();
+
+	public void setTravelSpeed(double travelSpeed);
+
+	public double getRotateSpeed();
+
+	public double getMaxRotateSpeed();
+
+	public void setRotateSpeed(double rotateSpeed);
 
 }

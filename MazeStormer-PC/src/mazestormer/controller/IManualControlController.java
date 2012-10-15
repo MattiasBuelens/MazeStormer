@@ -1,13 +1,17 @@
 package mazestormer.controller;
 
-public interface IManualControlController {
+import mazestormer.util.EventSource;
+
+public interface IManualControlController extends EventSource {
 
 	public void moveForward();
 
 	public void moveBackward();
 
-	public void turnLeft();
+	public void rotateLeft();
 
-	public void turnRight();
+	public void rotateRight();
+
+	public void stop();
 
 }

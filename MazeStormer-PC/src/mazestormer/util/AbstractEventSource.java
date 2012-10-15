@@ -2,7 +2,7 @@ package mazestormer.util;
 
 import com.google.common.eventbus.EventBus;
 
-public abstract class AbstractEventPublisher implements EventPublisher {
+public abstract class AbstractEventSource implements EventSource {
 
 	private EventBus eventBus;
 

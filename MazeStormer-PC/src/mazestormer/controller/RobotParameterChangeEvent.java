@@ -1,12 +1,11 @@
-package mazestormer.ui.event;
+package mazestormer.controller;
 
-public class RobotParameterChangeRequest {
+public class RobotParameterChangeEvent {
 
 	private final String parameter;
 	private final double value;
 
-	public RobotParameterChangeRequest(String parameter, double value) {
-		super();
+	public RobotParameterChangeEvent(String parameter, double value) {
 		this.parameter = parameter;
 		this.value = value;
 	}

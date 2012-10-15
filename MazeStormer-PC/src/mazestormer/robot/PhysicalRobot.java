@@ -15,4 +15,16 @@ public class PhysicalRobot extends DifferentialPilot implements Robot {
 				Motor.B, false);
 	}
 
+	@Override
+	public void connect() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void disconnect() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

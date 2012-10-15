@@ -1,4 +1,4 @@
-package mazestormer.map;
+package mazestormer.ui.map;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -18,18 +18,18 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
-import mazestormer.map.event.MapChangeEvent;
-import mazestormer.map.event.MapLayerAddEvent;
-import mazestormer.map.event.MapLayerPropertyChangeEvent;
 import mazestormer.ui.SplitButton;
-import mazestormer.util.EventPublisher;
+import mazestormer.ui.map.event.MapChangeEvent;
+import mazestormer.ui.map.event.MapLayerAddEvent;
+import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
+import mazestormer.util.EventSource;
 
 import org.apache.batik.swing.JSVGCanvas;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
-public class MapPanel extends JPanel implements EventPublisher {
+public class MapPanel extends JPanel implements EventSource {
 
 	private static final long serialVersionUID = 1L;
 

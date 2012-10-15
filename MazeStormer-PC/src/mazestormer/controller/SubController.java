@@ -1,8 +1,8 @@
 package mazestormer.controller;
 
-import mazestormer.util.AbstractEventPublisher;
+import mazestormer.util.AbstractEventSource;
 
-public abstract class SubController extends AbstractEventPublisher {
+public abstract class SubController extends AbstractEventSource {
 
 	private final MainController mainController;
 

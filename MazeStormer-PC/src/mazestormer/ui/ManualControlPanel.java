@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.beans.Beans;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -11,21 +12,25 @@ import javax.swing.JComponent;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 
+import mazestormer.controller.IManualControlController;
 import net.miginfocom.swing.MigLayout;
 
 import com.javarichclient.icon.tango.actions.GoDownIcon;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.GoPreviousIcon;
 import com.javarichclient.icon.tango.actions.GoUpIcon;
+import javax.swing.border.TitledBorder;
 
 public class ManualControlPanel extends ViewPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	private final IManualControlController controller;
+
 	private final Action moveForward = new MoveForwardAction();
 	private final Action moveBackward = new MoveBackwardAction();
-	private final Action turnLeft = new TurnLeftAction();
-	private final Action turnRight = new TurnRightAction();
+	private final Action turnLeft = new RotateLeftAction();
+	private final Action turnRight = new RotateRightAction();
 	private final Action stop = new StopAction();
 
 	private JToggleButton btnForward;
@@ -36,11 +41,22 @@ public class ManualControlPanel extends ViewPanel {
 	/**
 	 * Create the panel.
 	 */
-	public ManualControlPanel() {
+	public ManualControlPanel(IManualControlController controller) {
+		setBorder(new TitledBorder(null, "Manual control",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		this.controller = controller;
+
 		registerKeyboardActions();
 
 		setLayout(new MigLayout("", "[][][]", "[][]"));
 		createControls();
+
+		if (!Beans.isDesignTime())
+			registerController();
+	}
+
+	private void registerController() {
+		registerEventBus(controller.getEventBus());
 	}
 
 	private void createControls() {
@@ -66,7 +82,7 @@ public class ManualControlPanel extends ViewPanel {
 		add(btnRight, "cell 2 1,grow");
 	}
 
-	private void setCurrent(JToggleButton button) {
+	private void setCurrentButton(JToggleButton button) {
 		btnForward.setSelected(button == btnForward);
 		btnBackward.setSelected(button == btnBackward);
 		btnLeft.setSelected(button == btnLeft);
@@ -74,28 +90,28 @@ public class ManualControlPanel extends ViewPanel {
 	}
 
 	public void moveForward() {
-		setCurrent(btnForward);
-		System.out.println("Forward");
+		setCurrentButton(btnForward);
+		controller.moveForward();
 	}
 
 	public void moveBackward() {
-		setCurrent(btnBackward);
-		System.out.println("Backward");
+		setCurrentButton(btnBackward);
+		controller.moveBackward();
 	}
 
-	public void turnLeft() {
-		setCurrent(btnLeft);
-		System.out.println("Left");
+	public void rotateLeft() {
+		setCurrentButton(btnLeft);
+		controller.rotateLeft();
 	}
 
-	public void turnRight() {
-		setCurrent(btnRight);
-		System.out.println("Right");
+	public void rotateRight() {
+		setCurrentButton(btnRight);
+		controller.rotateRight();
 	}
 
 	public void stop() {
-		setCurrent(null);
-		System.out.println("Stop");
+		setCurrentButton(null);
+		controller.stop();
 	}
 
 	/**
@@ -135,7 +151,8 @@ public class ManualControlPanel extends ViewPanel {
 		}
 
 		private void trigger(Action action) {
-			action.actionPerformed(new ActionEvent(this, 0, null));
+			action.actionPerformed(new ActionEvent(this,
+					ActionEvent.ACTION_PERFORMED, null));
 		}
 
 		@Override
@@ -208,31 +225,31 @@ public class ManualControlPanel extends ViewPanel {
 		}
 	}
 
-	private class TurnLeftAction extends ImmediateAction {
+	private class RotateLeftAction extends ImmediateAction {
 		private static final long serialVersionUID = 1L;
 
-		public TurnLeftAction() {
-			putValue(NAME, "Turn left");
-			putValue(SHORT_DESCRIPTION, "Turn the robot counter-clockwise");
+		public RotateLeftAction() {
+			putValue(NAME, "Rotate left");
+			putValue(SHORT_DESCRIPTION, "Rotate the robot counter-clockwise");
 		}
 
 		@Override
 		public void go() {
-			turnLeft();
+			rotateLeft();
 		}
 	}
 
-	private class TurnRightAction extends ImmediateAction {
+	private class RotateRightAction extends ImmediateAction {
 		private static final long serialVersionUID = 1L;
 
-		public TurnRightAction() {
-			putValue(NAME, "Turn right");
-			putValue(SHORT_DESCRIPTION, "Turn the robot clockwise");
+		public RotateRightAction() {
+			putValue(NAME, "Rotate right");
+			putValue(SHORT_DESCRIPTION, "Rotate the robot clockwise");
 		}
 
 		@Override
 		public void go() {
-			turnRight();
+			rotateRight();
 		}
 	}
 
