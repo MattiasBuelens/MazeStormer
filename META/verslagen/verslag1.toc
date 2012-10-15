@@ -1,0 +1,35 @@
+\select@language {dutch}
+\contentsline {section}{\numberline {1}Inleiding}{2}{section.1}
+\contentsline {section}{\numberline {2}Bouw robot}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Fysieke bouw}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Meetresultaten}{2}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}\dots }{2}{subsection.2.3}
+\contentsline {section}{\numberline {3}Algoritmes}{3}{section.3}
+\contentsline {subsection}{\numberline {3.1}Rechtzetten robot op witte lijn}{3}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Lezen barcodes}{3}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Sturing van de robot}{3}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Navigatie door doolhof}{3}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}\dots }{3}{subsection.3.5}
+\contentsline {section}{\numberline {4}Software}{3}{section.4}
+\contentsline {subsection}{\numberline {4.1}Bluetooth}{3}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}GUI}{3}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Simulator}{3}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Software design}{3}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}\dots }{4}{subsection.4.5}
+\contentsline {section}{\numberline {5}Besluit}{4}{section.5}
+\setcounter {tocdepth}{1}
+\contentsline {section}{\numberline {A}Demo 1}{5}{appendix.A}
+\contentsline {subsection}{\numberline {A.1}Resultaten}{5}{subsection.A.1}
+\contentsline {subsection}{\numberline {A.2}Conclusies}{5}{subsection.A.2}
+\contentsline {subsection}{\numberline {A.3}Oplijsting aanpassingen verslag}{5}{subsection.A.3}
+\contentsline {section}{\numberline {B}Demo 2}{5}{appendix.B}
+\contentsline {subsection}{\numberline {B.1}Resultaten}{5}{subsection.B.1}
+\contentsline {subsection}{\numberline {B.2}Conclusies}{5}{subsection.B.2}
+\contentsline {subsection}{\numberline {B.3}Oplijsting aanpassingen verslag}{5}{subsection.B.3}
+\contentsline {section}{\numberline {C}Demo 3}{5}{appendix.C}
+\contentsline {subsection}{\numberline {C.1}Resultaten}{5}{subsection.C.1}
+\contentsline {subsection}{\numberline {C.2}Conclusies}{5}{subsection.C.2}
+\contentsline {subsection}{\numberline {C.3}Oplijsting aanpassingen verslag}{5}{subsection.C.3}
+\contentsline {section}{\numberline {D}Beschrijving van het proces}{5}{appendix.D}
+\contentsline {section}{\numberline {E}Beschrijving van de werkverdeling}{6}{appendix.E}
+\contentsline {section}{\numberline {F}Kritisch analyse}{6}{appendix.F}
