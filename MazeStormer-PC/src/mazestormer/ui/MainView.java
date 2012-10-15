@@ -6,8 +6,7 @@ import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
@@ -29,28 +27,29 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
+import mazestormer.controller.IMainController;
+import mazestormer.controller.MainController;
 import net.miginfocom.swing.MigLayout;
 
-public class MainControl extends JFrame{
+public class MainView extends JFrame{
 
 	public static final Font STANDARD_FONT = new Font("Verdana", Font.BOLD, 11);
 
 	private static final long serialVersionUID = 14L;
 	
+	private JPanel mainPanel;
 	private JPanel configurationPane;
 	private JPanel feedbackPane;
 	private JTextArea feedback;
-	
-	private JTabbedPane plotTabPane;
-	private JPanel consolePane;
+	private Box rightPanel;
 
-	private IModelViewController mvc;
+	private IMainController mc;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainControl frame = new MainControl(new ModelViewController());
+					MainView frame = new MainView(MainController.getInstance());
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -59,8 +58,8 @@ public class MainControl extends JFrame{
 		});
 	}
 	
-	public MainControl(IModelViewController mvc) {
-		this.mvc = mvc;
+	public MainView(IMainController mc) {
+		this.mc = mc;
 		
 		// FRAME
 		// TODO
@@ -74,27 +73,20 @@ public class MainControl extends JFrame{
 		initiateComponents();
 	}
 	
-	private Box rightPanel;
-	
 	private void initiateComponents() {
 		setJMenuBar(getMainMenuBar());
-	    JPanel mainPanel = new JPanel();
-	    mainPanel.setLayout(new MigLayout("insets 0", "", ""));
+	    this.mainPanel = new JPanel();
+	    this.mainPanel.setLayout(new MigLayout("insets 0", "", ""));
 	    
 	    initiateConfigurationPanel();
-	    initiateTabPanel();
-	    initiateConsolePanel();
+	    initiateRightPanel();
 	    initiateFeedbackPanel();
 	    
-	    this.rightPanel = new Box(BoxLayout.Y_AXIS);
-	    this.rightPanel.add(this.plotTabPane);
-        this.rightPanel.add(this.consolePane);
-	    
-	    mainPanel.add(this.configurationPane, "shrinky, top, w 450!");
-	    mainPanel.add(this.rightPanel, "spany 5, wrap, grow, pushx, wmin 400");
-	    mainPanel.add(this.feedbackPane, "pushy, growy, w 450!");
+	    this.mainPanel.add(this.configurationPane, "shrinky, top, w 450!");
+	    this.mainPanel.add(this.rightPanel, "spany 5, wrap, grow, pushx, wmin 400");
+	    this.mainPanel.add(this.feedbackPane, "pushy, growy, w 450!");
 
-	    JScrollPane contentScrollPane = new JScrollPane(mainPanel);
+	    JScrollPane contentScrollPane = new JScrollPane(this.mainPanel);
 	    contentScrollPane.setBorder(BorderFactory.createEmptyBorder());
 	    setContentPane(contentScrollPane);
 	  }
@@ -106,46 +98,36 @@ public class MainControl extends JFrame{
 	      this.configurationPane.setLayout(new MigLayout());
 	      //this.optionPane.setLayout(new MigLayout("insets 0", "", "top, align 50%"));
 	
-	      JLabel mode = new JLabel("Robot Type");
+	      JLabel robotType = new JLabel("Robot Type");
+	      robotType.setHorizontalAlignment(JLabel.RIGHT);
+	      this.configurationPane.add(robotType, "w 65!");
+	      this.configurationPane.add(new JSeparator(JSeparator.VERTICAL), "spany 5, growy, w 2!");
+	      final JComboBox rb = new JComboBox(ROBOT_TYPES);
+	      this.configurationPane.add(rb, "span, growx, wrap");
+	  
+	      JLabel mode = new JLabel("Mode");
 	      mode.setHorizontalAlignment(JLabel.RIGHT);
 	      this.configurationPane.add(mode, "w 65!");
-	      final JComboBox ob = new JComboBox(ROBOT_TYPES);
-	      ob.addActionListener(new ActionListener(){
-	    	  @Override
-	    	  public void actionPerformed(ActionEvent e) {
-	    		  changeMode((String) ob.getSelectedItem());
-	    	  }
-	      });
-	      this.configurationPane.add(ob, "span, growx, wrap");
-	  
-	      JLabel action = new JLabel("Action");
-	      action.setHorizontalAlignment(JLabel.RIGHT);
-	      this.configurationPane.add(action, "w 65!");
-	      final JComboBox ab = new JComboBox(OPTIONS);
-	      ab.addActionListener(new ActionListener(){
-	    	  	@Override
-				public void actionPerformed(ActionEvent e) {
-	    	  		changeOption((String) ob.getSelectedItem(), (String) ab.getSelectedItem());
-	    	  	}
-		  });
-	      this.configurationPane.add(ab, "span, growx, wrap");
+	      final JComboBox mb = new JComboBox(MODES);
+	      this.configurationPane.add(mb, "span, growx, wrap");
 	      
-	      this.configurationPane.add(new JSeparator(JSeparator.VERTICAL), "spany 5, growy, w 2!");
+	      
+	      JLabel space = new JLabel();
+	      this.configurationPane.add(space, "w 65!");
+	      JButton confirmButton = new JButton("Confirm");
+	      confirmButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				changeConfiguration((String) rb.getSelectedItem(), (String) mb.getSelectedItem());
+			} 
+	      });
+	      this.configurationPane.add(confirmButton);
 	    }
 	 }
 	
-	private void initiateTabPanel(){
-	    if(this.plotTabPane == null) {
-	      this.plotTabPane = new JTabbedPane();
-	      this.plotTabPane.add("Tab1", new JPanel());
-	      this.plotTabPane.add("Tab2", new JPanel());
-	    }
-	 }
-	
-	private void initiateConsolePanel(){
-	    if(this.consolePane == null) {
-	      this.consolePane = new JPanel();
-	      this.consolePane.setBorder(getTitleBorder("Console"));
+	private void initiateRightPanel(){
+	    if(this.rightPanel == null) {
+	      this.rightPanel = getMainController().getDefault();
 	    }
 	 }
 	
@@ -180,22 +162,23 @@ public class MainControl extends JFrame{
 	    }
 	 }
 	
-	private Border getTitleBorder(String title){
+	public static Border getTitleBorder(String title){
 		return BorderFactory.createTitledBorder(null, title, TitledBorder.LEFT, TitledBorder.TOP, new Font("null", Font.BOLD, 12), Color.BLUE);
 	}
-
-	private void setControlPane(ConsolePanel panel) throws NullPointerException {
-		if(panel == null)
-			throw new NullPointerException("The control pane may not refer the null reference.");
-		this.rightPanel.remove(this.consolePane);
-		this.consolePane = panel;
-		this.consolePane.setBorder(getTitleBorder("Console"));
-		this.rightPanel.add(this.consolePane);
+	
+	private void setRightPanel(Box rightPanel){
+		if(rightPanel == null)
+			throw new NullPointerException("The right panel may not refer the null reference.");
+		this.mainPanel.remove(this.feedbackPane);
+		this.mainPanel.remove(this.rightPanel);
+		this.rightPanel = rightPanel;
+		this.mainPanel.add(rightPanel, "spany 5, wrap, grow, pushx, wmin 400");
+		this.mainPanel.add(this.feedbackPane, "pushy, growy, w 450!");
 		validate();
 	}
 	
-	IModelViewController getModelViewController(){
-		return this.mvc;
+	IMainController getMainController(){
+		return this.mc;
 	}
 
 	void setFeedback(String msg){
@@ -207,35 +190,33 @@ public class MainControl extends JFrame{
 	}
 
 	private void updateFeedback(){
-		if(getModelViewController().getFeedback() != null)
-			setFeedback(getModelViewController().getFeedback());
+		if(getMainController().getFeedback() != null)
+			setFeedback(getMainController().getFeedback());
 	}
 	
-	private static final String[] ROBOT_TYPES = {"---", "Physical", "Virtual"};
-	private static final String[] OPTIONS = {"---", "Connect", "Control", "Polygon"};
+	private static final String[] ROBOT_TYPES = RobotType.getAllRobotTypeNames();
+	private static final String[] MODES = {"---", "Connect", "Control", "Polygon"};
 	
-	private void changeMode(String mode){
-		if(mode != null){
-			if(mode.equals("Manual"));
+	private void changeConfiguration(String robotType, String mode){
+		if(mode != null && robotType != null){
+			if(!RobotType.DEFAULT.getRobotTypeName().equals(robotType)){
+				String s = "Changing robot type will disconnect every NXT.\nChanging mode will delete all progress.\nAre you sure you want to continue?";
+				int a = JOptionPane.showConfirmDialog(this,s,"Change Configuration",JOptionPane.YES_OPTION,JOptionPane.WARNING_MESSAGE);
 				
-			if(mode.equals("Simulator"));
+				if(a == 0){
+					if(mode.equals("---"))
+						setRightPanel(getMainController().getDefault());
+					if(mode.equals("Connect"))
+						setRightPanel(getMainController().getConnectView(RobotType.getCorrespondingRobotType(robotType)));
+					if(mode.equals("Control"))
+						setRightPanel(getMainController().getControlView(RobotType.getCorrespondingRobotType(robotType)));
+					if(mode.equals("Polygon"))
+						setRightPanel(getMainController().getPolygonView(RobotType.getCorrespondingRobotType(robotType)));
+				}
+			}
+			else
+				setFeedback("Select a mode...");
 		}
-	}
-	
-	private void changeOption(String mode, String option){
-		if(option != null && mode != null && !"---".equals(mode)){
-			if(option.equals("---"))
-				setControlPane(new ConsolePanel(this));
-			if(option.equals("Connect"))
-				setControlPane(new ConnectConsolePanel(this));
-			if(option.equals("Control"))
-				setControlPane(new ControlConsolePanel(this));
-			if(option.equals("Polygon"))
-				setControlPane(new PolygonConsolePanel(this));
-		}
-		
-		if("---".equals(mode))
-			setFeedback("Select a mode.");
 	}
 	
 	// -- MENU --
@@ -277,7 +258,7 @@ public class MainControl extends JFrame{
 	// -- FILE --
 
 	private void showClose() {
-		int choice = JOptionPane.showConfirmDialog(this,"Are you sure you want to quit MazeStormer?","Close",0,1,new ImageIcon(MainControl.class.getResource("/res/images/ui/close.png")));
+		int choice = JOptionPane.showConfirmDialog(this,"Are you sure you want to quit MazeStormer?","Close",JOptionPane.YES_OPTION,JOptionPane.QUESTION_MESSAGE);
 		if(choice == 0){
 			setVisible(false);
 			dispose();
@@ -286,10 +267,10 @@ public class MainControl extends JFrame{
 
 	// -- HELP --
 
-	private void showAbout() { // TODO
-		String about = "MazeStormer\n\n" + "Version: " + "Default Version"
+	private void showAbout() {
+		String about = "MazeStormer\n\n" + "Version: " + "Default Version\n"
 				+ "Author: " + "Team Bronze\n\n"
 				+ "(c) Copyright Team Bronze.\n" + "All rights reserved.";
-		JOptionPane.showMessageDialog(this,about,"About MazeStormer",JOptionPane.INFORMATION_MESSAGE,new ImageIcon(MainControl.class.getResource("/res/images/ui/---.png")));
+		JOptionPane.showMessageDialog(this,about,"About MazeStormer",JOptionPane.INFORMATION_MESSAGE);
 	}
 }

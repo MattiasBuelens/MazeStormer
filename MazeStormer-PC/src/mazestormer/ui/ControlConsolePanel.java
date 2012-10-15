@@ -15,10 +15,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.javarichclient.icon.tango.actions.*;
+
+import mazestormer.controller.ControlViewController;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * The control console panel of the NXT.
+ * A class of control console panels.
  * 
  * @author 	Team Bronze
  * @version	
@@ -35,8 +37,8 @@ public class ControlConsolePanel extends ConsolePanel{
 	private JSpinner speedB;
 	private JSpinner speedC;
 
-	public ControlConsolePanel(MainControl mainControl){
-		super(mainControl);	
+	public ControlConsolePanel(ControlViewController cvc){
+		super(cvc);	
 		setLayout(new MigLayout("", "", ""));
 		initiateComponents();
 	}
@@ -78,7 +80,7 @@ public class ControlConsolePanel extends ConsolePanel{
 		down.registerKeyboardAction(down.getActionListeners()[0],
 	            KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false),  
 	            JComponent.WHEN_IN_FOCUSED_WINDOW);
-		add(down, "cell 1 2,alignx left,aligny top");
+		add(down, "cell 1 1,alignx left,aligny top");
 		
 		JButton left = new JButton("");
 		left.setIcon(new GoPreviousIcon(32,32));
@@ -90,6 +92,17 @@ public class ControlConsolePanel extends ConsolePanel{
 	            KeyStroke.getKeyStroke(KeyEvent.VK_Q, 0, false),  
 	            JComponent.WHEN_IN_FOCUSED_WINDOW);
 		add(left, "cell 0 1,alignx left,aligny top");
+		
+		JButton stop = new JButton("");
+		stop.setIcon(new ProcessStopIcon(32,32));
+		stop.addActionListener(new ActionListener(){
+			@Override
+	        public void actionPerformed(ActionEvent e){ stop(); }
+	    });
+		stop.registerKeyboardAction(stop.getActionListeners()[0],
+	            KeyStroke.getKeyStroke(KeyEvent.VK_A, 0, false),  
+	            JComponent.WHEN_IN_FOCUSED_WINDOW);
+		add(stop, "cell 1 2,alignx left,aligny top");
 	}
 	
 	private void initiateSpeeds(){
@@ -150,6 +163,10 @@ public class ControlConsolePanel extends ConsolePanel{
 
 	private void moveDown(){
 	
+	}
+	
+	private void stop(){
+		
 	}
 	
 	private void changeSpeed(Motor m, int input){

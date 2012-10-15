@@ -22,7 +22,7 @@ public enum Motor{
      * 			The motor name for this new motor.
      * @post 	The motor name for this new motor is 
      * 			equal to the given motor.
-     *          | new.getMotornr().equals(motorname)
+     *          | new.getMotorName().equals(motorname)
      */
     private Motor(String motorname){
     	this.motorname = motorname;
@@ -32,7 +32,7 @@ public enum Motor{
      * Returns the motor name of this motor.
      */
     @Basic @Immutable
-    public String getMotorname(){
+    public String getMotorName(){
     	return this.motorname;
     }
     
@@ -63,11 +63,11 @@ public enum Motor{
      * 			a not null referring motor with
      * 			the given value as its name.
      * 			| result == there exists a m in getAllMotors()
-     * 			|			for which m.getMotorname().equals(value)
+     * 			|			for which m.getMotorName().equals(value)
      */
     public static boolean correspondsToExistingMotor(String value){
     	for(Motor m : getAllMotors()){
-    		if(m.getMotorname().equals(value))
+    		if(m.getMotorName().equals(value))
     			return true;
     	}
     	return false;

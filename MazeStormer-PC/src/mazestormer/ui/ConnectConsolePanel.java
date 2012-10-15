@@ -5,10 +5,12 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+
+import mazestormer.controller.ConnectViewController;
 import net.miginfocom.swing.MigLayout;
 
 /**
- * The connect console panel of the NXT.
+ * A class of connect console panels.
  * 
  * @version
  * @author Team Bronze
@@ -23,8 +25,8 @@ public class ConnectConsolePanel extends ConsolePanel{
 	private JCheckBox bluetoothCheck;
 	private JCheckBox usbCheck;
 
-	public ConnectConsolePanel(MainControl mainControl) throws NullPointerException{
-		super(mainControl);
+	public ConnectConsolePanel(ConnectViewController cvc) throws NullPointerException{
+		super(cvc);
 		setLayout(new MigLayout("", "", ""));
 		initiateComponents();
 	}

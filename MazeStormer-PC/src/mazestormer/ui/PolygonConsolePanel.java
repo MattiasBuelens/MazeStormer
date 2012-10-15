@@ -7,12 +7,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 
+import mazestormer.controller.PolygonViewController;
 import net.miginfocom.swing.MigLayout;
 
 import com.javarichclient.icon.tango.actions.*;
 
 /**
- * The polygon console panel of the NXT.
+ * A class of polygon console panels.
  * 
  * @version
  * @author 	Team Bronze	
@@ -31,8 +32,8 @@ public class PolygonConsolePanel extends ConsolePanel{
 	private JButton playButton;
 	private JButton stopButton;
 
-	public PolygonConsolePanel(MainControl mainControl) throws NullPointerException{
-		super(mainControl);
+	public PolygonConsolePanel(PolygonViewController pvc) throws NullPointerException{
+		super(pvc);
 		setLayout(new MigLayout("", "", ""));
 		initiateComponents();
 	}

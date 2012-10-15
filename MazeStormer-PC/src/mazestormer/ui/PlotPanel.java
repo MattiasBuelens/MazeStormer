@@ -1,22 +1,16 @@
 package mazestormer.ui;
 
-import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+
 import mazestormer.controller.ViewController;
 
-/**
- * A class of console panels.
- * 
- * @version
- * @author 	Team Bronze
- *
- */
-public abstract class ConsolePanel extends JPanel{
+public abstract class PlotPanel extends JTabbedPane{
 	
-	private static final long serialVersionUID = 1856901269027189707L;
+	private static final long serialVersionUID = 205654497504294365L;
 	
 	private ViewController vc;
 	
-	protected ConsolePanel(ViewController vc) throws NullPointerException{
+	protected PlotPanel(ViewController vc) throws NullPointerException{
 		if(vc == null)
 			throw new NullPointerException("The given view controller may not refer the null reference.");
 		this.vc = vc;
@@ -25,4 +19,5 @@ public abstract class ConsolePanel extends JPanel{
 	protected ViewController getViewController(){
 		return this.vc;
 	}
+
 }
