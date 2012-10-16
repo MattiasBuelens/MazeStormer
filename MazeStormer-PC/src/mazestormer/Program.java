@@ -2,10 +2,9 @@ package mazestormer;
 
 import java.io.IOException;
 
-import lejos.nxt.Motor;
-import lejos.pc.comm.NXTCommandConnector;
 import lejos.pc.tools.ConsoleDebugDisplay;
 import lejos.pc.tools.ConsoleViewerUI;
+import mazestormer.connect.Connector;
 import mazestormer.console.ConsoleConnector;
 import mazestormer.console.StreamConsoleViewer;
 import mazestormer.robot.PhysicalRobot;

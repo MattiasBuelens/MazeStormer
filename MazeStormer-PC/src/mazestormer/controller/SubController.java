@@ -8,6 +8,7 @@ public abstract class SubController extends AbstractEventSource {
 
 	public SubController(MainController mainController) {
 		this.mainController = mainController;
+		mainController.register(this);
 	}
 
 	protected MainController getMainController() {

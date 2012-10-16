@@ -26,8 +26,7 @@ public class ParametersController extends SubController implements
 	@Override
 	public void setTravelSpeed(double travelSpeed) {
 		getRobot().setTravelSpeed(travelSpeed);
-		getEventBus().post(
-				new RobotParameterChangeEvent("travelSpeed", travelSpeed));
+		postEvent(new RobotParameterChangeEvent("travelSpeed", travelSpeed));
 	}
 
 	@Override
@@ -43,9 +42,7 @@ public class ParametersController extends SubController implements
 	@Override
 	public void setRotateSpeed(double rotateSpeed) {
 		getRobot().setRotateSpeed(rotateSpeed);
-		getEventBus().post(
-				new RobotParameterChangeEvent("rotateSpeed", rotateSpeed));
-
+		postEvent(new RobotParameterChangeEvent("rotateSpeed", rotateSpeed));
 	}
 
 }

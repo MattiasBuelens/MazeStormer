@@ -39,9 +39,12 @@ public class MainController implements IMainController {
 	/*
 	 * Controllers
 	 */
+	private IConfigurationController configuration;
 	private IParametersController parameters;
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
+
+	private IMapController map;
 
 	/*
 	 * View
@@ -74,10 +77,17 @@ public class MainController implements IMainController {
 	}
 
 	@Override
+	public IConfigurationController configuration() {
+		if (configuration == null) {
+			configuration = new ConfigurationController(this);
+		}
+		return configuration;
+	}
+
+	@Override
 	public IParametersController parameters() {
 		if (parameters == null) {
 			parameters = new ParametersController(this);
-			parameters.registerEventBus(getEventBus());
 		}
 		return parameters;
 	}
@@ -86,7 +96,6 @@ public class MainController implements IMainController {
 	public IManualControlController manualControl() {
 		if (manualControl == null) {
 			manualControl = new ManualControlController(this);
-			manualControl.registerEventBus(getEventBus());
 		}
 		return manualControl;
 	}
@@ -95,9 +104,21 @@ public class MainController implements IMainController {
 	public IPolygonControlController polygonControl() {
 		if (polygonControl == null) {
 			polygonControl = new PolygonControlController(this);
-			polygonControl.registerEventBus(getEventBus());
 		}
 		return polygonControl;
+	}
+
+	@Override
+	public IMapController map() {
+		if (map == null) {
+			map = new MapController(this);
+		}
+		return map;
+	}
+
+	@Override
+	public void register(EventSource eventSource) {
+		eventSource.registerEventBus(getEventBus());
 	}
 
 }

@@ -3,19 +3,16 @@ package mazestormer.ui.map;
 import java.util.Comparator;
 
 import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
-import mazestormer.util.EventSource;
+import mazestormer.util.AbstractEventSource;
 
 import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.svg.SVGStylableElement;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
-import com.google.common.eventbus.EventBus;
-
-public abstract class MapLayer implements EventSource {
+public abstract class MapLayer extends AbstractEventSource {
 
 	private final String name;
-	private EventBus eventBus;
 
 	private Element element;
 	private boolean isVisible;
@@ -23,22 +20,6 @@ public abstract class MapLayer implements EventSource {
 	public MapLayer(String name) {
 		this.name = name;
 		setVisible(true);
-	}
-
-	@Override
-	public EventBus getEventBus() {
-		return eventBus;
-	}
-
-	@Override
-	public void registerEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
-		eventBus.register(this);
-	}
-
-	public void postEvent(Object event) {
-		if (getEventBus() != null)
-			getEventBus().post(event);
 	}
 
 	public String getName() {

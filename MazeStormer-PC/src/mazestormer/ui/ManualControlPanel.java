@@ -1,5 +1,6 @@
 package mazestormer.ui;
 
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -9,8 +10,10 @@ import java.beans.Beans;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.IManualControlController;
 import net.miginfocom.swing.MigLayout;
@@ -19,7 +22,6 @@ import com.javarichclient.icon.tango.actions.GoDownIcon;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.GoPreviousIcon;
 import com.javarichclient.icon.tango.actions.GoUpIcon;
-import javax.swing.border.TitledBorder;
 
 public class ManualControlPanel extends ViewPanel {
 
@@ -33,6 +35,7 @@ public class ManualControlPanel extends ViewPanel {
 	private final Action turnRight = new RotateRightAction();
 	private final Action stop = new StopAction();
 
+	private JPanel container;
 	private JToggleButton btnForward;
 	private JToggleButton btnLeft;
 	private JToggleButton btnBackward;
@@ -47,8 +50,12 @@ public class ManualControlPanel extends ViewPanel {
 		this.controller = controller;
 
 		registerKeyboardActions();
+		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		setLayout(new MigLayout("", "[][][]", "[][]"));
+		container = new JPanel();
+		container.setLayout(new MigLayout("", "[][][]", "[][]"));
+		add(container);
+
 		createControls();
 
 		if (!Beans.isDesignTime())
@@ -63,23 +70,26 @@ public class ManualControlPanel extends ViewPanel {
 		btnForward = new JToggleButton();
 		btnForward.addItemListener(new ControlListener(moveForward, stop));
 		btnForward.setIcon(new GoUpIcon(32, 32));
-		add(btnForward, "cell 1 0,grow");
+		btnForward.setToolTipText("Forward");
+		container.add(btnForward, "cell 1 0,grow");
 
 		btnLeft = new JToggleButton();
 		btnLeft.addItemListener(new ControlListener(turnLeft, stop));
-		btnLeft.setToolTipText("Left");
 		btnLeft.setIcon(new GoPreviousIcon(32, 32));
-		add(btnLeft, "cell 0 1,grow");
+		btnLeft.setToolTipText("Left");
+		container.add(btnLeft, "cell 0 1,grow");
 
 		btnBackward = new JToggleButton();
 		btnBackward.addItemListener(new ControlListener(moveBackward, stop));
 		btnBackward.setIcon(new GoDownIcon(32, 32));
-		add(btnBackward, "cell 1 1,grow");
+		btnBackward.setToolTipText("Backward");
+		container.add(btnBackward, "cell 1 1,grow");
 
 		btnRight = new JToggleButton();
 		btnRight.addItemListener(new ControlListener(turnRight, stop));
 		btnRight.setIcon(new GoNextIcon(32, 32));
-		add(btnRight, "cell 2 1,grow");
+		btnRight.setToolTipText("Right");
+		container.add(btnRight, "cell 2 1,grow");
 	}
 
 	private void setCurrentButton(JToggleButton button) {

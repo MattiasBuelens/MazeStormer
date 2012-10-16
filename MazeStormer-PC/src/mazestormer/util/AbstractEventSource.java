@@ -17,4 +17,9 @@ public abstract class AbstractEventSource implements EventSource {
 		eventBus.register(this);
 	}
 
+	protected void postEvent(Object event) {
+		if (getEventBus() != null)
+			getEventBus().post(event);
+	}
+
 }

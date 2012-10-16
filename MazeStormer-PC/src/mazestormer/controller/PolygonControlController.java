@@ -31,7 +31,7 @@ public class PolygonControlController extends SubController implements
 	}
 
 	private void postState(EventType eventType) {
-		getEventBus().post(new PolygonEvent(eventType));
+		postEvent(new PolygonEvent(eventType));
 	}
 
 	private class PolygonRunner implements Runnable {

@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.beans.Beans;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,27 +14,26 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import mazestormer.controller.IMapController;
 import mazestormer.ui.SplitButton;
+import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
-import mazestormer.util.EventSource;
 
 import org.apache.batik.swing.JSVGCanvas;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
-public class MapPanel extends JPanel implements EventSource {
+public class MapPanel extends ViewPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private EventBus eventBus;
+	private final IMapController controller;
 
 	private JToolBar actionBar;
 	private JSVGCanvas canvas;
@@ -41,45 +41,27 @@ public class MapPanel extends JPanel implements EventSource {
 
 	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
 
-	public MapPanel(EventBus eventBus) {
-		registerEventBus(eventBus);
-		initialize();
-	}
+	public MapPanel(IMapController controller) {
+		this.controller = controller;
 
-	public MapPanel() {
-		this(new EventBus());
-	}
-
-	@Override
-	public EventBus getEventBus() {
-		return eventBus;
-	}
-
-	@Override
-	public void registerEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
-		eventBus.register(this);
-	}
-
-	protected void postEvent(Object event) {
-		if (eventBus != null)
-			eventBus.post(event);
-	}
-
-	private void initialize() {
 		setLayout(new BorderLayout(0, 0));
 
 		createCanvas();
 		add(canvas, BorderLayout.CENTER);
 
 		createActionBar();
-		actionBar.setFloatable(false);
 		add(actionBar, BorderLayout.NORTH);
+
+		if (!Beans.isDesignTime())
+			registerController();
+	}
+
+	private void registerController() {
+		registerEventBus(controller.getEventBus());
 	}
 
 	private void createCanvas() {
 		canvas = new MapCanvas();
-		canvas.setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
 	}
 
 	@Subscribe
@@ -89,6 +71,7 @@ public class MapPanel extends JPanel implements EventSource {
 
 	private void createActionBar() {
 		actionBar = new JToolBar();
+		actionBar.setFloatable(false);
 
 		JToggleButton btnFollow = new JToggleButton("Follow robot");
 		actionBar.add(btnFollow);
@@ -148,7 +131,7 @@ public class MapPanel extends JPanel implements EventSource {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				boolean isChecked = (e.getStateChange() == ItemEvent.SELECTED);
-				layer.setVisible(isChecked);
+				controller.setLayerVisible(layer, isChecked);
 			}
 		});
 
