@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdflatex 2012.10.9)  15 OCT 2012 18:59
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2012.10.15)  16 OCT 2012 07:59
 entering extended mode
-**C:/Users/Dennis/workspace/MazeStormer/META/verslagen/verslag1.tex
-(C:/Users/Dennis/workspace/MazeStormer/META/verslagen/verslag1.tex
+**C:/Users/Matthias/git/MazeStormer/META/verslag*1/verslag1.tex
+("C:/Users/Matthias/git/MazeStormer/META/verslag 1/verslag1.tex"
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
@@ -13,11 +13,11 @@ an, ngerman-x-2009-06-19, nynorsk, oriya, panjabi, pinyin, polish, portuguese,
 romanian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swis
 sgerman, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, u
 senglishmax, welsh, loaded.
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\penoverslag.cls
+("C:\Users\Matthias\git\MazeStormer\META\verslag 1\penoverslag.cls"
 Document Class: penoverslag 2012/09/25 v1.0 P&O verslag document class
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\article.cls"
+("C:\Program Files\proTeXt\tex\latex\base\article.cls"
 Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\size10.clo"
+("C:\Program Files\proTeXt\tex\latex\base\size10.clo"
 File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 \c@part=\count79
@@ -32,63 +32,63 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\babel\babel.sty"
+("C:\Program Files\proTeXt\tex\generic\babel\babel.sty"
 Package: babel 2008/07/08 v3.8m The Babel package
 
 *************************************
 * Local config file bblopts.cfg used
 *
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\00miktex\bblopts.cfg"
+("C:\Program Files\proTeXt\tex\latex\00miktex\bblopts.cfg"
 File: bblopts.cfg 2006/07/31 v1.0 MiKTeX 'babel' configuration
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\babel\dutch.ldf"
+("C:\Program Files\proTeXt\tex\generic\babel\dutch.ldf"
 Language: dutch 2005/03/30 v3.8i Dutch support from the babel system
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\babel\babel.def"
+("C:\Program Files\proTeXt\tex\generic\babel\babel.def"
 File: babel.def 2008/07/08 v3.8m Babel common definitions
 \babel@savecnt=\count87
 \U@D=\dimen103
 )
 Package babel Info: Making " an active character on input line 132.
 ))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\color.sty"
+("C:\Program Files\proTeXt\tex\latex\graphics\color.sty"
 Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\00miktex\color.cfg"
+("C:\Program Files\proTeXt\tex\latex\00miktex\color.cfg"
 File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package color Info: Driver file: pdftex.def on input line 130.
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\pdftex-def\pdftex.def"
+("C:\Program Files\proTeXt\tex\latex\pdftex-def\pdftex.def"
 File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\infwarerr.sty"
+("C:\Program Files\proTeXt\tex\generic\oberdiek\infwarerr.sty"
 Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\ltxcmds.sty"
+("C:\Program Files\proTeXt\tex\generic\oberdiek\ltxcmds.sty"
 Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
 )
 \Gread@gobject=\count88
 ))
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\everypage.sty
-Package: everypage 2006/06/30 1.0 Hooks to run on every page
+("C:\Program Files\proTeXt\tex\latex\everypage\everypage.sty"
+Package: everypage 2007/06/20 1.1 Hooks to run on every page
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\geometry\geometry.sty"
+("C:\Program Files\proTeXt\tex\latex\geometry\geometry.sty"
 Package: geometry 2010/09/12 v5.6 Page Geometry
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\keyval.sty"
+("C:\Program Files\proTeXt\tex\latex\graphics\keyval.sty"
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks14
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\ifpdf.sty"
+("C:\Program Files\proTeXt\tex\generic\oberdiek\ifpdf.sty"
 Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
 Package ifpdf Info: pdfTeX in PDF mode is detected.
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\ifvtex.sty"
+("C:\Program Files\proTeXt\tex\generic\oberdiek\ifvtex.sty"
 Package: ifvtex 2010/03/01 v1.5 Detect VTeX and its facilities (HO)
 Package ifvtex Info: VTeX not detected.
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\ifxetex\ifxetex.sty"
+("C:\Program Files\proTeXt\tex\generic\ifxetex\ifxetex.sty"
 Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 )
 \Gm@cnth=\count89
@@ -104,17 +104,17 @@ Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
 \Gm@layoutvoffset=\dimen111
 \Gm@dimlist=\toks15
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\geometry\geometry.cfg"))
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
+("C:\Program Files\proTeXt\tex\latex\geometry\geometry.cfg"))
+("C:\Program Files\proTeXt\tex\latex\graphics\graphicx.sty"
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\graphics.sty"
+("C:\Program Files\proTeXt\tex\latex\graphics\graphics.sty"
 Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\graphics\trig.sty"
+("C:\Program Files\proTeXt\tex\latex\graphics\trig.sty"
 Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\00miktex\graphics.cfg"
+("C:\Program Files\proTeXt\tex\latex\00miktex\graphics.cfg"
 File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
 )
 Package graphics Info: Driver file: pdftex.def on input line 91.
@@ -122,19 +122,18 @@ Package graphics Info: Driver file: pdftex.def on input line 91.
 \Gin@req@height=\dimen112
 \Gin@req@width=\dimen113
 ))
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\lipsum.sty
-Package: lipsum 2005/01/26 v1.0 150 paragraphs of Lorem Ipsum dummy text
-File: lipsum.dtx 2005/01/26 v1.0 150 paragraphs of Lorem Ipsum dummy text
+("C:\Program Files\proTeXt\tex\latex\lipsum\lipsum.sty"
+Package: lipsum 2011/04/14 v1.2 150 paragraphs of Lorem Ipsum dummy text
 \c@lips@count=\count92
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\hyperref\hyperref.sty"
+("C:\Program Files\proTeXt\tex\latex\hyperref\hyperref.sty"
 Package: hyperref 2012/05/13 v6.82q Hypertext links for LaTeX
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\hobsub-hyperref.sty"
+("C:\Program Files\proTeXt\tex\generic\oberdiek\hobsub-hyperref.sty"
 Package: hobsub-hyperref 2012/04/25 v1.12 Bundle oberdiek, subset hyperref (HO)
 
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\hobsub-generic.sty"
+("C:\Program Files\proTeXt\tex\generic\oberdiek\hobsub-generic.sty"
 Package: hobsub-generic 2012/04/25 v1.12 Bundle oberdiek, subset generic (HO)
 Package: hobsub 2012/04/25 v1.12 Construct package bundles (HO)
 Package hobsub Info: Skipping package `infwarerr' (already loaded).
@@ -173,19 +172,19 @@ Package: atbegshi 2011/10/05 v1.16 At begin shipout hook (HO)
 Package: refcount 2011/10/16 v3.4 Data extraction from label references (HO)
 Package: hycolor 2011/01/30 v1.7 Color options for hyperref/bookmark (HO)
 )
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\oberdiek\kvoptions.sty"
+("C:\Program Files\proTeXt\tex\latex\oberdiek\kvoptions.sty"
 Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
 )
 \@linkdim=\dimen114
 \Hy@linkcounter=\count93
 \Hy@pagecounter=\count94
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\hyperref\pd1enc.def"
+("C:\Program Files\proTeXt\tex\latex\hyperref\pd1enc.def"
 File: pd1enc.def 2012/05/13 v6.82q Hyperref: PDFDocEncoding definition (HO)
 )
 \Hy@SavedSpaceFactor=\count95
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\00miktex\hyperref.cfg"
+("C:\Program Files\proTeXt\tex\latex\00miktex\hyperref.cfg"
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
 )
 Package hyperref Info: Hyper figures OFF on input line 4062.
@@ -197,7 +196,7 @@ Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4300.
 \c@Hy@tempcnt=\count96
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\ltxmisc\url.sty"
+("C:\Program Files\proTeXt\tex\latex\ltxmisc\url.sty"
 \Urlmuskip=\muskip10
 Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
 )
@@ -221,19 +220,19 @@ LaTeX Info: Redefining \pageref on input line 5847.
 
 Package hyperref Message: Driver (autodetected): hpdftex.
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\hyperref\hpdftex.def"
+("C:\Program Files\proTeXt\tex\latex\hyperref\hpdftex.def"
 File: hpdftex.def 2012/05/13 v6.82q Hyperref driver for pdfTeX
 \Fld@listcount=\count101
 \c@bookmark@seq@number=\count102
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\oberdiek\rerunfilecheck.sty"
+("C:\Program Files\proTeXt\tex\latex\oberdiek\rerunfilecheck.sty"
 Package: rerunfilecheck 2011/04/15 v1.7 Rerun checks for auxiliary files (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 82.
 )
 \Hy@SectionHShift=\skip43
 )
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\verslag1.aux)
+("C:\Users\Matthias\git\MazeStormer\META\verslag 1\verslag1.aux")
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
 LaTeX Font Info:    ... okay on input line 23.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
@@ -249,7 +248,7 @@ LaTeX Font Info:    ... okay on input line 23.
 LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 23.
 LaTeX Font Info:    ... okay on input line 23.
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
+("C:\Program Files\proTeXt\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count103
 \scratchdimen=\dimen117
@@ -299,10 +298,10 @@ LaTeX Font Info:    ... okay on input line 23.
 
 \AtBeginShipoutBox=\box27
 Package hyperref Info: Link coloring OFF on input line 23.
-("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\hyperref\nameref.sty"
+("C:\Program Files\proTeXt\tex\latex\hyperref\nameref.sty"
 Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
 
-("C:\Program Files (x86)\MiKTeX 2.9\tex\generic\oberdiek\gettitlestring.sty"
+("C:\Program Files\proTeXt\tex\generic\oberdiek\gettitlestring.sty"
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count109
@@ -311,11 +310,11 @@ LaTeX Info: Redefining \ref on input line 23.
 LaTeX Info: Redefining \pageref on input line 23.
 LaTeX Info: Redefining \nameref on input line 23.
 
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\verslag1.out)
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\verslag1.out)
+("C:\Users\Matthias\git\MazeStormer\META\verslag 1\verslag1.out")
+("C:\Users\Matthias\git\MazeStormer\META\verslag 1\verslag1.out")
 \@outlinefile=\write3
 
-<sedes.pdf, id=47, 310.15875pt x 521.95pt>
+<sedes.pdf, id=35, 310.15875pt x 521.95pt>
 File: sedes.pdf Graphic file (type pdf)
  <use sedes.pdf>
 Package pdftex.def Info: sedes.pdf used on input line 32.
@@ -326,9 +325,16 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 32.
  [1
 
-{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map} <C:/Users/Dennis/workspace
-/MazeStormer/META/verslagen/sedes.pdf>]
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\verslag1.toc)
+{C:/Users/Matthias/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <C:/Users
+/Matthias/git/MazeStormer/META/verslag 1/sedes.pdf>]
+Missing character: There is no â in font cmr9!
+Missing character: There is no € in font cmr9!
+Missing character: There is no ˜ in font cmr9!
+Missing character: There is no â in font cmr9!
+Missing character: There is no € in font cmr9!
+Missing character: There is no ™ in font cmr9!
+
+("C:\Users\Matthias\git\MazeStormer\META\verslag 1\verslag1.toc")
 \tf@toc=\write4
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
@@ -336,56 +342,142 @@ been already used, duplicate ignored
                    \relax 
 l.40 \newpage
               [1]
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 57.
- ("C:\Program Files (x86)\MiKTeX 2.9\tex\latex\base\omscmr.fd"
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ˜ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no ¯ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ˜ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+
+
+LaTeX Warning: Citation `steeringrobot' on page 2 undefined on input line 55.
+
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ˜ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ˜ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+
+LaTeX Warning: Citation `expressbot' on page 2 undefined on input line 57.
+
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ˜ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+[2]
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+
+
+LaTeX Warning: Citation `lcp' on page 3 undefined on input line 106.
+
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ¦ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no « in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+
+LaTeX Warning: Citation `awtswing' on page 3 undefined on input line 110.
+
+[3]
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+Missing character: There is no Ã in font cmr10!
+Missing character: There is no © in font cmr10!
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 114.
+
+ ("C:\Program Files\proTeXt\tex\latex\base\omscmr.fd"
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 57.
- [2]
-Overfull \hbox (1.11208pt too wide) in paragraph at lines 114--115
-[]\OT1/cmr/m/n/10 Geef hier een dui-de-lijk beeld van het de-sign van de user i
-n-ter-face (welke be-slis-sin-gen, waarom?,
- []
-
-[3] [4] [5] [6]
-(C:\Users\Dennis\workspace\MazeStormer\META\verslagen\verslag1.bbl
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 114.
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ˜ in font cmr10!
+Missing character: There is no â in font cmr10!
+Missing character: There is no € in font cmr10!
+Missing character: There is no ™ in font cmr10!
+ [4] [5] [6]
+("C:\Users\Matthias\git\MazeStormer\META\verslag 1\verslag1.bbl"
 
 LaTeX Warning: Empty `thebibliography' environment on input line 3.
 
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 203.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 213.
  [7]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 203.
- (C:\Users\Dennis\workspace\MazeStormer\META\verslagen\verslag1.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 203.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 203.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 213.
+ ("C:\Users\Matthias\git\MazeStormer\META\verslag 1\verslag1.aux")
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 213.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 213.
 Package rerunfilecheck Info: File `verslag1.out' has not changed.
-(rerunfilecheck)             Checksum: 6945E8A98EDD6ED44F64759C07F3EA0F;542.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 203.
+(rerunfilecheck)             Checksum: 000D60D42FD4819432BED1EF03B654BC;409.
+
+
+LaTeX Warning: There were undefined references.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 213.
  ) 
 Here is how much of TeX's memory you used:
- 5940 strings out of 494045
- 87522 string characters out of 3145966
- 274077 words of memory out of 3000000
- 9138 multiletter control sequences out of 15000+200000
- 9005 words of font info for 32 fonts, out of 3000000 for 9000
+ 5935 strings out of 494045
+ 86709 string characters out of 3149586
+ 273067 words of memory out of 3000000
+ 9144 multiletter control sequences out of 15000+200000
+ 8837 words of font info for 31 fonts, out of 3000000 for 9000
  715 hyphenation exceptions out of 8191
- 32i,6n,31p,816b,400s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb>
-<C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C
-:/Program Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/P
-rogram Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Pr
-ogram Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Progr
-am Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program 
-Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Program File
-s (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmss17.pfb><C:/Program Files 
-(x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files (x
-86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti12.pfb><C:/Program Files (x86
-)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on verslag1.pdf (8 pages, 180208 bytes).
+ 32i,6n,31p,1078b,350s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Program Files/proTeXt/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Progr
+am Files/proTeXt/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Files/pr
+oTeXt/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Program Files/proTeXt/fonts/
+type1/public/amsfonts/cm/cmcsc10.pfb><C:/Program Files/proTeXt/fonts/type1/publ
+ic/amsfonts/cm/cmr10.pfb><C:/Program Files/proTeXt/fonts/type1/public/amsfonts/
+cm/cmr12.pfb><C:/Program Files/proTeXt/fonts/type1/public/amsfonts/cm/cmr9.pfb>
+<C:/Program Files/proTeXt/fonts/type1/public/amsfonts/cm/cmss17.pfb><C:/Program
+ Files/proTeXt/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program Files/proT
+eXt/fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on verslag1.pdf (8 pages, 166553 bytes).
 PDF statistics:
- 198 PDF objects out of 1000 (max. 8388607)
- 46 named destinations out of 1000 (max. 500000)
- 94 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 161 PDF objects out of 1000 (max. 8388607)
+ 34 named destinations out of 1000 (max. 500000)
+ 70 words of extra memory for PDF output out of 10000 (max. 10000000)
 

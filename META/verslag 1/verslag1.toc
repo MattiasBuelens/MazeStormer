@@ -1,0 +1,25 @@
+\select@language {dutch}
+\contentsline {section}{\numberline {1}Bouw robot}{2}{section.1}
+\contentsline {subsection}{\numberline {1.1}Fysieke bouw}{2}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Meetresultaten}{2}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}Afbuigingsmarge bij translatie}{3}{subsubsection.1.2.1}
+\contentsline {subsubsection}{\numberline {1.2.2}Foutmarge bij translatie}{3}{subsubsection.1.2.2}
+\contentsline {subsubsection}{\numberline {1.2.3}Foutmarge bij rotatie}{3}{subsubsection.1.2.3}
+\contentsline {section}{\numberline {2}Algoritmes}{3}{section.2}
+\contentsline {section}{\numberline {3}Software}{3}{section.3}
+\contentsline {subsection}{\numberline {3.1}Bluetooth}{3}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}GUI}{3}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}API}{3}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}Ontwerpbeslissingen en evolutie}{4}{subsubsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.3}Modes en features}{4}{subsubsection.3.2.3}
+\contentsline {subsection}{\numberline {3.3}Simulator}{4}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Software design}{4}{subsection.3.4}
+\contentsline {section}{\numberline {4}Besluit}{4}{section.4}
+\setcounter {tocdepth}{1}
+\contentsline {section}{\numberline {A}Demo 1}{6}{appendix.A}
+\contentsline {subsection}{\numberline {A.1}Resultaten}{6}{subsection.A.1}
+\contentsline {subsection}{\numberline {A.2}Conclusies}{6}{subsection.A.2}
+\contentsline {subsection}{\numberline {A.3}Oplijsting aanpassingen verslag}{6}{subsection.A.3}
+\contentsline {section}{\numberline {B}Beschrijving van het proces}{6}{appendix.B}
+\contentsline {section}{\numberline {C}Beschrijving van de werkverdeling}{6}{appendix.C}
+\contentsline {section}{\numberline {D}Kritisch analyse}{6}{appendix.D}
