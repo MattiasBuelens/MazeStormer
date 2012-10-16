@@ -1,0 +1,151 @@
+<class-diagram version="1.0.8" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true">  
+  <interface id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.IMainController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/IMainController.java" binary="false">    
+    <position height="-1" width="-1" x="443" y="160"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.MainController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/MainController.java" binary="false">    
+    <position height="-1" width="-1" x="778" y="160"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.VirtualControlViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/VirtualControlViewController.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="727" y="632"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.VirtualPolygonViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/VirtualPolygonViewController.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="1148" y="633"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PhysicalConnectViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/PhysicalConnectViewController.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="121" y="631"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PhysicalControlViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/PhysicalControlViewController.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="530" y="632"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PhysicalPolygonViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/PhysicalPolygonViewController.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="948" y="634"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.ControlViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/ControlViewController.java" binary="false">    
+    <position height="-1" width="-1" x="604" y="493"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </interface>  
+  <interface id="9" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.ConnectViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/ConnectViewController.java" binary="false">    
+    <position height="-1" width="-1" x="225" y="495"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </interface>  
+  <interface id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PolygonViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/PolygonViewController.java" binary="false">    
+    <position height="-1" width="-1" x="1019" y="494"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </interface>  
+  <interface id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.ViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/ViewController.java" binary="false">    
+    <position height="-1" width="-1" x="604" y="396"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.VirtualConnectViewController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/VirtualConnectViewController.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="324" y="633"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <realization id="13">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="9"/>  
+  </realization>  
+  <generalization id="14">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="11"/>  
+  </generalization>  
+  <realization id="15">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="8"/>  
+  </realization>  
+  <realization id="16">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="10"/>  
+  </realization>  
+  <generalization id="17">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="11"/>  
+  </generalization>  
+  <realization id="18">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="8"/>  
+  </realization>  
+  <realization id="19">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="9"/>  
+  </realization>  
+  <generalization id="20">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="11"/>  
+  </generalization>  
+  <realization id="21">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="10"/>  
+  </realization>  
+  <realization id="22">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </realization>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="false"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
