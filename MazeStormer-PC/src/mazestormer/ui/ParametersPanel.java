@@ -59,11 +59,11 @@ public class ParametersPanel extends ViewPanel {
 	private void updateState(boolean isConnected) {
 		setVisible(isConnected);
 
-		travelSpeedModel.setMaximum(controller.getMaxTravelSpeed());
 		travelSpeedModel.setValue(controller.getTravelSpeed());
+		travelSpeedModel.setMaximum(controller.getMaxTravelSpeed());
 
-		rotateSpeedModel.setMaximum(controller.getMaxRotateSpeed());
 		rotateSpeedModel.setValue(controller.getRotateSpeed());
+		rotateSpeedModel.setMaximum(controller.getMaxRotateSpeed());
 	}
 
 	@Subscribe

@@ -83,13 +83,16 @@ public class PolygonControlPanel extends ViewPanel {
 		JSpinner spinNbSides = new JSpinner();
 		spinNbSides.setModel(nbSidesModel);
 		container.add(spinNbSides, "cell 1 0,grow");
+		
+		JLabel lblUnit = new JLabel("sides");
+		container.add(lblUnit, "cell 2 0,grow");
 	}
 
 	private void createSideLength() {
 		sideLengthModel = new SpinnerNumberModel(new Double(0), new Double(0),
 				null, new Double(1));
 
-		JLabel lblSideLength = new JLabel("Side Length");
+		JLabel lblSideLength = new JLabel("Side length");
 		container.add(lblSideLength, "cell 0 1,grow");
 
 		JSpinner spinSideLength = new JSpinner();

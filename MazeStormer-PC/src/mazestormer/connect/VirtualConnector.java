@@ -5,6 +5,12 @@ import mazestormer.robot.SimulatedRobot;
 
 public class VirtualConnector implements Connector {
 
+	/*
+	 * Default virtual speeds
+	 */
+	private static final double travelSpeed = 20d; // cm/sec
+	private static final double rotateSpeed = 90d; // degrees/sec
+
 	private Robot robot;
 	private String deviceName; // not used
 
@@ -40,8 +46,11 @@ public class VirtualConnector implements Connector {
 	}
 
 	private Robot createRobot() {
-		return new SimulatedRobot(Robot.leftWheelDiameter,
+		Robot robot = new SimulatedRobot(Robot.leftWheelDiameter,
 				Robot.rightWheelDiameter, Robot.trackWidth);
+		robot.setTravelSpeed(travelSpeed);
+		robot.setRotateSpeed(rotateSpeed);
+		return robot;
 	}
 
 	@Override
