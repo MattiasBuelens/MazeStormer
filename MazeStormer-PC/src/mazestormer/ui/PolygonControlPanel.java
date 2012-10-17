@@ -1,11 +1,16 @@
 package mazestormer.ui;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.beans.Beans;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -15,18 +20,13 @@ import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.IPolygonControlController;
 import mazestormer.controller.IPolygonControlController.Direction;
+import mazestormer.controller.PolygonEvent;
 import mazestormer.controller.PolygonEvent.EventType;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
-
-import javax.swing.AbstractAction;
-import java.awt.event.ActionEvent;
-import javax.swing.Action;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 
 public class PolygonControlPanel extends ViewPanel {
 
@@ -69,7 +69,7 @@ public class PolygonControlPanel extends ViewPanel {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
-		
+
 		setButtonState(false);
 	}
 
@@ -146,8 +146,8 @@ public class PolygonControlPanel extends ViewPanel {
 	}
 
 	@Subscribe
-	public void onPolygonEvent(EventType eventType) {
-		setButtonState(eventType == EventType.STARTED);
+	public void onPolygonEvent(PolygonEvent e) {
+		setButtonState(e.getEventType() == EventType.STARTED);
 	}
 
 	private class StartAction extends AbstractAction {

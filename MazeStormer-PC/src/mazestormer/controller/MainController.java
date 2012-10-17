@@ -2,8 +2,10 @@ package mazestormer.controller;
 
 import java.awt.EventQueue;
 
+import mazestormer.connect.ConnectionProvider;
+import mazestormer.connect.Connector;
+import mazestormer.connect.RobotType;
 import mazestormer.robot.Robot;
-import mazestormer.robot.SimulatedRobot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
@@ -34,7 +36,8 @@ public class MainController implements IMainController {
 	/*
 	 * Models
 	 */
-	private Robot robot;
+	private ConnectionProvider connectionProvider;
+	private Connector connector;
 
 	/*
 	 * Controllers
@@ -45,6 +48,7 @@ public class MainController implements IMainController {
 	private IPolygonControlController polygonControl;
 
 	private IMapController map;
+	private IStateController state;
 
 	/*
 	 * View
@@ -52,28 +56,22 @@ public class MainController implements IMainController {
 	private EventSource view;
 
 	public MainController() {
-		robot = new SimulatedRobot(Robot.leftWheelDiameter,
-				Robot.rightWheelDiameter, Robot.trackWidth);
+		connectionProvider = new ConnectionProvider();
 
 		view = createView();
 		view.registerEventBus(getEventBus());
-	}
 
-	public Robot getRobot() throws IllegalStateException {
-		if (robot == null) {
-			throw new IllegalStateException("No robot is connected.");
-		}
-		return robot;
-	}
-
-	private EventBus getEventBus() {
-		return eventBus;
+		getEventBus().post(new InitializeEvent());
 	}
 
 	protected EventSource createView() {
 		MainView view = new MainView(this);
 		view.setVisible(true);
 		return view;
+	}
+
+	private EventBus getEventBus() {
+		return eventBus;
 	}
 
 	@Override
@@ -117,8 +115,35 @@ public class MainController implements IMainController {
 	}
 
 	@Override
+	public IStateController state() {
+		if (state == null) {
+			state = new StateController(this);
+		}
+		return state;
+	}
+
+	@Override
 	public void register(EventSource eventSource) {
 		eventSource.registerEventBus(getEventBus());
+	}
+
+	public Connector getConnector() {
+		return connector;
+	}
+
+	public Connector setConnector(RobotType robotType) {
+		connector = connectionProvider.getConnector(robotType);
+		return connector;
+	}
+
+	public boolean isConnected() {
+		return getConnector() != null && getConnector().isConnected();
+	}
+
+	public Robot getRobot() throws IllegalStateException {
+		if (!isConnected())
+			throw new IllegalStateException("Not connected to robot.");
+		return getConnector().getRobot();
 	}
 
 }
