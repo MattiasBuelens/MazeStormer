@@ -11,6 +11,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.IParametersController;
 import mazestormer.controller.RobotParameterChangeEvent;
 import net.miginfocom.swing.MigLayout;
@@ -29,19 +30,20 @@ public class ParametersPanel extends ViewPanel {
 	private SpinnerNumberModel travelSpeedModel;
 	private SpinnerNumberModel rotateSpeedModel;
 
-	/**
-	 * Create the panel.
-	 */
 	public ParametersPanel(IParametersController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Parameters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
+				"Parameters", TitledBorder.LEADING, TitledBorder.TOP, null,
+				null));
 		setLayout(new BorderLayout(0, 0));
 
 		container = new JPanel();
 		container.setLayout(new MigLayout("", "[grow 75][grow 25][right]",
 				"[][]"));
 		add(container, BorderLayout.NORTH);
+
+		createModels();
 
 		createTravelSpeed();
 		createRotateSpeed();
@@ -52,6 +54,10 @@ public class ParametersPanel extends ViewPanel {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
+	}
+
+	private void updateState(boolean isConnected) {
+		setVisible(isConnected);
 
 		travelSpeedModel.setMaximum(controller.getMaxTravelSpeed());
 		travelSpeedModel.setValue(controller.getTravelSpeed());
@@ -60,12 +66,22 @@ public class ParametersPanel extends ViewPanel {
 		rotateSpeedModel.setValue(controller.getRotateSpeed());
 	}
 
+	@Subscribe
+	public void onConnected(ConnectEvent e) {
+		updateState(e.isConnected());
+	}
+
+	private void createModels() {
+		travelSpeedModel = new SpinnerNumberModel(new Double(0), new Double(0),
+				null, new Double(1));
+
+		rotateSpeedModel = new SpinnerNumberModel(new Double(0), new Double(0),
+				null, new Double(1));
+	}
+
 	private void createTravelSpeed() {
 		JLabel lblTravelSpeed = new JLabel("Travel speed");
 		container.add(lblTravelSpeed, "cell 0 0,grow");
-
-		travelSpeedModel = new SpinnerNumberModel(new Double(0), new Double(0),
-				null, new Double(1));
 
 		travelSpeedModel.addChangeListener(new ChangeListener() {
 			@Override
@@ -85,9 +101,6 @@ public class ParametersPanel extends ViewPanel {
 	private void createRotateSpeed() {
 		JLabel lblRotateSpeed = new JLabel("Rotate speed");
 		container.add(lblRotateSpeed, "cell 0 1,grow");
-
-		rotateSpeedModel = new SpinnerNumberModel(new Double(0), new Double(0),
-				null, new Double(1));
 
 		rotateSpeedModel.addChangeListener(new ChangeListener() {
 			@Override

@@ -16,9 +16,9 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import mazestormer.connect.ConnectEvent;
+import mazestormer.connect.ControlMode;
+import mazestormer.connect.RobotType;
 import mazestormer.controller.IConfigurationController;
-import mazestormer.controller.IConfigurationController.ControlMode;
-import mazestormer.controller.IConfigurationController.RobotType;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;

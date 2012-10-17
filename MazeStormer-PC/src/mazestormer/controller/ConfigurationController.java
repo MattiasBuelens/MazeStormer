@@ -1,7 +1,19 @@
 package mazestormer.controller;
 
+import com.google.common.eventbus.Subscribe;
+
+import mazestormer.connect.ConnectEvent;
+import mazestormer.connect.Connector;
+import mazestormer.connect.ControlMode;
+import mazestormer.connect.ControlModeChangeEvent;
+import mazestormer.connect.RobotType;
+import mazestormer.robot.Robot;
+
 public class ConfigurationController extends SubController implements
 		IConfigurationController {
+
+	private RobotType robotType;
+	private ControlMode controlMode;
 
 	public ConfigurationController(MainController mainController) {
 		super(mainController);
@@ -9,38 +21,84 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public RobotType getRobotType() {
-		// TODO Auto-generated method stub
-		return null;
+		return robotType;
+	}
+
+	private void setRobotType(RobotType robotType) {
+		this.robotType = robotType;
 	}
 
 	@Override
 	public ControlMode getControlMode() {
-		// TODO Auto-generated method stub
-		return null;
+		return controlMode;
+	}
+
+	private void setControlMode(ControlMode controlMode) {
+		this.controlMode = controlMode;
+		postEvent(new ControlModeChangeEvent(controlMode));
 	}
 
 	@Override
 	public boolean isConnected() {
-		// TODO Auto-generated method stub
-		return false;
+		return getMainController().isConnected();
 	}
 
 	@Override
 	public void connect(RobotType robotType, ControlMode controlMode) {
-		// TODO Auto-generated method stub
+		if (isConnected())
+			throw new IllegalStateException("Already connected.");
 
+		// Set current state
+		setRobotType(robotType);
+		setControlMode(controlMode);
+
+		// Connect
+		Connector connector = getMainController().setConnector(robotType);
+		connector.connect();
+
+		postState();
 	}
 
 	@Override
 	public void disconnect() {
-		// TODO Auto-generated method stub
+		if (!isConnected())
+			throw new IllegalStateException("Not connected.");
 
+		// Stop the robot
+		stop();
+
+		// Disconnect
+		setControlMode(null);
+		getConnector().disconnect();
+
+		postState();
+	}
+
+	private void postState() {
+		postEvent(new ConnectEvent(isConnected()));
 	}
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
+		if (isConnected())
+			getRobot().stop();
+	}
 
+	@Subscribe
+	public void onInitialized(InitializeEvent e) {
+		// Post connected state on initialize
+		postState();
+	}
+
+	public Robot getRobot() {
+		if (!isConnected())
+			throw new IllegalStateException("Not connected.");
+
+		return getConnector().getRobot();
+	}
+
+	private Connector getConnector() {
+		return getMainController().getConnector();
 	}
 
 }

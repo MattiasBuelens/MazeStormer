@@ -1,17 +1,22 @@
 package mazestormer.ui;
 
 import java.awt.Dimension;
+import java.beans.Beans;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import mazestormer.connect.ConnectEvent;
+import mazestormer.connect.ControlMode;
+import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.controller.IMainController;
 import mazestormer.ui.map.MapPanel;
 import mazestormer.util.EventSource;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 public class MainView extends JFrame implements EventSource {
 
@@ -32,6 +37,16 @@ public class MainView extends JFrame implements EventSource {
 		this.controller = controller;
 
 		initialize();
+
+		if (!Beans.isDesignTime()) {
+			registerController();
+		}
+	}
+
+	private void registerController() {
+		controller.register(this);
+
+		setControlMode(controller.configuration().getControlMode());
 	}
 
 	private void initialize() {
@@ -40,7 +55,7 @@ public class MainView extends JFrame implements EventSource {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		getContentPane().setLayout(
-				new MigLayout("", "[grow][300px:n]", "[][grow][grow]"));
+				new MigLayout("hidemode 3", "[grow][]", "[][grow][grow]"));
 
 		configurationPanel = new ConfigurationPanel(controller.configuration());
 		getContentPane().add(configurationPanel, "cell 0 0,grow");
@@ -48,17 +63,17 @@ public class MainView extends JFrame implements EventSource {
 		parametersPanel = new ParametersPanel(controller.parameters());
 		getContentPane().add(parametersPanel, "cell 1 0,grow");
 
+		controlPanel = new ManualControlPanel(controller.manualControl());
+		getContentPane().add(controlPanel, "cell 1 1,grow");
+
 		mapPanel = new MapPanel(controller.map());
 		mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
 		getContentPane().add(mapPanel, "cell 0 1,grow");
 
-		controlPanel = new ManualControlPanel(controller.manualControl());
-		getContentPane().add(controlPanel, "cell 1 1,grow");
-
 		logPanel = new LogPanel();
 		getContentPane().add(logPanel, "cell 0 2,grow");
 
-		statePanel = new StatePanel();
+		statePanel = new StatePanel(controller.state());
 		getContentPane().add(statePanel, "cell 1 2,grow");
 	}
 
@@ -78,4 +93,34 @@ public class MainView extends JFrame implements EventSource {
 			getEventBus().post(event);
 	}
 
+	private void setControlMode(ControlMode controlMode) {
+		if (controlMode == null) {
+			setControlPanel(null);
+			return;
+		}
+
+		switch (controlMode) {
+		case Manual:
+			setControlPanel(new ManualControlPanel(controller.manualControl()));
+			break;
+		case Polygon:
+			setControlPanel(new PolygonControlPanel(controller.polygonControl()));
+			break;
+		}
+	}
+
+	private void setControlPanel(ViewPanel controlPanel) {
+		if (this.controlPanel != null) {
+			getContentPane().remove(this.controlPanel);
+		}
+		if (controlPanel != null) {
+			getContentPane().add(controlPanel, "cell 1 1,grow");
+			this.controlPanel = controlPanel;
+		}
+	}
+
+	@Subscribe
+	public void onControlModeChanged(ControlModeChangeEvent e) {
+		setControlMode(e.getControlMode());
+	}
 }
