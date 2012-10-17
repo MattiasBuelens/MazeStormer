@@ -1,6 +1,9 @@
 package mazestormer;
 
 import java.io.IOException;
+import java.util.Scanner;
+
+import org.jfree.util.WaitingImageObserver;
 
 import lejos.pc.tools.ConsoleDebugDisplay;
 import lejos.pc.tools.ConsoleViewerUI;
@@ -42,19 +45,26 @@ public class Program {
 		robot.setAcceleration(acceleration);
 		robot.setRotateSpeed(rotateSpeed);
 		robot.setTravelSpeed(travelSpeed);
-		int n = 5;
-		for (int i = 0; i < n; ++i) {
-			robot.travel(200 / n);
-		}
+		
+//		int n = 5;
+//		for (int i = 0; i < n; ++i) {
+//			robot.travel(200 / n);
+//		}
 
-		// Travel in a square
-		// int nSides = 5;
-		// int direction = 1; // 1 = counterclockwise, -1 = clockwise
-		// double sideLength = 50d;
-		// for (int i = 0; i < nSides; ++i) {
-		// robot.travel(sideLength);
-		// robot.rotate(direction * 360d / (double) nSides);
-		// }
+		//robot.travel(80d);
+		Scanner in = new Scanner(System.in); 
+		robot.travel(80d);
+		in.next();
+		robot.rotate(-120d);
+		robot.travel(80d);
+		 //Travel in a square
+//		 int nSides = 5;
+//		 int direction = -1; // 1 = counterclockwise, -1 = clockwise
+//		 double sideLength = 50d;
+//		 for (int i = 0; i < nSides; ++i) {
+//		 robot.travel(sideLength);
+//		 robot.rotate(direction * 360d / (double) nSides);
+//		 }
 		robot.stop();
 
 		Connector.close();
