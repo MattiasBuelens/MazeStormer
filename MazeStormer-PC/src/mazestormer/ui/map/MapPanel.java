@@ -149,7 +149,7 @@ public class MapPanel extends ViewPanel {
 		if (event.getPropertyName() == "isVisible") {
 			JMenuItem menuItem = layerMenuItems.get(event.getLayer());
 			if (menuItem != null) {
-				menuItem.setSelected((boolean) event.getPropertyValue());
+				menuItem.setSelected((Boolean) event.getPropertyValue());
 			}
 		}
 	}
