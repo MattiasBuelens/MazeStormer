@@ -341,7 +341,7 @@ public class SimulatedRobot implements Robot {
 		}
 
 		// Compare absolute values, since target may be negative
-		if (Math.abs(travelled) < target) {
+		if (Math.abs(travelled) < Math.abs(target)) {
 			// Make travelled same sign as target
 			return Math.copySign(travelled, target);
 		} else {
@@ -369,7 +369,7 @@ public class SimulatedRobot implements Robot {
 		}
 
 		// Compare absolute values, since target may be negative
-		if (Math.abs(rotated) < target) {
+		if (Math.abs(rotated) < Math.abs(target)) {
 			// Make travelled same sign as target
 			return Math.copySign(rotated, target);
 		} else {
