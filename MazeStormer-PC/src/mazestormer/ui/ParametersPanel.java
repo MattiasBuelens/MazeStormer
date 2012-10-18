@@ -86,7 +86,7 @@ public class ParametersPanel extends ViewPanel {
 		travelSpeedModel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				controller.setTravelSpeed((double) travelSpeedModel.getValue());
+				controller.setTravelSpeed((Double) travelSpeedModel.getValue());
 			}
 		});
 
@@ -105,7 +105,7 @@ public class ParametersPanel extends ViewPanel {
 		rotateSpeedModel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				controller.setRotateSpeed((double) rotateSpeedModel.getValue());
+				controller.setRotateSpeed((Double) rotateSpeedModel.getValue());
 			}
 		});
 
