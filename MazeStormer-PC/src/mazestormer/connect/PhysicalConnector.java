@@ -93,8 +93,4 @@ public class PhysicalConnector implements Connector {
 		}
 	}
 
-	public NXTCommand getCommand() {
-		return command;
-	}
-
 }
