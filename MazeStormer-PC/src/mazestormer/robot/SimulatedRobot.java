@@ -2,9 +2,12 @@ package mazestormer.robot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
+import lejos.robotics.navigation.Move.MoveType;
 
 public class SimulatedRobot implements Robot {
 
@@ -24,12 +27,10 @@ public class SimulatedRobot implements Robot {
 	private final double maxRotateSpeed;
 	private double minRadius;
 
-	private Move.MoveType moveType;
-	private double moveAngle;
-	private double moveDistance;
+	private Move move;
+	private float moveRadius;
+	private Timer moveTimer;
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
-
-	private Simulator simulator;
 
 	public SimulatedRobot(double leftWheelDiameter, double rightWheelDiameter,
 			double trackWidth, double maxTravelSpeed, double maxRotateSpeed) {
@@ -60,23 +61,10 @@ public class SimulatedRobot implements Robot {
 
 	@Override
 	public void connect() {
-		startSimulation();
 	}
 
 	@Override
 	public void disconnect() {
-		stopSimulation();
-	}
-
-	private void startSimulation() {
-		simulator = new Simulator();
-		simulator.start();
-	}
-
-	private void stopSimulation() {
-		if (simulator != null) {
-			simulator.stop();
-		}
 	}
 
 	@Override
@@ -111,42 +99,22 @@ public class SimulatedRobot implements Robot {
 
 	@Override
 	public void forward() {
-		moveType = Move.MoveType.TRAVEL;
-		moveAngle = 0;
-		moveDistance = Double.POSITIVE_INFINITY;
-		movementStart();
-		// TODO Auto-generated method stub
-
+		movementStart(MoveType.TRAVEL, Float.POSITIVE_INFINITY, 0);
 	}
 
 	@Override
 	public void backward() {
-		moveType = Move.MoveType.TRAVEL;
-		moveAngle = 0;
-		moveDistance = Double.NEGATIVE_INFINITY;
-		movementStart();
-		// TODO Auto-generated method stub
-
+		movementStart(MoveType.TRAVEL, Float.NEGATIVE_INFINITY, 0);
 	}
 
 	@Override
 	public void rotateLeft() {
-		moveType = Move.MoveType.TRAVEL;
-		moveAngle = Double.POSITIVE_INFINITY;
-		moveDistance = 0;
-		movementStart();
-		// TODO Auto-generated method stub
-
+		movementStart(MoveType.ROTATE, 0, Float.POSITIVE_INFINITY);
 	}
 
 	@Override
 	public void rotateRight() {
-		moveType = Move.MoveType.TRAVEL;
-		moveAngle = Double.NEGATIVE_INFINITY;
-		moveDistance = 0;
-		movementStart();
-		// TODO Auto-generated method stub
-
+		movementStart(MoveType.ROTATE, 0, Float.NEGATIVE_INFINITY);
 	}
 
 	@Override
@@ -156,12 +124,7 @@ public class SimulatedRobot implements Robot {
 
 	@Override
 	public void rotate(double angle, boolean immediateReturn) {
-		moveType = Move.MoveType.ROTATE;
-		moveDistance = 0;
-		moveAngle = angle;
-		movementStart();
-
-		// TODO Auto-generated method stub
+		movementStart(MoveType.ROTATE, 0, (float) angle);
 
 		if (!immediateReturn)
 			waitComplete();
@@ -169,8 +132,8 @@ public class SimulatedRobot implements Robot {
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
-
+		movementStop();
+		waitComplete();
 	}
 
 	@Override
@@ -180,20 +143,7 @@ public class SimulatedRobot implements Robot {
 
 	@Override
 	public void travel(double distance, boolean immediateReturn) {
-		moveType = Move.MoveType.TRAVEL;
-		moveDistance = distance;
-		moveAngle = 0;
-		if (distance == Double.POSITIVE_INFINITY) {
-			forward();
-			return;
-		}
-		if (distance == Double.NEGATIVE_INFINITY) {
-			backward();
-			return;
-		}
-		movementStart();
-
-		// TODO Auto-generated method stub
+		movementStart(MoveType.TRAVEL, (float) distance, 0);
 
 		if (!immediateReturn)
 			waitComplete();
@@ -201,34 +151,28 @@ public class SimulatedRobot implements Robot {
 
 	@Override
 	public void arcForward(double radius) {
-		moveType = Move.MoveType.ARC;
+		float angle, distance;
 		if (radius > 0) {
-			moveAngle = Double.POSITIVE_INFINITY;
-			moveDistance = Double.POSITIVE_INFINITY;
+			angle = Float.POSITIVE_INFINITY;
+			distance = Float.POSITIVE_INFINITY;
 		} else {
-			moveAngle = Double.NEGATIVE_INFINITY;
-			moveDistance = Double.NEGATIVE_INFINITY;
+			angle = Float.NEGATIVE_INFINITY;
+			distance = Float.NEGATIVE_INFINITY;
 		}
-		movementStart();
-
-		// TODO Auto-generated method stub
-
+		movementStart(MoveType.ARC, distance, angle, (float) radius);
 	}
 
 	@Override
 	public void arcBackward(double radius) {
-		moveType = Move.MoveType.ARC;
-		if (radius < 0) {
-			moveAngle = Double.POSITIVE_INFINITY;
-			moveDistance = Double.NEGATIVE_INFINITY;
+		float angle, distance;
+		if (radius > 0) {
+			angle = Float.POSITIVE_INFINITY;
+			distance = Float.NEGATIVE_INFINITY;
 		} else {
-			moveAngle = Double.NEGATIVE_INFINITY;
-			moveDistance = Double.POSITIVE_INFINITY;
+			angle = Float.NEGATIVE_INFINITY;
+			distance = Float.POSITIVE_INFINITY;
 		}
-		movementStart();
-
-		// TODO Auto-generated method stub
-
+		movementStart(MoveType.ARC, distance, angle, (float) radius);
 	}
 
 	@Override
@@ -264,10 +208,6 @@ public class SimulatedRobot implements Robot {
 		}
 		double angle = (distance * 180) / ((float) Math.PI * radius);
 		arc(radius, angle, immediateReturn);
-	}
-
-	private void reset() {
-		// TODO Reset tacho counts
 	}
 
 	/**
@@ -313,39 +253,72 @@ public class SimulatedRobot implements Robot {
 			forward();
 			return;
 		}
-		moveType = Move.MoveType.ARC;
-		moveAngle = angle;
-		moveDistance = 2 * Math.toRadians(angle) * radius(turnRate);
-		movementStart();
+		float distance = (float) (2 * Math.toRadians(angle) * radius(turnRate));
+		movementStart(MoveType.ARC, (float) angle, distance);
 
-		// TODO Auto-generated method stub
-
-		waitComplete();
+		if (!immediateReturn)
+			waitComplete();
 	}
 
-	protected void movementStart() {
-		if (isMoving())
-			movementStop();
-		reset();
+	protected void movementStart(MoveType moveType, float distance,
+			float angle, float radius) {
 
+		boolean wasMoving = isMoving();
+
+		if (wasMoving)
+			movementStop();
+
+		// Set current move
+		move = new Move(moveType, distance, angle, (float) getTravelSpeed(),
+				(float) getRotateSpeed(), wasMoving);
+		moveRadius = radius;
+
+		// Publish the *targeted* move distance and angle
 		for (MoveListener ml : moveListeners) {
-			ml.moveStarted(new Move(moveType, (float) moveDistance,
-					(float) moveAngle, (float) getTravelSpeed(),
-					(float) getRotateSpeed(), isMoving()), this);
+			ml.moveStarted(move, this);
 		}
+
+		// Start timer
+		long delay = getMoveDuration(move);
+		moveTimer = new Timer();
+		moveTimer.schedule(new MoveEndTimerTask(move), delay);
+	}
+
+	protected void movementStart(MoveType moveType, float distance, float angle) {
+		movementStart(moveType, distance, angle, 0);
 	}
 
 	private synchronized void movementStop() {
+		if (!isMoving())
+			return;
+
+		// Publish the *travelled* move distance and angle
+		Move travelledMove = new Move(move.getMoveType(),
+				getMovementIncrement(), getAngleIncrement(),
+				move.getTravelSpeed(), move.getRotateSpeed(), false);
+
 		for (MoveListener ml : moveListeners) {
-			ml.moveStopped(new Move(moveType, (float) moveDistance,
-					(float) moveAngle, (float) getTravelSpeed(),
-					(float) getRotateSpeed(), isMoving()), this);
+			ml.moveStopped(travelledMove, this);
 		}
+
+		// Reset current move
+		resetMove();
+	}
+
+	/**
+	 * Reset the current move.
+	 * 
+	 * Called when the current move is stopped.
+	 */
+	private void resetMove() {
+		move = null;
+		moveRadius = 0;
+		moveTimer.cancel();
 	}
 
 	@Override
 	public boolean isMoving() {
-		return (simulator == null) ? false : simulator.isMoving();
+		return move != null;
 	}
 
 	/**
@@ -375,16 +348,87 @@ public class SimulatedRobot implements Robot {
 	 * @return The move distance since it last started moving
 	 */
 	public float getMovementIncrement() {
-		// TODO Auto-generated method stub
-		return 0;
+		// Time spent travelling so far
+		long currentTime = System.currentTimeMillis();
+		long duration = currentTime - move.getTimeStamp();
+
+		// Currently travelled distance
+		float travelled = duration * move.getTravelSpeed();
+
+		// Target distance
+		float target = move.getDistanceTraveled();
+		if (isInfiniteArc(move)) {
+			// TODO Use radius instead
+			throw new IllegalStateException("Infinite arc not implemented yet.");
+		}
+
+		// Compare absolute values, since target may be negative
+		if (Math.abs(travelled) < target) {
+			// Make travelled same sign as target
+			return Math.copySign(travelled, target);
+		} else {
+			// Target reached
+			return target;
+		}
 	}
 
 	/**
 	 * @return The angle rotated since rotation began.
 	 */
 	public float getAngleIncrement() {
-		// TODO Auto-generated method stub
-		return 0;
+		// Time spent rotating so far
+		long currentTime = System.currentTimeMillis();
+		long duration = currentTime - move.getTimeStamp();
+
+		// Currently rotated angle
+		float rotated = duration * move.getRotateSpeed();
+
+		// Target angle
+		float target = move.getAngleTurned();
+		if (isInfiniteArc(move)) {
+			// TODO Use radius instead
+			throw new IllegalStateException("Infinite arc not implemented yet.");
+		}
+
+		// Compare absolute values, since target may be negative
+		if (Math.abs(rotated) < target) {
+			// Make travelled same sign as target
+			return Math.copySign(rotated, target);
+		} else {
+			// Target reached
+			return target;
+		}
+	}
+
+	private static long getMoveDuration(Move move) {
+		float duration = 0;
+		if (move.getMoveType() == MoveType.TRAVEL) {
+			// Translation duration
+			duration = move.getDistanceTraveled() / move.getTravelSpeed();
+		} else if (move.getMoveType() == MoveType.ROTATE) {
+			// Rotation duration
+			duration = move.getAngleTurned() / move.getRotateSpeed();
+		} else if (move.getMoveType() == MoveType.ARC) {
+			// Arc travel duration
+			if (isInfiniteArc(move)) {
+				return -1;
+			} else {
+				// TODO Implement
+			}
+		}
+		return (long) Math.abs(duration);
+	}
+
+	/**
+	 * Check if the given move is an infinite arc move.
+	 * 
+	 * Infinite arc moves have an infinite target distance and rotation and thus
+	 * increments needs to be calculated based on the finite arc radius.
+	 */
+	private static boolean isInfiniteArc(Move move) {
+		return move.getMoveType() == MoveType.ARC
+				&& Float.isInfinite(move.getDistanceTraveled())
+				&& Float.isInfinite(move.getAngleTurned());
 	}
 
 	@Override
@@ -394,51 +438,26 @@ public class SimulatedRobot implements Robot {
 
 	@Override
 	public Move getMovement() {
-		return new Move(moveType, getMovementIncrement(), getAngleIncrement(),
-				isMoving());
+		return new Move(move.getMoveType(), getMovementIncrement(),
+				getAngleIncrement(), isMoving());
 	}
 
-	private class Simulator implements Runnable {
+	private class MoveEndTimerTask extends TimerTask {
 
-		private Thread thread;
-		private boolean isRunning = true;
+		private final Move move;
 
-		private boolean isMoving;
-
-		public void start() {
-			if (thread != null) {
-				waitForStop();
-			}
-			isRunning = true;
-			thread = new Thread(this);
-			thread.start();
-		}
-
-		public void stop() {
-			isRunning = false;
-			thread = null;
-		}
-
-		public void waitForStop() {
-			isRunning = false;
-			try {
-				thread.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			thread = null;
-		}
-
-		public synchronized boolean isMoving() {
-			return isMoving;
+		public MoveEndTimerTask(Move move) {
+			this.move = move;
 		}
 
 		@Override
 		public void run() {
-			while (isRunning) {
-				// TODO Run simulation
+			// Current move has ended
+			if (SimulatedRobot.this.move == move) {
+				movementStop();
 			}
 		}
+
 	}
 
 }
