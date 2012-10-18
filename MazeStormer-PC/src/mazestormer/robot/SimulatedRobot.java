@@ -11,14 +11,6 @@ import lejos.robotics.navigation.Move.MoveType;
 
 public class SimulatedRobot implements Robot {
 
-	private final double leftWheelDiameter;
-	private final float leftTurnRatio;
-	private final float leftDegPerDistance;
-
-	private final double rightWheelDiameter;
-	private final float rightTurnRatio;
-	private final float rightDegPerDistance;
-
 	private final float trackWidth;
 
 	private double travelSpeed;
@@ -28,35 +20,22 @@ public class SimulatedRobot implements Robot {
 	private double minRadius;
 
 	private Move move;
-	private float moveRadius;
 	private Timer moveTimer;
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
-	public SimulatedRobot(double leftWheelDiameter, double rightWheelDiameter,
-			double trackWidth, double maxTravelSpeed, double maxRotateSpeed) {
+	public SimulatedRobot(double trackWidth, double maxTravelSpeed,
+			double maxRotateSpeed) {
 		this.maxTravelSpeed = maxTravelSpeed;
 		this.maxRotateSpeed = maxRotateSpeed;
 
 		this.trackWidth = (float) trackWidth;
 
-		// Left wheel
-		this.leftWheelDiameter = (float) leftWheelDiameter;
-		this.leftTurnRatio = (float) (trackWidth / leftWheelDiameter);
-		this.leftDegPerDistance = (float) (360 / (Math.PI * leftWheelDiameter));
-
-		// Right wheel
-		this.rightWheelDiameter = (float) rightWheelDiameter;
-		this.rightTurnRatio = (float) (trackWidth / rightWheelDiameter);
-		this.rightDegPerDistance = (float) (360 / (Math.PI * rightWheelDiameter));
-
 		setTravelSpeed(.8f * getMaxTravelSpeed());
 		setRotateSpeed(.8f * getRotateMaxSpeed());
 	}
 
-	public SimulatedRobot(double leftWheelDiameter, double rightWheelDiameter,
-			double trackWidth) {
-		this(leftWheelDiameter, rightWheelDiameter, trackWidth,
-				Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+	public SimulatedRobot(double trackWidth) {
+		this(trackWidth, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 	}
 
 	@Override
@@ -271,17 +250,17 @@ public class SimulatedRobot implements Robot {
 		// Set current move
 		move = new Move(moveType, distance, angle, (float) getTravelSpeed(),
 				(float) getRotateSpeed(), wasMoving);
-		moveRadius = radius;
-
 		// Publish the *targeted* move distance and angle
 		for (MoveListener ml : moveListeners) {
 			ml.moveStarted(move, this);
 		}
 
 		// Start timer
-		long delay = getMoveDuration(move);
-		moveTimer = new Timer();
-		moveTimer.schedule(new MoveEndTimerTask(move), delay);
+		float delay = getMoveDuration(move);
+		if (!Float.isInfinite(delay)) {
+			moveTimer = new Timer();
+			moveTimer.schedule(new MoveEndTimerTask(move), (long) delay);
+		}
 	}
 
 	protected void movementStart(MoveType moveType, float distance, float angle) {
@@ -311,9 +290,8 @@ public class SimulatedRobot implements Robot {
 	 * Called when the current move is stopped.
 	 */
 	private void resetMove() {
-		move = null;
-		moveRadius = 0;
 		moveTimer.cancel();
+		move = null;
 	}
 
 	@Override
@@ -350,7 +328,7 @@ public class SimulatedRobot implements Robot {
 	public float getMovementIncrement() {
 		// Time spent travelling so far
 		long currentTime = System.currentTimeMillis();
-		long duration = currentTime - move.getTimeStamp();
+		float duration = (currentTime - move.getTimeStamp()) / 1000f;
 
 		// Currently travelled distance
 		float travelled = duration * move.getTravelSpeed();
@@ -378,7 +356,7 @@ public class SimulatedRobot implements Robot {
 	public float getAngleIncrement() {
 		// Time spent rotating so far
 		long currentTime = System.currentTimeMillis();
-		long duration = currentTime - move.getTimeStamp();
+		float duration = (currentTime - move.getTimeStamp()) / 1000f;
 
 		// Currently rotated angle
 		float rotated = duration * move.getRotateSpeed();
@@ -400,7 +378,10 @@ public class SimulatedRobot implements Robot {
 		}
 	}
 
-	private static long getMoveDuration(Move move) {
+	/**
+	 * Get the expected duration of a move, in milliseconds.
+	 */
+	private static float getMoveDuration(Move move) {
 		float duration = 0;
 		if (move.getMoveType() == MoveType.TRAVEL) {
 			// Translation duration
@@ -411,12 +392,13 @@ public class SimulatedRobot implements Robot {
 		} else if (move.getMoveType() == MoveType.ARC) {
 			// Arc travel duration
 			if (isInfiniteArc(move)) {
-				return -1;
+				return Float.POSITIVE_INFINITY;
 			} else {
 				// TODO Implement
+				throw new IllegalStateException("Arc not implemented yet.");
 			}
 		}
-		return (long) Math.abs(duration);
+		return Math.abs(duration) * 1000f;
 	}
 
 	/**
