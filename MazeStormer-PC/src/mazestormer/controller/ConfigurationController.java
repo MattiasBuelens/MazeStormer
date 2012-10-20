@@ -1,9 +1,5 @@
 package mazestormer.controller;
 
-import com.google.common.eventbus.Subscribe;
-
-import mazestormer.connect.ConnectEvent;
-import mazestormer.connect.Connector;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;
@@ -53,10 +49,7 @@ public class ConfigurationController extends SubController implements
 		setControlMode(controlMode);
 
 		// Connect
-		Connector connector = getMainController().setConnector(robotType);
-		connector.connect();
-
-		postState();
+		getMainController().connect(robotType);
 	}
 
 	@Override
@@ -69,13 +62,7 @@ public class ConfigurationController extends SubController implements
 
 		// Disconnect
 		setControlMode(null);
-		getConnector().disconnect();
-
-		postState();
-	}
-
-	private void postState() {
-		postEvent(new ConnectEvent(isConnected()));
+		getMainController().disconnect();
 	}
 
 	@Override
@@ -84,21 +71,11 @@ public class ConfigurationController extends SubController implements
 			getRobot().stop();
 	}
 
-	@Subscribe
-	public void onInitialized(InitializeEvent e) {
-		// Post connected state on initialize
-		postState();
-	}
-
 	public Robot getRobot() {
 		if (!isConnected())
 			throw new IllegalStateException("Not connected.");
 
-		return getConnector().getRobot();
-	}
-
-	private Connector getConnector() {
-		return getMainController().getConnector();
+		return getMainController().getRobot();
 	}
 
 }

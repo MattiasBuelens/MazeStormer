@@ -2,14 +2,19 @@ package mazestormer.controller;
 
 import java.awt.EventQueue;
 
+import lejos.robotics.localization.OdometryPoseProvider;
+import lejos.robotics.localization.PoseProvider;
+import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
+import mazestormer.robot.DummyPoseProvider;
 import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 public class MainController implements IMainController {
 
@@ -38,6 +43,7 @@ public class MainController implements IMainController {
 	 */
 	private ConnectionProvider connectionProvider;
 	private Connector connector;
+	private PoseProvider poseProvider;
 
 	/*
 	 * Controllers
@@ -61,7 +67,7 @@ public class MainController implements IMainController {
 		view = createView();
 		view.registerEventBus(getEventBus());
 
-		getEventBus().post(new InitializeEvent());
+		postEvent(new InitializeEvent());
 	}
 
 	protected EventSource createView() {
@@ -72,6 +78,10 @@ public class MainController implements IMainController {
 
 	private EventBus getEventBus() {
 		return eventBus;
+	}
+
+	private void postEvent(Object event) {
+		getEventBus().post(event);
 	}
 
 	@Override
@@ -127,23 +137,66 @@ public class MainController implements IMainController {
 		eventSource.registerEventBus(getEventBus());
 	}
 
-	public Connector getConnector() {
-		return connector;
-	}
-
-	public Connector setConnector(RobotType robotType) {
-		connector = connectionProvider.getConnector(robotType);
-		return connector;
-	}
+	/*
+	 * Connection
+	 */
 
 	public boolean isConnected() {
-		return getConnector() != null && getConnector().isConnected();
+		return connector != null && connector.isConnected();
 	}
+
+	public void connect(RobotType robotType) throws IllegalStateException {
+		if (isConnected())
+			throw new IllegalStateException("Already connected.");
+
+		connector = connectionProvider.getConnector(robotType);
+		connector.connect();
+		postConnected();
+	}
+
+	public void disconnect() throws IllegalStateException {
+		if (!isConnected())
+			throw new IllegalStateException("Already disconnected.");
+
+		connector.disconnect();
+		connector = null;
+		postConnected();
+	}
+
+	private void postConnected() {
+		postEvent(new ConnectEvent(isConnected()));
+	}
+
+	// Post connected state on initialize
+	@Subscribe
+	public void onInitialized(InitializeEvent e) {
+		postConnected();
+	}
+
+	/*
+	 * Robot
+	 */
 
 	public Robot getRobot() throws IllegalStateException {
 		if (!isConnected())
 			throw new IllegalStateException("Not connected to robot.");
-		return getConnector().getRobot();
+		return connector.getRobot();
+	}
+
+	/*
+	 * Pose provider
+	 */
+	public PoseProvider getPoseProvider() {
+		return poseProvider;
+	}
+
+	@Subscribe
+	public void setupPoseProvider(ConnectEvent e) {
+		if (e.isConnected()) {
+			poseProvider = new OdometryPoseProvider(getRobot());
+		} else {
+			poseProvider = new DummyPoseProvider();
+		}
 	}
 
 }
