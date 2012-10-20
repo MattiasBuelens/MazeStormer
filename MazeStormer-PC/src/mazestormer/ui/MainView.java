@@ -117,6 +117,7 @@ public class MainView extends JFrame implements EventSource {
 			getContentPane().add(controlPanel, "cell 1 1,grow");
 			this.controlPanel = controlPanel;
 		}
+		getContentPane().validate();
 	}
 
 	@Subscribe

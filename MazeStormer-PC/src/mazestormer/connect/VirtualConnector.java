@@ -46,8 +46,7 @@ public class VirtualConnector implements Connector {
 	}
 
 	private Robot createRobot() {
-		Robot robot = new SimulatedRobot(Robot.leftWheelDiameter,
-				Robot.rightWheelDiameter, Robot.trackWidth);
+		Robot robot = new SimulatedRobot(Robot.trackWidth);
 		robot.setTravelSpeed(travelSpeed);
 		robot.setRotateSpeed(rotateSpeed);
 		return robot;

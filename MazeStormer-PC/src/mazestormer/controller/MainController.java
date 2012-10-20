@@ -66,6 +66,8 @@ public class MainController implements IMainController {
 	private EventSource view;
 
 	public MainController() {
+		getEventBus().register(this);
+
 		connectionProvider = new ConnectionProvider();
 
 		view = createView();
