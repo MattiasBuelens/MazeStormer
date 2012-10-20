@@ -1,10 +1,10 @@
 package mazestormer.controller;
 
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
+import lejos.robotics.navigation.Pose;
+import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
 import mazestormer.ui.map.RobotLayer;
@@ -13,10 +13,12 @@ import mazestormer.ui.map.event.MapLayerAddEvent;
 
 import org.w3c.dom.svg.SVGDocument;
 
+import com.google.common.eventbus.Subscribe;
+
 public class MapController extends SubController implements IMapController {
 
 	private MapDocument map;
-	private List<MapLayer> layers = new ArrayList<MapLayer>();
+	private RobotLayer robotLayer;
 
 	public MapController(MainController mainController) {
 		super(mainController);
@@ -36,12 +38,12 @@ public class MapController extends SubController implements IMapController {
 	}
 
 	private void createLayers() {
-		addLayer(new RobotLayer("Robot"));
+		robotLayer = new RobotLayer("Robot");
+		addLayer(robotLayer);
 	}
 
 	private void addLayer(MapLayer layer) {
 		layer.registerEventBus(getEventBus());
-		layers.add(layer);
 		map.addLayer(layer);
 		postEvent(new MapLayerAddEvent(layer));
 	}
@@ -59,6 +61,24 @@ public class MapController extends SubController implements IMapController {
 	@Override
 	public void setLayerVisible(MapLayer layer, boolean isVisible) {
 		layer.setVisible(isVisible);
+	}
+
+	public Pose getPose() {
+		return getMainController().getPose();
+	}
+
+	public void updateRobotPose() {
+		Pose pose = getPose();
+
+		if (robotLayer != null) {
+			robotLayer.setPosition(pose.getLocation());
+			robotLayer.setRotationAngle(pose.getHeading());
+		}
+	}
+
+	@Subscribe
+	public void updateRobotPose(MoveEvent e) {
+		updateRobotPose();
 	}
 
 }

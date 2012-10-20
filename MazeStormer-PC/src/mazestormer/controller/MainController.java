@@ -4,11 +4,15 @@ import java.awt.EventQueue;
 
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import lejos.robotics.navigation.Move;
+import lejos.robotics.navigation.MoveListener;
+import lejos.robotics.navigation.MoveProvider;
+import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
-import mazestormer.robot.DummyPoseProvider;
+import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
@@ -183,11 +187,36 @@ public class MainController implements IMainController {
 		return connector.getRobot();
 	}
 
+	@Subscribe
+	public void registerRobotMoveListener(ConnectEvent e) {
+		if (e.isConnected()) {
+			connector.getRobot().addMoveListener(new MovePublisher());
+		}
+	}
+
+	private class MovePublisher implements MoveListener {
+
+		@Override
+		public void moveStarted(Move event, MoveProvider mp) {
+			postEvent(new MoveEvent(MoveEvent.EventType.STARTED, event));
+		}
+
+		@Override
+		public void moveStopped(Move event, MoveProvider mp) {
+			postEvent(new MoveEvent(MoveEvent.EventType.STOPPED, event));
+		}
+
+	}
+
 	/*
-	 * Pose provider
+	 * Robot pose
 	 */
-	public PoseProvider getPoseProvider() {
-		return poseProvider;
+	public Pose getPose() {
+		if (poseProvider != null) {
+			return poseProvider.getPose();
+		} else {
+			return new Pose();
+		}
 	}
 
 	@Subscribe
@@ -195,7 +224,7 @@ public class MainController implements IMainController {
 		if (e.isConnected()) {
 			poseProvider = new OdometryPoseProvider(getRobot());
 		} else {
-			poseProvider = new DummyPoseProvider();
+			poseProvider = null;
 		}
 	}
 

@@ -2,8 +2,9 @@ package mazestormer.robot;
 
 import lejos.robotics.navigation.ArcRotateMoveController;
 import lejos.robotics.navigation.MoveController;
+import lejos.robotics.navigation.MoveProvider;
 
-public interface Robot extends ArcRotateMoveController {
+public interface Robot extends ArcRotateMoveController, MoveProvider {
 
 	/**
 	 * Left wheel diameter, in centimeters.
