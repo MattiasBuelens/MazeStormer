@@ -58,7 +58,6 @@ public class MainView extends JFrame implements EventSource {
 		setMinimumSize(new Dimension(650, 500));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setAlwaysOnTop(true);
 		
 		this.mainPanel = new JPanel();
 		this.mainPanel.setLayout(
