@@ -15,6 +15,8 @@ public interface IMainController {
 
 	public IMapController map();
 
+	public ILogController log();
+
 	public IStateController state();
 
 	public void register(EventSource eventSource);

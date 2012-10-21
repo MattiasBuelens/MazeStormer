@@ -1,6 +1,8 @@
 package mazestormer.controller;
 
 import java.awt.EventQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
@@ -58,7 +60,15 @@ public class MainController implements IMainController {
 	private IPolygonControlController polygonControl;
 
 	private IMapController map;
+	private ILogController log;
+
 	private IStateController state;
+
+	/*
+	 * Logging
+	 */
+	private String logName = "MazeStormer";
+	private Logger logger;
 
 	/*
 	 * View
@@ -131,6 +141,14 @@ public class MainController implements IMainController {
 	}
 
 	@Override
+	public ILogController log() {
+		if (log == null) {
+			log = new LogController(this);
+		}
+		return log;
+	}
+
+	@Override
 	public IStateController state() {
 		if (state == null) {
 			state = new StateController(this);
@@ -141,6 +159,37 @@ public class MainController implements IMainController {
 	@Override
 	public void register(EventSource eventSource) {
 		eventSource.registerEventBus(getEventBus());
+	}
+
+	/*
+	 * Logging
+	 */
+
+	public String getLogName() {
+		return logName;
+	}
+
+	public Logger getLogger() {
+		if (logger == null) {
+			logger = Logger.getLogger(getLogName());
+			logger.setLevel(Level.ALL);
+		}
+		return logger;
+	}
+
+	/*
+	 * Initialization
+	 */
+
+	// Post connected state on initialize
+	@Subscribe
+	public void onInitialized(InitializeEvent e) {
+		postConnected();
+	}
+
+	@Subscribe
+	public void logInitialize(InitializeEvent e) {
+		getLogger().info("Initialized.");
 	}
 
 	/*
@@ -173,10 +222,13 @@ public class MainController implements IMainController {
 		postEvent(new ConnectEvent(isConnected()));
 	}
 
-	// Post connected state on initialize
 	@Subscribe
-	public void onInitialized(InitializeEvent e) {
-		postConnected();
+	public void logConnect(ConnectEvent e) {
+		if (e.isConnected()) {
+			getLogger().info("Connected to robot.");
+		} else {
+			getLogger().info("Disconnected from robot.");
+		}
 	}
 
 	/*
@@ -200,11 +252,13 @@ public class MainController implements IMainController {
 
 		@Override
 		public void moveStarted(Move event, MoveProvider mp) {
+			getLogger().info("Move started: " + event.toString());
 			postEvent(new MoveEvent(MoveEvent.EventType.STARTED, event));
 		}
 
 		@Override
 		public void moveStopped(Move event, MoveProvider mp) {
+			getLogger().info("Move stopped: " + event.toString());
 			postEvent(new MoveEvent(MoveEvent.EventType.STOPPED, event));
 		}
 

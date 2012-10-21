@@ -3,13 +3,10 @@ package mazestormer.ui;
 import java.awt.Dimension;
 import java.beans.Beans;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
-import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.controller.IMainController;
@@ -76,7 +73,7 @@ public class MainView extends JFrame implements EventSource {
 		this.mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
 		this.mainPanel.add(mapPanel, "cell 0 1,grow");
 
-		this.logPanel = new LogPanel();
+		this.logPanel = new LogPanel(controller.log());
 		this.mainPanel.add(logPanel, "cell 0 2,grow");
 
 		this.statePanel = new StatePanel(controller.state());
