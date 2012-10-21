@@ -82,10 +82,8 @@ public class MainView extends JFrame implements EventSource {
 
 		this.statePanel = new StatePanel(controller.state());
 		this.mainPanel.add(statePanel, "cell 1 2,grow");
-		
-		JScrollPane contentScrollPane = new JScrollPane(this.mainPanel);
-	    contentScrollPane.setBorder(BorderFactory.createEmptyBorder());
-	    setContentPane(contentScrollPane);
+
+	    setContentPane(this.mainPanel);
 	}
 
 	@Override
