@@ -2,8 +2,11 @@ package mazestormer.controller;
 
 import java.awt.Rectangle;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.connect.ConnectEvent;
 import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
@@ -20,8 +23,15 @@ public class MapController extends SubController implements IMapController {
 	private MapDocument map;
 	private RobotLayer robotLayer;
 
+	private Timer updater;
+	private long updateInterval;
+
+	private static final long defaultUpdateInterval = 1000 / 5;
+
 	public MapController(MainController mainController) {
 		super(mainController);
+
+		setUpdateFPS(defaultUpdateInterval);
 
 		createMap();
 		createLayers();
@@ -67,7 +77,7 @@ public class MapController extends SubController implements IMapController {
 		return getMainController().getPose();
 	}
 
-	public void updateRobotPose() {
+	private void updateRobotPose() {
 		Pose pose = getPose();
 
 		if (robotLayer != null) {
@@ -76,9 +86,54 @@ public class MapController extends SubController implements IMapController {
 		}
 	}
 
+	private long getUpdateInterval() {
+		return updateInterval;
+	}
+
+	public void setUpdateInterval(long interval) {
+		updateInterval = Math.abs(interval);
+	}
+
+	public void setUpdateFPS(long fps) {
+		setUpdateInterval((long) (1000f / (float) fps));
+	}
+
+	private void startUpdateTimer() {
+		stopUpdateTimer();
+
+		updater = new Timer();
+		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0,
+				getUpdateInterval());
+	}
+
+	private void stopUpdateTimer() {
+		if (updater != null) {
+			updater.cancel();
+			updater = null;
+		}
+	}
+
 	@Subscribe
-	public void updateRobotPose(MoveEvent e) {
+	public void updateRobotPoseOnConnect(ConnectEvent e) {
+		if (e.isConnected()) {
+			startUpdateTimer();
+		} else {
+			stopUpdateTimer();
+		}
+	}
+
+	@Subscribe
+	public void updateRobotPoseOnMove(MoveEvent e) {
 		updateRobotPose();
+	}
+
+	private class UpdateTimerTask extends TimerTask {
+
+		@Override
+		public void run() {
+			updateRobotPose();
+		}
+
 	}
 
 }

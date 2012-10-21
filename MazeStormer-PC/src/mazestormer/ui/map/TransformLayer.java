@@ -57,11 +57,11 @@ public abstract class TransformLayer extends MapLayer {
 	}
 
 	public float getX() {
-		return (float) rotationCenter.getX();
+		return (float) position.getX();
 	}
 
 	public float getY() {
-		return (float) rotationCenter.getY();
+		return (float) position.getY();
 	}
 
 	public Point2D getPosition() {
@@ -86,16 +86,16 @@ public abstract class TransformLayer extends MapLayer {
 		update();
 	}
 
-	public float getRotationX() {
-		return (float) position.getX();
+	public float getRotationCenterX() {
+		return (float) rotationCenter.getX();
 	}
 
-	public float getRotationY() {
-		return (float) position.getY();
+	public float getRotationCenterY() {
+		return (float) rotationCenter.getY();
 	}
 
 	public Point2D getRotationCenter() {
-		return new Point2D.Float(getRotationX(), getRotationY());
+		return new Point2D.Float(getRotationCenterX(), getRotationCenterY());
 	}
 
 	public void setRotationCenter(float x, float y) {
@@ -138,8 +138,8 @@ public abstract class TransformLayer extends MapLayer {
 		scale.setScale(getScaleX(), getScaleY());
 		// Rotate
 		SVGTransform rotate = new SVGOMTransform();
-		float rotateX = getRotationX();
-		float rotateY = getRotationY();
+		float rotateX = getRotationCenterX();
+		float rotateY = getRotationCenterY();
 		if (rotationCenterRelative) {
 			Element element = getTransformElement();
 			if (element instanceof SVGLocatable) {

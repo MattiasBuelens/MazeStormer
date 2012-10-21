@@ -26,6 +26,7 @@ import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
 
 import org.apache.batik.swing.JSVGCanvas;
+import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -58,17 +59,19 @@ public class MapPanel extends ViewPanel {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
+		
+		// Initialize map and layers
+		setMap(controller.getDocument());
+		for(MapLayer layer : controller.getLayers()) {
+			addLayerMenuItem(layer);
+		}
 	}
 
 	private void createCanvas() {
 		canvas = new MapCanvas();
+		canvas.setDocumentState(MapCanvas.ALWAYS_DYNAMIC);
 	}
-
-	@Subscribe
-	public void onMapChanged(MapChangeEvent event) {
-		canvas.setDocument(event.getDocument());
-	}
-
+	
 	private void createActionBar() {
 		actionBar = new JToolBar();
 		actionBar.setFloatable(false);
@@ -121,6 +124,15 @@ public class MapPanel extends ViewPanel {
 		addPopup(this, menuLayers);
 
 		return btnLayers;
+	}
+
+	private void setMap(SVGDocument document) {
+		canvas.setDocument(document);
+	}
+
+	@Subscribe
+	public void onMapChanged(MapChangeEvent event) {
+		setMap(event.getDocument());
 	}
 
 	private void addLayerMenuItem(final MapLayer layer) {

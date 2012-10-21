@@ -53,8 +53,8 @@ public abstract class MapLayer extends AbstractEventSource {
 		if (element != null && element instanceof SVGStylableElement) {
 			CSSStyleDeclaration css = ((SVGStylableElement) element)
 					.getOverrideStyle();
-			css.setProperty("display", isVisible() ? "inline" : "none",
-					"important");
+			//css.setProperty("display", isVisible() ? "inline" : "none",
+			//		"important");
 		}
 	}
 
