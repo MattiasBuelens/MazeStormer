@@ -60,7 +60,7 @@ public class StatePanel extends ViewPanel {
 	
 	@Subscribe
 	public void onMove(MoveEvent me) {
-		String text = "POSE BEFOR ASSIGNMENT:" +
+		String text = "POSE BEFORE ASSIGNMENT:" +
 					  "\n   x-position= " + controller.getXPosition() +
 					  "\n   y-position= " + controller.getYPosition() +
 					  "\n   heading= " + controller.getHeading() +
