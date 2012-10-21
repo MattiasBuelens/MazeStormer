@@ -55,7 +55,6 @@ public class MainView extends JFrame implements EventSource {
 		setMinimumSize(new Dimension(650, 500));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setAlwaysOnTop(true);
 
 		getContentPane().setLayout(
 				new MigLayout("hidemode 3", "[grow][]", "[][grow][grow]"));
