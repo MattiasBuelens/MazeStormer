@@ -60,19 +60,40 @@ public class StatePanel extends ViewPanel {
 	
 	@Subscribe
 	public void onMove(MoveEvent me) {
-		String text = "STATUS:"
-					+ "\n- CURRENT POSITION: \n"
-					+ this.controller.getMainController().getPose()
-					+ "\n"
-					+ "\n- CURRENT ASSIGNMENT: \n";
+		String text = "POSE BEFOR ASSIGNMENT:" +
+					  "\n   x-position= " + controller.getXPosition() +
+					  "\n   y-position= " + controller.getYPosition() +
+					  "\n   heading= " + controller.getHeading() +
+					  "\n" +
+					  "\nCURRENT ASSIGNMENT: \n   ";
 		
 		if(me.getEventType() == EventType.STOPPED) {
-			text = text + "STAND STILL";
+			text = text + "stand still";
 		}
 		
 		else if(me.getEventType() == EventType.STARTED) {
-			text = text + me.getMove();
+			Move move = me.getMove();
+			switch(move.getMoveType()){
+			case TRAVEL:
+				float speed = Math.round(Math.abs(move.getTravelSpeed())*10)/10;
+				if(move.getDistanceTraveled() == Float.POSITIVE_INFINITY) text = text + "translate forward at " + speed + "cm/s";
+				else if(move.getDistanceTraveled() == Float.NEGATIVE_INFINITY) text = text + "translate backward at " + speed + "cm/s";
+				else if(move.getTravelSpeed() >=0 ) text = text + "translate " + Math.abs(move.getDistanceTraveled()) + "cm forward at " + speed + "cm/s";
+				else if(move.getTravelSpeed() < 0 ) text = text + "translate " + Math.abs(move.getDistanceTraveled()) + "cm backward at " + speed + "cm/s";
+				break;
+			case ROTATE:
+				float rotateSpeed = Math.round(Math.abs(move.getRotateSpeed())*10)/10;
+				if(move.getAngleTurned() == Float.POSITIVE_INFINITY) text = text + "rotate counter-clockwise at " + rotateSpeed + "deg/s";
+				else if(move.getAngleTurned() == Float.NEGATIVE_INFINITY) text = text + "rotate clockwise at " + rotateSpeed + "deg/s";
+				else if(move.getRotateSpeed() >=0 ) text = text + "rotate " + Math.abs(move.getAngleTurned()) + "deg counter-clockwise at " + rotateSpeed + "deg/s";
+				else if(move.getRotateSpeed() < 0 ) text = text + "rotate " + Math.abs(move.getAngleTurned()) + "deg clockwise at " + rotateSpeed + "deg/s";
+				break;
+			case ARC:
+				// n/a
+			case STOP:
+				// n/a
 			}
+		}
 				
 		else {
 			text = text + "UNKNOWN";

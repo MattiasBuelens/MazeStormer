@@ -6,4 +6,9 @@ public interface IStateController extends EventSource {
 
 	IMainController getMainController();
 	
+	public float getXPosition();
+	public float getYPosition();
+	public float getHeading();
+
+	
 }
