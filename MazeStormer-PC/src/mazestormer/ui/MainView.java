@@ -3,8 +3,10 @@ package mazestormer.ui;
 import java.awt.Dimension;
 import java.beans.Beans;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 
 import mazestormer.connect.ConnectEvent;
@@ -31,97 +33,106 @@ public class MainView extends JFrame implements EventSource {
 	private JPanel configurationPanel;
 	private JPanel logPanel;
 	private JPanel statePanel;
+	
+	private JPanel mainPanel;
 
-	public MainView(IMainController controller) {
+	public MainView(IMainController controller){
 		setTitle("MazeStormer");
+		
 		this.controller = controller;
 
 		initialize();
 
-		if (!Beans.isDesignTime()) {
+		if(!Beans.isDesignTime()){
 			registerController();
 		}
 	}
 
-	private void registerController() {
-		controller.register(this);
-
-		setControlMode(controller.configuration().getControlMode());
+	private void registerController(){
+		this.controller.register(this);
+		setControlMode(this.controller.configuration().getControlMode());
 	}
 
-	private void initialize() {
+	private void initialize(){
 		setBounds(100, 100, 650, 500);
-		this.setMinimumSize(new Dimension(650, 500));
+		setMinimumSize(new Dimension(650, 500));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		getContentPane().setLayout(
+		setLocationRelativeTo(null);
+		setAlwaysOnTop(true);
+		
+		this.mainPanel = new JPanel();
+		this.mainPanel.setLayout(
 				new MigLayout("hidemode 3", "[grow][]", "[][grow][grow]"));
 
-		configurationPanel = new ConfigurationPanel(controller.configuration());
-		getContentPane().add(configurationPanel, "cell 0 0,grow");
+		this.configurationPanel = new ConfigurationPanel(controller.configuration());
+		this.mainPanel.add(configurationPanel, "cell 0 0,grow");
 
-		parametersPanel = new ParametersPanel(controller.parameters());
-		getContentPane().add(parametersPanel, "cell 1 0,grow");
+		this.parametersPanel = new ParametersPanel(controller.parameters());
+		this.mainPanel.add(parametersPanel, "cell 1 0,grow");
 
-		controlPanel = new ManualControlPanel(controller.manualControl());
-		getContentPane().add(controlPanel, "cell 1 1,grow");
+		this.controlPanel = new ManualControlPanel(controller.manualControl());
+		this.mainPanel.add(controlPanel, "cell 1 1,grow");
 
-		mapPanel = new MapPanel(controller.map());
-		mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
-		getContentPane().add(mapPanel, "cell 0 1,grow");
+		this.mapPanel = new MapPanel(controller.map());
+		this.mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
+		this.mainPanel.add(mapPanel, "cell 0 1,grow");
 
-		logPanel = new LogPanel();
-		getContentPane().add(logPanel, "cell 0 2,grow");
+		this.logPanel = new LogPanel();
+		this.mainPanel.add(logPanel, "cell 0 2,grow");
 
-		statePanel = new StatePanel(controller.state());
-		getContentPane().add(statePanel, "cell 1 2,grow");
+		this.statePanel = new StatePanel(controller.state());
+		this.mainPanel.add(statePanel, "cell 1 2,grow");
+		
+		JScrollPane contentScrollPane = new JScrollPane(this.mainPanel);
+	    contentScrollPane.setBorder(BorderFactory.createEmptyBorder());
+	    setContentPane(contentScrollPane);
 	}
 
 	@Override
-	public EventBus getEventBus() {
-		return eventBus;
+	public EventBus getEventBus(){
+		return this.eventBus;
 	}
 
 	@Override
-	public void registerEventBus(EventBus eventBus) {
+	public void registerEventBus(EventBus eventBus){
 		this.eventBus = eventBus;
 		eventBus.register(this);
 	}
 
-	protected void postEvent(Object event) {
-		if (getEventBus() != null)
+	protected void postEvent(Object event){
+		if(getEventBus() != null)
 			getEventBus().post(event);
 	}
 
-	private void setControlMode(ControlMode controlMode) {
-		if (controlMode == null) {
+	private void setControlMode(ControlMode controlMode){
+		if(controlMode == null){
 			setControlPanel(null);
 			return;
 		}
 
-		switch (controlMode) {
+		switch(controlMode){
 		case Manual:
-			setControlPanel(new ManualControlPanel(controller.manualControl()));
+			setControlPanel(new ManualControlPanel(this.controller.manualControl()));
 			break;
 		case Polygon:
-			setControlPanel(new PolygonControlPanel(controller.polygonControl()));
+			setControlPanel(new PolygonControlPanel(this.controller.polygonControl()));
 			break;
 		}
 	}
 
-	private void setControlPanel(ViewPanel controlPanel) {
-		if (this.controlPanel != null) {
-			getContentPane().remove(this.controlPanel);
+	private void setControlPanel(ViewPanel controlPanel){
+		if(this.controlPanel != null){
+			this.mainPanel.remove(this.controlPanel);
 		}
-		if (controlPanel != null) {
-			getContentPane().add(controlPanel, "cell 1 1,grow");
+		if(controlPanel != null){
+			this.mainPanel.add(controlPanel, "cell 1 1,grow");
 			this.controlPanel = controlPanel;
 		}
 		getContentPane().validate();
 	}
 
 	@Subscribe
-	public void onControlModeChanged(ControlModeChangeEvent e) {
+	public void onControlModeChanged(ControlModeChangeEvent e){
 		setControlMode(e.getControlMode());
 	}
 }
