@@ -2,6 +2,7 @@ package mazestormer.ui.map;
 
 import java.util.Comparator;
 
+import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
 import mazestormer.util.AbstractEventSource;
 
@@ -51,11 +52,21 @@ public abstract class MapLayer extends AbstractEventSource {
 	protected void update() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
-			CSSStyleDeclaration css = ((SVGStylableElement) element)
-					.getOverrideStyle();
-			//css.setProperty("display", isVisible() ? "inline" : "none",
-			//		"important");
+			final String displayValue = isVisible() ? "inline" : "none";
+			final SVGStylableElement styleElement = (SVGStylableElement) element;
+
+			invokeDOMChange(new Runnable() {
+				@Override
+				public void run() {
+					CSSStyleDeclaration css = styleElement.getOverrideStyle();
+					css.setProperty("display", displayValue, "important");
+				}
+			});
 		}
+	}
+
+	protected void invokeDOMChange(Runnable request) {
+		postEvent(new MapDOMChangeRequest(request));
 	}
 
 	public Element build(AbstractDocument document) {

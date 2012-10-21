@@ -11,7 +11,7 @@ public abstract class SubController extends AbstractEventSource {
 		mainController.register(this);
 	}
 
-	protected MainController getMainController() {
+	public MainController getMainController() {
 		return mainController;
 	}
 

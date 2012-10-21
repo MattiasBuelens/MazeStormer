@@ -1,5 +1,6 @@
 package mazestormer.controller;
 
+import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.util.Set;
 import java.util.Timer;
@@ -12,10 +13,12 @@ import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
 import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapChangeEvent;
+import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 
 import org.w3c.dom.svg.SVGDocument;
 
+import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.Subscribe;
 
 public class MapController extends SubController implements IMapController {
@@ -41,7 +44,7 @@ public class MapController extends SubController implements IMapController {
 		map = new MapDocument();
 
 		// TODO Make maze define the view rectangle
-		map.setViewRect(new Rectangle(-500, -500, 1000, 1000));
+		map.setViewRect(new Rectangle(-250, -250, 500, 500));
 
 		SVGDocument document = map.getDocument();
 		postEvent(new MapChangeEvent(document));
@@ -78,12 +81,26 @@ public class MapController extends SubController implements IMapController {
 	}
 
 	private void updateRobotPose() {
-		Pose pose = getPose();
+		Pose pose = toMapCoordinates(getPose());
 
 		if (robotLayer != null) {
 			robotLayer.setPosition(pose.getLocation());
 			robotLayer.setRotationAngle(pose.getHeading());
 		}
+	}
+
+	protected static Pose toMapCoordinates(Pose pose) {
+		return new Pose(pose.getX(), -pose.getY(), -pose.getHeading() + 90f);
+	}
+
+	private void invokeUpdateRobotPose() {
+		// Invoke Swing methods in AWT thread
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				updateRobotPose();
+			}
+		});
 	}
 
 	private long getUpdateInterval() {
@@ -116,22 +133,43 @@ public class MapController extends SubController implements IMapController {
 	@Subscribe
 	public void updateRobotPoseOnConnect(ConnectEvent e) {
 		if (e.isConnected()) {
-			startUpdateTimer();
+			// Set initial pose
+			invokeUpdateRobotPose();
 		} else {
+			// Stop updating pose
 			stopUpdateTimer();
 		}
 	}
 
 	@Subscribe
 	public void updateRobotPoseOnMove(MoveEvent e) {
-		updateRobotPose();
+		if (e.getEventType() == MoveEvent.EventType.STARTED) {
+			// Start updating while moving
+			startUpdateTimer();
+		} else {
+			// Stop updating when move ended
+			stopUpdateTimer();
+		}
+	}
+
+	/**
+	 * When no view is attached yet, DOM change requests may not be consumed by
+	 * any listener and potentially get lost.
+	 * 
+	 * This event listener catches these dead requests and runs them directly.
+	 */
+	@Subscribe
+	public void recoverDeadDOMChangeRequest(DeadEvent event) {
+		if (event.getEvent() instanceof MapDOMChangeRequest) {
+			((MapDOMChangeRequest) event.getEvent()).getRequest().run();
+		}
 	}
 
 	private class UpdateTimerTask extends TimerTask {
 
 		@Override
 		public void run() {
-			updateRobotPose();
+			invokeUpdateRobotPose();
 		}
 
 	}

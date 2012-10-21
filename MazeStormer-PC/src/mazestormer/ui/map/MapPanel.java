@@ -22,10 +22,10 @@ import mazestormer.controller.IMapController;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapChangeEvent;
+import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
 
-import org.apache.batik.swing.JSVGCanvas;
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
@@ -37,7 +37,7 @@ public class MapPanel extends ViewPanel {
 	private final IMapController controller;
 
 	private JToolBar actionBar;
-	private JSVGCanvas canvas;
+	private MapCanvas canvas;
 	private JPopupMenu menuLayers;
 
 	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
@@ -59,10 +59,10 @@ public class MapPanel extends ViewPanel {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
-		
+
 		// Initialize map and layers
 		setMap(controller.getDocument());
-		for(MapLayer layer : controller.getLayers()) {
+		for (MapLayer layer : controller.getLayers()) {
 			addLayerMenuItem(layer);
 		}
 	}
@@ -71,7 +71,7 @@ public class MapPanel extends ViewPanel {
 		canvas = new MapCanvas();
 		canvas.setDocumentState(MapCanvas.ALWAYS_DYNAMIC);
 	}
-	
+
 	private void createActionBar() {
 		actionBar = new JToolBar();
 		actionBar.setFloatable(false);
@@ -149,6 +149,12 @@ public class MapPanel extends ViewPanel {
 
 		layerMenuItems.put(layer, menuItem);
 		menuLayers.add(menuItem);
+	}
+
+	@Subscribe
+	public void onMapDOMChange(MapDOMChangeRequest request) {
+		canvas.getUpdateManager().getUpdateRunnableQueue()
+				.invokeLater(request.getRequest());
 	}
 
 	@Subscribe

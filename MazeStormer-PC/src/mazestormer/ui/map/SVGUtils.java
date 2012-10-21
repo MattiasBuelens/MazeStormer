@@ -1,6 +1,8 @@
 package mazestormer.ui.map;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
 
@@ -8,6 +10,11 @@ import org.apache.batik.bridge.DocumentLoader;
 import org.apache.batik.bridge.UserAgent;
 import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.transcoder.Transcoder;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.svg2svg.SVGTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -56,6 +63,18 @@ public class SVGUtils {
 	 */
 	public static final SVGDocument loadSVGDocument(URL url) {
 		return loadSVGDocument(url.toExternalForm());
+	}
+
+	public static final void printSVG(SVGDocument document, OutputStream out) {
+		try {
+			Transcoder t = new SVGTranscoder();
+			TranscoderInput input = new TranscoderInput(document);
+			TranscoderOutput output = new TranscoderOutput(new PrintWriter(out));
+			t.transcode(input, output);
+		} catch (TranscoderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

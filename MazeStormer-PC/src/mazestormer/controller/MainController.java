@@ -225,6 +225,7 @@ public class MainController implements IMainController {
 	public void setupPoseProvider(ConnectEvent e) {
 		if (e.isConnected()) {
 			poseProvider = new OdometryPoseProvider(getRobot());
+			poseProvider.setPose(new Pose(0f, 0f, 90f));
 		} else {
 			poseProvider = null;
 		}

@@ -6,11 +6,16 @@ import org.w3c.dom.svg.SVGDocument;
 
 public class RobotLayer extends TransformLayer {
 
-	public RobotLayer(String name) {
+	private static final double defaultHeight = 30d;
+
+	public RobotLayer(String name, double height) {
 		super(name, getRobot().getDocumentElement());
-		setScale(0.5f);
 		setRotationCenter(0.5f, 0.5f);
-		setRotationCenterRelative(true);
+		setHeight(height);
+	}
+
+	public RobotLayer(String name) {
+		this(name, defaultHeight);
 	}
 
 	@Override
