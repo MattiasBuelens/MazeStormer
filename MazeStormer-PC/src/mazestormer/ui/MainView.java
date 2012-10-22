@@ -58,7 +58,7 @@ public class MainView extends JFrame implements EventSource {
 		
 		this.mainPanel = new JPanel();
 		this.mainPanel.setLayout(
-				new MigLayout("hidemode 3", "[grow][]", "[][grow][grow]"));
+				new MigLayout("hidemode 3", "[grow][]", "[][grow][::200px,growprio 50,grow]"));
 
 		this.configurationPanel = new ConfigurationPanel(controller.configuration());
 		this.mainPanel.add(configurationPanel, "cell 0 0,grow");

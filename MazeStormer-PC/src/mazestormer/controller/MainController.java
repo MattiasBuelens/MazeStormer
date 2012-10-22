@@ -96,8 +96,13 @@ public class MainController implements IMainController {
 		return eventBus;
 	}
 
-	private void postEvent(Object event) {
-		getEventBus().post(event);
+	private void postEvent(final Object event) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				getEventBus().post(event);
+			}
+		});
 	}
 
 	@Override

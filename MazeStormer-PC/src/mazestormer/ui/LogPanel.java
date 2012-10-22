@@ -35,6 +35,7 @@ public class LogPanel extends ViewPanel {
 		setLayout(new BorderLayout(0, 0));
 
 		final JTable table = new JTable();
+		table.setFillsViewportHeight(true);
 		tableModel = new LogTableModel();
 		table.setModel(tableModel);
 		add(new JScrollPane(table));
