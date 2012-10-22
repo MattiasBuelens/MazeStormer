@@ -17,7 +17,7 @@ public class PhysicalRobot extends DifferentialPilot implements Robot {
 	}
 
 	private static RemoteMotor getRemoteMotor(int id) {
-		return new RemoteMotor(NXTCommandConnector.getSingletonOpen(), id);
+		return new CachedRemoteMotor(NXTCommandConnector.getSingletonOpen(), id);
 	}
 
 	@Override

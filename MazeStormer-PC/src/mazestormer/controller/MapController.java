@@ -29,7 +29,7 @@ public class MapController extends SubController implements IMapController {
 	private Timer updater;
 	private long updateInterval;
 
-	private static final long defaultUpdateInterval = 1000;
+	private static final long defaultUpdateInterval = 1000 / 25;
 
 	public MapController(MainController mainController) {
 		super(mainController);
