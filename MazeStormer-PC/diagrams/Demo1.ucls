@@ -2,7 +2,7 @@
   associations="true" dependencies="false" nesting-relationships="true">  
   <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.util.AbstractEventSource" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/util/AbstractEventSource.java" binary="false">    
-    <position height="-1" width="-1" x="629" y="-21"/>    
+    <position height="-1" width="-1" x="615" y="25"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -10,7 +10,7 @@
   </class>  
   <interface id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.util.EventSource" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/util/EventSource.java" binary="false">    
-    <position height="-1" width="-1" x="433" y="-67"/>    
+    <position height="-1" width="-1" x="381" y="-59"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -26,7 +26,7 @@
   </class>  
   <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ViewPanel" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/ui/ViewPanel.java" binary="false">    
-    <position height="-1" width="-1" x="127" y="323"/>    
+    <position height="-1" width="-1" x="125" y="243"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -34,7 +34,7 @@
   </class>  
   <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.PolygonControlPanel.StartAction" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/ui/PolygonControlPanel.java" binary="false">    
-    <position height="-1" width="-1" x="83" y="485"/>    
+    <position height="-1" width="-1" x="90" y="431"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -42,7 +42,7 @@
   </class>  
   <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.PolygonControlPanel.StopAction" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/ui/PolygonControlPanel.java" binary="false">    
-    <position height="-1" width="-1" x="172" y="485"/>    
+    <position height="-1" width="-1" x="179" y="430"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -50,7 +50,7 @@
   </class>  
   <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.PolygonControlPanel" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/ui/PolygonControlPanel.java" binary="false">    
-    <position height="-1" width="-1" x="125" y="410"/>    
+    <position height="-1" width="-1" x="126" y="344"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -58,248 +58,179 @@
   </class>  
   <interface id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.IMainController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/IMainController.java" binary="false">    
-    <position height="-1" width="-1" x="432" y="117"/>    
+    <position height="-1" width="-1" x="374" y="117"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </interface>  
-  <class id="9" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.MainController.MovePublisher" 
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.MainController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/MainController.java" binary="false">    
-    <position height="-1" width="-1" x="431" y="296"/>    
+    <position height="-1" width="-1" x="371" y="204"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.MainController" 
-    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/MainController.java" binary="false">    
-    <position height="-1" width="-1" x="431" y="176"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.SubController" 
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.SubController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/SubController.java" binary="false">    
-    <position height="-1" width="-1" x="629" y="176"/>    
+    <position height="-1" width="-1" x="614" y="205"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <enumeration id="12" corner="BOTTOM_RIGHT" language="java" 
-    name="mazestormer.controller.IPolygonControlController.Direction" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/controller/IPolygonControlController.java" binary="false">    
-    <position height="-1" width="-1" x="843" y="409"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </enumeration>  
-  <interface id="13" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.IPolygonControlController" 
+  <interface id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.IPolygonControlController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/IPolygonControlController.java" 
     binary="false">    
-    <position height="-1" width="-1" x="630" y="409"/>    
+    <position height="-1" width="-1" x="613" y="345"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </interface>  
-  <class id="14" corner="BOTTOM_RIGHT" language="java" 
+  <class id="12" corner="BOTTOM_RIGHT" language="java" 
     name="mazestormer.controller.PolygonControlController.PolygonRunner" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/controller/PolygonControlController.java" binary="false">    
-    <position height="-1" width="-1" x="628" y="585"/>    
+    <position height="-1" width="-1" x="805" y="425"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="15" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PolygonControlController" 
+  <class id="13" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PolygonControlController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/PolygonControlController.java" 
     binary="false">    
-    <position height="-1" width="-1" x="628" y="491"/>    
+    <position height="-1" width="-1" x="615" y="424"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="16" corner="BOTTOM_RIGHT" language="java" name="javax.swing.JPanel" project="MazeStormer-NXT" 
-    file="C:/Program Files/Java/jre7/lib/rt.jar" binary="true">    
-    <position height="-1" width="-1" x="128" y="242"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="17" corner="BOTTOM_RIGHT" language="java" name="javax.swing.JFrame" project="MazeStormer-NXT" 
-    file="C:/Program Files/Java/jre7/lib/rt.jar" binary="true">    
-    <position height="-1" width="-1" x="127" y="38"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <interface id="18" corner="BOTTOM_RIGHT" language="java" name="java.lang.Runnable" project="MazeStormer-NXT" 
-    file="C:/Program Files/Java/jre7/lib/rt.jar" binary="true">    
-    <position height="-1" width="-1" x="476" y="587"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </interface>  
-  <interface id="19" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Robot" project="MazeStormer-PC" 
+  <interface id="14" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Robot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/robot/Robot.java" binary="false">    
-    <position height="-1" width="-1" x="923" y="584"/>    
+    <position height="-1" width="-1" x="948" y="424"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </interface>  
-  <nesting id="20">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="6"/>  
-  </nesting>  
-  <realization id="21">    
+  <generalization id="15">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <realization id="16">    
     <end type="SOURCE" refId="1"/>    
     <end type="TARGET" refId="2"/>  
   </realization>  
-  <generalization id="22">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="17"/>  
-  </generalization>  
-  <realization id="23">    
-    <bendpoint x="289" y="-31"/>    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="2"/>  
-  </realization>  
-  <association id="24">    
-    <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="25" name="direction"/>      
-      <multiplicity id="26" minimum="0" maximum="1"/>    
+  <nesting id="17">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="6"/>  
+  </nesting>  
+  <association id="18">    
+    <end type="SOURCE" refId="13" navigable="false">      
+      <attribute id="19" name="runner"/>      
+      <multiplicity id="20" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="12" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="27">    
-    <bendpoint x="280" y="-66"/>    
-    <end type="SOURCE" refId="3"/>    
+  <realization id="21">    
+    <bendpoint x="289" y="-31"/>    
+    <end type="SOURCE" refId="4"/>    
     <end type="TARGET" refId="2"/>  
   </realization>  
-  <association id="28">    
-    <end type="SOURCE" refId="7" navigable="false">      
-      <attribute id="29" name="controller"/>      
-      <multiplicity id="30" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="13" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <nesting id="31">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="5"/>  
-  </nesting>  
-  <generalization id="32">    
-    <end type="SOURCE" refId="15"/>    
-    <end type="TARGET" refId="11"/>  
-  </generalization>  
-  <realization id="33">    
-    <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="8"/>  
-  </realization>  
-  <generalization id="34">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="4"/>  
-  </generalization>  
-  <association id="35">    
-    <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="36" name="mainController"/>      
-      <multiplicity id="37" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <realization id="38">    
-    <end type="SOURCE" refId="15"/>    
-    <end type="TARGET" refId="13"/>  
-  </realization>  
-  <association id="39">    
-    <end type="SOURCE" refId="10" navigable="false">      
-      <attribute id="40" name="polygonControl"/>      
-      <multiplicity id="41" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="13" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="42">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="1"/>  
-  </generalization>  
-  <realization id="43">    
-    <end type="SOURCE" refId="14"/>    
-    <end type="TARGET" refId="18"/>  
-  </realization>  
-  <generalization id="44">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="16"/>  
-  </generalization>  
-  <association id="45">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="46" name="runner"/>      
-      <multiplicity id="47" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="14" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="48">    
+  <association id="22">    
     <end type="SOURCE" refId="3" navigable="false">      
-      <attribute id="49" name="controller">        
-        <position height="14" width="49" x="292" y="99"/>      
+      <attribute id="23" name="controller">        
+        <position height="14" width="49" x="208" y="99"/>      
       </attribute>      
-      <multiplicity id="50" minimum="0" maximum="1">        
-        <position height="14" width="18" x="308" y="120"/>      
+      <multiplicity id="24" minimum="0" maximum="1">        
+        <position height="14" width="18" x="218" y="120"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="8" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="51">    
-    <bendpoint x="304" y="176"/>    
-    <bendpoint x="384" y="25"/>    
-    <end type="SOURCE" refId="10" navigable="false">      
-      <attribute id="52" name="view">        
-        <position height="14" width="28" x="382" y="-35"/>      
+  <association id="25">    
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="26" name="robot"/>      
+      <multiplicity id="27" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="14" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <nesting id="28">    
+    <bendpoint x="693" y="473"/>    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="12"/>  
+  </nesting>  
+  <association id="29">    
+    <bendpoint x="295" y="189"/>    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="30" name="view">        
+        <position height="14" width="28" x="330" y="-27"/>      
       </attribute>      
-      <multiplicity id="53" minimum="0" maximum="1">        
-        <position height="14" width="18" x="395" y="-19"/>      
+      <multiplicity id="31" minimum="0" maximum="1">        
+        <position height="14" width="18" x="343" y="-11"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="54">    
-    <end type="SOURCE" refId="15"/>    
-    <end type="TARGET" refId="14"/>  
-  </nesting>  
-  <association id="55">    
-    <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="56" name="robot"/>      
-      <multiplicity id="57" minimum="0" maximum="1"/>    
+  <realization id="32">    
+    <bendpoint x="280" y="-66"/>    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="2"/>  
+  </realization>  
+  <association id="33">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="34" name="controller"/>      
+      <multiplicity id="35" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="19" navigable="true"/>    
+    <end type="TARGET" refId="11" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <nesting id="58">    
-    <end type="SOURCE" refId="13"/>    
-    <end type="TARGET" refId="12"/>  
+  <nesting id="36">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="5"/>  
   </nesting>  
-  <generalization id="59">    
-    <end type="SOURCE" refId="13"/>    
+  <generalization id="37">    
+    <end type="SOURCE" refId="11"/>    
     <end type="TARGET" refId="2"/>  
   </generalization>  
-  <nesting id="60">    
-    <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="9"/>  
-  </nesting>  
+  <generalization id="38">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <realization id="39">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="8"/>  
+  </realization>  
+  <generalization id="40">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="4"/>  
+  </generalization>  
+  <association id="41">    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="42" name="mainController"/>      
+      <multiplicity id="43" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="44">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="11"/>  
+  </realization>  
+  <association id="45">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="46" name="polygonControl"/>      
+      <multiplicity id="47" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="false" package="false" protected="false" private="false"/>    
