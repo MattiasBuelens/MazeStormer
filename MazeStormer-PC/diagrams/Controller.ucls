@@ -46,7 +46,7 @@
   <enumeration id="6" corner="BOTTOM_RIGHT" language="java" 
     name="mazestormer.controller.IPolygonControlController.Direction" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/controller/IPolygonControlController.java" binary="false">    
-    <position height="-1" width="-1" x="840" y="540"/>    
+    <position height="-1" width="-1" x="858" y="544"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -144,26 +144,30 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <association id="18">    
+  <class id="18" corner="BOTTOM_RIGHT" language="java" name="mazestormer.util.AbstractEventSource" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/util/AbstractEventSource.java" binary="false">    
+    <position height="-1" width="-1" x="370" y="651"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <association id="19">    
     <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="19" name="polygonControl"/>      
-      <multiplicity id="20" minimum="0" maximum="1"/>    
+      <attribute id="20" name="map"/>      
+      <multiplicity id="21" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="15" navigable="true"/>    
+    <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="21">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="2"/>  
-  </realization>  
-  <realization id="22">    
-    <end type="SOURCE" refId="16"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
-  <generalization id="23">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="10"/>  
+  <generalization id="22">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="18"/>  
   </generalization>  
+  <realization id="23">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="13"/>  
+  </realization>  
   <association id="24">    
     <end type="SOURCE" refId="10" navigable="false">      
       <attribute id="25" name="mainController"/>      
@@ -173,114 +177,122 @@
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="27">    
-    <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="28" name="configuration"/>      
-      <multiplicity id="29" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <nesting id="30">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="12"/>  
-  </nesting>  
-  <association id="31">    
     <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="32" name="direction">        
-        <position height="14" width="45" x="733" y="504"/>      
+      <attribute id="28" name="direction">        
+        <position height="14" width="45" x="751" y="508"/>      
       </attribute>      
-      <multiplicity id="33" minimum="0" maximum="1"/>    
+      <multiplicity id="29" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="6" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="34">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="5"/>  
-  </realization>  
-  <association id="35">    
-    <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="36" name="manualControl"/>      
-      <multiplicity id="37" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="4" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="38">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="10"/>  
-  </generalization>  
-  <nesting id="39">    
-    <end type="SOURCE" refId="15"/>    
-    <end type="TARGET" refId="6"/>  
-  </nesting>  
-  <generalization id="40">    
+  <generalization id="30">    
     <end type="SOURCE" refId="8"/>    
     <end type="TARGET" refId="10"/>  
   </generalization>  
-  <realization id="41">    
-    <end type="SOURCE" refId="17"/>    
-    <end type="TARGET" refId="3"/>  
-  </realization>  
-  <generalization id="42">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="10"/>  
-  </generalization>  
-  <realization id="43">    
-    <end type="SOURCE" refId="9"/>    
-    <end type="TARGET" refId="13"/>  
-  </realization>  
-  <association id="44">    
+  <association id="31">    
     <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="45" name="map"/>      
-      <multiplicity id="46" minimum="0" maximum="1"/>    
+      <attribute id="32" name="polygonControl"/>      
+      <multiplicity id="33" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
+    <end type="TARGET" refId="15" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <realization id="47">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="15"/>  
+  <realization id="34">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="2"/>  
   </realization>  
-  <generalization id="48">    
+  <generalization id="35">    
     <end type="SOURCE" refId="16"/>    
     <end type="TARGET" refId="10"/>  
   </generalization>  
-  <generalization id="49">    
-    <end type="SOURCE" refId="9"/>    
-    <end type="TARGET" refId="10"/>  
-  </generalization>  
-  <realization id="50">    
+  <realization id="36">    
     <end type="SOURCE" refId="8"/>    
     <end type="TARGET" refId="14"/>  
   </realization>  
-  <association id="51">    
+  <generalization id="37">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <generalization id="38">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <association id="39">    
     <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="52" name="state"/>      
-      <multiplicity id="53" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="13" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="54">    
-    <bendpoint x="470" y="457"/>    
-    <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="55" name="runner">        
-        <position height="14" width="36" x="557" y="508"/>      
-      </attribute>      
-      <multiplicity id="56" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="12" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="57">    
-    <end type="SOURCE" refId="17" navigable="false">      
-      <attribute id="58" name="parameters"/>      
-      <multiplicity id="59" minimum="0" maximum="1"/>    
+      <attribute id="40" name="parameters"/>      
+      <multiplicity id="41" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="14" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
+  <nesting id="42">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="6"/>  
+  </nesting>  
+  <association id="43">    
+    <end type="SOURCE" refId="17" navigable="false">      
+      <attribute id="44" name="configuration"/>      
+      <multiplicity id="45" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="46">    
+    <end type="SOURCE" refId="16"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
+  <generalization id="47">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <realization id="48">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="15"/>  
+  </realization>  
+  <association id="49">    
+    <bendpoint x="470" y="457"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="50" name="runner">        
+        <position height="14" width="36" x="557" y="508"/>      
+      </attribute>      
+      <multiplicity id="51" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <realization id="52">    
+    <end type="SOURCE" refId="17"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
+  <association id="53">    
+    <end type="SOURCE" refId="17" navigable="false">      
+      <attribute id="54" name="manualControl"/>      
+      <multiplicity id="55" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="56">    
+    <end type="SOURCE" refId="17" navigable="false">      
+      <attribute id="57" name="state"/>      
+      <multiplicity id="58" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="59">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <realization id="60">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="5"/>  
+  </realization>  
+  <nesting id="61">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="12"/>  
+  </nesting>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="false" package="false" protected="false" private="false"/>    
