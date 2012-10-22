@@ -39,6 +39,7 @@ public class StatePanel extends ViewPanel {
 		add(table);
 		
 		textPane = new JTextPane();
+		textPane.setEditable(false);
 		add(textPane, BorderLayout.CENTER);
 
 		if (!Beans.isDesignTime())
