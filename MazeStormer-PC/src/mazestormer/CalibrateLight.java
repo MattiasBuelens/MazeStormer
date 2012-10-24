@@ -9,6 +9,7 @@ import mazestormer.connect.RobotType;
 
 public class CalibrateLight {
 
+	@SuppressWarnings("resource")
 	public static void main(String[] aArgs) throws Exception {
 
 		Connector connector = new ConnectionProvider()
