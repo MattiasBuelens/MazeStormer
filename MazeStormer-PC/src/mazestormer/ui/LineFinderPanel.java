@@ -34,7 +34,7 @@ public class LineFinderPanel extends ViewPanel {
 		this.calibrateModel = new SpinnerNumberModel(new Integer(0), new Integer(0),
 				new Integer(1023), new Integer(1));
 		
-		JLabel lblCalibrate = new JLabel("Calibrate:");
+		JLabel lblCalibrate = new JLabel("Calibrate: ");
 		container.add(lblCalibrate, "cell 0 0,grow");
 
 		JSpinner spinNbSides = new JSpinner();
