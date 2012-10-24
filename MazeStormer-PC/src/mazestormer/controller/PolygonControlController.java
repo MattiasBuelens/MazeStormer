@@ -1,7 +1,7 @@
 package mazestormer.controller;
 
 import mazestormer.controller.PolygonEvent.EventType;
-import mazestormer.robot.Robot;
+import mazestormer.robot.Pilot;
 
 public class PolygonControlController extends SubController implements
 		IPolygonControlController {
@@ -12,8 +12,8 @@ public class PolygonControlController extends SubController implements
 
 	private PolygonRunner runner;
 
-	private Robot getRobot() {
-		return getMainController().getRobot();
+	private Pilot getPilot() {
+		return getMainController().getPilot();
 	}
 
 	@Override
@@ -40,11 +40,11 @@ public class PolygonControlController extends SubController implements
 		private final double sideLength;
 		private final Direction direction;
 
-		private final Robot robot;
+		private final Pilot pilot;
 		private boolean isRunning = false;
 
 		public PolygonRunner(int nbSides, double sideLength, Direction direction) {
-			this.robot = getRobot();
+			this.pilot = getPilot();
 			this.nbSides = nbSides;
 			this.sideLength = sideLength;
 			this.direction = direction;
@@ -59,7 +59,7 @@ public class PolygonControlController extends SubController implements
 		public void stop() {
 			if (isRunning()) {
 				isRunning = false;
-				robot.stop();
+				pilot.stop();
 				postState(EventType.STOPPED);
 			}
 		}
@@ -76,10 +76,10 @@ public class PolygonControlController extends SubController implements
 			for (int i = 0; i < nbSides; ++i) {
 				if (!isRunning())
 					return;
-				robot.travel(sideLength);
+				pilot.travel(sideLength);
 				if (!isRunning())
 					return;
-				robot.rotate(angle);
+				pilot.rotate(angle);
 			}
 
 			stop();

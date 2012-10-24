@@ -3,7 +3,7 @@ package mazestormer.controller;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;
-import mazestormer.robot.Robot;
+import mazestormer.robot.Pilot;
 
 public class ConfigurationController extends SubController implements
 		IConfigurationController {
@@ -68,14 +68,14 @@ public class ConfigurationController extends SubController implements
 	@Override
 	public void stop() {
 		if (isConnected())
-			getRobot().stop();
+			getPilot().stop();
 	}
 
-	public Robot getRobot() {
+	public Pilot getPilot() {
 		if (!isConnected())
 			throw new IllegalStateException("Not connected.");
 
-		return getMainController().getRobot();
+		return getMainController().getPilot();
 	}
 
 }

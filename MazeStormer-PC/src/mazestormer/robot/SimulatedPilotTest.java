@@ -8,9 +8,9 @@ import lejos.robotics.localization.PoseProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimulatedRobotTest {
+public class SimulatedPilotTest {
 
-	private SimulatedRobot robot;
+	private SimulatedPilot pilot;
 	private PoseProvider tracker;
 
 	private static final double travelSpeed = 100d; // cm/sec
@@ -22,11 +22,11 @@ public class SimulatedRobotTest {
 
 	@Before
 	public void setUp() throws Exception {
-		robot = new SimulatedRobot(Robot.leftWheelDiameter,
-				Robot.rightWheelDiameter, Robot.trackWidth);
-		robot.setTravelSpeed(travelSpeed);
-		robot.setRotateSpeed(rotateSpeed);
-		tracker = new OdometryPoseProvider(robot);
+		pilot = new SimulatedPilot(Pilot.leftWheelDiameter,
+				Pilot.rightWheelDiameter, Pilot.trackWidth);
+		pilot.setTravelSpeed(travelSpeed);
+		pilot.setRotateSpeed(rotateSpeed);
+		tracker = new OdometryPoseProvider(pilot);
 	}
 
 	@Test
@@ -36,7 +36,7 @@ public class SimulatedRobotTest {
 		long start = System.currentTimeMillis();
 
 		// Travel forward
-		robot.travel(expectedDistance);
+		pilot.travel(expectedDistance);
 
 		long duration = System.currentTimeMillis() - start;
 		float distance = tracker.getPose().getX();
@@ -52,7 +52,7 @@ public class SimulatedRobotTest {
 		long start = System.currentTimeMillis();
 
 		// Travel backward
-		robot.travel(expectedDistance);
+		pilot.travel(expectedDistance);
 
 		long duration = System.currentTimeMillis() - start;
 		float distance = tracker.getPose().getX();
@@ -70,19 +70,19 @@ public class SimulatedRobotTest {
 		long start = System.currentTimeMillis();
 
 		// Travel forward
-		robot.travel(targetDistance, true);
-		assertTrue(robot.isMoving());
+		pilot.travel(targetDistance, true);
+		assertTrue(pilot.isMoving());
 
 		// Wait
 		Thread.sleep((long) expectedDuration);
-		assertTrue(robot.isMoving());
+		assertTrue(pilot.isMoving());
 
 		// Stop while moving
-		robot.stop();
+		pilot.stop();
 
 		long duration = System.currentTimeMillis() - start;
 		float distance = tracker.getPose().getX();
-		assertFalse(robot.isMoving());
+		assertFalse(pilot.isMoving());
 
 		assertEquals(expectedDuration, duration, timeDelta);
 		assertEquals(expectedDistance, distance, timeDelta * distanceDelta);
@@ -95,7 +95,7 @@ public class SimulatedRobotTest {
 		long start = System.currentTimeMillis();
 
 		// Rotate counter-clockwise
-		robot.rotate(expectedAngle);
+		pilot.rotate(expectedAngle);
 
 		long duration = System.currentTimeMillis() - start;
 		float angle = tracker.getPose().getHeading();
@@ -111,7 +111,7 @@ public class SimulatedRobotTest {
 		long start = System.currentTimeMillis();
 
 		// Rotate clockwise
-		robot.rotate(expectedAngle);
+		pilot.rotate(expectedAngle);
 
 		long duration = System.currentTimeMillis() - start;
 		float angle = tracker.getPose().getHeading();
@@ -142,8 +142,8 @@ public class SimulatedRobotTest {
 
 		// Travel along a square
 		for (int i = 1; i <= sides; ++i) {
-			robot.travel(polygonSide);
-			robot.rotate(polygonAngle);
+			pilot.travel(polygonSide);
+			pilot.rotate(polygonAngle);
 		}
 
 		long duration = System.currentTimeMillis() - start;
@@ -156,11 +156,11 @@ public class SimulatedRobotTest {
 	}
 
 	private double getExceptedTravelDuration(double distance) {
-		return Math.abs(distance) / robot.getTravelSpeed() * 1000d;
+		return Math.abs(distance) / pilot.getTravelSpeed() * 1000d;
 	}
 
 	private double getExceptedRotateDuration(double angle) {
-		return Math.abs(angle) / robot.getRotateSpeed() * 1000d;
+		return Math.abs(angle) / pilot.getRotateSpeed() * 1000d;
 	}
 
 }

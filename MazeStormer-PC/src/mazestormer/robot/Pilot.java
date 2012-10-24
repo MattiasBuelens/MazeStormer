@@ -3,7 +3,7 @@ package mazestormer.robot;
 import lejos.robotics.navigation.ArcRotateMoveController;
 import lejos.robotics.navigation.MoveProvider;
 
-public interface Robot extends ArcRotateMoveController, MoveProvider {
+public interface Pilot extends ArcRotateMoveController, MoveProvider {
 
 	/**
 	 * Left wheel diameter, in centimeters.
@@ -21,22 +21,12 @@ public interface Robot extends ArcRotateMoveController, MoveProvider {
 	public final static double trackWidth = 13.97d;
 
 	/**
-	 * Connect to this robot.
-	 */
-	public void connect();
-
-	/**
-	 * Disconnect from this robot.
-	 */
-	public void disconnect();
-
-	/**
-	 * Starts the NXT robot turning left (counter-clockwise).
+	 * Starts the robot turning left (counter-clockwise).
 	 */
 	public void rotateLeft();
 
 	/**
-	 * Starts the NXT robot turning right (clockwise).
+	 * Starts the robot turning right (clockwise).
 	 */
 	public void rotateRight();
 
