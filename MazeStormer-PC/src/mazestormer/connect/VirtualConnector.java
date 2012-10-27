@@ -1,5 +1,6 @@
 package mazestormer.connect;
 
+import static com.google.common.base.Preconditions.*;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.SimulatedPilot;
 
@@ -26,8 +27,7 @@ public class VirtualConnector implements Connector {
 
 	@Override
 	public Pilot getPilot() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected to robot.");
+		checkState(isConnected());
 		return pilot;
 	}
 

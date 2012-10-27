@@ -1,5 +1,7 @@
 package mazestormer.controller;
 
+import static com.google.common.base.Preconditions.*;
+
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;
@@ -41,8 +43,7 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void connect(RobotType robotType, ControlMode controlMode) {
-		if (isConnected())
-			throw new IllegalStateException("Already connected.");
+		checkState(!isConnected());
 
 		// Set current state
 		setRobotType(robotType);
@@ -54,8 +55,7 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void disconnect() {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected.");
+		checkState(isConnected());
 
 		// Stop the robot
 		stop();
@@ -72,9 +72,7 @@ public class ConfigurationController extends SubController implements
 	}
 
 	public Pilot getPilot() {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected.");
-
+		checkState(isConnected());
 		return getMainController().getPilot();
 	}
 

@@ -1,5 +1,7 @@
 package mazestormer.connect;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.io.IOException;
 
 import lejos.nxt.remote.NXTCommand;
@@ -30,8 +32,7 @@ public class PhysicalConnector implements Connector {
 
 	@Override
 	public Pilot getPilot() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected to robot.");
+		checkState(isConnected());
 		return pilot;
 	}
 

@@ -1,5 +1,7 @@
 package mazestormer.controller;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.awt.EventQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -206,8 +208,7 @@ public class MainController implements IMainController {
 	}
 
 	public void connect(RobotType robotType) throws IllegalStateException {
-		if (isConnected())
-			throw new IllegalStateException("Already connected.");
+		checkState(!isConnected());
 
 		connector = connectionProvider.getConnector(robotType);
 		connector.connect();
@@ -215,8 +216,7 @@ public class MainController implements IMainController {
 	}
 
 	public void disconnect() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Already disconnected.");
+		checkState(isConnected());
 
 		connector.disconnect();
 		connector = null;
@@ -241,8 +241,7 @@ public class MainController implements IMainController {
 	 */
 
 	public Pilot getPilot() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected to robot.");
+		checkState(isConnected());
 		return connector.getPilot();
 	}
 
