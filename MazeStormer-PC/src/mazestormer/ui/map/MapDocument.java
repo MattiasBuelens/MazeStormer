@@ -17,8 +17,7 @@ public class MapDocument {
 
 	private SVGDocument document;
 
-	private SortedMap<MapLayer, Element> layers = new TreeMap<MapLayer, Element>(
-			new MapLayer.ZIndexComparator());
+	private SortedMap<MapLayer, Element> layers = new TreeMap<MapLayer, Element>(new MapLayer.ZIndexComparator());
 
 	public MapDocument() {
 		document = SVGUtils.createSVGDocument();

@@ -9,22 +9,31 @@ import lejos.geom.Point;
 
 public class Tile {
 
-	private final Point position;
-	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
-			Orientation.class);
+	private final long x;
+	private final long y;
+	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
 
-	public Tile(Point position) {
-		this.position = position;
+	public Tile(long x, long y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public long getX() {
+		return x;
+	}
+
+	public long getY() {
+		return y;
 	}
 
 	public Point getPosition() {
-		return position;
+		return new Point(getX(), getY());
 	}
 
 	public Iterable<Edge> getEdges() {
 		return Collections.unmodifiableCollection(edges.values());
 	}
-	
+
 	public boolean hasEdge(Edge edge) {
 		checkNotNull(edge);
 		return edges.containsValue(edge);

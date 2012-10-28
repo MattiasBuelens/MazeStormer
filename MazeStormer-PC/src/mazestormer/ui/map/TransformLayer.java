@@ -6,10 +6,7 @@ import lejos.geom.Rectangle;
 
 import org.apache.batik.bridge.BridgeException;
 import org.apache.batik.bridge.ViewBox;
-import org.apache.batik.dom.AbstractDocument;
-import org.apache.batik.dom.svg.SVGOMGElement;
 import org.apache.batik.dom.svg.SVGOMTransform;
-import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGGElement;
 import org.w3c.dom.svg.SVGTransform;
@@ -45,11 +42,9 @@ public abstract class TransformLayer extends MapLayer {
 	 *         box.
 	 */
 	private static Rectangle getViewBox(Element element) {
-		String attr = element.getAttributeNS(null,
-				SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
+		String attr = element.getAttributeNS(null, SVG_VIEW_BOX_ATTRIBUTE);
 		try {
-			float[] viewBox = ViewBox
-					.parseViewBoxAttribute(element, attr, null);
+			float[] viewBox = ViewBox.parseViewBoxAttribute(element, attr, null);
 			return new Rectangle(viewBox[0], viewBox[1], viewBox[2], viewBox[3]);
 		} catch (BridgeException e) {
 			return null;
@@ -296,11 +291,10 @@ public abstract class TransformLayer extends MapLayer {
 	}
 
 	@Override
-	protected Element create(AbstractDocument document) {
-		SVGGElement group = new SVGOMGElement(null, document);
+	protected Element create() {
+		SVGGElement group = (SVGGElement) createElementNS(null, SVG_G_TAG);
 
-		Element transformElement = (Element) document.importNode(
-				getTransformElement(), true);
+		Element transformElement = (Element) importNode(getTransformElement(), true);
 		group.appendChild(transformElement);
 
 		return group;

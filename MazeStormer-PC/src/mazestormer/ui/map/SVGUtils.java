@@ -15,6 +15,7 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.svg2svg.SVGTranscoder;
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -26,7 +27,7 @@ public class SVGUtils {
 	public static final SVGDocument createSVGDocument() {
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-		return (SVGDocument) impl.createDocument(svgNS, "svg", null);
+		return (SVGDocument) impl.createDocument(svgNS, SVGConstants.SVG_SVG_TAG, null);
 	}
 
 	/**

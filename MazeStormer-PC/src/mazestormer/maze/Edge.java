@@ -2,8 +2,6 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.*;
 
-import java.util.Set;
-
 import lejos.geom.Point;
 
 import com.google.common.collect.ImmutableSet;
@@ -65,7 +63,7 @@ public final class Edge {
 	/**
 	 * Get the positions touching this edge.
 	 */
-	public Set<Point> getTouching() {
+	public ImmutableSet<Point> getTouching() {
 		return ImmutableSet.of(getPosition(), getOrientation().shift(getPosition()));
 	}
 
