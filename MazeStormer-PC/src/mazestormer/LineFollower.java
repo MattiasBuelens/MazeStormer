@@ -19,6 +19,7 @@ public class LineFollower {
 		Pilot robot = connector.getPilot();
 		light.setFloodlight(true);
 		
+		//TODO: name?
 		final int blackWhiteThreshold = 30;
 		
 		double slowSpeed,fastSpeed;
@@ -85,6 +86,7 @@ public class LineFollower {
 		
 		boolean groter = false;
 		
+		//TODO: Hoek is altijd groter dan 180 graden nu
 		if(angle > 180){
 			groter = true;
 			angle = angle - 360;
