@@ -2,7 +2,8 @@ package mazestormer.connect;
 
 import static com.google.common.base.Preconditions.*;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.SimulatedPilot;
+import mazestormer.robot.Robot;
+import mazestormer.robot.VirtualRobot;
 
 public class VirtualConnector implements Connector {
 
@@ -12,7 +13,7 @@ public class VirtualConnector implements Connector {
 	private static final double travelSpeed = 20d; // cm/sec
 	private static final double rotateSpeed = 90d; // degrees/sec
 
-	private Pilot pilot;
+	private Robot robot;
 	private String deviceName; // not used
 
 	@Override
@@ -26,14 +27,14 @@ public class VirtualConnector implements Connector {
 	}
 
 	@Override
-	public Pilot getPilot() throws IllegalStateException {
+	public Robot getRobot() throws IllegalStateException {
 		checkState(isConnected());
-		return pilot;
+		return robot;
 	}
 
 	@Override
 	public boolean isConnected() {
-		return pilot != null;
+		return robot != null;
 	}
 
 	@Override
@@ -41,19 +42,20 @@ public class VirtualConnector implements Connector {
 		if (isConnected())
 			return;
 
-		pilot = createPilot();
+		robot = createRobot();
 	}
 
-	private Pilot createPilot() {
-		Pilot pilot = new SimulatedPilot(Pilot.trackWidth);
+	private Robot createRobot() {
+		Robot robot = new VirtualRobot();
+		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(travelSpeed);
 		pilot.setRotateSpeed(rotateSpeed);
-		return pilot;
+		return robot;
 	}
 
 	@Override
 	public void disconnect() {
-		pilot = null;
+		robot = null;
 	}
 
 }

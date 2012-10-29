@@ -1,6 +1,11 @@
 package mazestormer.robot;
 
-public interface Robot{
+import lejos.nxt.LightSensor;
+
+public interface Robot {
 
 	public Pilot getPilot();
+
+	public LightSensor getLightSensor();
+
 }

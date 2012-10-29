@@ -9,6 +9,7 @@ import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
 import mazestormer.util.AbstractEventSource;
 
 import org.apache.batik.dom.AbstractDocument;
+import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGStylableElement;
 import org.apache.batik.util.CSSConstants;
 import org.apache.batik.util.SVGConstants;
@@ -18,7 +19,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
-public abstract class MapLayer extends AbstractEventSource implements SVGConstants, CSSConstants {
+public abstract class MapLayer extends AbstractEventSource implements
+		SVGConstants, CSSConstants {
 
 	private final String name;
 
@@ -50,7 +52,8 @@ public abstract class MapLayer extends AbstractEventSource implements SVGConstan
 
 	public void setVisible(boolean visible) {
 		if (this.isVisible != visible) {
-			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible", visible));
+			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible",
+					visible));
 		}
 		this.isVisible = visible;
 
@@ -60,7 +63,8 @@ public abstract class MapLayer extends AbstractEventSource implements SVGConstan
 	protected void update() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
-			final String displayValue = isVisible() ? CSS_INLINE_VALUE : CSS_NONE_VALUE;
+			final String displayValue = isVisible() ? CSS_INLINE_VALUE
+					: CSS_NONE_VALUE;
 			final SVGStylableElement styleElement = (SVGStylableElement) element;
 
 			invokeDOMChange(new Runnable() {
@@ -86,15 +90,12 @@ public abstract class MapLayer extends AbstractEventSource implements SVGConstan
 
 	protected Element createElement(String tagName) throws DOMException {
 		checkNotNull(document);
-		return document.createElement(tagName);
+		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+		return document.createElementNS(svgNS, tagName);
 	}
 
-	protected Element createElementNS(String namespaceURI, String qualifiedName) throws DOMException {
-		checkNotNull(document);
-		return document.createElementNS(namespaceURI, qualifiedName);
-	}
-
-	protected Node importNode(Node importedNode, boolean deep) throws DOMException {
+	protected Node importNode(Node importedNode, boolean deep)
+			throws DOMException {
 		checkNotNull(document);
 		return document.importNode(importedNode, deep);
 	}

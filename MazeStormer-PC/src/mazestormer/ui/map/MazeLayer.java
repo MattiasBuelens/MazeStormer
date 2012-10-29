@@ -24,7 +24,7 @@ public class MazeLayer extends MapLayer {
 
 	@Override
 	protected Element create() {
-		SVGGElement group = (SVGGElement) createElementNS(null, SVG_G_TAG);
+		SVGGElement group = (SVGGElement) createElement(SVG_G_TAG);
 		return group;
 	}
 
@@ -39,8 +39,8 @@ public class MazeLayer extends MapLayer {
 		private final SVGRectElement rect;
 
 		public TileElement() {
-			group = (SVGGElement) createElementNS(null, SVG_G_TAG);
-			rect = (SVGRectElement) createElementNS(null, SVG_RECT_TAG);
+			group = (SVGGElement) createElement(SVG_G_TAG);
+			rect = (SVGRectElement) createElement(SVG_RECT_TAG);
 			rect.setAttribute(SVG_FILL_ATTRIBUTE, CSS_SANDYBROWN_VALUE);
 		}
 
@@ -52,7 +52,7 @@ public class MazeLayer extends MapLayer {
 		private Orientation orientation;
 
 		public EdgeElement(Orientation orientation) {
-			line = (SVGLineElement) createElementNS(null, SVG_LINE_TAG);
+			line = (SVGLineElement) createElement(SVG_LINE_TAG);
 			line.setAttribute(SVG_STROKE_ATTRIBUTE, CSS_PERU_VALUE);
 			line.setAttribute(SVG_STROKE_WIDTH_ATTRIBUTE, 5 + "");
 

@@ -292,7 +292,7 @@ public abstract class TransformLayer extends MapLayer {
 
 	@Override
 	protected Element create() {
-		SVGGElement group = (SVGGElement) createElementNS(null, SVG_G_TAG);
+		SVGGElement group = (SVGGElement) createElement(SVG_G_TAG);
 
 		Element transformElement = (Element) importNode(getTransformElement(), true);
 		group.appendChild(transformElement);

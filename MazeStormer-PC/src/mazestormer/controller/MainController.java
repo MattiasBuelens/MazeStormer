@@ -139,7 +139,7 @@ public class MainController implements IMainController {
 		}
 		return polygonControl;
 	}
-	
+
 	@Override
 	public ILineFinderController lineFinderControl() {
 		if (lineFinderControl == null) {
@@ -251,13 +251,13 @@ public class MainController implements IMainController {
 
 	public Pilot getPilot() throws IllegalStateException {
 		checkState(isConnected());
-		return connector.getPilot();
+		return connector.getRobot().getPilot();
 	}
 
 	@Subscribe
 	public void registerPilotMoveListener(ConnectEvent e) {
 		if (e.isConnected()) {
-			connector.getPilot().addMoveListener(new MovePublisher());
+			getPilot().addMoveListener(new MovePublisher());
 		}
 	}
 

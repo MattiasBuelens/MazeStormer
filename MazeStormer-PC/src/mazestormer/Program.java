@@ -23,7 +23,7 @@ public class Program {
 		connector.connect();
 
 		// Create pilot
-		Pilot pilot = connector.getPilot();
+		Pilot pilot = connector.getRobot().getPilot();
 		float travelSpeed = 15; // cm/sec
 		float rotateSpeed = 90; // degrees/sec
 		// int acceleration = (int) (travelSpeed * 0.5); // cm/sec²
