@@ -18,6 +18,7 @@ import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
@@ -248,10 +249,18 @@ public class MainController implements IMainController {
 	/*
 	 * Robot
 	 */
+	
+	public Robot getRobot() throws IllegalStateException {
+		checkState(isConnected());
+		return connector.getRobot();
+	}
+	
+	/*
+	 * Pilot
+	 */
 
 	public Pilot getPilot() throws IllegalStateException {
-		checkState(isConnected());
-		return connector.getRobot().getPilot();
+		return getRobot().getPilot();
 	}
 
 	@Subscribe
