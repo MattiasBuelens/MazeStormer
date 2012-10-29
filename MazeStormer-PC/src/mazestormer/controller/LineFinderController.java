@@ -1,13 +1,11 @@
 package mazestormer.controller;
 
-import com.google.common.eventbus.Subscribe;
-
 import lejos.nxt.LightSensor;
-import lejos.nxt.SensorPort;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.LineFinderEvent.EventType;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.RemoteSensorPort;
+
+import com.google.common.eventbus.Subscribe;
 
 public class LineFinderController extends SubController implements
 		ILineFinderController {

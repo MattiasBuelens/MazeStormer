@@ -17,7 +17,6 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.MoveEvent;
-import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
