@@ -1,11 +1,11 @@
 package mazestormer.controller;
 
+import com.google.common.eventbus.Subscribe;
+
 import lejos.nxt.LightSensor;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.LineFinderEvent.EventType;
 import mazestormer.robot.Pilot;
-
-import com.google.common.eventbus.Subscribe;
 
 public class LineFinderController extends SubController implements
 		ILineFinderController {
@@ -16,6 +16,10 @@ public class LineFinderController extends SubController implements
 
 	private Pilot getPilot() {
 		return getMainController().getRobot().getPilot();
+	}
+	
+	private void log(String logText){
+		getMainController().getLogger().info(logText);
 	}
 
 	private LightSensor getLightSensor() {
@@ -108,6 +112,7 @@ public class LineFinderController extends SubController implements
 			pilot.setTravelSpeed(5);
 
 			// Start looking for line
+			log("Start looking for line.");
 			pilot.forward();
 
 			int value;
@@ -117,6 +122,7 @@ public class LineFinderController extends SubController implements
 			while (true) {
 				value = getLightSensor().readValue();
 				if (value > threshold) {
+					log("Found line, start rotating left.");
 					startRotating(true, slowRotateSpeed, fastRotateSpeed,
 							rotateAngle);
 					break;
@@ -127,6 +133,7 @@ public class LineFinderController extends SubController implements
 			while (true) {
 				value = getLightSensor().readValue();
 				if (value > threshold) {
+					log("Found line, start rotating right.");
 					startRotating(false, slowRotateSpeed, fastRotateSpeed,
 							rotateAngle);
 					break;
@@ -150,9 +157,11 @@ public class LineFinderController extends SubController implements
 			final double extra = 3.5;
 
 			pilot.setRotateSpeed(fastRotateSpeed);
+			log("Positioning robot perpendicular to the line.");
 			pilot.rotate((angle / 2.0) - extra);
 
 			double dist = 7.2 * Math.cos(Math.toRadians(angle / 2.0));
+			
 			pilot.travel(dist);
 		}
 
