@@ -103,7 +103,8 @@ public class MainView extends JFrame implements EventSource {
 			setControlPanel(null);
 			return;
 		}
-
+		
+		this.mainPanel.add(parametersPanel, "cell 1 0,grow");
 		switch(controlMode){
 		case Manual:
 			setControlPanel(new ManualControlPanel(this.controller.manualControl()));
@@ -112,6 +113,7 @@ public class MainView extends JFrame implements EventSource {
 			setControlPanel(new PolygonControlPanel(this.controller.polygonControl()));
 			break;
 		case LineFinder:
+			this.mainPanel.remove(parametersPanel);
 			setControlPanel(new LineFinderPanel(this.controller.lineFinderControl()));
 			break;
 		}
