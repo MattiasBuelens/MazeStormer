@@ -1,6 +1,7 @@
 package mazestormer.connect;
 
 import java.util.EnumMap;
+import static com.google.common.base.Preconditions.*;
 
 public class ConnectionProvider {
 
@@ -16,8 +17,7 @@ public class ConnectionProvider {
 	}
 
 	public void setConnector(RobotType robotType, Connector connector) {
-		if (robotType == null)
-			throw new IllegalArgumentException("Robot type must be effective.");
+		checkNotNull(robotType);
 
 		if (connector == null)
 			connectorMap.remove(robotType);

@@ -1,5 +1,7 @@
 package mazestormer.controller;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.awt.EventQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,7 +17,7 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.MoveEvent;
-import mazestormer.robot.Pilot;
+import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
@@ -59,6 +61,7 @@ public class MainController implements IMainController {
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
 	private IBarcodeController barcodeControl;
+	private ILineFinderController lineFinderControl;
 
 	private IMapController map;
 	private ILogController log;
@@ -147,6 +150,14 @@ public class MainController implements IMainController {
 	}
 
 	@Override
+	public ILineFinderController lineFinderControl() {
+		if (lineFinderControl == null) {
+			lineFinderControl = new LineFinderController(this);
+		}
+		return lineFinderControl;
+	}
+
+	@Override
 	public IMapController map() {
 		if (map == null) {
 			map = new MapController(this);
@@ -215,8 +226,7 @@ public class MainController implements IMainController {
 	}
 
 	public void connect(RobotType robotType) throws IllegalStateException {
-		if (isConnected())
-			throw new IllegalStateException("Already connected.");
+		checkState(!isConnected());
 
 		connector = connectionProvider.getConnector(robotType);
 		connector.connect();
@@ -224,8 +234,7 @@ public class MainController implements IMainController {
 	}
 
 	public void disconnect() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Already disconnected.");
+		checkState(isConnected());
 
 		connector.disconnect();
 		connector = null;
@@ -249,16 +258,15 @@ public class MainController implements IMainController {
 	 * Robot
 	 */
 
-	public Pilot getPilot() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected to robot.");
-		return connector.getPilot();
+	public Robot getRobot() throws IllegalStateException {
+		checkState(isConnected());
+		return connector.getRobot();
 	}
 
 	@Subscribe
 	public void registerPilotMoveListener(ConnectEvent e) {
 		if (e.isConnected()) {
-			connector.getPilot().addMoveListener(new MovePublisher());
+			getRobot().getPilot().addMoveListener(new MovePublisher());
 		}
 	}
 
@@ -292,7 +300,7 @@ public class MainController implements IMainController {
 	@Subscribe
 	public void setupPoseProvider(ConnectEvent e) {
 		if (e.isConnected()) {
-			poseProvider = new OdometryPoseProvider(getPilot());
+			poseProvider = new OdometryPoseProvider(getRobot().getPilot());
 			poseProvider.setPose(new Pose(0f, 0f, 90f));
 		} else {
 			poseProvider = null;

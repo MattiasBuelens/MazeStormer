@@ -1,5 +1,7 @@
 package mazestormer.ui.map;
 
+import static com.google.common.base.Preconditions.*;
+
 import java.util.Comparator;
 
 import mazestormer.ui.map.event.MapDOMChangeRequest;
@@ -7,16 +9,25 @@ import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
 import mazestormer.util.AbstractEventSource;
 
 import org.apache.batik.dom.AbstractDocument;
+import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGStylableElement;
+import org.apache.batik.util.CSSConstants;
+import org.apache.batik.util.SVGConstants;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
-public abstract class MapLayer extends AbstractEventSource {
+public abstract class MapLayer extends AbstractEventSource implements
+		SVGConstants, CSSConstants {
 
 	private final String name;
 
 	private Element element;
 	private boolean isVisible;
+
+	private Document document;
 
 	public MapLayer(String name) {
 		this.name = name;
@@ -52,14 +63,15 @@ public abstract class MapLayer extends AbstractEventSource {
 	protected void update() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
-			final String displayValue = isVisible() ? "inline" : "none";
+			final String displayValue = isVisible() ? CSS_INLINE_VALUE
+					: CSS_NONE_VALUE;
 			final SVGStylableElement styleElement = (SVGStylableElement) element;
 
 			invokeDOMChange(new Runnable() {
 				@Override
 				public void run() {
 					CSSStyleDeclaration css = styleElement.getOverrideStyle();
-					css.setProperty("display", displayValue, "important");
+					css.setProperty(CSS_DISPLAY_PROPERTY, displayValue, null);
 				}
 			});
 		}
@@ -70,12 +82,25 @@ public abstract class MapLayer extends AbstractEventSource {
 	}
 
 	public Element build(AbstractDocument document) {
-		setElement(create(document));
+		this.document = document;
+		setElement(create());
 		update();
 		return getElement();
 	}
 
-	protected abstract Element create(AbstractDocument document);
+	protected Element createElement(String tagName) throws DOMException {
+		checkNotNull(document);
+		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+		return document.createElementNS(svgNS, tagName);
+	}
+
+	protected Node importNode(Node importedNode, boolean deep)
+			throws DOMException {
+		checkNotNull(document);
+		return document.importNode(importedNode, deep);
+	}
+
+	protected abstract Element create();
 
 	public abstract int getZIndex();
 

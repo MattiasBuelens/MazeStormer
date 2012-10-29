@@ -2,7 +2,7 @@ package mazestormer.barcode;
 
 import mazestormer.robot.Robot;
 
-public interface Action{
+public interface IAction{
 	
 	/**
 	 * 

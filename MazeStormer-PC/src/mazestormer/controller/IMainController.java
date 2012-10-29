@@ -15,6 +15,8 @@ public interface IMainController {
 	
 	public IBarcodeController barcodeControl();
 
+	public ILineFinderController lineFinderControl();
+
 	public IMapController map();
 
 	public ILogController log();

@@ -24,7 +24,6 @@ public class SoundPlayer {
 		//FileSystem.upload(myFile);
 		//Sound.playSoundFile(f3.getName(), false);
 		
-		
 //		Sound.playTone(PianoNote.E.getFrequency(), NoteDuration.D4.getDuration());
 //		Thread.sleep(NoteDuration.D4.getDuration()); 
 //		Sound.playTone(PianoNote.E.getFrequency(), NoteDuration.D4.getDuration());
@@ -54,6 +53,6 @@ public class SoundPlayer {
 //		Sound.playTone(PianoNote.D.getFrequency(), NoteDuration.D4.getDuration());
 //		Thread.sleep(NoteDuration.D4.getDuration()); 
 //		Sound.playTone(PianoNote.D.getFrequency(), NoteDuration.D2.getDuration());
-//		Thread.sleep(NoteDuration.D2.getDuration()); 
+//		Thread.sleep(NoteDuration.D2.getDuration());
 	}
 }
