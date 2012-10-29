@@ -26,19 +26,34 @@ public class SoundPlayer {
 		
 		
 		Sound.playTone(PianoNote.E.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.E.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.F.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.G.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.G.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.F.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.E.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.D.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.C.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.C.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.D.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.E.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.E.getFrequency(), NoteDuration.D2.getDuration());
+		Thread.sleep(NoteDuration.D2.getDuration()); 
 		Sound.playTone(PianoNote.D.getFrequency(), NoteDuration.D4.getDuration());
+		Thread.sleep(NoteDuration.D4.getDuration()); 
 		Sound.playTone(PianoNote.D.getFrequency(), NoteDuration.D2.getDuration());
+		Thread.sleep(NoteDuration.D2.getDuration()); 
 	}
 }
