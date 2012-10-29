@@ -14,12 +14,12 @@ public class SoundPlayer {
 		connector.setDeviceName("brons");
 		connector.connect();
 		
-		File f1 = new File("! Fanfare.rso");
-		File f2 = new File("! Sonar.rso");
-		File f3 = new File("liquido.rso");
-		
+		File f1 = new File("! Fanfare.wav");
+		File f2 = new File("! Sonar.wav");
+		File f3 = new File("liquido.wav");
 		
 		// TODO: uploading
+		//FileSystem.upload(myFile);
 		Sound.playSoundFile(f3.getName(), false);
 	}
 }
