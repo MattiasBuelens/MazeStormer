@@ -2,7 +2,7 @@ package mazestormer.barcode;
 
 import mazestormer.robot.Robot;
 
-public class RotateAction implements Action{
+public class RotateCounterClockwiseAction implements IAction{
 
 	@Override
 	public void performAction(Robot robot) throws IllegalStateException {

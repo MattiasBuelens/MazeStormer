@@ -105,6 +105,9 @@ public class MainView extends JFrame implements EventSource {
 		
 		this.mainPanel.add(parametersPanel, "cell 1 0,grow");
 		switch(controlMode){
+		case Barcode:
+			setControlPanel(new BarcodePanel(this.controller.barcodeControl()));
+			break;
 		case Manual:
 			setControlPanel(new ManualControlPanel(this.controller.manualControl()));
 			break;

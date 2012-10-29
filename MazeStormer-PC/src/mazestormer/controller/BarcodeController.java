@@ -13,8 +13,8 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 	private ActionRunner runner;
 
-	private Pilot getPilot(){
-		return getMainController().getPilot();
+	private Robot getRobot(){
+		return getMainController().getRobot();
 	}
 
 	@Override
@@ -53,12 +53,12 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 	private class ActionRunner implements Runnable{
 
-		private final Pilot pilot;
+		private final Robot robot;
 		private boolean isRunning = false;
 		private IAction action;
 
 		public ActionRunner(IAction action){
-			this.pilot = getPilot();
+			this.robot = getRobot();
 			this.action = action;
 		}
 
@@ -71,7 +71,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		public void stop(){
 			if(isRunning()){
 				this.isRunning = false;
-				this.pilot.stop();
+				this.robot.getPilot().stop();
 				postState(EventType.STOPPED);
 			}
 		}
@@ -82,7 +82,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 		@Override
 		public void run(){
-			this.action.performAction((Robot) this.pilot);
+			this.action.performAction(this.robot);
 			stop();
 		}
 
