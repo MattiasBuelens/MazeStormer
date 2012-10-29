@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.controller.PolygonEvent.EventType;
+import mazestormer.controller.EventType;
 import mazestormer.robot.Pilot;
 
 public class PolygonControlController extends SubController implements

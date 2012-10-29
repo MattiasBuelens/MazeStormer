@@ -21,7 +21,7 @@ import javax.swing.border.TitledBorder;
 import mazestormer.controller.IPolygonControlController;
 import mazestormer.controller.IPolygonControlController.Direction;
 import mazestormer.controller.PolygonEvent;
-import mazestormer.controller.PolygonEvent.EventType;
+import mazestormer.controller.EventType;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
@@ -133,8 +133,8 @@ public class PolygonControlPanel extends ViewPanel {
 	}
 
 	public void startPolygon() {
-		double sideLength = (double) sideLengthModel.getValue();
-		int nbSides = (int) nbSidesModel.getValue();
+		double sideLength = (Double) sideLengthModel.getValue();
+		int nbSides = (Integer) nbSidesModel.getValue();
 		Direction direction = (Direction) directionModel.getSelectedItem();
 		controller.startPolygon(nbSides, sideLength, direction);
 	}

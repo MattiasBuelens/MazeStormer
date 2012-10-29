@@ -58,6 +58,7 @@ public class MainController implements IMainController {
 	private IParametersController parameters;
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
+	private IBarcodeController barcodeControl;
 
 	private IMapController map;
 	private ILogController log;
@@ -135,6 +136,14 @@ public class MainController implements IMainController {
 			polygonControl = new PolygonControlController(this);
 		}
 		return polygonControl;
+	}
+	
+	@Override
+	public IBarcodeController barcodeControl() {
+		if (barcodeControl == null) {
+			barcodeControl = new BarcodeController(this);
+		}
+		return barcodeControl;
 	}
 
 	@Override

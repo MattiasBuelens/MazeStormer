@@ -117,8 +117,8 @@ public class LineFinderPanel extends ViewPanel {
 	}
 	
 	public void startSearching() {
-		int highValue = (int) highCalibrationModel.getValue();
-		int lowValue = (int) lowCalibrationModel.getValue();
+		int highValue = (Integer) highCalibrationModel.getValue();
+		int lowValue = (Integer) lowCalibrationModel.getValue();
 		controller.startSearching(highValue, lowValue);
 	}
 	

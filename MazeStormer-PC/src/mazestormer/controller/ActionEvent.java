@@ -1,15 +1,14 @@
 package mazestormer.controller;
 
-public class PolygonEvent{
+public class ActionEvent{
 
 	private final EventType eventType;
 
-	public PolygonEvent(EventType type) {
+	public ActionEvent(EventType type) {
 		this.eventType = type;
 	}
 
 	public EventType getEventType() {
 		return eventType;
 	}
-
 }
