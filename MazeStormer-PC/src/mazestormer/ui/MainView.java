@@ -64,7 +64,6 @@ public class MainView extends JFrame implements EventSource {
 		this.mainPanel.add(configurationPanel, "cell 0 0,grow");
 
 		this.parametersPanel = new ParametersPanel(controller.parameters());
-		this.mainPanel.add(parametersPanel, "cell 1 0,grow");
 
 		this.controlPanel = new ManualControlPanel(controller.manualControl());
 		this.mainPanel.add(controlPanel, "cell 1 1,grow");
