@@ -69,7 +69,7 @@ public class RangeScannerFeatureDetector extends FeatureDetectorAdapter {
 		RangeReadings rawReadings = scanner.getRangeValues();
 
 		// Filter and sort the readings
-		Comparator<RangeReading> comparator = new RangeReadingComparator();
+		Comparator<RangeReading> comparator = new ReadingRangeComparator();
 		RangeReadings readings = new RangeReadings(0);
 
 		for (RangeReading reading : rawReadings) {
