@@ -9,7 +9,7 @@ import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.Move.MoveType;
 
-public class SimulatedRobot implements Robot {
+public class SimulatedPilot implements Pilot {
 
 	private final float trackWidth;
 
@@ -23,7 +23,7 @@ public class SimulatedRobot implements Robot {
 	private Timer moveTimer;
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
-	public SimulatedRobot(double trackWidth, double maxTravelSpeed,
+	public SimulatedPilot(double trackWidth, double maxTravelSpeed,
 			double maxRotateSpeed) {
 		this.maxTravelSpeed = maxTravelSpeed;
 		this.maxRotateSpeed = maxRotateSpeed;
@@ -34,16 +34,8 @@ public class SimulatedRobot implements Robot {
 		setRotateSpeed(.8f * getRotateMaxSpeed());
 	}
 
-	public SimulatedRobot(double trackWidth) {
+	public SimulatedPilot(double trackWidth) {
 		this(trackWidth, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-	}
-
-	@Override
-	public void connect() {
-	}
-
-	@Override
-	public void disconnect() {
 	}
 
 	@Override
@@ -437,7 +429,7 @@ public class SimulatedRobot implements Robot {
 		@Override
 		public void run() {
 			// Current move has ended
-			if (SimulatedRobot.this.move == move) {
+			if (SimulatedPilot.this.move == move) {
 				movementStop();
 			}
 		}

@@ -7,8 +7,8 @@ import lejos.pc.comm.NXTComm;
 import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTCommandConnector;
 import lejos.pc.comm.NXTConnector;
-import mazestormer.robot.PhysicalRobot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.PhysicalPilot;
+import mazestormer.robot.Pilot;
 
 public class PhysicalConnector implements Connector {
 
@@ -16,7 +16,7 @@ public class PhysicalConnector implements Connector {
 	private NXTCommand command;
 
 	private String deviceName;
-	private Robot robot;
+	private Pilot pilot;
 
 	@Override
 	public String getDeviceName() {
@@ -29,15 +29,15 @@ public class PhysicalConnector implements Connector {
 	}
 
 	@Override
-	public Robot getRobot() throws IllegalStateException {
+	public Pilot getPilot() throws IllegalStateException {
 		if (!isConnected())
 			throw new IllegalStateException("Not connected to robot.");
-		return robot;
+		return pilot;
 	}
 
 	@Override
 	public boolean isConnected() {
-		return command != null && command.isOpen() && robot != null;
+		return command != null && command.isOpen() && pilot != null;
 	}
 
 	@Override
@@ -49,8 +49,7 @@ public class PhysicalConnector implements Connector {
 		if (!isConnected)
 			return;
 
-		robot = createRobot();
-		robot.connect();
+		pilot = createPilot();
 	}
 
 	private boolean createConnection() {
@@ -68,15 +67,14 @@ public class PhysicalConnector implements Connector {
 		return true;
 	}
 
-	private Robot createRobot() {
-		return new PhysicalRobot(Robot.leftWheelDiameter,
-				Robot.rightWheelDiameter, Robot.trackWidth);
+	private Pilot createPilot() {
+		return new PhysicalPilot(Pilot.leftWheelDiameter,
+				Pilot.rightWheelDiameter, Pilot.trackWidth);
 	}
 
 	@Override
 	public void disconnect() {
-		robot.disconnect();
-		robot = null;
+		pilot = null;
 
 		try {
 			if (command != null) {

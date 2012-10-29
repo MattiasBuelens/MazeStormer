@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.robot.Robot;
+import mazestormer.robot.Pilot;
 
 public class ManualControlController extends SubController implements
 		IManualControlController {
@@ -9,38 +9,38 @@ public class ManualControlController extends SubController implements
 		super(mainController);
 	}
 
-	private Robot getRobot() {
-		return getMainController().getRobot();
+	private Pilot getPilot() {
+		return getMainController().getPilot();
 	}
 
 	@Override
 	public void moveForward() {
-		Robot robot = getRobot();
-		robot.forward();
+		Pilot pilot = getPilot();
+		pilot.forward();
 	}
 
 	@Override
 	public void moveBackward() {
-		Robot robot = getRobot();
-		robot.backward();
+		Pilot pilot = getPilot();
+		pilot.backward();
 	}
 
 	@Override
 	public void rotateLeft() {
-		Robot robot = getRobot();
-		robot.rotateLeft();
+		Pilot pilot = getPilot();
+		pilot.rotateLeft();
 	}
 
 	@Override
 	public void rotateRight() {
-		Robot robot = getRobot();
-		robot.rotateRight();
+		Pilot pilot = getPilot();
+		pilot.rotateRight();
 	}
 
 	@Override
 	public void stop() {
-		Robot robot = getRobot();
-		robot.stop();
+		Pilot pilot = getPilot();
+		pilot.stop();
 	}
 
 }
