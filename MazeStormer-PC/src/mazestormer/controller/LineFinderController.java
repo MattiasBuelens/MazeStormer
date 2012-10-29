@@ -1,23 +1,39 @@
 package mazestormer.controller;
 
+import com.google.common.eventbus.Subscribe;
+
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
+import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.LineFinderEvent.EventType;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.RemoteSensorPort;
 
-public class LineFinderController extends SubController implements ILineFinderController{
+public class LineFinderController extends SubController implements
+		ILineFinderController {
 
-	LightSensor light = new LightSensor(SensorPort.S1);
-	
+	// TODO Do not store reference here!
+	LightSensor light;
+
 	public LineFinderController(MainController mainController) {
 		super(mainController);
-		light.setFloodlight(true);
 	}
 
 	private Pilot getPilot() {
 		return getMainController().getPilot();
 	}
-	
+
+	@Subscribe
+	public void onConnect(ConnectEvent e) {
+		if (e.isConnected()) {
+			// TODO Retrieve from Connector!
+			light = new LightSensor(RemoteSensorPort.get(0));
+			light.setFloodlight(true);
+		} else {
+			light = null;
+		}
+	}
+
 	@Override
 	public int measureLightValue() {
 		return light.getNormalizedLightValue();
@@ -42,7 +58,7 @@ public class LineFinderController extends SubController implements ILineFinderCo
 	private void postState(EventType eventType) {
 		postEvent(new LineFinderEvent(eventType));
 	}
-	
+
 	private class LineFinderRunner implements Runnable {
 
 		private final int lowLightValue;
@@ -78,77 +94,80 @@ public class LineFinderController extends SubController implements ILineFinderCo
 		@Override
 		public void run() {
 			final int threshold = 30;
-			
-			double slowRotateSpeed,fastRotateSpeed;
+
+			double slowRotateSpeed, fastRotateSpeed;
 			slowRotateSpeed = 20;
 			fastRotateSpeed = 50;
-			
+
 			double rotateAngle = 180.0;
-			
+
 			light.setLow(lowLightValue);
 			light.setHigh(highLightValue);
-			
-			//TODO: Speed?
-			//pilot.setTravelSpeed(5);
 
-			//Start looking for line
+			// TODO: Speed?
+			// pilot.setTravelSpeed(5);
+
+			// Start looking for line
 			pilot.forward();
-			
+
 			int value;
-			
+
 			double angle;
-			
+
 			while (true) {
 				value = light.readValue();
-				if(value > threshold){
-					startRotating(true,slowRotateSpeed,fastRotateSpeed,rotateAngle);
+				if (value > threshold) {
+					startRotating(true, slowRotateSpeed, fastRotateSpeed,
+							rotateAngle);
 					break;
 				}
-				
+
 			}
-			
+
 			while (true) {
 				value = light.readValue();
-				if(value > threshold){
-					startRotating(false,slowRotateSpeed,fastRotateSpeed,rotateAngle);
+				if (value > threshold) {
+					startRotating(false, slowRotateSpeed, fastRotateSpeed,
+							rotateAngle);
 					break;
 				}
-				
+
 			}
-			
+
 			while (true) {
 				value = light.readValue();
-				if(value > threshold){
+				if (value > threshold) {
 					pilot.stop();
 					angle = pilot.getMovement().getAngleTurned();
 					break;
 				}
-				
+
 			}
-			
+
 			angle = Math.abs(angle) + rotateAngle;
-			
-			final double extra  = 3.0;
-			
+
+			final double extra = 3.0;
+
 			pilot.setRotateSpeed(fastRotateSpeed);
-			pilot.rotate((angle/2.0) - extra);
-			
-			double dist = 7.2*Math.cos(Math.toRadians(angle/2.0));
+			pilot.rotate((angle / 2.0) - extra);
+
+			double dist = 7.2 * Math.cos(Math.toRadians(angle / 2.0));
 			pilot.travel(dist);
 		}
-		
-		private void startRotating(boolean goingLeft, double slowRotateSpeed, double fastRotateSpeed, double rotateAngle){
+
+		private void startRotating(boolean goingLeft, double slowRotateSpeed,
+				double fastRotateSpeed, double rotateAngle) {
 			pilot.stop();
 			pilot.setRotateSpeed(fastRotateSpeed);
-			
-			if(goingLeft)
+
+			if (goingLeft)
 				pilot.rotate(rotateAngle, false);
 			else
 				pilot.rotate(-rotateAngle, false);
-				
+
 			pilot.setRotateSpeed(slowRotateSpeed);
-			
-			if(goingLeft)
+
+			if (goingLeft)
 				pilot.rotateLeft();
 			else
 				pilot.rotateRight();
