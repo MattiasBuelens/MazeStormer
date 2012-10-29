@@ -17,7 +17,7 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.MoveEvent;
-import mazestormer.robot.Pilot;
+import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
@@ -249,15 +249,15 @@ public class MainController implements IMainController {
 	 * Robot
 	 */
 
-	public Pilot getPilot() throws IllegalStateException {
+	public Robot getRobot() throws IllegalStateException {
 		checkState(isConnected());
-		return connector.getRobot().getPilot();
+		return connector.getRobot();
 	}
 
 	@Subscribe
 	public void registerPilotMoveListener(ConnectEvent e) {
 		if (e.isConnected()) {
-			getPilot().addMoveListener(new MovePublisher());
+			getRobot().getPilot().addMoveListener(new MovePublisher());
 		}
 	}
 
@@ -291,7 +291,7 @@ public class MainController implements IMainController {
 	@Subscribe
 	public void setupPoseProvider(ConnectEvent e) {
 		if (e.isConnected()) {
-			poseProvider = new OdometryPoseProvider(getPilot());
+			poseProvider = new OdometryPoseProvider(getRobot().getPilot());
 			poseProvider.setPose(new Pose(0f, 0f, 90f));
 		} else {
 			poseProvider = null;
