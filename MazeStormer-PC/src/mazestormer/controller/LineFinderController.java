@@ -12,9 +12,6 @@ import mazestormer.robot.RemoteSensorPort;
 public class LineFinderController extends SubController implements
 		ILineFinderController {
 
-	// TODO Do not store reference here!
-	LightSensor light;
-
 	public LineFinderController(MainController mainController) {
 		super(mainController);
 	}
@@ -23,27 +20,27 @@ public class LineFinderController extends SubController implements
 		return getMainController().getPilot();
 	}
 
+	private LightSensor getLightSensor() {
+		return getMainController().getRobot().getLightSensor();
+	}
+
 	@Subscribe
 	public void onConnect(ConnectEvent e) {
 		if (e.isConnected()) {
-			// TODO Retrieve from Connector!
-			light = new LightSensor(RemoteSensorPort.get(0));
-			light.setFloodlight(true);
-		} else {
-			light = null;
+			getLightSensor().setFloodlight(true);
 		}
 	}
 
 	@Override
 	public int measureLightValue() {
-		return light.getNormalizedLightValue();
+		return getLightSensor().getNormalizedLightValue();
 	}
 
 	private LineFinderRunner runner;
 
 	@Override
 	public void startSearching(int highLightValue, int lowLightValue) {
-		runner = new LineFinderRunner(lowLightValue, highLightValue);
+		runner = new LineFinderRunner(highLightValue, lowLightValue);
 		runner.start();
 	}
 
@@ -74,9 +71,14 @@ public class LineFinderController extends SubController implements
 		}
 
 		public void start() {
-			isRunning = true;
-			new Thread(this).start();
-			postState(EventType.STARTED);
+			if (lowLightValue >= highLightValue) {
+				getMainController().getLogger().warning(
+						"High light value is lower than low light value.");
+			} else {
+				isRunning = true;
+				new Thread(this).start();
+				postState(EventType.STARTED);
+			}
 		}
 
 		public void stop() {
@@ -101,11 +103,11 @@ public class LineFinderController extends SubController implements
 
 			double rotateAngle = 180.0;
 
-			light.setLow(lowLightValue);
-			light.setHigh(highLightValue);
+			getLightSensor().setLow(lowLightValue);
+			getLightSensor().setHigh(highLightValue);
 
 			// TODO: Speed?
-			// pilot.setTravelSpeed(5);
+			pilot.setTravelSpeed(5);
 
 			// Start looking for line
 			pilot.forward();
@@ -115,7 +117,7 @@ public class LineFinderController extends SubController implements
 			double angle;
 
 			while (true) {
-				value = light.readValue();
+				value = getLightSensor().readValue();
 				if (value > threshold) {
 					startRotating(true, slowRotateSpeed, fastRotateSpeed,
 							rotateAngle);
@@ -125,7 +127,7 @@ public class LineFinderController extends SubController implements
 			}
 
 			while (true) {
-				value = light.readValue();
+				value = getLightSensor().readValue();
 				if (value > threshold) {
 					startRotating(false, slowRotateSpeed, fastRotateSpeed,
 							rotateAngle);
@@ -135,7 +137,7 @@ public class LineFinderController extends SubController implements
 			}
 
 			while (true) {
-				value = light.readValue();
+				value = getLightSensor().readValue();
 				if (value > threshold) {
 					pilot.stop();
 					angle = pilot.getMovement().getAngleTurned();
@@ -144,9 +146,10 @@ public class LineFinderController extends SubController implements
 
 			}
 
-			angle = Math.abs(angle) + rotateAngle;
+			angle = Math.abs(angle) + rotateAngle - 360.0;
 
-			final double extra = 3.0;
+			// Correction angle
+			final double extra = 3.5;
 
 			pilot.setRotateSpeed(fastRotateSpeed);
 			pilot.rotate((angle / 2.0) - extra);
