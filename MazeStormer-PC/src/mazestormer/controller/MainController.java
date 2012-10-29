@@ -60,6 +60,7 @@ public class MainController implements IMainController {
 	private IParametersController parameters;
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
+	private ILineFinderController lineFinderControl;
 
 	private IMapController map;
 	private ILogController log;
@@ -137,6 +138,14 @@ public class MainController implements IMainController {
 			polygonControl = new PolygonControlController(this);
 		}
 		return polygonControl;
+	}
+	
+	@Override
+	public ILineFinderController lineFinderControl() {
+		if (lineFinderControl == null) {
+			lineFinderControl = new LineFinderController(this);
+		}
+		return lineFinderControl;
 	}
 
 	@Override
