@@ -10,8 +10,14 @@ public class BarcodeDecoder{
 	}
 	
 	private static void setActions(){
-		// temporary
-		// getActions()[1] = new NoAction();
+		getActions()[5] = new RotateCounterClockwiseAction();
+		getActions()[9] = new RotateClockwiseAction();
+		getActions()[15] = new SoundAction();
+		getActions()[19] = new WaitAction();
+		getActions()[25] = new LowSpeedAction();
+		getActions()[37] = new HighSpeedAction();
+		// TODO
+		getActions()[55] = NoAction.getInstance();
 	}
 	
 	public static IAction[] getActions(){
