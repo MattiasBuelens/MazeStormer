@@ -249,24 +249,16 @@ public class MainController implements IMainController {
 	/*
 	 * Robot
 	 */
-	
+
 	public Robot getRobot() throws IllegalStateException {
 		checkState(isConnected());
 		return connector.getRobot();
-	}
-	
-	/*
-	 * Pilot
-	 */
-
-	public Pilot getPilot() throws IllegalStateException {
-		return getRobot().getPilot();
 	}
 
 	@Subscribe
 	public void registerPilotMoveListener(ConnectEvent e) {
 		if (e.isConnected()) {
-			getPilot().addMoveListener(new MovePublisher());
+			getRobot().getPilot().addMoveListener(new MovePublisher());
 		}
 	}
 
@@ -300,7 +292,7 @@ public class MainController implements IMainController {
 	@Subscribe
 	public void setupPoseProvider(ConnectEvent e) {
 		if (e.isConnected()) {
-			poseProvider = new OdometryPoseProvider(getPilot());
+			poseProvider = new OdometryPoseProvider(getRobot().getPilot());
 			poseProvider.setPose(new Pose(0f, 0f, 90f));
 		} else {
 			poseProvider = null;

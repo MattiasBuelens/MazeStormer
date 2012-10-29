@@ -36,6 +36,11 @@ public class ConfigurationController extends SubController implements
 		postEvent(new ControlModeChangeEvent(controlMode));
 	}
 
+	private Pilot getPilot() {
+		checkState(isConnected());
+		return getMainController().getRobot().getPilot();
+	}
+
 	@Override
 	public boolean isConnected() {
 		return getMainController().isConnected();
@@ -69,11 +74,6 @@ public class ConfigurationController extends SubController implements
 	public void stop() {
 		if (isConnected())
 			getPilot().stop();
-	}
-
-	public Pilot getPilot() {
-		checkState(isConnected());
-		return getMainController().getPilot();
 	}
 
 }

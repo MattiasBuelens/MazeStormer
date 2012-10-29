@@ -20,7 +20,7 @@ public class LineFinderController extends SubController implements
 	}
 
 	private Pilot getPilot() {
-		return getMainController().getPilot();
+		return getMainController().getRobot().getPilot();
 	}
 
 	@Subscribe
