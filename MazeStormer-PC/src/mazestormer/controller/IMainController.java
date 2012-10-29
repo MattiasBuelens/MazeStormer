@@ -12,6 +12,8 @@ public interface IMainController {
 	public IManualControlController manualControl();
 
 	public IPolygonControlController polygonControl();
+	
+	public ILineFinderController lineFinderControl();
 
 	public IMapController map();
 
