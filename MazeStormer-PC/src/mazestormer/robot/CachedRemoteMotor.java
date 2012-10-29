@@ -9,11 +9,16 @@ import com.google.common.cache.CacheBuilder;
 
 import lejos.nxt.remote.NXTCommand;
 import lejos.nxt.remote.RemoteMotor;
+import lejos.pc.comm.NXTCommandConnector;
 
 public class CachedRemoteMotor extends RemoteMotor {
 
 	private static final long cacheDuration = 100;
 	private static final TimeUnit cacheTimeUnit = TimeUnit.MILLISECONDS;
+
+	public static CachedRemoteMotor get(int id) {
+		return new CachedRemoteMotor(NXTCommandConnector.getSingletonOpen(), id);
+	}
 
 	public CachedRemoteMotor(NXTCommand nxtCommand, int id) {
 		super(nxtCommand, id);

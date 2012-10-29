@@ -5,29 +5,28 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Collections;
 import java.util.EnumMap;
 
-import lejos.geom.Point;
+import mazestormer.util.LongPoint;
 
 public class Tile {
 
-	private final long x;
-	private final long y;
-	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
+	private final LongPoint position;
+	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
+			Orientation.class);
 
 	public Tile(long x, long y) {
-		this.x = x;
-		this.y = y;
+		this.position = new LongPoint(x, y);
 	}
 
 	public long getX() {
-		return x;
+		return (long) position.getX();
 	}
 
 	public long getY() {
-		return y;
+		return (long) position.getY();
 	}
 
-	public Point getPosition() {
-		return new Point(getX(), getY());
+	public LongPoint getPosition() {
+		return new LongPoint(position);
 	}
 
 	public Iterable<Edge> getEdges() {

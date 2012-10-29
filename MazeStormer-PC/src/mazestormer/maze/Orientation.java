@@ -1,5 +1,7 @@
 package mazestormer.maze;
 
+import java.awt.geom.Point2D;
+
 import lejos.geom.Point;
 
 public enum Orientation {
@@ -23,31 +25,35 @@ public enum Orientation {
 	}
 
 	/**
-	 * Shift the given point in the direction of this orientation
-	 * by the given shift amount.
+	 * Shift the given point in the direction of this orientation by the given
+	 * shift amount.
 	 * 
 	 * @param point
-	 * 			The point to shift.
+	 *            The point to shift.
 	 * @param amount
-	 * 			The shift amount.
+	 *            The shift amount.
 	 * 
 	 * @return The shifted point.
 	 */
-	public Point shift(Point point, float amount) {
-		return getDelta().multiply(amount).addWith(point);
+	public <P extends Point2D> P shift(P point, float amount) {
+		Point shift = getDelta().multiply(amount);
+		double x = point.getX() + shift.getX();
+		double y = point.getY() + shift.getY();
+		@SuppressWarnings("unchecked")
+		P result = (P) point.clone();
+		result.setLocation(x, y);
+		return result;
 	}
 
 	/**
-	 * Shift the given point in the direction of this orientation
-	 * by one unit.
+	 * Shift the given point in the direction of this orientation by one unit.
 	 * 
 	 * @param point
-	 * 			The point to shift.
+	 *            The point to shift.
 	 * 
-	 * @return The shifted point.
-	 * 			| result.equals(shift(point, 1))
+	 * @return The shifted point. | result.equals(shift(point, 1))
 	 */
-	public Point shift(Point point) {
+	public <P extends Point2D> P shift(P point) {
 		return shift(point, 1);
 	}
 }

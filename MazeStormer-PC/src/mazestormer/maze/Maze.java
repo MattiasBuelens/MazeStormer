@@ -2,11 +2,13 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.awt.geom.Point2D;
 import java.math.RoundingMode;
 
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.util.AbstractEventSource;
+import mazestormer.util.LongPoint;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -14,7 +16,7 @@ import com.google.common.math.DoubleMath;
 
 public class Maze extends AbstractEventSource {
 
-	private static final float defaultTileSize = 80f;
+	private static final float defaultTileSize = 40f;
 
 	private final float tileSize;
 	private Pose origin = new Pose();
@@ -40,8 +42,8 @@ public class Maze extends AbstractEventSource {
 	 * Get the pose of the robot at the bottom left corner of the origin tile,
 	 * i.e. the tile at {@code (0, 0)}.
 	 * 
-	 * This pose is used to translate between the absolute pose
-	 * of the robot and its relative pose on the maze.
+	 * This pose is used to translate between the absolute pose of the robot and
+	 * its relative pose on the maze.
 	 */
 	public Pose getOrigin() {
 		return origin;
@@ -51,7 +53,7 @@ public class Maze extends AbstractEventSource {
 	 * Set the pose of the robot at the bottom left corner of the origin tile.
 	 * 
 	 * @param origin
-	 * 			The new origin pose.
+	 *            The new origin pose.
 	 */
 	public void setOrigin(Pose origin) {
 		this.origin = origin;
@@ -61,9 +63,9 @@ public class Maze extends AbstractEventSource {
 	 * Get the tile at the given tile coordinates.
 	 * 
 	 * @param tileX
-	 * 			The X-coordinate of the tile.
+	 *            The X-coordinate of the tile.
 	 * @param tileY
-	 * 			The Y-coordinate of the tile.
+	 *            The Y-coordinate of the tile.
 	 */
 	public Tile getTileAt(long tileX, long tileY) {
 		// Try to get tile
@@ -83,11 +85,13 @@ public class Maze extends AbstractEventSource {
 	 * @param tilePosition
 	 *            The tile position.
 	 */
-	public Tile getTileAt(Point tilePosition) {
+	public Tile getTileAt(Point2D tilePosition) {
 		checkNotNull(tilePosition);
 		// Round towards negative infinity to get bottom left corner
-		long tileX = DoubleMath.roundToLong(tilePosition.getX(), RoundingMode.FLOOR);
-		long tileY = DoubleMath.roundToLong(tilePosition.getY(), RoundingMode.FLOOR);
+		long tileX = DoubleMath.roundToLong(tilePosition.getX(),
+				RoundingMode.FLOOR);
+		long tileY = DoubleMath.roundToLong(tilePosition.getY(),
+				RoundingMode.FLOOR);
 		return getTileAt(tileX, tileY);
 	}
 
@@ -96,15 +100,15 @@ public class Maze extends AbstractEventSource {
 	 * 
 	 * @param edge
 	 *            The edge to add.
-	 * @post The edge is added to the maze tiles at its touching positions.
-	 * 			| for each point in edge.getTouching() :
-	 * 			|    getTileAt(point).hasEdge(edge)
+	 * @post The edge is added to the maze tiles at its touching positions. |
+	 *       for each point in edge.getTouching() : |
+	 *       getTileAt(point).hasEdge(edge)
 	 */
 	public void addEdge(Edge edge) {
 		checkNotNull(edge);
 
 		// Add edge to touching tiles
-		for (Point touchingPosition : edge.getTouching()) {
+		for (LongPoint touchingPosition : edge.getTouching()) {
 			Tile touchingTile = getTileAt(touchingPosition);
 			touchingTile.addEdge(edge);
 		}
@@ -113,11 +117,11 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the absolute position in robot coordinates of
-	 * the given relative position in map coordinates.
+	 * Get the absolute position in robot coordinates of the given relative
+	 * position in map coordinates.
 	 * 
 	 * @param relativePosition
-	 * 			The relative position.
+	 *            The relative position.
 	 */
 	public Point toAbsolute(Point relativePosition) {
 		checkNotNull(relativePosition);
@@ -125,22 +129,22 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the absolute heading in robot coordinates of
-	 * the given relative heading in map coordinates.
+	 * Get the absolute heading in robot coordinates of the given relative
+	 * heading in map coordinates.
 	 * 
 	 * @param relativeHeading
-	 * 			The relative heading.
+	 *            The relative heading.
 	 */
 	public float toAbsolute(float relativeHeading) {
 		return normalizeHeading(relativeHeading + getOrigin().getHeading());
 	}
 
 	/**
-	 * Get the absolute pose in robot coordinates of
-	 * the given relative pose in map coordinates.
+	 * Get the absolute pose in robot coordinates of the given relative pose in
+	 * map coordinates.
 	 * 
 	 * @param relativePose
-	 * 			The relative pose.
+	 *            The relative pose.
 	 */
 	public Pose toAbsolute(Pose relativePose) {
 		checkNotNull(relativePose);
@@ -151,11 +155,11 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the relative position in map coordinates of
-	 * the given absolute position in robot coordinates.
+	 * Get the relative position in map coordinates of the given absolute
+	 * position in robot coordinates.
 	 * 
 	 * @param absolutePosition
-	 * 			The absolute position.
+	 *            The absolute position.
 	 */
 	public Point toRelative(Point absolutePosition) {
 		checkNotNull(absolutePosition);
@@ -163,22 +167,22 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the relative heading in map coordinates of
-	 * the given absolute heading in robot coordinates.
+	 * Get the relative heading in map coordinates of the given absolute heading
+	 * in robot coordinates.
 	 * 
 	 * @param absoluteHeading
-	 * 			The absolute heading.
+	 *            The absolute heading.
 	 */
 	public float toRelative(float absoluteHeading) {
 		return normalizeHeading(absoluteHeading - getOrigin().getHeading());
 	}
 
 	/**
-	 * Get the relative pose in map coordinates of
-	 * the given absolute pose in robot coordinates.
+	 * Get the relative pose in map coordinates of the given absolute pose in
+	 * robot coordinates.
 	 * 
 	 * @param absolutePose
-	 * 			The absolute pose.
+	 *            The absolute pose.
 	 */
 	public Pose toRelative(Pose absolutePose) {
 		checkNotNull(absolutePose);
@@ -189,11 +193,11 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the position in tile coordinates of
-	 * the given relative position in map coordinates.
+	 * Get the position in tile coordinates of the given relative position in
+	 * map coordinates.
 	 * 
 	 * @param relativePosition
-	 * 			The relative position.
+	 *            The relative position.
 	 */
 	public Point toTile(Point relativePosition) {
 		double x = relativePosition.getX() / getTileSize();
@@ -202,22 +206,21 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the relative position in map coordinates of
-	 * the bottom left corner of the given tile position.
-	 *  
+	 * Get the relative position in map coordinates of the bottom left corner of
+	 * the given tile position.
+	 * 
 	 * @param tilePosition
-	 * 			The tile position.
+	 *            The tile position.
 	 */
 	public Point fromTile(Point tilePosition) {
 		return tilePosition.multiply(getTileSize());
 	}
 
 	/**
-	 * Normalize a given heading to ensure it is
-	 * between -180 and +180 degrees.
+	 * Normalize a given heading to ensure it is between -180 and +180 degrees.
 	 * 
 	 * @param heading
-	 * 			The heading.
+	 *            The heading.
 	 */
 	private float normalizeHeading(float heading) {
 		while (heading < 180)

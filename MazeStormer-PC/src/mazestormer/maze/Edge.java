@@ -1,14 +1,14 @@
 package mazestormer.maze;
 
-import static com.google.common.base.Preconditions.*;
-
-import lejos.geom.Point;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import mazestormer.util.LongPoint;
 
 import com.google.common.collect.ImmutableSet;
 
 public final class Edge {
 
-	private final Point position;
+	private final LongPoint position;
 	private final Orientation orientation;
 
 	/**
@@ -24,7 +24,7 @@ public final class Edge {
 	 * @param orientation
 	 *            The side of the new edge.
 	 */
-	public Edge(Point position, Orientation orientation) {
+	public Edge(LongPoint position, Orientation orientation) {
 		checkNotNull(position);
 		checkNotNull(orientation);
 
@@ -49,7 +49,7 @@ public final class Edge {
 	/**
 	 * Get the normalized position of this edge.
 	 */
-	public Point getPosition() {
+	public LongPoint getPosition() {
 		return position;
 	}
 
@@ -63,7 +63,7 @@ public final class Edge {
 	/**
 	 * Get the positions touching this edge.
 	 */
-	public ImmutableSet<Point> getTouching() {
+	public ImmutableSet<LongPoint> getTouching() {
 		return ImmutableSet.of(getPosition(), getOrientation().shift(getPosition()));
 	}
 
@@ -73,7 +73,7 @@ public final class Edge {
 	 * @param position
 	 *            The position to check.
 	 */
-	public boolean touches(Point position) {
+	public boolean touches(LongPoint position) {
 		checkNotNull(position);
 		return getTouching().contains(position);
 	}
@@ -85,7 +85,7 @@ public final class Edge {
 	 * @param neighborPosition
 	 *            The neighboring position.
 	 */
-	public Orientation getOrientationFrom(Point neighborPosition) {
+	public Orientation getOrientationFrom(LongPoint neighborPosition) {
 		checkNotNull(neighborPosition);
 		checkArgument(touches(neighborPosition));
 
