@@ -1,7 +1,6 @@
 package mazestormer.controller;
 
 import mazestormer.barcode.IAction;
-import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
 

@@ -8,7 +8,12 @@ public class WaitAction implements IAction{
 	public void performAction(Robot robot) throws IllegalStateException {
 		if(robot == null)
 			throw new IllegalStateException("The given robot must be a valid robot.");
-		//System.Threading.Thread.Sleep(2000);
+		robot.getPilot().stop();
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
-
 }

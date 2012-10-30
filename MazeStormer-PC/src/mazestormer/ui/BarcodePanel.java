@@ -40,7 +40,7 @@ public class BarcodePanel extends ViewPanel {
 	public BarcodePanel(IBarcodeController controller){
 		this.controller = controller;
 		
-		setBorder(new TitledBorder(null, "Polygon control", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "Barcode control", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.container = new JPanel();
