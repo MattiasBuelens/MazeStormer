@@ -13,8 +13,8 @@ public class Tile {
 	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
 			Orientation.class);
 
-	public Tile(long x, long y) {
-		this.position = new LongPoint(x, y);
+	public Tile(LongPoint position) {
+		this.position = new LongPoint(position);
 	}
 
 	public long getX() {

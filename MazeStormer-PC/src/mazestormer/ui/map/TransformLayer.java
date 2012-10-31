@@ -14,24 +14,20 @@ import org.w3c.dom.svg.SVGTransformList;
 
 public abstract class TransformLayer extends MapLayer {
 
-	private final Element transformElement;
-
 	private Point2D scale = new Point2D.Float(1, 1);
 	private Point2D position = new Point2D.Float();
-	private float rotationAngle = 0;
+	private float rotationAngle = 0f;
 	private Point2D rotationCenter = new Point2D.Float();
+	private float opacity = 1f;
 
-	public TransformLayer(String name, Element transformElement) {
+	public TransformLayer(String name) {
 		super(name);
-		this.transformElement = transformElement;
 	}
 
 	/**
 	 * Get the element being transformed by this layer.
 	 */
-	public Element getTransformElement() {
-		return transformElement;
-	}
+	public abstract Element getTransformElement();
 
 	/**
 	 * Get the view box of an element.
@@ -43,6 +39,8 @@ public abstract class TransformLayer extends MapLayer {
 	 */
 	private static Rectangle getViewBox(Element element) {
 		String attr = element.getAttributeNS(null, SVG_VIEW_BOX_ATTRIBUTE);
+		if (attr.isEmpty())
+			return null;
 		try {
 			float[] viewBox = ViewBox.parseViewBoxAttribute(element, attr, null);
 			return new Rectangle(viewBox[0], viewBox[1], viewBox[2], viewBox[3]);
@@ -290,11 +288,29 @@ public abstract class TransformLayer extends MapLayer {
 		setHeight(height, true);
 	}
 
+	/**
+	 * Get the opacity of this element as a number between {code 0.0} and {code 1.0}.
+	 */
+	public float getOpacity() {
+		return opacity;
+	}
+
+	/**
+	 * Set the opacity of this element.
+	 * 
+	 * @param opacity
+	 *            The new opacity as a number between {code 0.0} and {code 1.0}.
+	 */
+	public void setOpacity(float opacity) {
+		this.opacity = opacity;
+		update();
+	}
+
 	@Override
 	protected Element create() {
 		SVGGElement group = (SVGGElement) createElement(SVG_G_TAG);
 
-		Element transformElement = (Element) importNode(getTransformElement(), true);
+		Element transformElement = getTransformElement();
 		group.appendChild(transformElement);
 
 		return group;
@@ -329,10 +345,12 @@ public abstract class TransformLayer extends MapLayer {
 		final SVGTransform translate = new SVGOMTransform();
 		translate.setTranslate(getX(), getY());
 
-		// Apply transformation
 		invokeDOMChange(new Runnable() {
 			@Override
 			public void run() {
+				// Set opacity
+				group.setAttribute(SVG_OPACITY_ATTRIBUTE, getOpacity() + "");
+				// Apply transformation
 				SVGTransformList list = group.getTransform().getBaseVal();
 				list.clear();
 				list.appendItem(translate);

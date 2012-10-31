@@ -1,6 +1,6 @@
 package mazestormer.ui.map;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Comparator;
 
@@ -16,11 +16,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
-public abstract class MapLayer extends AbstractEventSource implements
-		SVGConstants, CSSConstants {
+public abstract class MapLayer extends AbstractEventSource implements SVGConstants, CSSConstants {
 
 	private final String name;
 
@@ -46,14 +44,21 @@ public abstract class MapLayer extends AbstractEventSource implements
 		this.element = element;
 	}
 
+	protected Document getDocument() {
+		return document;
+	}
+
+	private void setDocument(Document document) {
+		this.document = document;
+	}
+
 	public boolean isVisible() {
 		return isVisible;
 	}
 
 	public void setVisible(boolean visible) {
 		if (this.isVisible != visible) {
-			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible",
-					visible));
+			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible", visible));
 		}
 		this.isVisible = visible;
 
@@ -63,8 +68,7 @@ public abstract class MapLayer extends AbstractEventSource implements
 	protected void update() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
-			final String displayValue = isVisible() ? CSS_INLINE_VALUE
-					: CSS_NONE_VALUE;
+			final String displayValue = isVisible() ? CSS_INLINE_VALUE : CSS_NONE_VALUE;
 			final SVGStylableElement styleElement = (SVGStylableElement) element;
 
 			invokeDOMChange(new Runnable() {
@@ -82,22 +86,16 @@ public abstract class MapLayer extends AbstractEventSource implements
 	}
 
 	public Element build(AbstractDocument document) {
-		this.document = document;
+		setDocument(document);
 		setElement(create());
 		update();
 		return getElement();
 	}
 
 	protected Element createElement(String tagName) throws DOMException {
-		checkNotNull(document);
+		checkNotNull(getDocument());
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-		return document.createElementNS(svgNS, tagName);
-	}
-
-	protected Node importNode(Node importedNode, boolean deep)
-			throws DOMException {
-		checkNotNull(document);
-		return document.importNode(importedNode, deep);
+		return getDocument().createElementNS(svgNS, tagName);
 	}
 
 	protected abstract Element create();

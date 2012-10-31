@@ -11,7 +11,9 @@ import mazestormer.connect.ConnectEvent;
 import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
+import mazestormer.ui.map.MazeLayer;
 import mazestormer.ui.map.RobotLayer;
+import mazestormer.ui.map.SVGUtils;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
@@ -24,7 +26,10 @@ import com.google.common.eventbus.Subscribe;
 public class MapController extends SubController implements IMapController {
 
 	private MapDocument map;
+
 	private RobotLayer robotLayer;
+	private MazeLayer mazeLayer;
+	private MazeLayer loadedMazeLayer;
 
 	private Timer updater;
 	private long updateInterval;
@@ -53,6 +58,19 @@ public class MapController extends SubController implements IMapController {
 	private void createLayers() {
 		robotLayer = new RobotLayer("Robot");
 		addLayer(robotLayer);
+
+		loadedMazeLayer = new MazeLayer("Loaded maze", getMainController().getLoadedMaze());
+		loadedMazeLayer.setZIndex(1);
+		loadedMazeLayer.setOpacity(0.5f);
+		getMainController().getLoadedMaze().setOrigin(new Pose(10, 10, 0));
+		addLayer(loadedMazeLayer);
+
+		mazeLayer = new MazeLayer("Discovered maze", getMainController().getMaze());
+		mazeLayer.setZIndex(2);
+		getMainController().getMaze().setOrigin(new Pose(10, 10, 10));
+		addLayer(mazeLayer);
+		
+		SVGUtils.printSVG(getDocument(), System.out);
 	}
 
 	private void addLayer(MapLayer layer) {
@@ -119,8 +137,7 @@ public class MapController extends SubController implements IMapController {
 		stopUpdateTimer();
 
 		updater = new Timer();
-		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0,
-				getUpdateInterval());
+		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0, getUpdateInterval());
 	}
 
 	private void stopUpdateTimer() {
