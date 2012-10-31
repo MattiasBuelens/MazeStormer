@@ -176,22 +176,5 @@ public class LineFinderController extends SubController implements
 			
 			pilot.travel(dist);
 		}
-
-		private void startRotating(boolean goingLeft, double slowRotateSpeed,
-				double fastRotateSpeed, double rotateAngle) {
-			pilot.stop();
-			pilot.setRotateSpeed(fastRotateSpeed);
-			
-			pilot.rotate(rotateAngle, false);
-			pilot.rotate(-rotateAngle, false);
-
-			pilot.setRotateSpeed(slowRotateSpeed);
-
-			if (goingLeft)
-				pilot.rotateLeft();
-			else
-				pilot.rotateRight();
-		}
-
 	}
 }
