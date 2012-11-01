@@ -13,7 +13,6 @@ import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
 import mazestormer.ui.map.MazeLayer;
 import mazestormer.ui.map.RobotLayer;
-import mazestormer.ui.map.SVGUtils;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
@@ -69,8 +68,6 @@ public class MapController extends SubController implements IMapController {
 		mazeLayer.setZIndex(2);
 		getMainController().getMaze().setOrigin(new Pose(10, 10, 10));
 		addLayer(mazeLayer);
-		
-		SVGUtils.printSVG(getDocument(), System.out);
 	}
 
 	private void addLayer(MapLayer layer) {

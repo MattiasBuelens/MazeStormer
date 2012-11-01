@@ -21,6 +21,9 @@ import org.w3c.dom.svg.SVGDocument;
 
 public class SVGUtils {
 
+	private SVGUtils() {
+	}
+
 	/**
 	 * Creates a new SVG document.
 	 */

@@ -7,7 +7,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 public class RobotLayer extends TransformLayer {
 
-	private static final double defaultHeight = 20d;
+	private static final double defaultHeight = 15d;
 
 	public RobotLayer(String name, double height) {
 		super(name);

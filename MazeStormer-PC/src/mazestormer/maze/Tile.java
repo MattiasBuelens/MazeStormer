@@ -2,6 +2,7 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 
@@ -29,7 +30,7 @@ public class Tile {
 		return new LongPoint(position);
 	}
 
-	public Iterable<Edge> getEdges() {
+	public Collection<Edge> getEdges() {
 		return Collections.unmodifiableCollection(edges.values());
 	}
 

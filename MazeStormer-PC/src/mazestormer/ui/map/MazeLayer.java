@@ -67,6 +67,21 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		return maze;
 	}
 
+	private void addTile(Tile tile) {
+		final TileElement tileElement = new TileElement(tile);
+		tilesGroup.appendChild(tileElement.get());
+		tiles.put(tile.getPosition(), tileElement);
+	}
+
+	private void addEdge(Edge edge) {
+		for (LongPoint tilePosition : edge.getTouching()) {
+			TileElement tileElement = tiles.get(tilePosition);
+			if (tileElement != null) {
+				tileElement.addEdge(edge);
+			}
+		}
+	}
+
 	private void setOrigin(Pose origin) {
 		setPosition(origin.getX(), -origin.getY());
 		setRotationAngle(-origin.getHeading());
@@ -78,8 +93,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		invokeDOMChange(new Runnable() {
 			@Override
 			public void run() {
-				final TileElement tileElement = new TileElement(tile);
-				tiles.put(tile.getPosition(), tileElement);
+				addTile(tile);
 			}
 		});
 	}
@@ -92,12 +106,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 	@Override
 	public void edgeAdded(Edge edge) {
-		for (LongPoint tilePosition : edge.getTouching()) {
-			TileElement tileElement = tiles.get(tilePosition);
-			if (tileElement != null) {
-				tileElement.addEdge(edge);
-			}
-		}
+		addEdge(edge);
 	}
 
 	@Override
@@ -125,10 +134,14 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		this.zIndex = zIndex;
 	}
 
-	private void tilePosition(SVGTransformable element, double x, double y) {
+	private void tilePosition(SVGTransformable element, double tileX, double tileY) {
+		// tileX runs from left to right
+		double x = tileX;
+
+		// tileY runs from bottom to top
 		// Shift Y by one to position bottom left tile corner
 		// Negate Y coordinate to account for Y-axis orientation
-		y = -(y + 1);
+		double y = -(tileY + 1);
 
 		// Apply translation
 		final SVGTransform translate = new SVGOMTransform();
@@ -147,37 +160,44 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		private final Tile tile;
 		private final EnumMap<Orientation, EdgeElement> edges = new EnumMap<Orientation, EdgeElement>(Orientation.class);
 
+		private final SVGGElement tileGroup;
 		private final SVGRectElement rect;
 
 		public TileElement(final Tile tile) {
 			this.tile = tile;
 
+			tileGroup = (SVGGElement) createElement(SVG_G_TAG);
+			tilePosition(tileGroup, tile.getPosition());
+
 			rect = (SVGRectElement) createElement(SVG_RECT_TAG);
 			rect.setAttribute(SVG_WIDTH_ATTRIBUTE, tileSize + "");
 			rect.setAttribute(SVG_HEIGHT_ATTRIBUTE, tileSize + "");
 			rect.setAttribute(SVG_FILL_ATTRIBUTE, CSS_SANDYBROWN_VALUE);
-			tilesGroup.appendChild(rect);
-			tilePosition(rect, tile.getPosition());
+			tileGroup.appendChild(rect);
 
 			for (Orientation orientation : Orientation.values()) {
 				setEdge(orientation, tile.hasEdgeAt(orientation));
 			}
 		}
 
+		public Element get() {
+			return tileGroup;
+		}
+
 		public LongPoint getPosition() {
 			return tile.getPosition();
 		}
 
-		private void setEdge(Orientation orientation, boolean isWall) {
+		private void setEdge(Orientation orientation, boolean isClosed) {
 			checkNotNull(orientation);
 			EdgeElement edgeElement = edges.get(orientation);
 			if (edgeElement == null) {
 				edgeElement = new EdgeElement(getPosition(), orientation);
 				edges.put(orientation, edgeElement);
 			}
-			edgeElement.setWall(isWall);
+			edgeElement.setClosed(isClosed);
 			// Put walls above lines
-			if (edgeElement.isWall()) {
+			if (edgeElement.isClosed()) {
 				edgesGroup.appendChild(edgeElement.get());
 			} else {
 				edgesGroup.insertBefore(edgeElement.get(), edgesGroup.getFirstChild());
@@ -200,7 +220,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		private final LongPoint position;
 		private final Orientation orientation;
-		private boolean isWall;
+		private boolean isClosed;
 
 		private final SVGLineElement line;
 
@@ -228,12 +248,12 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			return orientation;
 		}
 
-		public boolean isWall() {
-			return isWall;
+		public boolean isClosed() {
+			return isClosed;
 		}
 
-		public void setWall(boolean isWall) {
-			this.isWall = isWall;
+		public void setClosed(boolean isClosed) {
+			this.isClosed = isClosed;
 			invokeDOMChange(new Runnable() {
 				@Override
 				public void run() {
@@ -244,7 +264,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		private void update() {
 			// Set stroke color
-			line.setAttribute(SVG_STROKE_ATTRIBUTE, isWall() ? CSS_PERU_VALUE : CSS_WHITE_VALUE);
+			line.setAttribute(SVG_STROKE_ATTRIBUTE, isClosed() ? CSS_PERU_VALUE : CSS_WHITE_VALUE);
 		}
 
 		private void setPoints() {

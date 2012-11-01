@@ -23,8 +23,6 @@ public class Maze extends AbstractEventSource {
 	private Pose origin = new Pose();
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
-	private long tileRows = 0;
-	private long tileColumns = 0;
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
@@ -79,9 +77,6 @@ public class Maze extends AbstractEventSource {
 			// Create and put tile
 			tile = new Tile(tilePosition);
 			tiles.put(tilePosition, tile);
-			// Update row and column counts
-			tileRows = Math.max(tileRows, (long) tilePosition.getX() + 1);
-			tileColumns = Math.max(tileColumns, (long) tilePosition.getY() + 1);
 			// Fire tile added event
 			fireTileAdded(tile);
 		}
@@ -104,20 +99,6 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Collection<Tile> getTiles() {
 		return Collections.unmodifiableCollection(tiles.values());
-	}
-
-	/**
-	 * Get the amount of rows, i.e. the highest X-coordinate of all tiles.
-	 */
-	public long getRows() {
-		return tileRows;
-	}
-
-	/**
-	 * Get the amount of columns, i.e. the highest Y-coordinate of all tiles.
-	 */
-	public long getColumns() {
-		return tileColumns;
 	}
 
 	/**
@@ -149,8 +130,6 @@ public class Maze extends AbstractEventSource {
 	 */
 	public void clear() {
 		tiles.clear();
-		tileRows = 0;
-		tileColumns = 0;
 		fireMazeCleared();
 	}
 
