@@ -44,7 +44,7 @@ public class BarcodePanel extends ViewPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.container = new JPanel();
-		this.container.setLayout(new MigLayout("", "[grow 75][grow][right]","[][][][]"));
+		this.container.setLayout(new MigLayout("", "[grow 75][grow]", "[][]"));
 		add(this.container);
 		
 		createActionChoicePanel();
@@ -73,7 +73,7 @@ public class BarcodePanel extends ViewPanel {
 	
 	private void createButtons(){
 		JPanel buttons = new JPanel();
-		this.container.add(buttons, "cell 0 3 3 1,grow");
+		this.container.add(buttons, "cell 0 1 2 1,grow");
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		this.btnStart = new JButton();
