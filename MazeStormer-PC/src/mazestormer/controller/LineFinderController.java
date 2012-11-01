@@ -117,14 +117,17 @@ public class LineFinderController extends SubController implements
 
 			int value;
 
-			double angle;
+			double angle1,angle2;
 
 			while (true) {
 				value = getLightSensor().readValue();
 				if (value > threshold) {
 					log("Found line, start rotating left.");
-					startRotating(true, slowRotateSpeed, fastRotateSpeed,
-							rotateAngle);
+					pilot.stop();
+					pilot.setRotateSpeed(fastRotateSpeed);
+					pilot.rotate(rotateAngle, false);
+					pilot.setRotateSpeed(slowRotateSpeed);
+					pilot.rotateLeft();
 					break;
 				}
 
@@ -134,8 +137,12 @@ public class LineFinderController extends SubController implements
 				value = getLightSensor().readValue();
 				if (value > threshold) {
 					log("Found line, start rotating right.");
-					startRotating(false, slowRotateSpeed, fastRotateSpeed,
-							rotateAngle);
+					pilot.stop();
+					angle1 = pilot.getMovement().getAngleTurned();
+					pilot.setRotateSpeed(fastRotateSpeed);
+					pilot.rotate(-rotateAngle, false);
+					pilot.setRotateSpeed(slowRotateSpeed);
+					pilot.rotateRight();
 					break;
 				}
 
@@ -145,43 +152,29 @@ public class LineFinderController extends SubController implements
 				value = getLightSensor().readValue();
 				if (value > threshold) {
 					pilot.stop();
-					angle = pilot.getMovement().getAngleTurned();
+					angle2 = pilot.getMovement().getAngleTurned();
 					break;
 				}
 
 			}
-
-			angle = Math.abs(angle) + rotateAngle - 360.0;
-
+			double ang1tmp, ang2tmp;
+			ang1tmp = Math.abs(angle1) + 180.0;
+			ang2tmp = Math.abs(angle2) + 180.0;
+			
+			System.out.println("Angle: " + ang1tmp);
+			System.out.println("Angle2: " + ang2tmp);
+			angle2 = Math.abs(angle2) + rotateAngle - 360.0;
+			
 			// Correction angle
 			final double extra = 3.5;
 
 			pilot.setRotateSpeed(fastRotateSpeed);
 			log("Positioning robot perpendicular to the line.");
-			pilot.rotate((angle / 2.0) - extra);
+			pilot.rotate((angle2 / 2.0) - extra);
 
-			double dist = 7.2 * Math.cos(Math.toRadians(angle / 2.0));
+			double dist = 7.2 * Math.cos(Math.toRadians(angle2 / 2.0));
 			
 			pilot.travel(dist);
 		}
-
-		private void startRotating(boolean goingLeft, double slowRotateSpeed,
-				double fastRotateSpeed, double rotateAngle) {
-			pilot.stop();
-			pilot.setRotateSpeed(fastRotateSpeed);
-
-			if (goingLeft)
-				pilot.rotate(rotateAngle, false);
-			else
-				pilot.rotate(-rotateAngle, false);
-
-			pilot.setRotateSpeed(slowRotateSpeed);
-
-			if (goingLeft)
-				pilot.rotateLeft();
-			else
-				pilot.rotateRight();
-		}
-
 	}
 }
