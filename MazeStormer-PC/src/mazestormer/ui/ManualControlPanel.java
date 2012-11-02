@@ -16,8 +16,10 @@ import javax.swing.KeyStroke;
 import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.IManualControlController;
+import mazestormer.robot.StopEvent;
 import net.miginfocom.swing.MigLayout;
 
+import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoDownIcon;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.GoPreviousIcon;
@@ -45,8 +47,7 @@ public class ManualControlPanel extends ViewPanel {
 	 * Create the panel.
 	 */
 	public ManualControlPanel(IManualControlController controller) {
-		setBorder(new TitledBorder(null, "Manual control",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "Manual control", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		this.controller = controller;
 
 		registerKeyboardActions();
@@ -124,6 +125,11 @@ public class ManualControlPanel extends ViewPanel {
 		controller.stop();
 	}
 
+	@Subscribe
+	public void onStopped(StopEvent e) {
+		setCurrentButton(null);
+	}
+
 	/**
 	 * The currently executing keyboard action.
 	 */
@@ -136,15 +142,12 @@ public class ManualControlPanel extends ViewPanel {
 		bindKeyboardAction(KeyEvent.VK_D, turnRight, stop);
 	}
 
-	private void bindKeyboardAction(int key, Action startAction,
-			Action stopAction) {
+	private void bindKeyboardAction(int key, Action startAction, Action stopAction) {
 		Object start = new Object();
 		Object stop = new Object();
 
-		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke(key, 0, false), start);
-		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-				KeyStroke.getKeyStroke(key, 0, true), stop);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0, false), start);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0, true), stop);
 
 		getActionMap().put(start, startAction);
 		getActionMap().put(stop, stopAction);
@@ -161,8 +164,7 @@ public class ManualControlPanel extends ViewPanel {
 		}
 
 		private void trigger(Action action) {
-			action.actionPerformed(new ActionEvent(this,
-					ActionEvent.ACTION_PERFORMED, null));
+			action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 		}
 
 		@Override

@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGTransformable;
 public class MazeLayer extends TransformLayer implements MazeListener {
 
 	private static final double tileSize = 1d;
-	private static final double edgeStrokeWidth = 0.05d;
+	private final double edgeStrokeWidth;
 
 	private final Maze maze;
 	private int zIndex = 0;
@@ -41,8 +41,10 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		this.maze = maze;
 		maze.addListener(this);
 
-		setScale(getMaze().getTileSize());
-		setOrigin(getMaze().getOrigin());
+		this.edgeStrokeWidth = maze.getEdgeSize() / maze.getTileSize();
+
+		setScale(maze.getTileSize());
+		setOrigin(maze.getOrigin());
 		setRotationCenter(0, 0);
 	}
 
@@ -63,7 +65,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		return mazeElement;
 	}
 
-	private Maze getMaze() {
+	public Maze getMaze() {
 		return maze;
 	}
 

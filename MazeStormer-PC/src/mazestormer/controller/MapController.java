@@ -19,6 +19,7 @@ import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
+import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 
 import org.w3c.dom.svg.SVGDocument;
 
@@ -28,7 +29,6 @@ import com.google.common.eventbus.Subscribe;
 public class MapController extends SubController implements IMapController {
 
 	private MapDocument map;
-
 	private RobotLayer robotLayer;
 	private MazeLayer mazeLayer;
 	private MazeLayer loadedMazeLayer;
@@ -51,7 +51,7 @@ public class MapController extends SubController implements IMapController {
 		map = new MapDocument();
 
 		// TODO Make maze define the view rectangle
-		map.setViewRect(new Rectangle(-300, -300, 600, 600));
+		map.setViewRect(new Rectangle(-500, -500, 1000, 1000));
 
 		SVGDocument document = map.getDocument();
 		postEvent(new MapChangeEvent(document));
@@ -73,7 +73,6 @@ public class MapController extends SubController implements IMapController {
 			maze.setOrigin(new Pose(-20, -20, 0));
 			String path = MapController.class.getResource("/res/ExampleMaze.txt").getPath();
 			CharSequence contents = FileUtils.load(path);
-			System.out.println(contents);
 			new Parser(maze).parse(contents);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -105,17 +104,20 @@ public class MapController extends SubController implements IMapController {
 		layer.setVisible(isVisible);
 	}
 
-	public Pose getPose() {
-		return getMainController().getPose();
+	@Override
+	public Pose getRobotPose() {
+		return toMapCoordinates(getMainController().getPose());
 	}
 
 	private void updateRobotPose() {
-		Pose pose = toMapCoordinates(getPose());
+		Pose pose = getRobotPose();
 
 		if (robotLayer != null) {
 			robotLayer.setPosition(pose.getLocation());
 			robotLayer.setRotationAngle(pose.getHeading());
 		}
+		
+		postEvent(new MapRobotPoseChangeEvent(pose));
 	}
 
 	protected static Pose toMapCoordinates(Pose pose) {

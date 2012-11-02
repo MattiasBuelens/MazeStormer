@@ -285,11 +285,15 @@ public class MainController implements IMainController {
 	 * Robot pose
 	 */
 
+	private Pose getStartPose() {
+		return new Pose(0f, 0f, 90f);
+	}
+
 	public Pose getPose() {
 		if (poseProvider != null) {
 			return poseProvider.getPose();
 		} else {
-			return new Pose();
+			return getStartPose();
 		}
 	}
 
@@ -297,7 +301,7 @@ public class MainController implements IMainController {
 	public void setupPoseProvider(ConnectEvent e) {
 		if (e.isConnected()) {
 			poseProvider = new OdometryPoseProvider(getRobot().getPilot());
-			poseProvider.setPose(new Pose(0f, 0f, 90f));
+			poseProvider.setPose(getStartPose());
 		} else {
 			poseProvider = null;
 		}

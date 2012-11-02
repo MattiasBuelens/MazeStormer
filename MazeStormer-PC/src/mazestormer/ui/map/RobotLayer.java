@@ -9,6 +9,8 @@ public class RobotLayer extends TransformLayer {
 
 	private static final double defaultHeight = 15d;
 
+	private Element element;
+
 	public RobotLayer(String name, double height) {
 		super(name);
 		setHeight(height);
@@ -21,11 +23,16 @@ public class RobotLayer extends TransformLayer {
 
 	@Override
 	public Element getTransformElement() {
-		Element element = getRobot().getDocumentElement();
 		if (getDocument() != null) {
-			return (Element) getDocument().importNode(element, true);
-		} else {
+			// Import to document
+			if (element == null) {
+				element = (Element) getDocument().importNode(getRobot().getDocumentElement(), true);
+			}
+			// Return imported element
 			return element;
+		} else {
+			// Return foreign element for measurements
+			return getRobot().getDocumentElement();
 		}
 	}
 

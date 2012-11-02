@@ -18,16 +18,23 @@ import mazestormer.util.LongPoint;
 public class Maze extends AbstractEventSource {
 
 	private static final float defaultTileSize = 40f;
+	private static final float defaultEdgeSize = 1f;
 
 	private final float tileSize;
+	private final float edgeSize;
 	private Pose origin = new Pose();
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
-	public Maze(float tileSize) {
+	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
+		this.edgeSize = edgeSize;
+	}
+
+	public Maze(float tileSize) {
+		this(tileSize, defaultEdgeSize);
 	}
 
 	public Maze() {
@@ -39,6 +46,13 @@ public class Maze extends AbstractEventSource {
 	 */
 	public float getTileSize() {
 		return tileSize;
+	}
+
+	/**
+	 * Get the size of an edge in this maze.
+	 */
+	public float getEdgeSize() {
+		return edgeSize;
 	}
 
 	/**
