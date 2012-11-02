@@ -8,6 +8,7 @@ import java.util.Set;
 import mazestormer.maze.Edge;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.Tile;
 import mazestormer.util.LongPoint;
 
 public class Parser {
@@ -58,9 +59,10 @@ public class Parser {
 				// Get position
 				LongPoint position = new LongPoint(x, y);
 				// Add edges
+				Tile tile = maze.getTileAt(position);
 				Set<Orientation> edgeOrientations = token.getType().getEdges(token.getOrientation());
 				for (Orientation edgeOrientation : edgeOrientations) {
-					maze.addEdge(new Edge(position, edgeOrientation));
+					maze.addEdge(new Edge(tile.getPosition(), edgeOrientation));
 				}
 				// TODO Add barcode
 				// maze.getTileAt(position).setBarcode(token.getBarcode())

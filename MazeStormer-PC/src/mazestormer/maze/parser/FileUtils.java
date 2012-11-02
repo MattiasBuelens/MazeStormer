@@ -32,7 +32,7 @@ public class FileUtils {
 	 * 			If the given file could not be read.
 	 */
 	public static CharBuffer load(String path) throws IllegalArgumentException, IOException {
-		checkArgument(path == null, "Path must be effective.");
+		checkArgument(path != null, "Path must be effective.");
 
 		return load(new File(path));
 	}
@@ -52,7 +52,7 @@ public class FileUtils {
 	 * 			If the given file could not be read.
 	 */
 	public static CharBuffer load(File file) throws IllegalArgumentException, IOException {
-		checkArgument(file == null, "File must be effective.");
+		checkArgument(file != null, "File must be effective.");
 
 		// Read the entire file contents into a buffer
 		return readFile(file);

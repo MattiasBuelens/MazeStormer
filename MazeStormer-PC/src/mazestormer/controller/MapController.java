@@ -8,6 +8,9 @@ import java.util.TimerTask;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
+import mazestormer.maze.Maze;
+import mazestormer.maze.parser.FileUtils;
+import mazestormer.maze.parser.Parser;
 import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
@@ -48,7 +51,7 @@ public class MapController extends SubController implements IMapController {
 		map = new MapDocument();
 
 		// TODO Make maze define the view rectangle
-		map.setViewRect(new Rectangle(-250, -250, 500, 500));
+		map.setViewRect(new Rectangle(-300, -300, 600, 600));
 
 		SVGDocument document = map.getDocument();
 		postEvent(new MapChangeEvent(document));
@@ -58,15 +61,26 @@ public class MapController extends SubController implements IMapController {
 		robotLayer = new RobotLayer("Robot");
 		addLayer(robotLayer);
 
-		loadedMazeLayer = new MazeLayer("Loaded maze", getMainController().getLoadedMaze());
+		Maze loadedMaze = getMainController().getLoadedMaze();
+		loadedMazeLayer = new MazeLayer("Loaded maze", loadedMaze);
 		loadedMazeLayer.setZIndex(1);
 		loadedMazeLayer.setOpacity(0.5f);
-		getMainController().getLoadedMaze().setOrigin(new Pose(10, 10, 0));
 		addLayer(loadedMazeLayer);
 
-		mazeLayer = new MazeLayer("Discovered maze", getMainController().getMaze());
+		Maze maze = getMainController().getMaze();
+		// TODO Remove hard-coded loading of example maze
+		try {
+			maze.setOrigin(new Pose(-20, -20, 0));
+			String path = MapController.class.getResource("/res/ExampleMaze.txt").getPath();
+			CharSequence contents = FileUtils.load(path);
+			System.out.println(contents);
+			new Parser(maze).parse(contents);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// End remove
+		mazeLayer = new MazeLayer("Discovered maze", maze);
 		mazeLayer.setZIndex(2);
-		getMainController().getMaze().setOrigin(new Pose(10, 10, 10));
 		addLayer(mazeLayer);
 	}
 
