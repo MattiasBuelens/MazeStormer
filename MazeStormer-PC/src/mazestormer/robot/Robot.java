@@ -1,13 +1,12 @@
 package mazestormer.robot;
 
-import lejos.nxt.LightSensor;
 import lejos.robotics.RangeScanner;
 
 public interface Robot {
 
 	public Pilot getPilot();
 
-	public LightSensor getLightSensor();
+	public CalibratedLightSensor getLightSensor();
 
 	public RangeScanner getRangeScanner();
 

@@ -1,12 +1,11 @@
 package mazestormer.robot;
 
-import lejos.nxt.LightSensor;
 import lejos.robotics.RangeScanner;
 
 public class VirtualRobot implements Robot {
 
 	private SimulatedPilot pilot;
-	private LightSensor light;
+	private CalibratedLightSensor light;
 	private RangeScanner scanner;
 
 	@Override
@@ -18,7 +17,7 @@ public class VirtualRobot implements Robot {
 	}
 
 	@Override
-	public LightSensor getLightSensor() {
+	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
 			// TODO Implement virtual sensor
 		}

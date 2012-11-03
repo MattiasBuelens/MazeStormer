@@ -1,22 +1,21 @@
 package mazestormer;
 
-import lejos.nxt.*;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
+import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
 public class LineFollower {
 
 	public static void main(String[] aArg) throws Exception {
-		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.Physical);
+		Connector connector = new ConnectionProvider().getConnector(RobotType.Physical);
 		connector.setDeviceName("brons");
 		connector.connect();
 
 		Robot robot = connector.getRobot();
-		LightSensor light = robot.getLightSensor();
+		CalibratedLightSensor light = robot.getLightSensor();
 		Pilot pilot = robot.getPilot();
 		light.setFloodlight(true);
 
@@ -38,14 +37,14 @@ public class LineFollower {
 
 		int value;
 
-		System.out.println("Current: " + light.readValue());
+		System.out.println("Current: " + light.getLightValue());
 		double angle;
 		while (true) {
-			value = light.readValue();
+			value = light.getLightValue();
 			if (value > blackWhiteThreshold) {
 				System.out.println("Found white: " + value);
 				pilot.stop();
-				System.out.println(light.readValue());
+				System.out.println(light.getLightValue());
 				pilot.rotate(rotateAngle, false);
 				pilot.setRotateSpeed(slowSpeed);
 				pilot.rotateLeft();
@@ -55,11 +54,11 @@ public class LineFollower {
 		}
 
 		while (true) {
-			value = light.readValue();
+			value = light.getLightValue();
 			if (value > blackWhiteThreshold) {
 				System.out.println("Found white: " + value);
 				pilot.stop();
-				System.out.println(light.readValue());
+				System.out.println(light.getLightValue());
 				pilot.setRotateSpeed(fastSpeed);
 				pilot.rotate(-rotateAngle, false);
 				pilot.setRotateSpeed(slowSpeed);
@@ -70,12 +69,12 @@ public class LineFollower {
 		}
 
 		while (true) {
-			value = light.readValue();
+			value = light.getLightValue();
 			if (value > blackWhiteThreshold) {
 				System.out.println("Found white: " + value);
 				pilot.stop();
 				angle = pilot.getMovement().getAngleTurned();
-				System.out.println(light.readValue());
+				System.out.println(light.getLightValue());
 				break;
 			}
 
