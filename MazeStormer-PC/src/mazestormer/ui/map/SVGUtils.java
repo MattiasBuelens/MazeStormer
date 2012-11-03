@@ -21,6 +21,9 @@ import org.w3c.dom.svg.SVGDocument;
 
 public class SVGUtils {
 
+	private SVGUtils() {
+	}
+
 	/**
 	 * Creates a new SVG document.
 	 */
@@ -73,7 +76,6 @@ public class SVGUtils {
 			TranscoderOutput output = new TranscoderOutput(new PrintWriter(out));
 			t.transcode(input, output);
 		} catch (TranscoderException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

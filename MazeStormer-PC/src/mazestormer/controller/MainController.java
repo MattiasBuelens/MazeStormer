@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.awt.EventQueue;
 import java.util.logging.Level;
@@ -16,6 +16,7 @@ import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
+import mazestormer.maze.Maze;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
@@ -52,6 +53,9 @@ public class MainController implements IMainController {
 	private ConnectionProvider connectionProvider;
 	private Connector connector;
 	private PoseProvider poseProvider;
+
+	private Maze maze;
+	private Maze loadedMaze;
 
 	/*
 	 * Controllers
@@ -280,11 +284,16 @@ public class MainController implements IMainController {
 	/*
 	 * Robot pose
 	 */
+
+	private Pose getStartPose() {
+		return new Pose(0f, 0f, 90f);
+	}
+
 	public Pose getPose() {
 		if (poseProvider != null) {
 			return poseProvider.getPose();
 		} else {
-			return new Pose();
+			return getStartPose();
 		}
 	}
 
@@ -292,10 +301,28 @@ public class MainController implements IMainController {
 	public void setupPoseProvider(ConnectEvent e) {
 		if (e.isConnected()) {
 			poseProvider = new OdometryPoseProvider(getRobot().getPilot());
-			poseProvider.setPose(new Pose(0f, 0f, 90f));
+			poseProvider.setPose(getStartPose());
 		} else {
 			poseProvider = null;
 		}
+	}
+
+	/*
+	 * Maze
+	 */
+
+	public Maze getMaze() {
+		if (maze == null) {
+			maze = new Maze();
+		}
+		return maze;
+	}
+
+	public Maze getLoadedMaze() {
+		if (loadedMaze == null) {
+			loadedMaze = new Maze();
+		}
+		return loadedMaze;
 	}
 
 }

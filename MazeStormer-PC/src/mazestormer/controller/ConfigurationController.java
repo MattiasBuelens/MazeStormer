@@ -6,9 +6,9 @@ import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.StopEvent;
 
-public class ConfigurationController extends SubController implements
-		IConfigurationController {
+public class ConfigurationController extends SubController implements IConfigurationController {
 
 	private RobotType robotType;
 	private ControlMode controlMode;
@@ -72,8 +72,10 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void stop() {
-		if (isConnected())
+		if (isConnected()) {
 			getPilot().stop();
+			postEvent(new StopEvent());
+		}
 	}
 
 }

@@ -8,13 +8,18 @@ import java.util.TimerTask;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
+import mazestormer.maze.Maze;
+import mazestormer.maze.parser.FileUtils;
+import mazestormer.maze.parser.Parser;
 import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
+import mazestormer.ui.map.MazeLayer;
 import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
+import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 
 import org.w3c.dom.svg.SVGDocument;
 
@@ -25,6 +30,8 @@ public class MapController extends SubController implements IMapController {
 
 	private MapDocument map;
 	private RobotLayer robotLayer;
+	private MazeLayer mazeLayer;
+	private MazeLayer loadedMazeLayer;
 
 	private Timer updater;
 	private long updateInterval;
@@ -44,7 +51,7 @@ public class MapController extends SubController implements IMapController {
 		map = new MapDocument();
 
 		// TODO Make maze define the view rectangle
-		map.setViewRect(new Rectangle(-250, -250, 500, 500));
+		map.setViewRect(new Rectangle(-500, -500, 1000, 1000));
 
 		SVGDocument document = map.getDocument();
 		postEvent(new MapChangeEvent(document));
@@ -53,6 +60,27 @@ public class MapController extends SubController implements IMapController {
 	private void createLayers() {
 		robotLayer = new RobotLayer("Robot");
 		addLayer(robotLayer);
+
+		Maze loadedMaze = getMainController().getLoadedMaze();
+		loadedMazeLayer = new MazeLayer("Loaded maze", loadedMaze);
+		loadedMazeLayer.setZIndex(1);
+		loadedMazeLayer.setOpacity(0.5f);
+		addLayer(loadedMazeLayer);
+
+		Maze maze = getMainController().getMaze();
+		// TODO Remove hard-coded loading of example maze
+		try {
+			maze.setOrigin(new Pose(-20, -20, 0));
+			String path = MapController.class.getResource("/res/ExampleMaze.txt").getPath();
+			CharSequence contents = FileUtils.load(path);
+			new Parser(maze).parse(contents);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// End remove
+		mazeLayer = new MazeLayer("Discovered maze", maze);
+		mazeLayer.setZIndex(2);
+		addLayer(mazeLayer);
 	}
 
 	private void addLayer(MapLayer layer) {
@@ -76,17 +104,20 @@ public class MapController extends SubController implements IMapController {
 		layer.setVisible(isVisible);
 	}
 
-	public Pose getPose() {
-		return getMainController().getPose();
+	@Override
+	public Pose getRobotPose() {
+		return toMapCoordinates(getMainController().getPose());
 	}
 
 	private void updateRobotPose() {
-		Pose pose = toMapCoordinates(getPose());
+		Pose pose = getRobotPose();
 
 		if (robotLayer != null) {
 			robotLayer.setPosition(pose.getLocation());
 			robotLayer.setRotationAngle(pose.getHeading());
 		}
+		
+		postEvent(new MapRobotPoseChangeEvent(pose));
 	}
 
 	protected static Pose toMapCoordinates(Pose pose) {
@@ -119,8 +150,7 @@ public class MapController extends SubController implements IMapController {
 		stopUpdateTimer();
 
 		updater = new Timer();
-		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0,
-				getUpdateInterval());
+		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0, getUpdateInterval());
 	}
 
 	private void stopUpdateTimer() {

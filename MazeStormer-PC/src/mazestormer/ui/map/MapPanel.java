@@ -18,6 +18,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import lejos.robotics.navigation.Pose;
 import mazestormer.controller.IMapController;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
@@ -25,14 +26,19 @@ import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
+import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 public class MapPanel extends ViewPanel {
 
 	private static final long serialVersionUID = 1L;
+
+	private boolean isFollowing;
 
 	private final IMapController controller;
 
@@ -41,6 +47,8 @@ public class MapPanel extends ViewPanel {
 	private JPopupMenu menuLayers;
 
 	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
+	private final Action goToRobotAction = new GoToRobotAction();
+	private final Action goToStartAction = new GoToStartAction();
 
 	public MapPanel(IMapController controller) {
 		this.controller = controller;
@@ -77,6 +85,11 @@ public class MapPanel extends ViewPanel {
 		actionBar.setFloatable(false);
 
 		JToggleButton btnFollow = new JToggleButton("Follow robot");
+		btnFollow.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				setFollowing(e.getStateChange() == ItemEvent.SELECTED);
+			}
+		});
 		actionBar.add(btnFollow);
 
 		actionBar.add(createGoButton());
@@ -99,8 +112,10 @@ public class MapPanel extends ViewPanel {
 		JPopupMenu menuGo = new JPopupMenu();
 
 		JMenuItem menuGoRobot = new JMenuItem("Go to robot");
+		menuGoRobot.setAction(goToRobotAction);
 		menuGo.add(menuGoRobot);
 		JMenuItem menuGoStart = new JMenuItem("Go to start");
+		menuGoStart.setAction(goToStartAction);
 		menuGo.add(menuGoStart);
 
 		SplitButton btnGo = new SplitButton();
@@ -136,8 +151,7 @@ public class MapPanel extends ViewPanel {
 	}
 
 	private void addLayerMenuItem(final MapLayer layer) {
-		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(
-				layer.getName());
+		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(layer.getName());
 		menuItem.setSelected(layer.isVisible());
 		menuItem.addItemListener(new ItemListener() {
 			@Override
@@ -153,8 +167,7 @@ public class MapPanel extends ViewPanel {
 
 	@Subscribe
 	public void onMapDOMChange(MapDOMChangeRequest request) {
-		canvas.getUpdateManager().getUpdateRunnableQueue()
-				.invokeLater(request.getRequest());
+		canvas.getUpdateManager().getUpdateRunnableQueue().invokeLater(request.getRequest());
 	}
 
 	@Subscribe
@@ -172,8 +185,56 @@ public class MapPanel extends ViewPanel {
 		}
 	}
 
+	public boolean isFollowing() {
+		return isFollowing;
+	}
+
+	public void setFollowing(boolean isFollowing) {
+		this.isFollowing = isFollowing;
+		updateRobotPose(controller.getRobotPose());
+	}
+
+	private void updateRobotPose(Pose pose) {
+		canvas.setEnablePanInteractor(!isFollowing());
+		if (isFollowing()) {
+			canvas.centerOn(pose.getX(), pose.getY(), pose.getHeading());
+		}
+	}
+
+	@Subscribe
+	public void onMapRobotPoseChanged(MapRobotPoseChangeEvent event) {
+		updateRobotPose(event.getPose());
+	}
+
 	// Dummy method to trick the designer into showing the popup menus
 	private static void addPopup(Component component, final JPopupMenu popup) {
 
+	}
+
+	private class GoToRobotAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public GoToRobotAction() {
+			putValue(NAME, "Go to robot");
+			putValue(SHORT_DESCRIPTION, "Center the map on the robot.");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			Pose pose = controller.getRobotPose();
+			canvas.centerOn(pose.getX(), pose.getY(), 0);
+		}
+	}
+
+	private class GoToStartAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public GoToStartAction() {
+			putValue(NAME, "Go to start");
+			putValue(SHORT_DESCRIPTION, "Center the map on the start position.");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			canvas.centerOn(0, 0, 0);
+		}
 	}
 }
