@@ -76,7 +76,6 @@ public class SVGUtils {
 			TranscoderOutput output = new TranscoderOutput(new PrintWriter(out));
 			t.transcode(input, output);
 		} catch (TranscoderException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

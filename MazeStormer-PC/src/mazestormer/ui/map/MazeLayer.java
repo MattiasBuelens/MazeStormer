@@ -102,8 +102,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 	@Override
 	public void tileChanged(Tile tile) {
-		// TODO Auto-generated method stub
-
+		// TODO Update tile when barcode is detected
 	}
 
 	@Override

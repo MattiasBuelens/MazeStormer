@@ -38,12 +38,17 @@ public class MapCanvas extends JSVGCanvas {
 		Dimension size = getSize();
 		Point2D center = new Point2D.Double(size.getWidth() / 2, size.getHeight() / 2);
 
-		// Place point at center
+//		// Place point at center
+//		at.translate(center.getX(), center.getY());
+//		at.translate(-point.getX(), -point.getY());
+//
+//		// Rotate around point
+//		at.rotate(Math.toRadians(-angle), point.getX(), point.getY());
+		
+		// Place point at center and rotate around it
 		at.translate(center.getX(), center.getY());
+		at.rotate(Math.toRadians(-angle));
 		at.translate(-point.getX(), -point.getY());
-
-		// Rotate around point
-		at.rotate(Math.toRadians(-angle), point.getX(), point.getY());
 
 		// Apply zoom
 		at.concatenate(zoomOn(point, getZoomScale()));

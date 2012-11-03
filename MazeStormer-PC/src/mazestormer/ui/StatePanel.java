@@ -4,19 +4,16 @@ import java.awt.BorderLayout;
 import java.beans.Beans;
 
 import javax.swing.JTable;
+import javax.swing.JTextPane;
 import javax.swing.border.TitledBorder;
 
 import lejos.robotics.navigation.Move;
-import lejos.robotics.navigation.Move.MoveType;
-import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.IStateController;
-import mazestormer.controller.StateController;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.MoveEvent.EventType;
 
 import com.google.common.eventbus.Subscribe;
-import javax.swing.JTextPane;
 
 public class StatePanel extends ViewPanel {
 
