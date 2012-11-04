@@ -15,11 +15,13 @@ import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
 import mazestormer.ui.map.MazeLayer;
+import mazestormer.ui.map.RangesLayer;
 import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
+import mazestormer.util.MapUtils;
 
 import org.w3c.dom.svg.SVGDocument;
 
@@ -32,6 +34,7 @@ public class MapController extends SubController implements IMapController {
 	private RobotLayer robotLayer;
 	private MazeLayer mazeLayer;
 	private MazeLayer loadedMazeLayer;
+	private RangesLayer rangesLayer;
 
 	private Timer updater;
 	private long updateInterval;
@@ -81,6 +84,9 @@ public class MapController extends SubController implements IMapController {
 		mazeLayer = new MazeLayer("Discovered maze", maze);
 		mazeLayer.setZIndex(2);
 		addLayer(mazeLayer);
+
+		rangesLayer = new RangesLayer("Detected ranges");
+		addLayer(rangesLayer);
 	}
 
 	private void addLayer(MapLayer layer) {
@@ -106,7 +112,7 @@ public class MapController extends SubController implements IMapController {
 
 	@Override
 	public Pose getRobotPose() {
-		return toMapCoordinates(getMainController().getPose());
+		return MapUtils.toMapCoordinates(getMainController().getPose());
 	}
 
 	private void updateRobotPose() {
@@ -116,12 +122,8 @@ public class MapController extends SubController implements IMapController {
 			robotLayer.setPosition(pose.getLocation());
 			robotLayer.setRotationAngle(pose.getHeading());
 		}
-		
-		postEvent(new MapRobotPoseChangeEvent(pose));
-	}
 
-	protected static Pose toMapCoordinates(Pose pose) {
-		return new Pose(pose.getX(), -pose.getY(), -pose.getHeading() + 90f);
+		postEvent(new MapRobotPoseChangeEvent(pose));
 	}
 
 	private void invokeUpdateRobotPose() {

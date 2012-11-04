@@ -25,7 +25,12 @@ import org.w3c.dom.svg.SVGTransformable;
 
 public class MazeLayer extends TransformLayer implements MazeListener {
 
+	private static final String tileColor = CSS_SANDYBROWN_VALUE;
+	private static final String wallColor = CSS_PERU_VALUE;
+	private static final String lineColor = CSS_WHITE_VALUE;
+
 	private static final double tileSize = 1d;
+
 	private final double edgeStrokeWidth;
 
 	private final Maze maze;
@@ -173,7 +178,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			rect = (SVGRectElement) createElement(SVG_RECT_TAG);
 			rect.setAttribute(SVG_WIDTH_ATTRIBUTE, tileSize + "");
 			rect.setAttribute(SVG_HEIGHT_ATTRIBUTE, tileSize + "");
-			rect.setAttribute(SVG_FILL_ATTRIBUTE, CSS_SANDYBROWN_VALUE);
+			rect.setAttribute(SVG_FILL_ATTRIBUTE, tileColor);
 			tileGroup.appendChild(rect);
 
 			for (Orientation orientation : Orientation.values()) {
@@ -265,7 +270,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		private void update() {
 			// Set stroke color
-			line.setAttribute(SVG_STROKE_ATTRIBUTE, isClosed() ? CSS_PERU_VALUE : CSS_WHITE_VALUE);
+			line.setAttribute(SVG_STROKE_ATTRIBUTE, isClosed() ? wallColor : lineColor);
 		}
 
 		private void setPoints() {

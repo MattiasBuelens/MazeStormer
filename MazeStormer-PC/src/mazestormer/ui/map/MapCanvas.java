@@ -16,8 +16,8 @@ public class MapCanvas extends JSVGCanvas {
 
 	private static final long serialVersionUID = 1L;
 
-	private boolean enablePanInteractor;
-	private boolean enableZoomInteractor;
+	private boolean isPanInteractorEnabled;
+	private boolean isZoomInteractorEnabled;
 	private PanInteractor panInteractor = new PanInteractor();
 	private ZoomListener zoomListener = new ZoomListener();
 
@@ -44,7 +44,7 @@ public class MapCanvas extends JSVGCanvas {
 //
 //		// Rotate around point
 //		at.rotate(Math.toRadians(-angle), point.getX(), point.getY());
-		
+
 		// Place point at center and rotate around it
 		at.translate(center.getX(), center.getY());
 		at.rotate(Math.toRadians(-angle));
@@ -90,31 +90,39 @@ public class MapCanvas extends JSVGCanvas {
 
 	@Override
 	public boolean getEnablePanInteractor() {
-		return enablePanInteractor;
+		return isPanInteractorEnabled;
 	}
 
 	@Override
 	public void setEnablePanInteractor(boolean b) {
-		enablePanInteractor = b;
-		if (getEnablePanInteractor()) {
-			addInteractor(panInteractor);
-		} else {
-			removeInteractor(panInteractor);
+		if (isPanInteractorEnabled != b) {
+			boolean oldValue = isPanInteractorEnabled;
+			isPanInteractorEnabled = b;
+			if (isPanInteractorEnabled) {
+				addInteractor(panInteractor);
+			} else {
+				removeInteractor(panInteractor);
+			}
+			pcs.firePropertyChange("enablePanInteractor", oldValue, b);
 		}
 	}
 
 	@Override
 	public boolean getEnableZoomInteractor() {
-		return enableZoomInteractor;
+		return isZoomInteractorEnabled;
 	}
 
 	@Override
 	public void setEnableZoomInteractor(boolean b) {
-		enableZoomInteractor = b;
-		if (getEnableZoomInteractor()) {
-			addMouseWheelListener(zoomListener);
-		} else {
-			removeMouseWheelListener(zoomListener);
+		if (isZoomInteractorEnabled != b) {
+			boolean oldValue = isZoomInteractorEnabled;
+			isZoomInteractorEnabled = b;
+			if (isZoomInteractorEnabled) {
+				addMouseWheelListener(zoomListener);
+			} else {
+				removeMouseWheelListener(zoomListener);
+			}
+			pcs.firePropertyChange("enableZoomInteractor", oldValue, b);
 		}
 	}
 
