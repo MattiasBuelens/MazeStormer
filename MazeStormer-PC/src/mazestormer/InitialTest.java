@@ -100,6 +100,8 @@ public class InitialTest implements FeatureListener {
 		
 		centerOfMass = new Point(sumX/readings.size(), sumY/readings.size());
 		
+		System.out.println("ZwaartepuntX: " + centerOfMass.getX());
+		System.out.println("ZwaartepuntY: " + centerOfMass.getY());
 		//	3) bepaal datapunt met maximale afstand tot G (heeft richting alfa tov oorsprong)
 		float MaxDistance = 0;
 		double distance;
@@ -111,12 +113,15 @@ public class InitialTest implements FeatureListener {
 			Point point = rangeFeature.getPose().pointAt(range, angle);
 			distance = point.distance(centerOfMass);
 			if(distance > MaxDistance) chosenReading = reading;
+			
+			System.out.println(reading.getRange());
 		}
 		
 		//	4) draai in de gevonden richting en rijd tot witte lijn wordt gezien
 		if(chosenReading == null) System.out.println("Chosen Reading is null.");
 		
 		connector.getRobot().getPilot().rotate(chosenReading.getAngle());
+		System.out.println(chosenReading.getAngle());
 				
 		//	5) rijd tot witte lijn wordt gezien
 		//	6) positioneer loodrecht op witte lijn

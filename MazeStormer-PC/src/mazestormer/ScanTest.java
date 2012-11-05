@@ -42,7 +42,7 @@ public class ScanTest implements FeatureListener {
 
 		RangeScanner scanner = connector.getRobot().getRangeScanner();
 
-		float scanRange = 180f;
+		float scanRange = 360f;
 		float scanIncrement = 5f;
 
 		int scanCount = (int) (scanRange / scanIncrement) + 1;
@@ -53,7 +53,7 @@ public class ScanTest implements FeatureListener {
 		}
 		scanner.setAngles(scanAngles);
 
-		float maxDistance = 35f;
+		float maxDistance = 255f;
 		int delay = 10 * 1000;
 		RangeScannerFeatureDetector detector = new RangeScannerFeatureDetector(
 				scanner, maxDistance, delay);
