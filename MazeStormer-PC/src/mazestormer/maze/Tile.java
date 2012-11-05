@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.EnumSet;
 
 import mazestormer.util.LongPoint;
 
@@ -58,5 +59,19 @@ public class Tile {
 		for (Edge edge : edges) {
 			addEdge(edge);
 		}
+	}
+
+	public EnumSet<Orientation> getClosedSides() {
+		EnumSet<Orientation> result = EnumSet.noneOf(Orientation.class);
+		for (Orientation orientation : Orientation.values()) {
+			if (hasEdgeAt(orientation)) {
+				result.add(orientation);
+			}
+		}
+		return result;
+	}
+
+	public EnumSet<Orientation> getOpenSides() {
+		return EnumSet.complementOf(getClosedSides());
 	}
 }
