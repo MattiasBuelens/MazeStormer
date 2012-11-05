@@ -8,6 +8,8 @@ public interface IPolygonControlController extends EventSource {
 
 	public void stopPolygon();
 
+	public IParametersController parameters();
+
 	public enum Direction {
 		ClockWise("Clockwise"), CounterClockWise("Counter-clockwise");
 

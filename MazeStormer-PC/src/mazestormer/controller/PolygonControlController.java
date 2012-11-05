@@ -4,7 +4,8 @@ import com.google.common.eventbus.Subscribe;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
 
-public class PolygonControlController extends SubController implements IPolygonControlController {
+public class PolygonControlController extends SubController implements
+		IPolygonControlController {
 
 	public PolygonControlController(MainController mainController) {
 		super(mainController);
@@ -28,6 +29,11 @@ public class PolygonControlController extends SubController implements IPolygonC
 			runner.stop();
 			runner = null;
 		}
+	}
+
+	@Override
+	public IParametersController parameters() {
+		return getMainController().parameters();
 	}
 
 	@Subscribe

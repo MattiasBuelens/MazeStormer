@@ -6,7 +6,6 @@ import java.beans.Beans;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -18,10 +17,10 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
+import mazestormer.controller.EventType;
 import mazestormer.controller.IPolygonControlController;
 import mazestormer.controller.IPolygonControlController.Direction;
 import mazestormer.controller.PolygonEvent;
-import mazestormer.controller.EventType;
 import mazestormer.robot.StopEvent;
 import net.miginfocom.swing.MigLayout;
 
@@ -38,6 +37,7 @@ public class PolygonControlPanel extends ViewPanel {
 	private JPanel container;
 	private JButton btnStart;
 	private JButton btnStop;
+	private ParametersPanel parametersPanel;
 
 	private SpinnerModel sideLengthModel;
 	private SpinnerModel nbSidesModel;
@@ -49,11 +49,13 @@ public class PolygonControlPanel extends ViewPanel {
 	public PolygonControlPanel(IPolygonControlController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Polygon control", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		setBorder(new TitledBorder(null, "Polygon control",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setLayout(new MigLayout("", "[grow,fill]", "[][]"));
 
 		container = new JPanel();
-		container.setLayout(new MigLayout("", "[grow 75][grow][right]", "[][][][]"));
+		container.setLayout(new MigLayout("", "[grow 75][grow][right]",
+				"[][][][]"));
 		add(container);
 
 		createNbSides();
@@ -61,6 +63,9 @@ public class PolygonControlPanel extends ViewPanel {
 		createDirection();
 
 		createButtons();
+
+		parametersPanel = new ParametersPanel(controller.parameters());
+		add(parametersPanel, "cell 0 1");
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -73,7 +78,8 @@ public class PolygonControlPanel extends ViewPanel {
 	}
 
 	private void createNbSides() {
-		nbSidesModel = new SpinnerNumberModel(new Integer(2), new Integer(2), null, new Integer(1));
+		nbSidesModel = new SpinnerNumberModel(new Integer(2), new Integer(2),
+				null, new Integer(1));
 
 		JLabel lblNbSides = new JLabel("Number of sides");
 		container.add(lblNbSides, "cell 0 0,grow");
@@ -87,7 +93,8 @@ public class PolygonControlPanel extends ViewPanel {
 	}
 
 	private void createSideLength() {
-		sideLengthModel = new SpinnerNumberModel(new Double(0), new Double(0), null, new Double(1));
+		sideLengthModel = new SpinnerNumberModel(new Double(0), new Double(0),
+				null, new Double(1));
 
 		JLabel lblSideLength = new JLabel("Side length");
 		container.add(lblSideLength, "cell 0 1,grow");

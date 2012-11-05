@@ -1,6 +1,5 @@
 package mazestormer.ui;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -42,22 +41,30 @@ public class ManualControlPanel extends ViewPanel {
 	private JToggleButton btnLeft;
 	private JToggleButton btnBackward;
 	private JToggleButton btnRight;
+	private ParametersPanel parametersPanel;
+	private ScanPanel scanPanel;
 
 	/**
 	 * Create the panel.
 	 */
 	public ManualControlPanel(IManualControlController controller) {
-		setBorder(new TitledBorder(null, "Manual control", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "Manual control",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		this.controller = controller;
 
 		registerKeyboardActions();
-		setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		setLayout(new MigLayout("", "[grow]", "[][][]"));
 
 		container = new JPanel();
 		container.setLayout(new MigLayout("", "[][][]", "[][]"));
-		add(container);
-
+		add(container, "cell 0 0,alignx center,aligny top");
 		createControls();
+
+		parametersPanel = new ParametersPanel(controller.parameters());
+		add(parametersPanel, "cell 0 1,grow");
+
+		scanPanel = new ScanPanel(controller.scan());
+		add(scanPanel, "cell 0 2,grow");
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -142,12 +149,15 @@ public class ManualControlPanel extends ViewPanel {
 		bindKeyboardAction(KeyEvent.VK_D, turnRight, stop);
 	}
 
-	private void bindKeyboardAction(int key, Action startAction, Action stopAction) {
+	private void bindKeyboardAction(int key, Action startAction,
+			Action stopAction) {
 		Object start = new Object();
 		Object stop = new Object();
 
-		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0, false), start);
-		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0, true), stop);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(key, 0, false), start);
+		getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(key, 0, true), stop);
 
 		getActionMap().put(start, startAction);
 		getActionMap().put(stop, stopAction);
@@ -164,7 +174,8 @@ public class ManualControlPanel extends ViewPanel {
 		}
 
 		private void trigger(Action action) {
-			action.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			action.actionPerformed(new ActionEvent(this,
+					ActionEvent.ACTION_PERFORMED, null));
 		}
 
 		@Override

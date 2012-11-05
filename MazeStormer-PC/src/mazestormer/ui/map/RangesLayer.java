@@ -1,6 +1,8 @@
 package mazestormer.ui.map;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
@@ -15,7 +17,7 @@ import com.google.common.eventbus.Subscribe;
 
 public class RangesLayer extends MapLayer {
 
-	private static final float pointRadius = 0.01f;
+	private static final float pointRadius = 1f;
 	private static final String pointColor = CSS_RED_VALUE;
 
 	public RangesLayer(String name) {
@@ -33,18 +35,34 @@ public class RangesLayer extends MapLayer {
 	}
 
 	private void addRangeFeature(RangeFeature feature) {
+		final List<Point2D> points = new ArrayList<Point2D>();
+
 		// Get robot pose at time of reading
 		Pose robotPose = feature.getPose();
+
+		// Get points
 		for (RangeReading reading : feature.getRangeReadings()) {
+			if (reading.invalidReading() || reading.getRange() < 0f)
+				continue;
 			// Get reading point in robot coordinates
 			Point2D robotPoint = robotPose.pointAt(reading.getRange(),
-					reading.getAngle());
-			// Convert to map coordinates
+					reading.getAngle() + robotPose.getHeading());
+			// Convert to map coordinates and store
 			Point2D mapPoint = MapUtils.toMapCoordinates(robotPoint);
-			// Append new point
-			Element point = createPoint(mapPoint.getX(), mapPoint.getY());
-			getElement().appendChild(point);
+			points.add(mapPoint);
 		}
+
+		// Append points
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				Element container = getElement();
+				for (Point2D point : points) {
+					Element element = createPoint(point.getX(), point.getY());
+					container.appendChild(element);
+				}
+			}
+		});
 	}
 
 	private Element createPoint(double x, double y) {

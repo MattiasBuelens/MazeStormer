@@ -121,9 +121,9 @@ public class Maze extends AbstractEventSource {
 	 * 
 	 * @param edge
 	 *            The edge to add.
-	 * @post The edge is added to the maze tiles at its touching positions.
-	 * 			| for each point in edge.getTouching() :
-	 * 			|   getTileAt(point).hasEdge(edge)
+	 * @post The edge is added to the maze tiles at its touching positions. |
+	 *       for each point in edge.getTouching() : |
+	 *       getTileAt(point).hasEdge(edge)
 	 */
 	public void addEdge(Edge edge) {
 		checkNotNull(edge);
@@ -299,6 +299,18 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
+	 * Get the relative position in map coordinates of the bottom left corner of
+	 * the given tile position.
+	 * 
+	 * @param tilePosition
+	 *            The tile position.
+	 */
+	public Point fromTile(LongPoint tilePosition) {
+		return fromTile(new Point((float) tilePosition.getX(),
+				(float) tilePosition.getY()));
+	}
+
+	/**
 	 * Normalize a given heading to ensure it is between -180 and +180 degrees.
 	 * 
 	 * @param heading
@@ -311,16 +323,22 @@ public class Maze extends AbstractEventSource {
 			heading -= 360;
 		return heading;
 	}
-	
-	public Map<Edge, Line> getLines(){
-		return Collections.unmodifiableMap(this.lines);
+
+	public Map<Edge, Line> getLines() {
+		return Collections.unmodifiableMap(lines);
 	}
-	
+
 	Map<Edge, Line> lines = new HashMap<Edge, Line>();
-	
-	private void updateLines(Edge edge){
-		LongPoint p = edge.getOrientation().shift(edge.getPosition(), getTileSize());
-		Line l = new Line(((Double) edge.getPosition().getX()).floatValue(), ((Double) edge.getPosition().getY()).floatValue(), ((Double) p.getX()).floatValue(), ((Double) p.getY()).floatValue());
-		this.lines.put(edge, l);	
+
+	private void updateLines(Edge edge) {
+		// TODO Fix me!
+		Point2D point = fromTile(edge.getPosition());
+		Point2D otherPoint = edge.getOrientation().shift(point, getTileSize());
+		float x1 = (float) point.getX();
+		float y1 = (float) point.getY();
+		float x2 = (float) otherPoint.getX();
+		float y2 = (float) otherPoint.getY();
+		Line l = new Line(x1, y1, x2, y2);
+		lines.put(edge, l);
 	}
 }
