@@ -63,6 +63,7 @@ public class MainController implements IMainController {
 	 */
 	private IConfigurationController configuration;
 	private IParametersController parameters;
+	private ICalibrationController calibration;
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
 	private IBarcodeController barcodeControl;
@@ -137,6 +138,13 @@ public class MainController implements IMainController {
 		return configuration;
 	}
 
+	@Override
+	public ICalibrationController calibration() {
+		if(calibration == null)
+			calibration = new CalibrationController(this);
+		return calibration;
+	}
+	
 	@Override
 	public IParametersController parameters() {
 		if (parameters == null) {
