@@ -6,7 +6,8 @@ import lejos.robotics.LampLightDetector;
 import mazestormer.robot.CalibratedLightSensor;
 
 /**
- * A calibrated light sensor implementation which uses a delegate {@link LampLightDetector}.
+ * A calibrated light sensor implementation which uses a delegate
+ * {@link LampLightDetector}.
  */
 public class DelegatedCalibratedLightSensor implements CalibratedLightSensor {
 
@@ -19,7 +20,7 @@ public class DelegatedCalibratedLightSensor implements CalibratedLightSensor {
 	 * Create a new delegated calibrated light sensor with the given delegate.
 	 * 
 	 * @param delegate
-	 * 			The lamp light detector to use as delegate.
+	 *            The lamp light detector to use as delegate.
 	 */
 	public DelegatedCalibratedLightSensor(LampLightDetector delegate) {
 		this.delegate = checkNotNull(delegate);
@@ -54,12 +55,12 @@ public class DelegatedCalibratedLightSensor implements CalibratedLightSensor {
 
 	@Override
 	public void calibrateLow() {
-		zero = getNormalizedLightValue();
+		setLow(getNormalizedLightValue());
 	}
 
 	@Override
 	public void calibrateHigh() {
-		zero = getNormalizedLightValue();
+		setHigh(getNormalizedLightValue());
 	}
 
 	@Override

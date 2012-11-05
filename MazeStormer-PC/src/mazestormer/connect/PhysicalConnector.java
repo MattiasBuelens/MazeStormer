@@ -17,18 +17,7 @@ public class PhysicalConnector implements Connector {
 	private NXTComm comm;
 	private NXTCommand command;
 
-	private String deviceName;
 	private Robot robot;
-
-	@Override
-	public String getDeviceName() {
-		return deviceName;
-	}
-
-	@Override
-	public void setDeviceName(String deviceName) {
-		this.deviceName = deviceName;
-	}
 
 	@Override
 	public Robot getRobot() throws IllegalStateException {
@@ -42,21 +31,21 @@ public class PhysicalConnector implements Connector {
 	}
 
 	@Override
-	public void connect() {
+	public void connect(ConnectionContext context) {
 		if (isConnected())
 			return;
 
-		boolean isConnected = createConnection();
+		boolean isConnected = createConnection(context.getDeviceName());
 		if (!isConnected)
 			return;
 
 		robot = new PhysicalRobot();
 	}
 
-	private boolean createConnection() {
+	private boolean createConnection(String deviceName) {
 		// Search for NXT by name and connect over LCP
 		NXTConnector conn = new NXTConnector();
-		boolean isConnected = conn.connectTo(getDeviceName(), null,
+		boolean isConnected = conn.connectTo(deviceName, null,
 				NXTCommFactory.ALL_PROTOCOLS, NXTComm.LCP);
 		if (!isConnected)
 			return false;

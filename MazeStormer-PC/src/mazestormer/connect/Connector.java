@@ -8,11 +8,7 @@ public interface Connector {
 
 	public boolean isConnected();
 
-	public String getDeviceName();
-
-	public void setDeviceName(String name);
-
-	public void connect();
+	public void connect(ConnectionContext context);
 
 	public void disconnect();
 

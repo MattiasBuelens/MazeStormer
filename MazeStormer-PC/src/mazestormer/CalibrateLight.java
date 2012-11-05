@@ -3,6 +3,7 @@ package mazestormer;
 import java.util.Scanner;
 
 import lejos.nxt.*;
+import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
@@ -14,8 +15,9 @@ public class CalibrateLight {
 
 		Connector connector = new ConnectionProvider()
 				.getConnector(RobotType.Physical);
-		connector.setDeviceName("brons");
-		connector.connect();
+		ConnectionContext context = new ConnectionContext();
+		context.setDeviceName("brons");
+		connector.connect(context);
 
 		LightSensor light = new LightSensor(SensorPort.S1);
 

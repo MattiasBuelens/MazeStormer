@@ -12,6 +12,7 @@ import lejos.robotics.objectdetection.Feature;
 import lejos.robotics.objectdetection.FeatureDetector;
 import lejos.robotics.objectdetection.FeatureListener;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
@@ -34,8 +35,9 @@ public class ScanTest implements FeatureListener {
 	private void start() {
 		Connector connector = new ConnectionProvider()
 				.getConnector(RobotType.Physical);
-		connector.setDeviceName(nxtName);
-		connector.connect();
+		ConnectionContext context = new ConnectionContext();
+		context.setDeviceName("brons");
+		connector.connect(context);
 
 		Pilot pilot = connector.getRobot().getPilot();
 		PoseProvider pp = new OdometryPoseProvider(pilot);

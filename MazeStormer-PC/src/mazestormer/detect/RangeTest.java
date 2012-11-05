@@ -10,6 +10,7 @@ import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.RotatingRangeScanner;
+import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
@@ -20,11 +21,12 @@ public class RangeTest {
 
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-		// Set up command connection
+		// Set up connection
 		Connector connector = new ConnectionProvider()
 				.getConnector(RobotType.Physical);
-		connector.setDeviceName(nxtName);
-		connector.connect();
+		ConnectionContext context = new ConnectionContext();
+		context.setDeviceName("brons");
+		connector.connect(context);
 
 		// Head
 		RegulatedMotor head = Motor.C;

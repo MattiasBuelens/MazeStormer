@@ -11,6 +11,7 @@ import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
+import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
@@ -48,7 +49,8 @@ public class MainController implements IMainController {
 	/*
 	 * Models
 	 */
-	private ConnectionProvider connectionProvider;
+	private final ConnectionProvider connectionProvider;
+	private final ConnectionContext connectionContext = new ConnectionContext();
 	private Connector connector;
 
 	private Maze maze;
@@ -84,6 +86,9 @@ public class MainController implements IMainController {
 		getEventBus().register(this);
 
 		connectionProvider = new ConnectionProvider();
+		// TODO Configure device name in GUI?
+		connectionContext.setDeviceName("brons");
+		connectionContext.setLoadedMaze(getLoadedMaze());
 
 		view = createView();
 		view.registerEventBus(getEventBus());
@@ -230,7 +235,7 @@ public class MainController implements IMainController {
 		checkState(!isConnected());
 
 		connector = connectionProvider.getConnector(robotType);
-		connector.connect();
+		connector.connect(connectionContext);
 		postConnected();
 	}
 

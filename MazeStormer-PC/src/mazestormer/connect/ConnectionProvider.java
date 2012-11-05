@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.*;
 
 public class ConnectionProvider {
 
-	private EnumMap<RobotType, Connector> connectorMap = new EnumMap<RobotType, Connector>(
+	private final EnumMap<RobotType, Connector> connectorMap = new EnumMap<RobotType, Connector>(
 			RobotType.class);
 
 	public ConnectionProvider() {
@@ -19,10 +19,11 @@ public class ConnectionProvider {
 	public void setConnector(RobotType robotType, Connector connector) {
 		checkNotNull(robotType);
 
-		if (connector == null)
+		if (connector == null) {
 			connectorMap.remove(robotType);
-		else
+		} else {
 			connectorMap.put(robotType, connector);
+		}
 	}
 
 	protected void addConnectors() {
