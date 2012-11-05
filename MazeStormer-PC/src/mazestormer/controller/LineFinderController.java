@@ -9,6 +9,9 @@ import com.google.common.eventbus.Subscribe;
 
 public class LineFinderController extends SubController implements ILineFinderController {
 
+	private static final double sensorToWheels = 7.2;
+	final static double rotateAngle = 135.0;
+	
 	public LineFinderController(MainController mainController) {
 		super(mainController);
 	}
@@ -101,8 +104,6 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			slowRotateSpeed = 20;
 			fastRotateSpeed = 50;
 
-			double rotateAngle = 180.0;
-
 			getLightSensor().setLow(lowLightValue);
 			getLightSensor().setHigh(highLightValue);
 
@@ -156,23 +157,57 @@ public class LineFinderController extends SubController implements ILineFinderCo
 
 			}
 			double ang1tmp, ang2tmp;
-			ang1tmp = Math.abs(angle1) + 180.0;
-			ang2tmp = Math.abs(angle2) + 180.0;
+//			ang1tmp = Math.abs(angle1) + rotateAngle;
+//			ang2tmp = Math.abs(angle2) + rotateAngle;
 
-			System.out.println("Angle: " + ang1tmp);
-			System.out.println("Angle2: " + ang2tmp);
-			angle2 = Math.abs(angle2) + rotateAngle - 360.0;
+//			System.out.println("Angle: " + ang1tmp);
+//			System.out.println("Angle2: " + ang2tmp);
+
+			//angle2 = Math.abs(angle2) + rotateAngle - 360.0;
+			angle1 = Math.abs(angle1) + rotateAngle;
+			angle2 = Math.abs(angle2) + rotateAngle;
 
 			// Correction angle
 			final double extra = 3.5;
-
 			pilot.setRotateSpeed(fastRotateSpeed);
+
+			double finalAngle;
+			
+			if (isCross(angle1,angle2)){
+				log("Cross detected.");
+				finalAngle = ((angle2 - angle1) / 2.0) - extra;
+			}else{
+				finalAngle = ((angle2 - 360.0) / 2.0) - extra;
+			}
+
 			log("Positioning robot perpendicular to the line.");
-			pilot.rotate((angle2 / 2.0) - extra);
-
-			double dist = 7.2 * Math.cos(Math.toRadians(angle2 / 2.0));
-
+			
+			pilot.rotate(finalAngle);
+			double dist = sensorToWheels * Math.cos(Math.toRadians(finalAngle));
 			pilot.travel(dist);
+
+		}
+		
+		private final double crossTreshold = 3.0;
+		private boolean isCross(double angle1, double angle2){
+			double radAngle1 = Math.toRadians(angle1);
+			double radAngle2 = Math.toRadians(angle2);
+			
+			double xp = 0;
+			double yp = sensorToWheels;
+			
+			double x0 = -sensorToWheels*Math.sin(radAngle1);
+			double y0 = sensorToWheels*Math.cos(radAngle1);
+			
+			double x1 = -sensorToWheels*Math.sin(radAngle1-radAngle2);
+			double y1 = sensorToWheels*Math.cos(radAngle1-radAngle2);
+
+			double lambda=((x1-x0)*(xp-x0)+(y1-y0)*(yp-y0))/
+					(Math.pow((x1-x0),2)+Math.pow((y1-y0),2));
+			
+			double afstand=Math.sqrt(Math.pow(xp-x0-lambda*(x1-x0),2)+(Math.pow(yp-y0-lambda*(y1-y0),2)));
+			
+			return afstand > crossTreshold;
 		}
 	}
 }
