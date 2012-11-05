@@ -12,6 +12,8 @@ import mazestormer.maze.Maze;
 
 public class VirtualRangeScanner implements RangeScanner {
 
+	private static final float maxDistance = 255f;
+
 	public VirtualRangeScanner(Maze maze, PoseProvider poseProvider) {
 		this.maze = maze;
 		this.poseProvider = poseProvider;
@@ -29,6 +31,10 @@ public class VirtualRangeScanner implements RangeScanner {
 
 	private Maze maze;
 
+	public static final float getMaxDistance() {
+		return maxDistance;
+	}
+
 	@Override
 	public RangeReadings getRangeValues() {
 		RangeReadings r = new RangeReadings(angles.length);
@@ -39,26 +45,29 @@ public class VirtualRangeScanner implements RangeScanner {
 	}
 
 	private float generateRange(float angle) {
+		// Get relative robot pose
 		Pose pose = getMaze().toRelative(getPoseProvider().getPose());
 
-		double heading = Math.toRadians(pose.getHeading() + angle);
+		// Create ray from robot to maximum reachable point
+		Point p1 = pose.getLocation();
+		Point p2 = p1.pointAt(getMaxDistance() - 1f, pose.getHeading() + angle);
+		Line ray = new Line(p1.x, p1.y, p2.x, p2.y);
 
-		Line l = new Line(pose.getX(), pose.getY(), pose.getX() + 254f
-				* (float) Math.cos(heading), pose.getY() + 254f
-				* (float) Math.sin(heading));
-		Line rl = null;
+		// Initialize with infinite best distance
+		float bestDistance = Float.POSITIVE_INFINITY;
 
-		for (Line line : getMaze().getLines().values()) {
-			Point p = line.intersectsAt(l);
-			if (p == null)
-				continue; // Does not intersect
-			Line tl = new Line(pose.getX(), pose.getY(), p.x, p.y);
-			// If the range line intersects more than one map line
-			// then take the shortest distance.
-			if (rl == null || tl.length() < rl.length())
-				rl = tl;
+		for (Line line : getMaze().getLines()) {
+			Point p = line.intersectsAt(ray);
+			if (p != null) {
+				// If intersecting, get distance
+				float distance = (float) p.distance(p1);
+				// If the range line intersects more than one map line,
+				// take the shortest distance
+				if (Float.isInfinite(bestDistance) || distance < bestDistance)
+					bestDistance = distance;
+			}
 		}
-		return (rl == null ? -1 : rl.length());
+		return (Float.isInfinite(bestDistance) ? -1 : bestDistance);
 	}
 
 	@Override

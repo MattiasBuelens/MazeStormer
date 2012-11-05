@@ -3,6 +3,8 @@ package mazestormer.util;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
+import lejos.geom.Point;
+
 public class LongPoint extends Point2D implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -39,6 +41,10 @@ public class LongPoint extends Point2D implements Serializable {
 	public void setLocation(long x, long y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public Point toPoint() {
+		return new Point((float) getX(), (float) getY());
 	}
 
 	@Override

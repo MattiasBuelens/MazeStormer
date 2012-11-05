@@ -21,10 +21,35 @@ public class MapCanvas extends JSVGCanvas {
 	private PanInteractor panInteractor = new PanInteractor();
 	private ZoomListener zoomListener = new ZoomListener();
 
-	private double zoomScale = 1f;
+	private double zoomScale = 1d;
+	private static final int zoomScaleLimit = 1 << 10;
 
 	public MapCanvas() {
 		setupInteractors();
+	}
+
+	public double getZoomScale() {
+		return zoomScale;
+	}
+
+	public void zoom(double zoomFactor) {
+		zoomOn(getCenter(), zoomFactor);
+	}
+
+	public void resetZoom() {
+		zoom(1d / getZoomScale());
+		zoomScale = 1d;
+	}
+
+	@Override
+	public void resetRenderingTransform() {
+		zoomScale = 1f;
+		super.resetRenderingTransform();
+	}
+
+	private Point2D getCenter() {
+		Dimension size = getSize();
+		return new Point2D.Double(size.getWidth() / 2d, size.getHeight() / 2d);
 	}
 
 	public void centerOn(double x, double y, double angle) {
@@ -35,15 +60,14 @@ public class MapCanvas extends JSVGCanvas {
 		getViewingTransform().transform(point, point);
 
 		// Get center of canvas
-		Dimension size = getSize();
-		Point2D center = new Point2D.Double(size.getWidth() / 2, size.getHeight() / 2);
+		Point2D center = getCenter();
 
-//		// Place point at center
-//		at.translate(center.getX(), center.getY());
-//		at.translate(-point.getX(), -point.getY());
-//
-//		// Rotate around point
-//		at.rotate(Math.toRadians(-angle), point.getX(), point.getY());
+		// Place point at center
+		// at.translate(center.getX(), center.getY());
+		// at.translate(-point.getX(), -point.getY());
+		//
+		// Rotate around point
+		// at.rotate(Math.toRadians(-angle), point.getX(), point.getY());
 
 		// Place point at center and rotate around it
 		at.translate(center.getX(), center.getY());
@@ -51,16 +75,25 @@ public class MapCanvas extends JSVGCanvas {
 		at.translate(-point.getX(), -point.getY());
 
 		// Apply zoom
-		at.concatenate(zoomOn(point, getZoomScale()));
+		at.concatenate(getZoomTransform(point, getZoomScale()));
 
 		setRenderingTransform(at);
 	}
 
-	public double getZoomScale() {
-		return zoomScale;
+	private void zoomOn(Point2D center, double zoomFactor) {
+		double newZoomScale = zoomScale * zoomFactor;
+		if (newZoomScale <= zoomScaleLimit
+				&& 1 <= newZoomScale * zoomScaleLimit) {
+			// Store new zoom scale
+			zoomScale = newZoomScale;
+			// Set new rendering transform
+			AffineTransform at = getZoomTransform(center, zoomFactor);
+			at.concatenate(getRenderingTransform());
+			setRenderingTransform(at);
+		}
 	}
 
-	private AffineTransform zoomOn(Point2D center, double scale) {
+	private AffineTransform getZoomTransform(Point2D center, double scale) {
 		double dx = -center.getX() * (scale - 1.0);
 		double dy = -center.getY() * (scale - 1.0);
 
@@ -68,12 +101,6 @@ public class MapCanvas extends JSVGCanvas {
 		at.translate(dx, dy);
 		at.scale(scale, scale);
 		return at;
-	}
-
-	@Override
-	public void resetRenderingTransform() {
-		zoomScale = 1f;
-		super.resetRenderingTransform();
 	}
 
 	private void setupInteractors() {
@@ -139,42 +166,30 @@ public class MapCanvas extends JSVGCanvas {
 		@Override
 		public boolean startInteraction(InputEvent ie) {
 			int mods = ie.getModifiers();
-			boolean res = ie.getID() == MouseEvent.MOUSE_PRESSED && (mods & InputEvent.BUTTON1_MASK) != 0;
+			boolean res = ie.getID() == MouseEvent.MOUSE_PRESSED
+					&& (mods & InputEvent.BUTTON1_MASK) != 0;
 			return res;
 		}
 	}
 
 	private class ZoomListener implements MouseWheelListener {
 
-		private static final float defaultScaleFactor = 1.25f;
-		private static final int scaleLimit = 1 << 10;
-		private float scaleFactor;
+		private static final double defaultFactor = 1.25d;
+		private double factor;
 
-		public ZoomListener(float scaleFactor) {
-			this.scaleFactor = scaleFactor;
+		public ZoomListener(double factor) {
+			this.factor = factor;
 		}
 
 		public ZoomListener() {
-			this(defaultScaleFactor);
+			this(defaultFactor);
 		}
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent ev) {
-			double scale = (ev.getWheelRotation() < 0) ? scaleFactor : 1.0f / scaleFactor;
-
-			// Zoom on mouse pointer
-			AffineTransform at = zoomOn(ev.getPoint(), scale);
-
-			// Concatenate with rendering transform
-			AffineTransform rat = getRenderingTransform();
-			at.concatenate(rat);
-
-			if (at.getScaleX() <= scaleLimit && 1 <= at.getScaleX() * scaleLimit) {
-				// Store zoom scale
-				zoomScale *= scale;
-				// Set as rendering transform
-				setRenderingTransform(at);
-			}
+			double zoomFactor = (ev.getWheelRotation() < 0) ? factor
+					: 1d / factor;
+			zoomOn(ev.getPoint(), zoomFactor);
 		}
 	}
 

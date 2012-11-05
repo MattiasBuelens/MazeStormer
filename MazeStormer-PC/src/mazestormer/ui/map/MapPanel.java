@@ -3,15 +3,15 @@ package mazestormer.ui.map;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.Beans;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -31,8 +31,6 @@ import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 
 public class MapPanel extends ViewPanel {
 
@@ -44,11 +42,17 @@ public class MapPanel extends ViewPanel {
 
 	private JToolBar actionBar;
 	private MapCanvas canvas;
-	private JPopupMenu menuLayers;
 
-	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
 	private final Action goToRobotAction = new GoToRobotAction();
 	private final Action goToStartAction = new GoToStartAction();
+	private final Action zoomInAction = new ZoomInAction();
+	private final Action zoomOutAction = new ZoomOutAction();
+	private final Action resetZoomAction = new ResetZoomAction();
+
+	private JPopupMenu menuLayers;
+	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
+
+	public static final double zoomFactor = 1.1d;
 
 	public MapPanel(IMapController controller) {
 		this.controller = controller;
@@ -97,13 +101,7 @@ public class MapPanel extends ViewPanel {
 		Component horizontalGlue = Box.createHorizontalGlue();
 		actionBar.add(horizontalGlue);
 
-		JButton btnReset = new JButton("Reset zoom");
-		btnReset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				canvas.resetRenderingTransform();
-			}
-		});
-		actionBar.add(btnReset);
+		actionBar.add(createZoomButton());
 
 		actionBar.add(createLayersButton());
 	}
@@ -126,6 +124,29 @@ public class MapPanel extends ViewPanel {
 		addPopup(this, menuGo);
 
 		return btnGo;
+	}
+
+	private SplitButton createZoomButton() {
+		JPopupMenu menuZoom = new JPopupMenu();
+
+		JMenuItem menuZoomIn = new JMenuItem("Zoom in");
+		menuZoomIn.setAction(zoomInAction);
+		menuZoom.add(menuZoomIn);
+		JMenuItem menuZoomOut = new JMenuItem("Zoom out");
+		menuZoomOut.setAction(zoomOutAction);
+		menuZoom.add(menuZoomOut);
+		JMenuItem menuResetZoom = new JMenuItem("Reset zoom");
+		menuResetZoom.setAction(resetZoomAction);
+		menuZoom.add(menuResetZoom);
+
+		SplitButton btnZoom = new SplitButton();
+		btnZoom.setAlwaysDropDown(true);
+		btnZoom.setText("Zoom");
+
+		btnZoom.setPopupMenu(menuZoom);
+		addPopup(this, menuZoom);
+
+		return btnZoom;
 	}
 
 	private SplitButton createLayersButton() {
@@ -151,7 +172,8 @@ public class MapPanel extends ViewPanel {
 	}
 
 	private void addLayerMenuItem(final MapLayer layer) {
-		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(layer.getName());
+		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(
+				layer.getName());
 		menuItem.setSelected(layer.isVisible());
 		menuItem.addItemListener(new ItemListener() {
 			@Override
@@ -167,7 +189,8 @@ public class MapPanel extends ViewPanel {
 
 	@Subscribe
 	public void onMapDOMChange(MapDOMChangeRequest request) {
-		canvas.getUpdateManager().getUpdateRunnableQueue().invokeLater(request.getRequest());
+		canvas.getUpdateManager().getUpdateRunnableQueue()
+				.invokeLater(request.getRequest());
 	}
 
 	@Subscribe
@@ -237,4 +260,44 @@ public class MapPanel extends ViewPanel {
 			canvas.centerOn(0, 0, 0);
 		}
 	}
+
+	private class ZoomInAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public ZoomInAction() {
+			putValue(NAME, "Zoom in");
+			putValue(SHORT_DESCRIPTION, "Zoom in on the map.");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			canvas.zoom(zoomFactor);
+		}
+	}
+
+	private class ZoomOutAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public ZoomOutAction() {
+			putValue(NAME, "Zoom out");
+			putValue(SHORT_DESCRIPTION, "Zoom out on the map.");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			canvas.zoom(1d / zoomFactor);
+		}
+	}
+
+	private class ResetZoomAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public ResetZoomAction() {
+			putValue(NAME, "Reset zoom");
+			putValue(SHORT_DESCRIPTION, "Reset the zoom on the map.");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			canvas.resetZoom();
+		}
+	}
+
 }

@@ -9,9 +9,9 @@ import mazestormer.robot.Pilot;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimulatedPilotTest {
+public class VirtualPilotTest {
 
-	private SimulatedPilot pilot;
+	private VirtualPilot pilot;
 	private PoseProvider tracker;
 
 	private static final double travelSpeed = 100d; // cm/sec
@@ -23,7 +23,7 @@ public class SimulatedPilotTest {
 
 	@Before
 	public void setUp() throws Exception {
-		pilot = new SimulatedPilot(Pilot.leftWheelDiameter,
+		pilot = new VirtualPilot(Pilot.leftWheelDiameter,
 				Pilot.rightWheelDiameter, Pilot.trackWidth);
 		pilot.setTravelSpeed(travelSpeed);
 		pilot.setRotateSpeed(rotateSpeed);

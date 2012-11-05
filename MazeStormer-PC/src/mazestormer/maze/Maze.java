@@ -19,13 +19,14 @@ import mazestormer.util.LongPoint;
 public class Maze extends AbstractEventSource {
 
 	private static final float defaultTileSize = 40f;
-	private static final float defaultEdgeSize = 1f;
+	private static final float defaultEdgeSize = 2f;
 
 	private final float tileSize;
 	private final float edgeSize;
 	private Pose origin = new Pose();
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
+	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
@@ -117,6 +118,13 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
+	 * Get a collection of all edges as lines.
+	 */
+	public Collection<Line> getLines() {
+		return Collections.unmodifiableCollection(lines.values());
+	}
+
+	/**
 	 * Add an edge to this maze.
 	 * 
 	 * @param edge
@@ -130,7 +138,7 @@ public class Maze extends AbstractEventSource {
 
 		// Fire edge added event
 		fireEdgeAdded(edge);
-		updateLines(edge);
+		addLine(edge);
 
 		// Add edge to touching tiles
 		for (LongPoint touchingPosition : edge.getTouching()) {
@@ -139,6 +147,22 @@ public class Maze extends AbstractEventSource {
 			// Fire tile updated event
 			fireTileChanged(touchingTile);
 		}
+	}
+
+	private void addLine(Edge edge) {
+		// Get edge points in tile coordinates
+		Line line = edge.getOrientation().getLine();
+		Point position = edge.getPosition().toPoint();
+		Point p1 = line.getP1().add(position);
+		Point p2 = line.getP2().add(position);
+
+		// Convert to relative coordinates
+		p1 = fromTile(p1);
+		p2 = fromTile(p2);
+
+		// Add line
+		Line l = new Line(p1.x, p1.y, p2.x, p2.y);
+		lines.put(edge, l);
 	}
 
 	/**
@@ -299,18 +323,6 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the relative position in map coordinates of the bottom left corner of
-	 * the given tile position.
-	 * 
-	 * @param tilePosition
-	 *            The tile position.
-	 */
-	public Point fromTile(LongPoint tilePosition) {
-		return fromTile(new Point((float) tilePosition.getX(),
-				(float) tilePosition.getY()));
-	}
-
-	/**
 	 * Normalize a given heading to ensure it is between -180 and +180 degrees.
 	 * 
 	 * @param heading
@@ -322,23 +334,5 @@ public class Maze extends AbstractEventSource {
 		while (heading > 180)
 			heading -= 360;
 		return heading;
-	}
-
-	public Map<Edge, Line> getLines() {
-		return Collections.unmodifiableMap(lines);
-	}
-
-	Map<Edge, Line> lines = new HashMap<Edge, Line>();
-
-	private void updateLines(Edge edge) {
-		// TODO Fix me!
-		Point2D point = fromTile(edge.getPosition());
-		Point2D otherPoint = edge.getOrientation().shift(point, getTileSize());
-		float x1 = (float) point.getX();
-		float y1 = (float) point.getY();
-		float x2 = (float) otherPoint.getX();
-		float y2 = (float) otherPoint.getY();
-		Line l = new Line(x1, y1, x2, y2);
-		lines.put(edge, l);
 	}
 }

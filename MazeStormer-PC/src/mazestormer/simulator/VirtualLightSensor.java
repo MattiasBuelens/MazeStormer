@@ -2,6 +2,8 @@ package mazestormer.simulator;
 
 import java.awt.geom.Rectangle2D;
 
+import lejos.geom.Line;
+import lejos.geom.Point;
 import lejos.robotics.LampLightDetector;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
@@ -9,84 +11,102 @@ import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 
-public class VirtualLightSensor implements LampLightDetector{
-	
-	public VirtualLightSensor(Maze maze, PoseProvider poseProvider){
+public class VirtualLightSensor implements LampLightDetector {
+
+	public static final int BROWN_VALUE = 410;
+	public static final int WHITE_VALUE = 450;
+
+	private Maze maze;
+	private PoseProvider poseProvider;
+
+	public VirtualLightSensor(Maze maze, PoseProvider poseProvider) {
 		this.maze = maze;
 		this.poseProvider = poseProvider;
 	}
-	
-	private PoseProvider getPoseProvider(){
-		return this.poseProvider;
+
+	private Maze getMaze() {
+		return maze;
 	}
-	
-	private PoseProvider poseProvider;
-	
-	private Maze getMaze(){
-		return this.maze;
+
+	private PoseProvider getPoseProvider() {
+		return poseProvider;
 	}
-	
-	private Maze maze;
-	
+
+	/**
+	 * Not implemented.
+	 */
 	@Override
-	public int getLightValue(){
+	public int getLightValue() {
 		return 0;
 	}
-	
-	public static final int BROWN_VALUE = 410;
-	public static final int WHITE_VALUE = 450;
-	public static final int HALF_LINE_THICKNESS = 1;
 
 	@Override
-	public int getNormalizedLightValue(){
+	public int getNormalizedLightValue() {
 		Pose pose = getMaze().toRelative(getPoseProvider().getPose());
 		Tile tile = getMaze().getTileAt(pose.getLocation());
-		for(Orientation orientation : tile.getOpenSides()){
-			if(getRectangle(tile, orientation).contains(pose.getLocation()))	
+		for (Orientation orientation : tile.getOpenSides()) {
+			if (getSide(tile, orientation).contains(pose.getLocation())) {
 				return WHITE_VALUE;
+			}
 		}
 		return BROWN_VALUE;
 	}
-	
-	private Rectangle2D getRectangle(Tile tile, Orientation orientation){
-		if(orientation == Orientation.NORTH)
-			return new Rectangle2D.Float(tile.getX()-HALF_LINE_THICKNESS, tile.getY()+getMaze().getTileSize()+HALF_LINE_THICKNESS, getMaze().getTileSize()+2*HALF_LINE_THICKNESS, 2*HALF_LINE_THICKNESS);
-		if(orientation == Orientation.SOUTH)
-			return new Rectangle2D.Float(tile.getX()-HALF_LINE_THICKNESS, tile.getY()+HALF_LINE_THICKNESS, getMaze().getTileSize()+2*HALF_LINE_THICKNESS, 2*HALF_LINE_THICKNESS);
-		if(orientation == Orientation.EAST)
-			return new Rectangle2D.Float(tile.getX()+getMaze().getTileSize()-HALF_LINE_THICKNESS, tile.getY()+getMaze().getTileSize()+HALF_LINE_THICKNESS, 2*HALF_LINE_THICKNESS, getMaze().getTileSize()+2*HALF_LINE_THICKNESS);
-		if(orientation == Orientation.WEST)
-			return new Rectangle2D.Float(tile.getX()-HALF_LINE_THICKNESS, tile.getY()+getMaze().getTileSize()+HALF_LINE_THICKNESS, 2*HALF_LINE_THICKNESS, getMaze().getTileSize()+2*HALF_LINE_THICKNESS);
-		return null;
+
+	private Rectangle2D getSide(Tile tile, Orientation orientation) {
+		// Get edge points in tile coordinates
+		Line line = orientation.getLine();
+		Point tilePosition = tile.getPosition().toPoint();
+		Point p1 = line.getP1().add(tilePosition);
+		Point p2 = line.getP2().add(tilePosition);
+
+		// Convert to relative coordinates
+		p1 = getMaze().fromTile(p1);
+		p2 = getMaze().fromTile(p2);
+
+		// Shift points to account for edge size
+		float halfLineThickness = getMaze().getEdgeSize() / 2f;
+		Point shift = new Point(halfLineThickness, halfLineThickness);
+		p1 = p1.subtract(shift);
+		p2 = p2.add(shift);
+
+		// Return bounding box
+		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX()
+				- p1.getX(), p2.getY() - p1.getY());
 	}
 
+	/**
+	 * Not implemented.
+	 */
 	@Override
-	public int getHigh(){
+	public int getHigh() {
+		return 0;
+	}
+
+	/**
+	 * Not implemented.
+	 */
+	@Override
+	public int getLow() {
 		return 0;
 	}
 
 	@Override
-	public int getLow(){
-		return 0;
+	public void setFloodlight(boolean floodlight) {
+
 	}
 
 	@Override
-	public void setFloodlight(boolean floodlight){
-		
-	}
-
-	@Override
-	public boolean isFloodlightOn(){
+	public boolean isFloodlightOn() {
 		return true;
 	}
 
 	@Override
-	public int getFloodlight(){
+	public int getFloodlight() {
 		return 0;
 	}
 
 	@Override
-	public boolean setFloodlight(int color){
+	public boolean setFloodlight(int color) {
 		return false;
 	}
 

@@ -11,7 +11,7 @@ import mazestormer.robot.Robot;
 public class VirtualRobot implements Robot {
 
 	private final Maze maze;
-	private SimulatedPilot pilot;
+	private VirtualPilot pilot;
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
 	private PoseProvider poseProvider;
@@ -23,7 +23,7 @@ public class VirtualRobot implements Robot {
 	@Override
 	public Pilot getPilot() {
 		if (pilot == null) {
-			pilot = new SimulatedPilot(Pilot.trackWidth);
+			pilot = new VirtualPilot(Pilot.trackWidth);
 		}
 		return pilot;
 	}

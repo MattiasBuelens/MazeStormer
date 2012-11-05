@@ -10,7 +10,7 @@ import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.Move.MoveType;
 import mazestormer.robot.Pilot;
 
-public class SimulatedPilot implements Pilot {
+public class VirtualPilot implements Pilot {
 
 	private final float trackWidth;
 
@@ -24,7 +24,7 @@ public class SimulatedPilot implements Pilot {
 	private Timer moveTimer;
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
-	public SimulatedPilot(double trackWidth, double maxTravelSpeed,
+	public VirtualPilot(double trackWidth, double maxTravelSpeed,
 			double maxRotateSpeed) {
 		this.maxTravelSpeed = maxTravelSpeed;
 		this.maxRotateSpeed = maxRotateSpeed;
@@ -35,7 +35,7 @@ public class SimulatedPilot implements Pilot {
 		setRotateSpeed(.8f * getRotateMaxSpeed());
 	}
 
-	public SimulatedPilot(double trackWidth) {
+	public VirtualPilot(double trackWidth) {
 		this(trackWidth, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 	}
 
@@ -429,7 +429,7 @@ public class SimulatedPilot implements Pilot {
 		@Override
 		public void run() {
 			// Current move has ended
-			if (SimulatedPilot.this.move == move) {
+			if (VirtualPilot.this.move == move) {
 				movementStop();
 			}
 		}
