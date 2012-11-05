@@ -30,15 +30,15 @@ public class VirtualRobot implements Robot {
 
 	@Override
 	public CalibratedLightSensor getLightSensor() {
-		if (light == null) {
-			// TODO Implement virtual sensor
+		if (light == null){
+			this.light = new DelegatedCalibratedLightSensor(new VirtualLightSensor(this.maze, this.poseProvider));
 		}
 		return light;
 	}
 
 	@Override
 	public RangeScanner getRangeScanner() {
-		if (scanner == null) {
+		if(scanner == null){
 			this.scanner = new VirtualRangeScanner(this.maze, this.poseProvider);
 		}
 		return scanner;

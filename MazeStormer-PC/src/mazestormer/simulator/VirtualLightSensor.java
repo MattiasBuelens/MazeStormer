@@ -1,11 +1,32 @@
 package mazestormer.simulator;
 
 import lejos.robotics.LampLightDetector;
+import lejos.robotics.localization.PoseProvider;
+import mazestormer.maze.Maze;
 
 public class VirtualLightSensor implements LampLightDetector{
+	
+	public VirtualLightSensor(Maze maze, PoseProvider poseProvider){
+		this.maze = maze;
+		this.poseProvider = poseProvider;
+	}
+	
+	private PoseProvider getPoseProvider(){
+		return this.poseProvider;
+	}
+	
+	private PoseProvider poseProvider;
+	
+	private Maze getMaze(){
+		return this.maze;
+	}
+	
+	private Maze maze;
 
 	@Override
 	public int getLightValue(){
+		
+		
 		return 0;
 	}
 
