@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.util.AbstractEventSource;
@@ -129,6 +130,7 @@ public class Maze extends AbstractEventSource {
 
 		// Fire edge added event
 		fireEdgeAdded(edge);
+		updateLines(edge);
 
 		// Add edge to touching tiles
 		for (LongPoint touchingPosition : edge.getTouching()) {
@@ -308,5 +310,17 @@ public class Maze extends AbstractEventSource {
 		while (heading > 180)
 			heading -= 360;
 		return heading;
+	}
+	
+	public Map<Edge, Line> getLines(){
+		return Collections.unmodifiableMap(this.lines);
+	}
+	
+	Map<Edge, Line> lines = new HashMap<Edge, Line>();
+	
+	private void updateLines(Edge edge){
+		LongPoint p = edge.getOrientation().shift(edge.getPosition(), getTileSize());
+		Line l = new Line(((Double) edge.getPosition().getX()).floatValue(), ((Double) edge.getPosition().getY()).floatValue(), ((Double) p.getX()).floatValue(), ((Double) p.getY()).floatValue());
+		this.lines.put(edge, l);	
 	}
 }

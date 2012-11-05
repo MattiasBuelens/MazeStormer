@@ -11,7 +11,6 @@ import mazestormer.robot.Robot;
 public class VirtualRobot implements Robot {
 
 	private final Maze maze;
-
 	private SimulatedPilot pilot;
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
@@ -40,7 +39,7 @@ public class VirtualRobot implements Robot {
 	@Override
 	public RangeScanner getRangeScanner() {
 		if (scanner == null) {
-			// TODO Implement virtual scanner
+			this.scanner = new VirtualRangeScanner(this.maze, this.poseProvider);
 		}
 		return scanner;
 	}

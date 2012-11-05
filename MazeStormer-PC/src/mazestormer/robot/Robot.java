@@ -12,5 +12,4 @@ public interface Robot {
 	public RangeScanner getRangeScanner();
 
 	public PoseProvider getPoseProvider();
-
 }
