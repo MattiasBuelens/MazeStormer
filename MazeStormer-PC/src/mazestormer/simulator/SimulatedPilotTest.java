@@ -1,9 +1,10 @@
-package mazestormer.robot;
+package mazestormer.simulator;
 
 import static org.junit.Assert.*;
 import lejos.geom.Point;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.robot.Pilot;
 
 import org.junit.Before;
 import org.junit.Test;

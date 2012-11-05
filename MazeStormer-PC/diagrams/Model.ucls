@@ -16,8 +16,8 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </interface>  
-  <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.SimulatedPilot" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/robot/SimulatedPilot.java" binary="false">    
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.simulator.SimulatedPilot" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/simulator/SimulatedPilot.java" binary="false">    
     <position height="-1" width="-1" x="294" y="201"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      

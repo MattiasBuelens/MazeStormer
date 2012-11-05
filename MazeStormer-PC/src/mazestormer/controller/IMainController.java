@@ -1,6 +1,5 @@
 package mazestormer.controller;
 
-import lejos.robotics.navigation.Pose;
 import mazestormer.util.EventSource;
 
 public interface IMainController {
@@ -12,7 +11,7 @@ public interface IMainController {
 	public IManualControlController manualControl();
 
 	public IPolygonControlController polygonControl();
-	
+
 	public IBarcodeController barcodeControl();
 
 	public ILineFinderController lineFinderControl();
@@ -24,7 +23,5 @@ public interface IMainController {
 	public IStateController state();
 
 	public void register(EventSource eventSource);
-
-	public Pose getPose();
 
 }

@@ -1,8 +1,9 @@
-package mazestormer.robot;
+package mazestormer.simulator;
 
 import static com.google.common.base.Preconditions.*;
 
 import lejos.robotics.LampLightDetector;
+import mazestormer.robot.CalibratedLightSensor;
 
 /**
  * A calibrated light sensor implementation which uses a delegate {@link LampLightDetector}.
