@@ -6,8 +6,6 @@ import java.awt.EventQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import lejos.robotics.localization.OdometryPoseProvider;
-import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
@@ -52,7 +50,6 @@ public class MainController implements IMainController {
 	 */
 	private ConnectionProvider connectionProvider;
 	private Connector connector;
-	private PoseProvider poseProvider;
 
 	private Maze maze;
 	private Maze loadedMaze;
@@ -144,7 +141,7 @@ public class MainController implements IMainController {
 		}
 		return polygonControl;
 	}
-	
+
 	@Override
 	public IBarcodeController barcodeControl() {
 		if (barcodeControl == null) {
@@ -299,20 +296,17 @@ public class MainController implements IMainController {
 	}
 
 	public Pose getPose() {
-		if (poseProvider != null) {
-			return poseProvider.getPose();
+		if (isConnected()) {
+			return getRobot().getPoseProvider().getPose();
 		} else {
 			return getStartPose();
 		}
 	}
 
 	@Subscribe
-	public void setupPoseProvider(ConnectEvent e) {
+	public void setupStartPose(ConnectEvent e) {
 		if (e.isConnected()) {
-			poseProvider = new OdometryPoseProvider(getRobot().getPilot());
-			poseProvider.setPose(getStartPose());
-		} else {
-			poseProvider = null;
+			getRobot().getPoseProvider().setPose(getStartPose());
 		}
 	}
 
