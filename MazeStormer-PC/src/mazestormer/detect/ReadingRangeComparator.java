@@ -9,7 +9,7 @@ import com.google.common.primitives.Floats;
 /**
  * Compares range readings by their range.
  */
-public class RangeReadingComparator implements Comparator<RangeReading> {
+public class ReadingRangeComparator implements Comparator<RangeReading> {
 
 	@Override
 	public int compare(RangeReading left, RangeReading right) {

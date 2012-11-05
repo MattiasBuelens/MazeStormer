@@ -1,8 +1,0 @@
-This is BibTeX, Version 0.99dThe top-level auxiliary file: verslag1.aux
-The style file: siam.bst
-Database file #1: biblio.bib
-I was expecting a `,' or a `}'---line 3 of file biblio.bib
- :   title = {Difference Between AWT and Swing}
- :                                             ",
-I'm skipping whatever remains of this entry
-(There was 1 error message)

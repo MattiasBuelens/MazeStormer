@@ -330,8 +330,8 @@ public class SimulatedPilot implements Pilot {
 		// Target distance
 		float target = move.getDistanceTraveled();
 		if (isInfiniteArc(move)) {
-			// TODO Use radius instead
-			throw new IllegalStateException("Infinite arc not implemented yet.");
+			// Implementation: Use radius instead
+			throw new IllegalStateException("Simulator does not fully support arcs.");
 		}
 
 		// Compare absolute values, since target may be negative
@@ -358,8 +358,8 @@ public class SimulatedPilot implements Pilot {
 		// Target angle
 		float target = move.getAngleTurned();
 		if (isInfiniteArc(move)) {
-			// TODO Use radius instead
-			throw new IllegalStateException("Infinite arc not implemented yet.");
+			// Implementation: Use radius instead
+			throw new IllegalStateException("Simulator does not fully support arcs.");
 		}
 
 		// Compare absolute values, since target may be negative
@@ -388,8 +388,7 @@ public class SimulatedPilot implements Pilot {
 			if (isInfiniteArc(move)) {
 				return Float.POSITIVE_INFINITY;
 			} else {
-				// TODO Implement
-				throw new IllegalStateException("Arc not implemented yet.");
+				throw new IllegalStateException("Simulator does not fully support arcs.");
 			}
 		}
 		return Math.abs(duration) * 1000f;

@@ -1,10 +1,10 @@
 package mazestormer.controller;
 
-import mazestormer.controller.EventType;
+import com.google.common.eventbus.Subscribe;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.StopEvent;
 
-public class PolygonControlController extends SubController implements
-		IPolygonControlController {
+public class PolygonControlController extends SubController implements IPolygonControlController {
 
 	public PolygonControlController(MainController mainController) {
 		super(mainController);
@@ -28,6 +28,11 @@ public class PolygonControlController extends SubController implements
 			runner.stop();
 			runner = null;
 		}
+	}
+
+	@Subscribe
+	public void onStopped(StopEvent e) {
+		stopPolygon();
 	}
 
 	private void postState(EventType eventType) {

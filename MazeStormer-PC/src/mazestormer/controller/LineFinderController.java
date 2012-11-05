@@ -1,14 +1,13 @@
 package mazestormer.controller;
 
-import com.google.common.eventbus.Subscribe;
-
-import lejos.nxt.LightSensor;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.LineFinderEvent.EventType;
+import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 
-public class LineFinderController extends SubController implements
-		ILineFinderController {
+import com.google.common.eventbus.Subscribe;
+
+public class LineFinderController extends SubController implements ILineFinderController {
 
 	public LineFinderController(MainController mainController) {
 		super(mainController);
@@ -17,12 +16,12 @@ public class LineFinderController extends SubController implements
 	private Pilot getPilot() {
 		return getMainController().getRobot().getPilot();
 	}
-	
-	private void log(String logText){
+
+	private void log(String logText) {
 		getMainController().getLogger().info(logText);
 	}
 
-	private LightSensor getLightSensor() {
+	private CalibratedLightSensor getLightSensor() {
 		return getMainController().getRobot().getLightSensor();
 	}
 
@@ -74,8 +73,7 @@ public class LineFinderController extends SubController implements
 
 		public void start() {
 			if (lowLightValue >= highLightValue) {
-				getMainController().getLogger().warning(
-						"High light value is lower than low light value.");
+				getMainController().getLogger().warning("High light value is lower than low light value.");
 			} else {
 				isRunning = true;
 				new Thread(this).start();
@@ -117,10 +115,10 @@ public class LineFinderController extends SubController implements
 
 			int value;
 
-			double angle1,angle2;
+			double angle1, angle2;
 
 			while (true) {
-				value = getLightSensor().readValue();
+				value = getLightSensor().getLightValue();
 				if (value > threshold) {
 					log("Found line, start rotating left.");
 					pilot.stop();
@@ -134,7 +132,7 @@ public class LineFinderController extends SubController implements
 			}
 
 			while (true) {
-				value = getLightSensor().readValue();
+				value = getLightSensor().getLightValue();
 				if (value > threshold) {
 					log("Found line, start rotating right.");
 					pilot.stop();
@@ -149,7 +147,7 @@ public class LineFinderController extends SubController implements
 			}
 
 			while (true) {
-				value = getLightSensor().readValue();
+				value = getLightSensor().getLightValue();
 				if (value > threshold) {
 					pilot.stop();
 					angle2 = pilot.getMovement().getAngleTurned();
@@ -160,11 +158,11 @@ public class LineFinderController extends SubController implements
 			double ang1tmp, ang2tmp;
 			ang1tmp = Math.abs(angle1) + 180.0;
 			ang2tmp = Math.abs(angle2) + 180.0;
-			
+
 			System.out.println("Angle: " + ang1tmp);
 			System.out.println("Angle2: " + ang2tmp);
 			angle2 = Math.abs(angle2) + rotateAngle - 360.0;
-			
+
 			// Correction angle
 			final double extra = 3.5;
 
@@ -173,7 +171,7 @@ public class LineFinderController extends SubController implements
 			pilot.rotate((angle2 / 2.0) - extra);
 
 			double dist = 7.2 * Math.cos(Math.toRadians(angle2 / 2.0));
-			
+
 			pilot.travel(dist);
 		}
 	}
