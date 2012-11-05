@@ -1,5 +1,6 @@
 package mazestormer;
 
+import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
@@ -10,9 +11,11 @@ import mazestormer.robot.Robot;
 public class LineFollower {
 
 	public static void main(String[] aArg) throws Exception {
-		Connector connector = new ConnectionProvider().getConnector(RobotType.Physical);
-		connector.setDeviceName("brons");
-		connector.connect();
+		Connector connector = new ConnectionProvider()
+				.getConnector(RobotType.Physical);
+		ConnectionContext context = new ConnectionContext();
+		context.setDeviceName("brons");
+		connector.connect(context);
 
 		Robot robot = connector.getRobot();
 		CalibratedLightSensor light = robot.getLightSensor();
