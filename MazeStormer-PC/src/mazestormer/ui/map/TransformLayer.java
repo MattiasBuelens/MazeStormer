@@ -6,10 +6,7 @@ import lejos.geom.Rectangle;
 
 import org.apache.batik.bridge.BridgeException;
 import org.apache.batik.bridge.ViewBox;
-import org.apache.batik.dom.AbstractDocument;
-import org.apache.batik.dom.svg.SVGOMGElement;
 import org.apache.batik.dom.svg.SVGOMTransform;
-import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGGElement;
 import org.w3c.dom.svg.SVGTransform;
@@ -17,24 +14,20 @@ import org.w3c.dom.svg.SVGTransformList;
 
 public abstract class TransformLayer extends MapLayer {
 
-	private final Element transformElement;
-
 	private Point2D scale = new Point2D.Float(1, 1);
 	private Point2D position = new Point2D.Float();
-	private float rotationAngle = 0;
+	private float rotationAngle = 0f;
 	private Point2D rotationCenter = new Point2D.Float();
+	private float opacity = 1f;
 
-	public TransformLayer(String name, Element transformElement) {
+	public TransformLayer(String name) {
 		super(name);
-		this.transformElement = transformElement;
 	}
 
 	/**
 	 * Get the element being transformed by this layer.
 	 */
-	public Element getTransformElement() {
-		return transformElement;
-	}
+	public abstract Element getTransformElement();
 
 	/**
 	 * Get the view box of an element.
@@ -45,11 +38,11 @@ public abstract class TransformLayer extends MapLayer {
 	 *         box.
 	 */
 	private static Rectangle getViewBox(Element element) {
-		String attr = element.getAttributeNS(null,
-				SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
+		String attr = element.getAttributeNS(null, SVG_VIEW_BOX_ATTRIBUTE);
+		if (attr.isEmpty())
+			return null;
 		try {
-			float[] viewBox = ViewBox
-					.parseViewBoxAttribute(element, attr, null);
+			float[] viewBox = ViewBox.parseViewBoxAttribute(element, attr, null);
 			return new Rectangle(viewBox[0], viewBox[1], viewBox[2], viewBox[3]);
 		} catch (BridgeException e) {
 			return null;
@@ -295,12 +288,29 @@ public abstract class TransformLayer extends MapLayer {
 		setHeight(height, true);
 	}
 
-	@Override
-	protected Element create(AbstractDocument document) {
-		SVGGElement group = new SVGOMGElement(null, document);
+	/**
+	 * Get the opacity of this element as a number between {code 0.0} and {code 1.0}.
+	 */
+	public float getOpacity() {
+		return opacity;
+	}
 
-		Element transformElement = (Element) document.importNode(
-				getTransformElement(), true);
+	/**
+	 * Set the opacity of this element.
+	 * 
+	 * @param opacity
+	 *            The new opacity as a number between {code 0.0} and {code 1.0}.
+	 */
+	public void setOpacity(float opacity) {
+		this.opacity = opacity;
+		update();
+	}
+
+	@Override
+	protected Element create() {
+		SVGGElement group = (SVGGElement) createElement(SVG_G_TAG);
+
+		Element transformElement = getTransformElement();
 		group.appendChild(transformElement);
 
 		return group;
@@ -335,10 +345,12 @@ public abstract class TransformLayer extends MapLayer {
 		final SVGTransform translate = new SVGOMTransform();
 		translate.setTranslate(getX(), getY());
 
-		// Apply transformation
 		invokeDOMChange(new Runnable() {
 			@Override
 			public void run() {
+				// Set opacity
+				group.setAttribute(SVG_OPACITY_ATTRIBUTE, getOpacity() + "");
+				// Apply transformation
 				SVGTransformList list = group.getTransform().getBaseVal();
 				list.clear();
 				list.appendItem(translate);

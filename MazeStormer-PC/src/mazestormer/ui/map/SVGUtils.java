@@ -15,10 +15,14 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.svg2svg.SVGTranscoder;
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.svg.SVGDocument;
 
 public class SVGUtils {
+
+	private SVGUtils() {
+	}
 
 	/**
 	 * Creates a new SVG document.
@@ -26,7 +30,7 @@ public class SVGUtils {
 	public static final SVGDocument createSVGDocument() {
 		String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 		DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
-		return (SVGDocument) impl.createDocument(svgNS, "svg", null);
+		return (SVGDocument) impl.createDocument(svgNS, SVGConstants.SVG_SVG_TAG, null);
 	}
 
 	/**
@@ -72,7 +76,6 @@ public class SVGUtils {
 			TranscoderOutput output = new TranscoderOutput(new PrintWriter(out));
 			t.transcode(input, output);
 		} catch (TranscoderException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -2,7 +2,7 @@ package mazestormer.barcode;
 
 import mazestormer.robot.Robot;
 
-public class SoundAction implements Action{
+public class SoundAction implements IAction{
 
 	@Override
 	public void performAction(Robot robot) throws IllegalStateException {

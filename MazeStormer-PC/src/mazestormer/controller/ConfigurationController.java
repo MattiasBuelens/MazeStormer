@@ -1,12 +1,14 @@
 package mazestormer.controller;
 
+import static com.google.common.base.Preconditions.*;
+
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.StopEvent;
 
-public class ConfigurationController extends SubController implements
-		IConfigurationController {
+public class ConfigurationController extends SubController implements IConfigurationController {
 
 	private RobotType robotType;
 	private ControlMode controlMode;
@@ -34,6 +36,11 @@ public class ConfigurationController extends SubController implements
 		postEvent(new ControlModeChangeEvent(controlMode));
 	}
 
+	private Pilot getPilot() {
+		checkState(isConnected());
+		return getMainController().getRobot().getPilot();
+	}
+
 	@Override
 	public boolean isConnected() {
 		return getMainController().isConnected();
@@ -41,8 +48,7 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void connect(RobotType robotType, ControlMode controlMode) {
-		if (isConnected())
-			throw new IllegalStateException("Already connected.");
+		checkState(!isConnected());
 
 		// Set current state
 		setRobotType(robotType);
@@ -54,8 +60,7 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void disconnect() {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected.");
+		checkState(isConnected());
 
 		// Stop the robot
 		stop();
@@ -67,15 +72,10 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void stop() {
-		if (isConnected())
+		if (isConnected()) {
 			getPilot().stop();
-	}
-
-	public Pilot getPilot() {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected.");
-
-		return getMainController().getPilot();
+			postEvent(new StopEvent());
+		}
 	}
 
 }

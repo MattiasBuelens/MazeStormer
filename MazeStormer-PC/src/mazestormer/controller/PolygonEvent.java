@@ -1,10 +1,6 @@
 package mazestormer.controller;
 
-public class PolygonEvent {
-
-	public enum EventType {
-		STARTED, STOPPED
-	};
+public class PolygonEvent{
 
 	private final EventType eventType;
 

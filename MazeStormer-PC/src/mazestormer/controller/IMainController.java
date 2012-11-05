@@ -12,6 +12,10 @@ public interface IMainController {
 	public IManualControlController manualControl();
 
 	public IPolygonControlController polygonControl();
+	
+	public IBarcodeController barcodeControl();
+
+	public ILineFinderController lineFinderControl();
 
 	public IMapController map();
 

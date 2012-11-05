@@ -1,5 +1,5 @@
 package mazestormer.connect;
 
 public enum ControlMode {
-	Manual, Polygon;
+	Barcode, LineFinder, Manual, Polygon;
 }

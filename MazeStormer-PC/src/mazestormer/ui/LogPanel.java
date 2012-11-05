@@ -12,8 +12,6 @@ import java.util.logging.LogRecord;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 
@@ -112,11 +110,6 @@ public class LogPanel extends ViewPanel {
 			int index = getRowCount();
 			records.add(record);
 			fireTableRowsInserted(index, index);
-		}
-
-		public void clear() {
-			records.clear();
-			fireTableDataChanged();
 		}
 
 		@Override

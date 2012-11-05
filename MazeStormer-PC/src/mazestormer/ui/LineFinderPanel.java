@@ -58,7 +58,7 @@ public class LineFinderPanel extends ViewPanel {
 	}
 
 	private void createHighCalibrate() {
-		this.highCalibrationModel = new SpinnerNumberModel(new Integer(0), new Integer(0),
+		this.highCalibrationModel = new SpinnerNumberModel(new Integer(450), new Integer(0),
 				new Integer(1023), new Integer(1));
 		
 		JLabel lblCalibrate = new JLabel("Calibrate");
@@ -76,7 +76,7 @@ public class LineFinderPanel extends ViewPanel {
 	}
 	
 	private void createLowCalibrate() {
-		this.lowCalibrationModel = new SpinnerNumberModel(new Integer(0), new Integer(0),
+		this.lowCalibrationModel = new SpinnerNumberModel(new Integer(410), new Integer(0),
 				new Integer(1023), new Integer(1));
 		
 		JSpinner spinLowCalibration = new JSpinner();
@@ -117,8 +117,8 @@ public class LineFinderPanel extends ViewPanel {
 	}
 	
 	public void startSearching() {
-		int highValue = (int) highCalibrationModel.getValue();
-		int lowValue = (int) lowCalibrationModel.getValue();
+		int highValue = (Integer) highCalibrationModel.getValue();
+		int lowValue = (Integer) lowCalibrationModel.getValue();
 		controller.startSearching(highValue, lowValue);
 	}
 	

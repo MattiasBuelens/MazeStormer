@@ -1,5 +1,7 @@
 package mazestormer.controller;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.awt.EventQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,8 +16,9 @@ import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
+import mazestormer.maze.Maze;
 import mazestormer.robot.MoveEvent;
-import mazestormer.robot.Pilot;
+import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
@@ -51,6 +54,9 @@ public class MainController implements IMainController {
 	private Connector connector;
 	private PoseProvider poseProvider;
 
+	private Maze maze;
+	private Maze loadedMaze;
+
 	/*
 	 * Controllers
 	 */
@@ -58,6 +64,8 @@ public class MainController implements IMainController {
 	private IParametersController parameters;
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
+	private IBarcodeController barcodeControl;
+	private ILineFinderController lineFinderControl;
 
 	private IMapController map;
 	private ILogController log;
@@ -136,6 +144,22 @@ public class MainController implements IMainController {
 		}
 		return polygonControl;
 	}
+	
+	@Override
+	public IBarcodeController barcodeControl() {
+		if (barcodeControl == null) {
+			barcodeControl = new BarcodeController(this);
+		}
+		return barcodeControl;
+	}
+
+	@Override
+	public ILineFinderController lineFinderControl() {
+		if (lineFinderControl == null) {
+			lineFinderControl = new LineFinderController(this);
+		}
+		return lineFinderControl;
+	}
 
 	@Override
 	public IMapController map() {
@@ -206,8 +230,7 @@ public class MainController implements IMainController {
 	}
 
 	public void connect(RobotType robotType) throws IllegalStateException {
-		if (isConnected())
-			throw new IllegalStateException("Already connected.");
+		checkState(!isConnected());
 
 		connector = connectionProvider.getConnector(robotType);
 		connector.connect();
@@ -215,8 +238,7 @@ public class MainController implements IMainController {
 	}
 
 	public void disconnect() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Already disconnected.");
+		checkState(isConnected());
 
 		connector.disconnect();
 		connector = null;
@@ -240,16 +262,15 @@ public class MainController implements IMainController {
 	 * Robot
 	 */
 
-	public Pilot getPilot() throws IllegalStateException {
-		if (!isConnected())
-			throw new IllegalStateException("Not connected to robot.");
-		return connector.getPilot();
+	public Robot getRobot() throws IllegalStateException {
+		checkState(isConnected());
+		return connector.getRobot();
 	}
 
 	@Subscribe
 	public void registerPilotMoveListener(ConnectEvent e) {
 		if (e.isConnected()) {
-			connector.getPilot().addMoveListener(new MovePublisher());
+			getRobot().getPilot().addMoveListener(new MovePublisher());
 		}
 	}
 
@@ -272,22 +293,45 @@ public class MainController implements IMainController {
 	/*
 	 * Robot pose
 	 */
+
+	private Pose getStartPose() {
+		return new Pose(0f, 0f, 90f);
+	}
+
 	public Pose getPose() {
 		if (poseProvider != null) {
 			return poseProvider.getPose();
 		} else {
-			return new Pose();
+			return getStartPose();
 		}
 	}
 
 	@Subscribe
 	public void setupPoseProvider(ConnectEvent e) {
 		if (e.isConnected()) {
-			poseProvider = new OdometryPoseProvider(getPilot());
-			poseProvider.setPose(new Pose(0f, 0f, 90f));
+			poseProvider = new OdometryPoseProvider(getRobot().getPilot());
+			poseProvider.setPose(getStartPose());
 		} else {
 			poseProvider = null;
 		}
+	}
+
+	/*
+	 * Maze
+	 */
+
+	public Maze getMaze() {
+		if (maze == null) {
+			maze = new Maze();
+		}
+		return maze;
+	}
+
+	public Maze getLoadedMaze() {
+		if (loadedMaze == null) {
+			loadedMaze = new Maze();
+		}
+		return loadedMaze;
 	}
 
 }
