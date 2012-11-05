@@ -26,7 +26,8 @@ public class MainView extends JFrame implements EventSource {
 	private EventBus eventBus;
 	private ViewPanel mapPanel;
 	private ViewPanel controlPanel;
-	private ViewPanel parametersPanel;
+	//private ViewPanel parametersPanel;
+	private ViewPanel calibrationPanel;
 	private JPanel configurationPanel;
 	private JPanel logPanel;
 	private JPanel statePanel;
@@ -63,7 +64,10 @@ public class MainView extends JFrame implements EventSource {
 		this.configurationPanel = new ConfigurationPanel(controller.configuration());
 		this.mainPanel.add(configurationPanel, "cell 0 0,grow");
 
-		this.parametersPanel = new ParametersPanel(controller.parameters());
+		//this.parametersPanel = new ParametersPanel(controller.parameters());
+		//this.mainPanel.add(parametersPanel, "cell 1 0,grow");
+		this.calibrationPanel = new CalibrationPanel(controller.calibration());
+		this.mainPanel.add(calibrationPanel, "cell 1 0, grow");
 
 		this.controlPanel = new ManualControlPanel(controller.manualControl());
 		this.mainPanel.add(controlPanel, "cell 1 1,grow");
@@ -103,7 +107,6 @@ public class MainView extends JFrame implements EventSource {
 			return;
 		}
 		
-		this.mainPanel.add(parametersPanel, "cell 1 0,grow");
 		switch(controlMode){
 		case Barcode:
 			setControlPanel(new BarcodePanel(this.controller.barcodeControl()));
@@ -115,7 +118,6 @@ public class MainView extends JFrame implements EventSource {
 			setControlPanel(new PolygonControlPanel(this.controller.polygonControl()));
 			break;
 		case LineFinder:
-			this.mainPanel.remove(parametersPanel);
 			setControlPanel(new LineFinderPanel(this.controller.lineFinderControl()));
 			break;
 		}

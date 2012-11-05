@@ -14,4 +14,8 @@ public interface IManualControlController extends EventSource {
 
 	public void stop();
 
+	public IParametersController parameters();
+
+	public IScanController scan();
+
 }

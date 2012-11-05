@@ -9,8 +9,6 @@ import java.util.TimerTask;
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.maze.Maze;
-import mazestormer.maze.parser.FileUtils;
-import mazestormer.maze.parser.Parser;
 import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
@@ -71,16 +69,6 @@ public class MapController extends SubController implements IMapController {
 		addLayer(loadedMazeLayer);
 
 		Maze maze = getMainController().getMaze();
-		// TODO Remove hard-coded loading of example maze
-		try {
-			maze.setOrigin(new Pose(-20, -20, 0));
-			String path = MapController.class.getResource("/res/ExampleMaze.txt").getPath();
-			CharSequence contents = FileUtils.load(path);
-			new Parser(maze).parse(contents);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// End remove
 		mazeLayer = new MazeLayer("Discovered maze", maze);
 		mazeLayer.setZIndex(2);
 		addLayer(mazeLayer);
@@ -152,7 +140,8 @@ public class MapController extends SubController implements IMapController {
 		stopUpdateTimer();
 
 		updater = new Timer();
-		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0, getUpdateInterval());
+		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0,
+				getUpdateInterval());
 	}
 
 	private void stopUpdateTimer() {

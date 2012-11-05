@@ -7,7 +7,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -17,7 +16,6 @@ import mazestormer.controller.RobotParameterChangeEvent;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
-import javax.swing.UIManager;
 
 public class ParametersPanel extends ViewPanel {
 
@@ -33,9 +31,7 @@ public class ParametersPanel extends ViewPanel {
 	public ParametersPanel(IParametersController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
-				"Parameters", TitledBorder.LEADING, TitledBorder.TOP, null,
-				null));
+		setBorder(null);
 		setLayout(new BorderLayout(0, 0));
 
 		container = new JPanel();

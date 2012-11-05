@@ -5,6 +5,8 @@ import mazestormer.robot.Pilot;
 public class ManualControlController extends SubController implements
 		IManualControlController {
 
+	private IScanController scanController;
+
 	public ManualControlController(MainController mainController) {
 		super(mainController);
 	}
@@ -41,6 +43,19 @@ public class ManualControlController extends SubController implements
 	public void stop() {
 		Pilot pilot = getPilot();
 		pilot.stop();
+	}
+
+	@Override
+	public IParametersController parameters() {
+		return getMainController().parameters();
+	}
+
+	@Override
+	public IScanController scan() {
+		if (scanController == null) {
+			scanController = new ScanController(getMainController());
+		}
+		return scanController;
 	}
 
 }

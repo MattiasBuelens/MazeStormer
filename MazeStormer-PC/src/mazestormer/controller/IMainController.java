@@ -5,6 +5,8 @@ import mazestormer.util.EventSource;
 public interface IMainController {
 
 	public IConfigurationController configuration();
+	
+	public ICalibrationController calibration();
 
 	public IParametersController parameters();
 

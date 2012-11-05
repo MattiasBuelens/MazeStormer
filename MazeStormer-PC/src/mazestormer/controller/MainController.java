@@ -16,6 +16,8 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
+import mazestormer.maze.parser.FileUtils;
+import mazestormer.maze.parser.Parser;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
@@ -61,6 +63,7 @@ public class MainController implements IMainController {
 	 */
 	private IConfigurationController configuration;
 	private IParametersController parameters;
+	private ICalibrationController calibration;
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
 	private IBarcodeController barcodeControl;
@@ -89,6 +92,18 @@ public class MainController implements IMainController {
 		// TODO Configure device name in GUI?
 		connectionContext.setDeviceName("brons");
 		connectionContext.setLoadedMaze(getLoadedMaze());
+
+		// TODO Remove hard-coded loading of example maze
+		try {
+			getLoadedMaze().setOrigin(new Pose(-20, -20, 0));
+			String path = MapController.class.getResource(
+					"/res/ExampleMaze.txt").getPath();
+			CharSequence contents = FileUtils.load(path);
+			new Parser(getLoadedMaze()).parse(contents);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// End remove
 
 		view = createView();
 		view.registerEventBus(getEventBus());
@@ -123,6 +138,13 @@ public class MainController implements IMainController {
 		return configuration;
 	}
 
+	@Override
+	public ICalibrationController calibration() {
+		if(calibration == null)
+			calibration = new CalibrationController(this);
+		return calibration;
+	}
+	
 	@Override
 	public IParametersController parameters() {
 		if (parameters == null) {
