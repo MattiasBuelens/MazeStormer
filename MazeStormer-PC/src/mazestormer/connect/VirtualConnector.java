@@ -3,7 +3,7 @@ package mazestormer.connect;
 import static com.google.common.base.Preconditions.*;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
-import mazestormer.robot.VirtualRobot;
+import mazestormer.simulator.VirtualRobot;
 
 public class VirtualConnector implements Connector {
 

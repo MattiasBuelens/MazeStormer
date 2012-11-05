@@ -1,5 +1,8 @@
 package mazestormer.ui.map;
 
+import java.awt.geom.Point2D;
+
+import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.detect.RangeFeatureDetectEvent;
@@ -30,12 +33,21 @@ public class RangesLayer extends MapLayer {
 	}
 
 	private void addRangeFeature(RangeFeature feature) {
-		Pose pose = MapUtils.toMapCoordinates(feature.getPose());
-		Element point = createPoint(pose.getX(), pose.getY());
-		getElement().appendChild(point);
+		// Get robot pose at time of reading
+		Pose robotPose = feature.getPose();
+		for (RangeReading reading : feature.getRangeReadings()) {
+			// Get reading point in robot coordinates
+			Point2D robotPoint = robotPose.pointAt(reading.getRange(),
+					reading.getAngle());
+			// Convert to map coordinates
+			Point2D mapPoint = MapUtils.toMapCoordinates(robotPoint);
+			// Append new point
+			Element point = createPoint(mapPoint.getX(), mapPoint.getY());
+			getElement().appendChild(point);
+		}
 	}
 
-	private Element createPoint(float x, float y) {
+	private Element createPoint(double x, double y) {
 		SVGCircleElement circle = (SVGCircleElement) createElement(SVG_CIRCLE_TAG);
 		circle.setAttribute(SVG_CX_ATTRIBUTE, x + "");
 		circle.setAttribute(SVG_CY_ATTRIBUTE, y + "");

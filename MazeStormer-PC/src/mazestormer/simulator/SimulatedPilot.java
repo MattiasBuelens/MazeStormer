@@ -1,4 +1,4 @@
-package mazestormer.robot;
+package mazestormer.simulator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import java.util.TimerTask;
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.Move.MoveType;
+import mazestormer.robot.Pilot;
 
 public class SimulatedPilot implements Pilot {
 
