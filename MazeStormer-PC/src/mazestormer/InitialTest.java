@@ -12,6 +12,7 @@ import lejos.robotics.objectdetection.Feature;
 import lejos.robotics.objectdetection.FeatureDetector;
 import lejos.robotics.objectdetection.FeatureListener;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
@@ -34,14 +35,17 @@ public class InitialTest implements FeatureListener {
 	private float scanIncrement = 5f; //°
 	private float maxDistance = 255f; //cm
 	private int delay = 10 * 1000; //ms
+	
 	private Connector connector;
 
 	private void start() {
-		connector = new ConnectionProvider()
-				.getConnector(RobotType.Physical);
-		connector.setDeviceName(nxtName);
-		connector.connect();
-
+		Connector connector = new ConnectionProvider()
+		.getConnector(RobotType.Physical);
+		
+		ConnectionContext context = new ConnectionContext();
+		context.setDeviceName("brons");
+		connector.connect(context);
+		
 		Pilot pilot = connector.getRobot().getPilot();
 		PoseProvider pp = new OdometryPoseProvider(pilot);
 
@@ -49,24 +53,24 @@ public class InitialTest implements FeatureListener {
 
 		//	1) scan 360°
 
-		int scanCount = (int) (scanRange / scanIncrement) + 1;
-		float[] scanAngles = new float[scanCount];
-		float scanStart = -scanRange / 2f;
-		for (int i = 0; i < scanCount; i++) {
-			scanAngles[i] = scanStart + i * scanIncrement;
-		}
-		scanner.setAngles(scanAngles);
-
-		RangeScannerFeatureDetector detector = new RangeScannerFeatureDetector(
-				scanner, maxDistance, delay);
-		detector.setPoseProvider(pp);
-		detector.addListener(this);
-		detector.enableDetection(true);
+//		int scanCount = (int) (scanRange / scanIncrement) + 1;
+//		float[] scanAngles = new float[scanCount];
+//		float scanStart = -scanRange / 2f;
+//		for (int i = 0; i < scanCount; i++) {
+//			scanAngles[i] = scanStart + i * scanIncrement;
+//		}
+//		scanner.setAngles(scanAngles);
+//
+//		RangeScannerFeatureDetector detector = new RangeScannerFeatureDetector(
+//				scanner, maxDistance, delay);
+//		detector.setPoseProvider(pp);
+//		detector.addListener(this);
+//		detector.enableDetection(true);
 
 		isRunning = true;
 		while (isRunning)
 			Thread.yield();
-		detector.enableDetection(false);
+		//detector.enableDetection(false);
 	}
 
 	public static void main(String[] args) throws IOException,
@@ -116,7 +120,10 @@ public class InitialTest implements FeatureListener {
 		//	4) draai in de gevonden richting en rijd tot witte lijn wordt gezien
 		if(chosenReading == null) System.out.println("Chosen Reading is null.");
 		
-		connector.getRobot().getPilot().rotate(chosenReading.getAngle());
+		System.out.println("Connector: " + connector);
+		System.out.println("Robot: " + connector.getRobot());
+		System.out.println("Pilot: " + connector.getRobot().getPilot());
+		//connector.getRobot().getPilot().rotate(chosenReading.getAngle());
 				
 		//	5) rijd tot witte lijn wordt gezien
 		//	6) positioneer loodrecht op witte lijn
