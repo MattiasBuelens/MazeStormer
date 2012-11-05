@@ -42,13 +42,21 @@ public class VirtualLightSensor implements LampLightDetector {
 
 	@Override
 	public int getNormalizedLightValue() {
-		Pose pose = getMaze().toRelative(getPoseProvider().getPose());
-		Tile tile = getMaze().getTileAt(pose.getLocation());
+		// Get absolute robot pose
+		Pose pose = getPoseProvider().getPose();
+
+		// Get tile underneath robot
+		Point relativePosition = getMaze().toRelative(pose.getLocation());
+		Point tilePosition = getMaze().toTile(relativePosition);
+		Tile tile = getMaze().getTileAt(tilePosition);
+
+		// Check if robot is on open side of tile
 		for (Orientation orientation : tile.getOpenSides()) {
-			if (getSide(tile, orientation).contains(pose.getLocation())) {
+			if (getSide(tile, orientation).contains(relativePosition)) {
 				return WHITE_VALUE;
 			}
 		}
+
 		return BROWN_VALUE;
 	}
 
@@ -92,7 +100,6 @@ public class VirtualLightSensor implements LampLightDetector {
 
 	@Override
 	public void setFloodlight(boolean floodlight) {
-
 	}
 
 	@Override
