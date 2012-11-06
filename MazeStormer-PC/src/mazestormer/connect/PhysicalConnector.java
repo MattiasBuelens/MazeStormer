@@ -59,6 +59,10 @@ public class PhysicalConnector implements Connector {
 
 	@Override
 	public void disconnect() {
+		if (!isConnected())
+			return;
+
+		robot.terminate();
 		robot = null;
 
 		try {

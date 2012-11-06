@@ -3,8 +3,10 @@ package mazestormer.controller;
 import java.awt.EventQueue;
 import java.awt.Rectangle;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
@@ -34,7 +36,9 @@ public class MapController extends SubController implements IMapController {
 	private MazeLayer loadedMazeLayer;
 	private RangesLayer rangesLayer;
 
-	private Timer updater;
+	private ScheduledExecutorService executor;
+	private Runnable updateTask = new UpdateTask();
+	private ScheduledFuture<?> updateHandle;
 	private long updateInterval;
 
 	private static final long defaultUpdateInterval = 1000 / 25;
@@ -42,6 +46,7 @@ public class MapController extends SubController implements IMapController {
 	public MapController(MainController mainController) {
 		super(mainController);
 
+		executor = Executors.newSingleThreadScheduledExecutor();
 		setUpdateInterval(defaultUpdateInterval);
 
 		createMap();
@@ -129,25 +134,36 @@ public class MapController extends SubController implements IMapController {
 	}
 
 	public void setUpdateInterval(long interval) {
-		updateInterval = Math.abs(interval);
+		interval = Math.abs(interval);
+		if (interval != this.updateInterval) {
+			this.updateInterval = interval;
+			// Reschedule with new delay
+			rescheduleUpdater();
+		}
 	}
 
 	public void setUpdateFPS(long fps) {
 		setUpdateInterval((long) (1000f / (float) fps));
 	}
 
-	private void startUpdateTimer() {
-		stopUpdateTimer();
-
-		updater = new Timer();
-		updater.scheduleAtFixedRate(new UpdateTimerTask(), 0,
-				getUpdateInterval());
+	private void scheduleUpdater() {
+		// Cancel if still running
+		cancelUpdater();
+		// Reschedule updater
+		updateHandle = executor.scheduleAtFixedRate(updateTask, 0,
+				getUpdateInterval(), TimeUnit.MILLISECONDS);
 	}
 
-	private void stopUpdateTimer() {
-		if (updater != null) {
-			updater.cancel();
-			updater = null;
+	private void cancelUpdater() {
+		if (updateHandle != null) {
+			updateHandle.cancel(false);
+		}
+	}
+
+	private void rescheduleUpdater() {
+		// Schedule only if still running
+		if (updateHandle != null && !updateHandle.isDone()) {
+			scheduleUpdater();
 		}
 	}
 
@@ -158,7 +174,7 @@ public class MapController extends SubController implements IMapController {
 			invokeUpdateRobotPose();
 		} else {
 			// Stop updating pose
-			stopUpdateTimer();
+			cancelUpdater();
 		}
 	}
 
@@ -166,10 +182,10 @@ public class MapController extends SubController implements IMapController {
 	public void updateRobotPoseOnMove(MoveEvent e) {
 		if (e.getEventType() == MoveEvent.EventType.STARTED) {
 			// Start updating while moving
-			startUpdateTimer();
+			scheduleUpdater();
 		} else {
 			// Stop updating when move ended
-			stopUpdateTimer();
+			cancelUpdater();
 		}
 	}
 
@@ -186,13 +202,11 @@ public class MapController extends SubController implements IMapController {
 		}
 	}
 
-	private class UpdateTimerTask extends TimerTask {
-
+	private class UpdateTask implements Runnable {
 		@Override
 		public void run() {
 			invokeUpdateRobotPose();
 		}
-
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
+import lejos.geom.Line;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Edge;
 import mazestormer.maze.Maze;
@@ -13,6 +14,7 @@ import mazestormer.maze.MazeListener;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.util.LongPoint;
+import mazestormer.util.MapUtils;
 
 import org.apache.batik.dom.svg.SVGOMTransform;
 import org.w3c.dom.Element;
@@ -90,7 +92,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	}
 
 	private void setOrigin(Pose origin) {
-		setPosition(origin.getX(), -origin.getY());
+		setPosition(MapUtils.toMapCoordinates(origin.getLocation()));
 		setRotationAngle(-origin.getHeading());
 		update();
 	}
@@ -140,7 +142,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		this.zIndex = zIndex;
 	}
 
-	private void tilePosition(SVGTransformable element, double tileX, double tileY) {
+	private void tilePosition(SVGTransformable element, double tileX,
+			double tileY) {
 		// tileX runs from left to right
 		double x = tileX;
 
@@ -164,7 +167,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private class TileElement {
 
 		private final Tile tile;
-		private final EnumMap<Orientation, EdgeElement> edges = new EnumMap<Orientation, EdgeElement>(Orientation.class);
+		private final EnumMap<Orientation, EdgeElement> edges = new EnumMap<Orientation, EdgeElement>(
+				Orientation.class);
 
 		private final SVGGElement tileGroup;
 		private final SVGRectElement rect;
@@ -206,7 +210,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			if (edgeElement.isClosed()) {
 				edgesGroup.appendChild(edgeElement.get());
 			} else {
-				edgesGroup.insertBefore(edgeElement.get(), edgesGroup.getFirstChild());
+				edgesGroup.insertBefore(edgeElement.get(),
+						edgesGroup.getFirstChild());
 			}
 		}
 
@@ -270,30 +275,17 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		private void update() {
 			// Set stroke color
-			line.setAttribute(SVG_STROKE_ATTRIBUTE, isClosed() ? wallColor : lineColor);
+			line.setAttribute(SVG_STROKE_ATTRIBUTE, isClosed() ? wallColor
+					: lineColor);
 		}
 
 		private void setPoints() {
-			int startX = 0, startY = 0, endX = 0, endY = 0;
-			switch (getOrientation()) {
-			case NORTH:
-				endX = 1;
-				break;
-			case WEST:
-				endY = 1;
-				break;
-			case EAST:
-				startX = 1;
-				endX = 1;
-			case SOUTH:
-				startY = 1;
-				endY = 1;
-			}
-
-			line.setAttribute(SVG_X1_ATTRIBUTE, startX + "");
-			line.setAttribute(SVG_Y1_ATTRIBUTE, startY + "");
-			line.setAttribute(SVG_X2_ATTRIBUTE, endX + "");
-			line.setAttribute(SVG_Y2_ATTRIBUTE, endY + "");
+			Line edgeLine = getOrientation().getLine();
+			//
+			line.setAttribute(SVG_X1_ATTRIBUTE, edgeLine.getX1() + "");
+			line.setAttribute(SVG_Y1_ATTRIBUTE, (1d - edgeLine.getY1()) + "");
+			line.setAttribute(SVG_X2_ATTRIBUTE, edgeLine.getX2() + "");
+			line.setAttribute(SVG_Y2_ATTRIBUTE, (1d - edgeLine.getY2()) + "");
 		}
 
 	}

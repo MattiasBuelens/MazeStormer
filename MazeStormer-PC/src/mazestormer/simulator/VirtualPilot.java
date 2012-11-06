@@ -2,12 +2,14 @@ package mazestormer.simulator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import lejos.robotics.navigation.Move;
-import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.Move.MoveType;
+import lejos.robotics.navigation.MoveListener;
 import mazestormer.robot.Pilot;
 
 public class VirtualPilot implements Pilot {
@@ -21,11 +23,15 @@ public class VirtualPilot implements Pilot {
 	private double minRadius;
 
 	private Move move;
-	private Timer moveTimer;
+	private ScheduledExecutorService executor;
+	private ScheduledFuture<?> moveEndHandle;
+
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
 	public VirtualPilot(double trackWidth, double maxTravelSpeed,
 			double maxRotateSpeed) {
+		executor = Executors.newSingleThreadScheduledExecutor();
+
 		this.maxTravelSpeed = maxTravelSpeed;
 		this.maxRotateSpeed = maxRotateSpeed;
 
@@ -37,6 +43,11 @@ public class VirtualPilot implements Pilot {
 
 	public VirtualPilot(double trackWidth) {
 		this(trackWidth, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+	}
+
+	public void shutdown() {
+		stop();
+		executor.shutdownNow();
 	}
 
 	@Override
@@ -251,8 +262,8 @@ public class VirtualPilot implements Pilot {
 		// Start timer
 		float delay = getMoveDuration(move);
 		if (!Float.isInfinite(delay)) {
-			moveTimer = new Timer();
-			moveTimer.schedule(new MoveEndTimerTask(move), (long) delay);
+			moveEndHandle = executor.schedule(new MoveEndRunner(move),
+					(long) delay, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -283,8 +294,8 @@ public class VirtualPilot implements Pilot {
 	 * Called when the current move is stopped.
 	 */
 	private void resetMove() {
-		if (moveTimer != null) {
-			moveTimer.cancel();
+		if (moveEndHandle != null) {
+			moveEndHandle.cancel(false);
 		}
 		move = null;
 	}
@@ -332,7 +343,8 @@ public class VirtualPilot implements Pilot {
 		float target = move.getDistanceTraveled();
 		if (isInfiniteArc(move)) {
 			// Implementation: Use radius instead
-			throw new IllegalStateException("Simulator does not fully support arcs.");
+			throw new IllegalStateException(
+					"Simulator does not fully support arcs.");
 		}
 
 		// Compare absolute values, since target may be negative
@@ -360,7 +372,8 @@ public class VirtualPilot implements Pilot {
 		float target = move.getAngleTurned();
 		if (isInfiniteArc(move)) {
 			// Implementation: Use radius instead
-			throw new IllegalStateException("Simulator does not fully support arcs.");
+			throw new IllegalStateException(
+					"Simulator does not fully support arcs.");
 		}
 
 		// Compare absolute values, since target may be negative
@@ -389,7 +402,8 @@ public class VirtualPilot implements Pilot {
 			if (isInfiniteArc(move)) {
 				return Float.POSITIVE_INFINITY;
 			} else {
-				throw new IllegalStateException("Simulator does not fully support arcs.");
+				throw new IllegalStateException(
+						"Simulator does not fully support arcs.");
 			}
 		}
 		return Math.abs(duration) * 1000f;
@@ -418,11 +432,11 @@ public class VirtualPilot implements Pilot {
 				getAngleIncrement(), isMoving());
 	}
 
-	private class MoveEndTimerTask extends TimerTask {
+	private class MoveEndRunner implements Runnable {
 
 		private final Move move;
 
-		public MoveEndTimerTask(Move move) {
+		public MoveEndRunner(Move move) {
 			this.move = move;
 		}
 

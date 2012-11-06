@@ -10,11 +10,12 @@ import mazestormer.robot.Robot;
 
 public class VirtualRobot implements Robot {
 
-	private final Maze maze;
 	private VirtualPilot pilot;
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
 	private PoseProvider poseProvider;
+
+	private final Maze maze;
 
 	public VirtualRobot(Maze maze) {
 		this.maze = maze;
@@ -30,16 +31,17 @@ public class VirtualRobot implements Robot {
 
 	@Override
 	public CalibratedLightSensor getLightSensor() {
-		if (light == null){
-			this.light = new DelegatedCalibratedLightSensor(new VirtualLightSensor(this.maze, this.poseProvider));
+		if (light == null) {
+			light = new DelegatedCalibratedLightSensor(new VirtualLightSensor(
+					maze, poseProvider));
 		}
 		return light;
 	}
 
 	@Override
 	public RangeScanner getRangeScanner() {
-		if(scanner == null){
-			this.scanner = new VirtualRangeScanner(this.maze, this.poseProvider);
+		if (scanner == null) {
+			scanner = new VirtualRangeScanner(maze, poseProvider);
 		}
 		return scanner;
 	}
@@ -50,6 +52,11 @@ public class VirtualRobot implements Robot {
 			poseProvider = new OdometryPoseProvider(getPilot());
 		}
 		return poseProvider;
+	}
+
+	@Override
+	public void terminate() {
+		pilot.shutdown();
 	}
 
 }

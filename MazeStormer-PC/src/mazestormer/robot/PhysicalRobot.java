@@ -51,4 +51,9 @@ public class PhysicalRobot implements Robot {
 		return poseProvider;
 	}
 
+	@Override
+	public void terminate() {
+		pilot.stop();
+	}
+
 }

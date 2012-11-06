@@ -45,6 +45,10 @@ public class VirtualConnector implements Connector {
 
 	@Override
 	public void disconnect() {
+		if (!isConnected())
+			return;
+
+		robot.terminate();
 		robot = null;
 	}
 
