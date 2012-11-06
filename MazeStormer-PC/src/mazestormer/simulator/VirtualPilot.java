@@ -23,6 +23,7 @@ public class VirtualPilot implements Pilot {
 	private double minRadius;
 
 	private Move move;
+	private boolean isMoving = false;
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?> moveEndHandle;
 
@@ -255,6 +256,8 @@ public class VirtualPilot implements Pilot {
 		// Set current move
 		move = new Move(moveType, distance, angle, (float) getTravelSpeed(),
 				(float) getRotateSpeed(), wasMoving);
+		isMoving = true;
+
 		// Publish the *targeted* move distance and angle
 		for (MoveListener ml : moveListeners) {
 			ml.moveStarted(move, this);
@@ -298,12 +301,12 @@ public class VirtualPilot implements Pilot {
 		if (moveEndHandle != null) {
 			moveEndHandle.cancel(false);
 		}
-		move = null;
+		isMoving = false;
 	}
 
 	@Override
 	public boolean isMoving() {
-		return move != null;
+		return isMoving;
 	}
 
 	/**
@@ -444,7 +447,7 @@ public class VirtualPilot implements Pilot {
 		@Override
 		public void run() {
 			// Current move has ended
-			if (VirtualPilot.this.move == move) {
+			if (isMoving() && VirtualPilot.this.move == move) {
 				movementStop();
 			}
 		}
