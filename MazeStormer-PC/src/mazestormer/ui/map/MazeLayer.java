@@ -281,7 +281,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		private void setPoints() {
 			Line edgeLine = getOrientation().getLine();
-			//
+			// Convert Y-coordinates to top-to-bottom
 			line.setAttribute(SVG_X1_ATTRIBUTE, edgeLine.getX1() + "");
 			line.setAttribute(SVG_Y1_ATTRIBUTE, (1d - edgeLine.getY1()) + "");
 			line.setAttribute(SVG_X2_ATTRIBUTE, edgeLine.getX2() + "");

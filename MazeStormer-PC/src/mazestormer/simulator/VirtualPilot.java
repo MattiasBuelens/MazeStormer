@@ -45,7 +45,8 @@ public class VirtualPilot implements Pilot {
 		this(trackWidth, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 	}
 
-	public void shutdown() {
+	@Override
+	public void terminate() {
 		stop();
 		executor.shutdownNow();
 	}

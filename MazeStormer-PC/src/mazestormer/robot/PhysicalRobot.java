@@ -53,7 +53,7 @@ public class PhysicalRobot implements Robot {
 
 	@Override
 	public void terminate() {
-		pilot.stop();
+		pilot.terminate();
 	}
 
 }

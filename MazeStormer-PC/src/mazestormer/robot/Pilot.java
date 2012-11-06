@@ -30,4 +30,9 @@ public interface Pilot extends ArcRotateMoveController, MoveProvider {
 	 */
 	public void rotateRight();
 
+	/**
+	 * Stop and terminate this pilot.
+	 */
+	public void terminate();
+
 }

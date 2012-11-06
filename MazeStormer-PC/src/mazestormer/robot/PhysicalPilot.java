@@ -23,4 +23,9 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot {
 				rightMotor, reverse);
 	}
 
+	@Override
+	public void terminate() {
+		stop();
+	}
+
 }

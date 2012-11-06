@@ -56,7 +56,7 @@ public class VirtualRobot implements Robot {
 
 	@Override
 	public void terminate() {
-		pilot.shutdown();
+		pilot.terminate();
 	}
 
 }
