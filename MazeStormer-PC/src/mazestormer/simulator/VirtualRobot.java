@@ -24,7 +24,7 @@ public class VirtualRobot implements Robot {
 	@Override
 	public Pilot getPilot() {
 		if (pilot == null) {
-			pilot = new VirtualPilot(Pilot.trackWidth);
+			pilot = new VirtualPilot(Robot.trackWidth);
 		}
 		return pilot;
 	}
