@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import lejos.geom.Point;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.robot.Pilot;
+import mazestormer.robot.Robot;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +23,8 @@ public class VirtualPilotTest {
 
 	@Before
 	public void setUp() throws Exception {
-		pilot = new VirtualPilot(Pilot.leftWheelDiameter,
-				Pilot.rightWheelDiameter, Pilot.trackWidth);
+		pilot = new VirtualPilot(Robot.leftWheelDiameter,
+				Robot.rightWheelDiameter, Robot.trackWidth);
 		pilot.setTravelSpeed(travelSpeed);
 		pilot.setRotateSpeed(rotateSpeed);
 		tracker = new OdometryPoseProvider(pilot);
