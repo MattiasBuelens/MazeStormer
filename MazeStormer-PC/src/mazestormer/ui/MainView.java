@@ -117,7 +117,7 @@ public class MainView extends JFrame implements EventSource {
 		case Polygon:
 			setControlPanel(new PolygonControlPanel(this.controller.polygonControl()));
 			break;
-		case LineFinder:
+		case PerpendicularOnLine:
 			setControlPanel(new LineFinderPanel(this.controller.lineFinderControl()));
 			break;
 		}
