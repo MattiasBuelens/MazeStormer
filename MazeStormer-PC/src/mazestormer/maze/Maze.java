@@ -170,6 +170,7 @@ public class Maze extends AbstractEventSource {
 	 */
 	public void clear() {
 		tiles.clear();
+		lines.clear();
 		fireMazeCleared();
 	}
 

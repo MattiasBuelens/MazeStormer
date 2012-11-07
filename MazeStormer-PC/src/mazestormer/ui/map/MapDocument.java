@@ -17,7 +17,8 @@ public class MapDocument {
 
 	private SVGDocument document;
 
-	private SortedMap<MapLayer, Element> layers = new TreeMap<MapLayer, Element>(new MapLayer.ZIndexComparator());
+	private SortedMap<MapLayer, Element> layers = new TreeMap<MapLayer, Element>(
+			new MapLayer.ZIndexComparator());
 
 	public MapDocument() {
 		document = SVGUtils.createSVGDocument();
@@ -50,9 +51,7 @@ public class MapDocument {
 		SVGDocument document = getDocument();
 		Element root = document.getDocumentElement();
 		// Remove previous elements
-		while (root.hasChildNodes()) {
-			root.removeChild(root.getFirstChild());
-		}
+		SVGUtils.removeChildNodes(root);
 		// Add elements
 		for (Map.Entry<MapLayer, Element> entry : layers.entrySet()) {
 			Element layerElement = entry.getValue();

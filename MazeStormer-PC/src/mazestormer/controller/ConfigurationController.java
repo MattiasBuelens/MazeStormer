@@ -1,9 +1,16 @@
 package mazestormer.controller;
 
 import static com.google.common.base.Preconditions.checkState;
+
+import java.io.IOException;
+import java.text.ParseException;
+
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;
+import mazestormer.maze.Maze;
+import mazestormer.maze.parser.FileUtils;
+import mazestormer.maze.parser.Parser;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
 
@@ -15,6 +22,14 @@ public class ConfigurationController extends SubController implements
 
 	public ConfigurationController(MainController mainController) {
 		super(mainController);
+	}
+
+	private void log(String logText) {
+		getMainController().getLogger().info(logText);
+	}
+
+	private void warning(String logText) {
+		getMainController().getLogger().warning(logText);
 	}
 
 	@Override
@@ -80,4 +95,19 @@ public class ConfigurationController extends SubController implements
 		}
 	}
 
+	@Override
+	public void loadMaze(String mazeFilePath) {
+		Maze maze = getMainController().getSourceMaze();
+		CharSequence contents;
+		try {
+			contents = FileUtils.load(mazeFilePath);
+			maze.clear();
+			new Parser(maze).parse(contents);
+			log("Source maze successfully loaded.");
+		} catch (IOException e) {
+			warning("Failed to load source maze: " + e.getMessage());
+		} catch (ParseException e) {
+			warning("Failed to parse source maze:" + e.getMessage());
+		}
+	}
 }

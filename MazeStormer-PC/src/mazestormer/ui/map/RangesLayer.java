@@ -84,10 +84,7 @@ public class RangesLayer extends MapLayer {
 		invokeDOMChange(new Runnable() {
 			@Override
 			public void run() {
-				Element element = getElement();
-				while (element.hasChildNodes()) {
-					element.removeChild(element.getFirstChild());
-				}
+				SVGUtils.removeChildNodes(getElement());
 			}
 		});
 	}

@@ -20,4 +20,6 @@ public interface IConfigurationController extends EventSource {
 
 	public void stop();
 
+	public void loadMaze(String mazeFilePath);
+
 }

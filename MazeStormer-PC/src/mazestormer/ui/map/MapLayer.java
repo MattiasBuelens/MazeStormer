@@ -18,7 +18,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
-public abstract class MapLayer extends AbstractEventSource implements SVGConstants, CSSConstants {
+public abstract class MapLayer extends AbstractEventSource implements
+		SVGConstants, CSSConstants {
 
 	private final String name;
 
@@ -58,7 +59,8 @@ public abstract class MapLayer extends AbstractEventSource implements SVGConstan
 
 	public void setVisible(boolean visible) {
 		if (this.isVisible != visible) {
-			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible", visible));
+			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible",
+					visible));
 		}
 		this.isVisible = visible;
 
@@ -68,7 +70,8 @@ public abstract class MapLayer extends AbstractEventSource implements SVGConstan
 	protected void update() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
-			final String displayValue = isVisible() ? CSS_INLINE_VALUE : CSS_NONE_VALUE;
+			final String displayValue = isVisible() ? CSS_INLINE_VALUE
+					: CSS_NONE_VALUE;
 			final SVGStylableElement styleElement = (SVGStylableElement) element;
 
 			invokeDOMChange(new Runnable() {

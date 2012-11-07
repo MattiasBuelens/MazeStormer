@@ -59,7 +59,7 @@ public class MainController implements IMainController {
 	private Connector connector;
 
 	private Maze maze;
-	private Maze loadedMaze;
+	private Maze sourceMaze;
 
 	/*
 	 * Controllers
@@ -94,15 +94,15 @@ public class MainController implements IMainController {
 		connectionProvider = new ConnectionProvider();
 		// TODO Configure device name in GUI?
 		connectionContext.setDeviceName("brons");
-		connectionContext.setLoadedMaze(getLoadedMaze());
+		connectionContext.setLoadedMaze(getSourceMaze());
 
 		// TODO Remove hard-coded loading of example maze
 		try {
-			getLoadedMaze().setOrigin(new Pose(-20, -20, 0));
+			getSourceMaze().setOrigin(new Pose(-20, -20, 0));
 			String path = MapController.class.getResource(
 					"/res/ExampleMaze.txt").getPath();
 			CharSequence contents = FileUtils.load(path);
-			new Parser(getLoadedMaze()).parse(contents);
+			new Parser(getSourceMaze()).parse(contents);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -351,11 +351,11 @@ public class MainController implements IMainController {
 		return maze;
 	}
 
-	public Maze getLoadedMaze() {
-		if (loadedMaze == null) {
-			loadedMaze = new Maze();
+	public Maze getSourceMaze() {
+		if (sourceMaze == null) {
+			sourceMaze = new Maze();
 		}
-		return loadedMaze;
+		return sourceMaze;
 	}
 
 }

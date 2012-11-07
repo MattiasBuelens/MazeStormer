@@ -33,7 +33,7 @@ public class MapController extends SubController implements IMapController {
 	private MapDocument map;
 	private RobotLayer robotLayer;
 	private MazeLayer mazeLayer;
-	private MazeLayer loadedMazeLayer;
+	private MazeLayer sourceMazeLayer;
 	private RangesLayer rangesLayer;
 
 	private ScheduledExecutorService executor;
@@ -67,11 +67,11 @@ public class MapController extends SubController implements IMapController {
 		robotLayer = new RobotLayer("Robot");
 		addLayer(robotLayer);
 
-		Maze loadedMaze = getMainController().getLoadedMaze();
-		loadedMazeLayer = new MazeLayer("Loaded maze", loadedMaze);
-		loadedMazeLayer.setZIndex(1);
-		loadedMazeLayer.setOpacity(0.5f);
-		addLayer(loadedMazeLayer);
+		Maze sourceMaze = getMainController().getSourceMaze();
+		sourceMazeLayer = new MazeLayer("Source maze", sourceMaze);
+		sourceMazeLayer.setZIndex(1);
+		sourceMazeLayer.setOpacity(0.5f);
+		addLayer(sourceMazeLayer);
 
 		Maze maze = getMainController().getMaze();
 		mazeLayer = new MazeLayer("Discovered maze", maze);

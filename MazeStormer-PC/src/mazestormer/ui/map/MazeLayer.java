@@ -130,10 +130,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		invokeDOMChange(new Runnable() {
 			@Override
 			public void run() {
-				Element element = getElement();
-				while (element.hasChildNodes()) {
-					element.removeChild(element.getFirstChild());
-				}
+				SVGUtils.removeChildNodes(tilesGroup);
+				SVGUtils.removeChildNodes(edgesGroup);
 			}
 		});
 	}

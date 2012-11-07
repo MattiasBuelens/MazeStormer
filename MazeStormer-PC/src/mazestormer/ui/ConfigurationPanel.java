@@ -2,6 +2,7 @@ package mazestormer.ui;
 
 import java.awt.event.ActionEvent;
 import java.beans.Beans;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -10,6 +11,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
@@ -21,10 +23,12 @@ import mazestormer.controller.IConfigurationController;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
+import com.javarichclient.icon.tango.actions.DocumentOpenIcon;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.MediaEjectIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.ProcessStopIcon;
+import javax.swing.JTextField;
 
 public class ConfigurationPanel extends ViewPanel {
 
@@ -44,8 +48,14 @@ public class ConfigurationPanel extends ViewPanel {
 	private final Action disconnectAction = new DisconnectAction();
 	private final Action controlModeAction = new ControlModeAction();
 	private final Action stopAction = new StopAction();
+	private final Action browseMazeAction = new BrowseMazeAction();
+	private final Action loadMazeAction = new LoadMazeAction();
 
 	private JButton btnSwitchMode;
+	private JLabel lblMaze;
+	private JTextField txtMaze;
+	private JButton btnMazeBrowse;
+	private JButton btnMazeLoad;
 
 	public ConfigurationPanel(IConfigurationController controller) {
 		this.controller = controller;
@@ -56,17 +66,18 @@ public class ConfigurationPanel extends ViewPanel {
 
 		container = new JPanel();
 		container.setLayout(new MigLayout("hidemode 3",
-				"[grow 75][grow][fill][fill]", "[fill][fill]"));
+				"[grow 75][grow][fill][fill]", "[fill][fill][fill]"));
 		add(container);
 
 		createRobotType();
 		createControlMode();
+		createSourceMaze();
 
 		btnStop = new JButton();
-		container.add(btnStop, "cell 3 0 1 2");
 		btnStop.setAction(stopAction);
 		btnStop.setText("");
 		btnStop.setIcon(new ProcessStopIcon(32, 32));
+		container.add(btnStop, "cell 3 0 1 3");
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -74,7 +85,6 @@ public class ConfigurationPanel extends ViewPanel {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
-
 		setConnectState(controller.isConnected());
 	}
 
@@ -119,6 +129,26 @@ public class ConfigurationPanel extends ViewPanel {
 		container.add(btnSwitchMode, "cell 2 1");
 	}
 
+	private void createSourceMaze() {
+		lblMaze = new JLabel("Source maze");
+		container.add(lblMaze, "cell 0 2,grow");
+
+		txtMaze = new JTextField();
+		container.add(txtMaze, "flowx,cell 1 2,growx");
+
+		btnMazeBrowse = new JButton();
+		btnMazeBrowse.setAction(browseMazeAction);
+		btnMazeBrowse.setText("");
+		btnMazeBrowse.setIcon(new DocumentOpenIcon(24, 24));
+		container.add(btnMazeBrowse, "cell 1 2");
+
+		btnMazeLoad = new JButton();
+		btnMazeLoad.setAction(loadMazeAction);
+		btnMazeLoad.setText("");
+		btnMazeLoad.setIcon(new GoNextIcon(24, 24));
+		container.add(btnMazeLoad, "cell 2 2");
+	}
+
 	public void connect() {
 		RobotType robotType = (RobotType) robotTypeModel.getSelectedItem();
 		controller.connect(robotType);
@@ -137,6 +167,18 @@ public class ConfigurationPanel extends ViewPanel {
 
 	public void stop() {
 		controller.stop();
+	}
+
+	public void loadMaze() {
+		controller.loadMaze(getMazePath());
+	}
+
+	private String getMazePath() {
+		return txtMaze.getText();
+	}
+
+	private void setMazePath(String path) {
+		txtMaze.setText(path);
 	}
 
 	private void setConnectState(boolean isConnected) {
@@ -202,6 +244,41 @@ public class ConfigurationPanel extends ViewPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			stop();
+		}
+	}
+
+	private class BrowseMazeAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public BrowseMazeAction() {
+			putValue(NAME, "Browse for source maze file");
+			putValue(SHORT_DESCRIPTION,
+					"Browse for a file to use as source maze");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser chooser = new JFileChooser(getMazePath());
+			int result = chooser.showOpenDialog(ConfigurationPanel.this);
+			if (result == JFileChooser.APPROVE_OPTION) {
+				File file = chooser.getSelectedFile();
+				if (file != null) {
+					setMazePath(file.getAbsolutePath());
+				}
+			}
+		}
+	}
+
+	private class LoadMazeAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public LoadMazeAction() {
+			putValue(NAME, "Load source maze");
+			putValue(SHORT_DESCRIPTION,
+					"Load the source maze from the given file");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			loadMaze();
 		}
 	}
 }
