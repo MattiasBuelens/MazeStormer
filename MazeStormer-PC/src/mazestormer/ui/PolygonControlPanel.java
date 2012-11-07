@@ -49,7 +49,7 @@ public class PolygonControlPanel extends ViewPanel {
 	public PolygonControlPanel(IPolygonControlController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Polygon control",
+		setBorder(new TitledBorder(null, "Polygon driver",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new MigLayout("", "[grow,fill]", "[][]"));
 

@@ -33,7 +33,7 @@ public class LineFinderPanel extends ViewPanel {
 	public LineFinderPanel(ILineFinderController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Linefinder control",
+		setBorder(new TitledBorder(null, "Perpendicular on line",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
