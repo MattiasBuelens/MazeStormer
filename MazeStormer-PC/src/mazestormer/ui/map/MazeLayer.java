@@ -124,13 +124,18 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 	@Override
 	public void mazeCleared() {
-		// Remove all child nodes
-		Element element = getElement();
-		while (element.hasChildNodes()) {
-			element.removeChild(element.getFirstChild());
-		}
 		// Clear map
 		tiles.clear();
+		// Remove all child nodes
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				Element element = getElement();
+				while (element.hasChildNodes()) {
+					element.removeChild(element.getFirstChild());
+				}
+			}
+		});
 	}
 
 	@Override

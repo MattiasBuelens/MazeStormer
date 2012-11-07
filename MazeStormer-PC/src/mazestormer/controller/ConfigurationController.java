@@ -1,9 +1,6 @@
 package mazestormer.controller;
 
-import static com.google.common.base.Preconditions.*;
-
-import com.google.common.eventbus.Subscribe;
-
+import static com.google.common.base.Preconditions.checkState;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;

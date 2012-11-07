@@ -20,6 +20,10 @@ public class VirtualLightSensor implements LampLightDetector {
 	private Maze maze;
 	private PoseProvider poseProvider;
 
+	// private int delay = 50; // ms
+	// private long nextTime = 0;
+	// private int nextValue = 0;
+
 	public VirtualLightSensor(Maze maze, PoseProvider poseProvider) {
 		this.maze = maze;
 		this.poseProvider = poseProvider;
@@ -41,6 +45,21 @@ public class VirtualLightSensor implements LampLightDetector {
 		return 0;
 	}
 
+	// private void waitUntil(long when) {
+	// long delay = when - System.currentTimeMillis();
+	// Delay.msDelay(delay);
+	// }
+
+	// @Override
+	// public int getNormalizedLightValue() {
+	// int value = nextValue;
+	// waitUntil(nextTime);
+	// nextValue = readNormalizedLightValue();
+	// nextTime = System.currentTimeMillis() + delay;
+	// return value;
+	// }
+
+	// private int readNormalizedLightValue() {
 	@Override
 	public int getNormalizedLightValue() {
 		// Get absolute robot pose

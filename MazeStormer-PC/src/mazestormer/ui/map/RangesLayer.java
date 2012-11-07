@@ -79,4 +79,16 @@ public class RangesLayer extends MapLayer {
 		return 10;
 	}
 
+	public void clear() {
+		// Remove all child nodes
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				Element element = getElement();
+				while (element.hasChildNodes()) {
+					element.removeChild(element.getFirstChild());
+				}
+			}
+		});
+	}
 }
