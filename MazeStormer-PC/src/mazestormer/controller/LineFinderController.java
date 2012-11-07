@@ -146,14 +146,7 @@ public class LineFinderController extends SubController implements
 				}
 
 			}
-			// double ang1tmp, ang2tmp;
-			// ang1tmp = Math.abs(angle1) + rotateAngle;
-			// ang2tmp = Math.abs(angle2) + rotateAngle;
 
-			// System.out.println("Angle: " + ang1tmp);
-			// System.out.println("Angle2: " + ang2tmp);
-
-			// angle2 = Math.abs(angle2) + rotateAngle - 360.0;
 			angle1 = Math.abs(angle1) + rotateAngle;
 			angle2 = Math.abs(angle2) + rotateAngle;
 
