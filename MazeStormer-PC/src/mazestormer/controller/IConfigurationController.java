@@ -12,7 +12,9 @@ public interface IConfigurationController extends EventSource {
 
 	public boolean isConnected();
 
-	public void connect(RobotType robotType, ControlMode controlMode);
+	public void connect(RobotType robotType);
+
+	public void setControlMode(ControlMode controlMode);
 
 	public void disconnect();
 

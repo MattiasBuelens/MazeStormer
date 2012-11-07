@@ -1,6 +1,5 @@
 package mazestormer.ui;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.beans.Beans;
 
@@ -22,6 +21,7 @@ import mazestormer.controller.IConfigurationController;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
+import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.MediaEjectIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.ProcessStopIcon;
@@ -42,7 +42,10 @@ public class ConfigurationPanel extends ViewPanel {
 
 	private final Action connectAction = new ConnectAction();
 	private final Action disconnectAction = new DisconnectAction();
+	private final Action controlModeAction = new ControlModeAction();
 	private final Action stopAction = new StopAction();
+
+	private JButton btnSwitchMode;
 
 	public ConfigurationPanel(IConfigurationController controller) {
 		this.controller = controller;
@@ -52,13 +55,18 @@ public class ConfigurationPanel extends ViewPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		container = new JPanel();
-		container.setLayout(new MigLayout("", "[grow 75][grow]", "[][][]"));
+		container.setLayout(new MigLayout("hidemode 3",
+				"[grow 75][grow][fill][fill]", "[fill][fill]"));
 		add(container);
 
 		createRobotType();
 		createControlMode();
 
-		createButtons();
+		btnStop = new JButton();
+		container.add(btnStop, "cell 3 0 1 2");
+		btnStop.setAction(stopAction);
+		btnStop.setText("");
+		btnStop.setIcon(new ProcessStopIcon(32, 32));
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -79,6 +87,18 @@ public class ConfigurationPanel extends ViewPanel {
 		JComboBox<RobotType> cmbType = new JComboBox<RobotType>();
 		cmbType.setModel(robotTypeModel);
 		container.add(cmbType, "cell 1 0,grow");
+
+		btnConnect = new JButton();
+		container.add(btnConnect, "flowx,cell 2 0");
+		btnConnect.setAction(connectAction);
+		btnConnect.setText("");
+		btnConnect.setIcon(new MediaPlaybackStartIcon(24, 24));
+
+		btnDisconnect = new JButton();
+		container.add(btnDisconnect, "cell 2 0");
+		btnDisconnect.setAction(disconnectAction);
+		btnDisconnect.setText("");
+		btnDisconnect.setIcon(new MediaEjectIcon(24, 24));
 	}
 
 	private void createControlMode() {
@@ -91,37 +111,24 @@ public class ConfigurationPanel extends ViewPanel {
 		JComboBox<ControlMode> cmbMode = new JComboBox<ControlMode>();
 		cmbMode.setModel(controlModeModel);
 		container.add(cmbMode, "cell 1 1,grow");
-	}
 
-	private void createButtons() {
-		JPanel buttons = new JPanel();
-		container.add(buttons, "cell 0 2 3 1,grow");
-		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		btnConnect = new JButton();
-		btnConnect.setAction(connectAction);
-		btnConnect.setText("");
-		btnConnect.setIcon(new MediaPlaybackStartIcon(32, 32));
-		buttons.add(btnConnect);
-
-		btnDisconnect = new JButton();
-		btnDisconnect.setAction(disconnectAction);
-		btnDisconnect.setText("");
-		btnDisconnect.setIcon(new MediaEjectIcon(32, 32));
-		buttons.add(btnDisconnect);
-
-		btnStop = new JButton();
-		btnStop.setAction(stopAction);
-		btnStop.setText("");
-		btnStop.setIcon(new ProcessStopIcon(32, 32));
-		buttons.add(btnStop);
+		btnSwitchMode = new JButton();
+		btnSwitchMode.setAction(controlModeAction);
+		btnSwitchMode.setText("");
+		btnSwitchMode.setIcon(new GoNextIcon(24, 24));
+		container.add(btnSwitchMode, "cell 2 1");
 	}
 
 	public void connect() {
 		RobotType robotType = (RobotType) robotTypeModel.getSelectedItem();
+		controller.connect(robotType);
+		setControlMode();
+	}
+
+	public void setControlMode() {
 		ControlMode controlMode = (ControlMode) controlModeModel
 				.getSelectedItem();
-		controller.connect(robotType, controlMode);
+		controller.setControlMode(controlMode);
 	}
 
 	public void disconnect() {
@@ -134,7 +141,10 @@ public class ConfigurationPanel extends ViewPanel {
 
 	private void setConnectState(boolean isConnected) {
 		btnConnect.setEnabled(!isConnected);
+		btnConnect.setVisible(!isConnected);
 		btnDisconnect.setEnabled(isConnected);
+		btnDisconnect.setVisible(isConnected);
+		btnSwitchMode.setEnabled(isConnected);
 		btnStop.setEnabled(isConnected);
 	}
 
@@ -166,6 +176,19 @@ public class ConfigurationPanel extends ViewPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			disconnect();
+		}
+	}
+
+	private class ControlModeAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public ControlModeAction() {
+			putValue(NAME, "Set control mode");
+			putValue(SHORT_DESCRIPTION, "Set the control mode of the robot");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			setControlMode();
 		}
 	}
 

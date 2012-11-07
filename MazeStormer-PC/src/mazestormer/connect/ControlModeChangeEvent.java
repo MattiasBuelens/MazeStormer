@@ -1,7 +1,5 @@
 package mazestormer.connect;
 
-
-
 public class ControlModeChangeEvent {
 
 	private final ControlMode controlMode;

@@ -26,46 +26,47 @@ public class MainView extends JFrame implements EventSource {
 	private EventBus eventBus;
 	private ViewPanel mapPanel;
 	private ViewPanel controlPanel;
-	//private ViewPanel parametersPanel;
+	// private ViewPanel parametersPanel;
 	private ViewPanel calibrationPanel;
 	private JPanel configurationPanel;
 	private JPanel logPanel;
 	private JPanel statePanel;
-	
+
 	private JPanel mainPanel;
 
-	public MainView(IMainController controller){
+	public MainView(IMainController controller) {
 		setTitle("MazeStormer");
-		
+
 		this.controller = controller;
 
 		initialize();
 
-		if(!Beans.isDesignTime()){
+		if (!Beans.isDesignTime()) {
 			registerController();
 		}
 	}
 
-	private void registerController(){
+	private void registerController() {
 		this.controller.register(this);
 		setControlMode(this.controller.configuration().getControlMode());
 	}
 
-	private void initialize(){
+	private void initialize() {
 		setBounds(100, 100, 650, 500);
-		setMinimumSize(new Dimension(700, 600));
+		setMinimumSize(new Dimension(800, 600));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		
-		this.mainPanel = new JPanel();
-		this.mainPanel.setLayout(
-				new MigLayout("hidemode 3", "[grow][]", "[][grow][::200px,growprio 50,grow]"));
 
-		this.configurationPanel = new ConfigurationPanel(controller.configuration());
+		this.mainPanel = new JPanel();
+		this.mainPanel.setLayout(new MigLayout("hidemode 3", "[grow][]",
+				"[][grow][::200px,growprio 50,grow]"));
+
+		this.configurationPanel = new ConfigurationPanel(
+				controller.configuration());
 		this.mainPanel.add(configurationPanel, "cell 0 0,grow");
 
-		//this.parametersPanel = new ParametersPanel(controller.parameters());
-		//this.mainPanel.add(parametersPanel, "cell 1 0,grow");
+		// this.parametersPanel = new ParametersPanel(controller.parameters());
+		// this.mainPanel.add(parametersPanel, "cell 1 0,grow");
 		this.calibrationPanel = new CalibrationPanel(controller.calibration());
 		this.mainPanel.add(calibrationPanel, "cell 1 0, grow");
 
@@ -82,52 +83,55 @@ public class MainView extends JFrame implements EventSource {
 		this.statePanel = new StatePanel(controller.state());
 		this.mainPanel.add(statePanel, "cell 1 2,grow");
 
-	    setContentPane(this.mainPanel);
+		setContentPane(this.mainPanel);
 	}
 
 	@Override
-	public EventBus getEventBus(){
+	public EventBus getEventBus() {
 		return this.eventBus;
 	}
 
 	@Override
-	public void registerEventBus(EventBus eventBus){
+	public void registerEventBus(EventBus eventBus) {
 		this.eventBus = eventBus;
 		eventBus.register(this);
 	}
 
-	protected void postEvent(Object event){
-		if(getEventBus() != null)
+	protected void postEvent(Object event) {
+		if (getEventBus() != null)
 			getEventBus().post(event);
 	}
 
-	private void setControlMode(ControlMode controlMode){
-		if(controlMode == null){
+	private void setControlMode(ControlMode controlMode) {
+		if (controlMode == null) {
 			setControlPanel(null);
 			return;
 		}
-		
-		switch(controlMode){
+
+		switch (controlMode) {
 		case Barcode:
 			setControlPanel(new BarcodePanel(this.controller.barcodeControl()));
 			break;
 		case Manual:
-			setControlPanel(new ManualControlPanel(this.controller.manualControl()));
+			setControlPanel(new ManualControlPanel(
+					this.controller.manualControl()));
 			break;
 		case Polygon:
-			setControlPanel(new PolygonControlPanel(this.controller.polygonControl()));
+			setControlPanel(new PolygonControlPanel(
+					this.controller.polygonControl()));
 			break;
 		case PerpendicularOnLine:
-			setControlPanel(new LineFinderPanel(this.controller.lineFinderControl()));
+			setControlPanel(new LineFinderPanel(
+					this.controller.lineFinderControl()));
 			break;
 		}
 	}
 
-	private void setControlPanel(ViewPanel controlPanel){
-		if(this.controlPanel != null){
+	private void setControlPanel(ViewPanel controlPanel) {
+		if (this.controlPanel != null) {
 			this.mainPanel.remove(this.controlPanel);
 		}
-		if(controlPanel != null){
+		if (controlPanel != null) {
 			this.mainPanel.add(controlPanel, "cell 1 1,grow");
 			this.controlPanel = controlPanel;
 		}
@@ -135,7 +139,7 @@ public class MainView extends JFrame implements EventSource {
 	}
 
 	@Subscribe
-	public void onControlModeChanged(ControlModeChangeEvent e){
+	public void onControlModeChanged(ControlModeChangeEvent e) {
 		setControlMode(e.getControlMode());
 	}
 }
