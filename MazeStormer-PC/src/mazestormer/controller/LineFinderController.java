@@ -15,7 +15,7 @@ public class LineFinderController extends SubController implements
 	private final static double rotateAngle = 135.0;
 
 	// Correction angle
-	private final static double extraAngle = 0; // 3.5;
+	private final static double extraAngle = 4.0;
 
 	private LineFinderRunner runner;
 
@@ -66,6 +66,9 @@ public class LineFinderController extends SubController implements
 		private final CalibratedLightSensor sensor;
 		private boolean isRunning = false;
 
+		private double originalTravelSpeed;
+		private double originalRotateSpeed;
+
 		public LineFinderRunner() {
 			this.pilot = getPilot();
 			this.sensor = getLightSensor();
@@ -89,8 +92,21 @@ public class LineFinderController extends SubController implements
 			return isRunning;
 		}
 
+		private boolean shouldStop() {
+			boolean shouldStop = !isRunning();
+			if (shouldStop) {
+				pilot.setTravelSpeed(originalTravelSpeed);
+				pilot.setRotateSpeed(originalRotateSpeed);
+				pilot.stop();
+			}
+			return shouldStop;
+		}
+
 		@Override
 		public void run() {
+			originalTravelSpeed = pilot.getTravelSpeed();
+			originalRotateSpeed = pilot.getRotateSpeed();
+
 			final int threshold = 30;
 
 			double slowRotateSpeed, fastRotateSpeed;
@@ -106,45 +122,51 @@ public class LineFinderController extends SubController implements
 
 			int value;
 
-			double angle1, angle2;
+			double angle1 = 0, angle2 = 0;
 
-			while (true) {
+			while (!shouldStop()) {
 				value = sensor.getLightValue();
 				if (value > threshold) {
 					log("Found line, start rotating left.");
 					pilot.stop();
 					pilot.setRotateSpeed(fastRotateSpeed);
+					if (shouldStop())
+						return;
 					pilot.rotate(rotateAngle, false);
 					pilot.setRotateSpeed(slowRotateSpeed);
+					if (shouldStop())
+						return;
 					pilot.rotateLeft();
 					break;
 				}
 
 			}
 
-			while (true) {
+			while (!shouldStop()) {
 				value = sensor.getLightValue();
 				if (value > threshold) {
 					log("Found line, start rotating right.");
 					pilot.stop();
 					angle1 = pilot.getMovement().getAngleTurned();
 					pilot.setRotateSpeed(fastRotateSpeed);
+					if (shouldStop())
+						return;
 					pilot.rotate(-rotateAngle, false);
 					pilot.setRotateSpeed(slowRotateSpeed);
+					if (shouldStop())
+						return;
 					pilot.rotateRight();
 					break;
 				}
-
 			}
 
-			while (true) {
+			while (!shouldStop()) {
 				value = sensor.getLightValue();
 				if (value > threshold) {
 					pilot.stop();
 					angle2 = pilot.getMovement().getAngleTurned();
 					break;
 				}
-
 			}
 
 			angle1 = Math.abs(angle1) + rotateAngle;
@@ -163,9 +185,13 @@ public class LineFinderController extends SubController implements
 
 			log("Positioning robot perpendicular to the line.");
 
+			if (shouldStop())
+				return;
 			pilot.rotate(finalAngle);
 			double dist = Robot.sensorOffset
 					* Math.cos(Math.toRadians(finalAngle));
+			if (shouldStop())
+				return;
 			pilot.travel(dist);
 
 		}
