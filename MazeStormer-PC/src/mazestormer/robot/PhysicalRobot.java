@@ -18,8 +18,8 @@ public class PhysicalRobot implements Robot {
 	@Override
 	public Pilot getPilot() {
 		if (pilot == null) {
-			pilot = new PhysicalPilot(Pilot.leftWheelDiameter,
-					Pilot.rightWheelDiameter, Pilot.trackWidth,
+			pilot = new PhysicalPilot(Robot.leftWheelDiameter,
+					Robot.rightWheelDiameter, Robot.trackWidth,
 					CachedRemoteMotor.get(0), CachedRemoteMotor.get(1), false);
 		}
 		return pilot;

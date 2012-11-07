@@ -10,6 +10,7 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.robot.Robot;
 
 public class VirtualLightSensor implements LampLightDetector {
 
@@ -44,9 +45,12 @@ public class VirtualLightSensor implements LampLightDetector {
 	public int getNormalizedLightValue() {
 		// Get absolute robot pose
 		Pose pose = getPoseProvider().getPose();
+		// Add sensor offset
+		Point position = pose.getLocation().pointAt(Robot.sensorOffset,
+				pose.getHeading());
 
 		// Get tile underneath robot
-		Point relativePosition = getMaze().toRelative(pose.getLocation());
+		Point relativePosition = getMaze().toRelative(position);
 		Point tilePosition = getMaze().toTile(relativePosition);
 		Tile tile = getMaze().getTileAt(tilePosition);
 
