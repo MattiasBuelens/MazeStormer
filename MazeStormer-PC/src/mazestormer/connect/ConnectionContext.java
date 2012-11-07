@@ -7,7 +7,7 @@ import mazestormer.maze.Maze;
 public class ConnectionContext {
 
 	private String deviceName;
-	private Maze loadedMaze;
+	private Maze sourceMaze;
 
 	public String getDeviceName() {
 		return deviceName;
@@ -17,12 +17,12 @@ public class ConnectionContext {
 		this.deviceName = checkNotNull(deviceName);
 	}
 
-	public Maze getLoadedMaze() {
-		return loadedMaze;
+	public Maze getSourceMaze() {
+		return sourceMaze;
 	}
 
-	public void setLoadedMaze(Maze loadedMaze) {
-		this.loadedMaze = checkNotNull(loadedMaze);
+	public void setSourceMaze(Maze sourceMaze) {
+		this.sourceMaze = checkNotNull(sourceMaze);
 	}
 
 }

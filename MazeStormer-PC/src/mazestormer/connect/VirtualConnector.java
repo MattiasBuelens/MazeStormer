@@ -32,7 +32,7 @@ public class VirtualConnector implements Connector {
 		if (isConnected())
 			return;
 
-		robot = createRobot(context.getLoadedMaze());
+		robot = createRobot(context.getSourceMaze());
 	}
 
 	private Robot createRobot(Maze loadedMaze) {

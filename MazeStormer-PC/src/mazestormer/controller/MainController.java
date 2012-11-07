@@ -17,8 +17,6 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
-import mazestormer.maze.parser.FileUtils;
-import mazestormer.maze.parser.Parser;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
@@ -94,19 +92,7 @@ public class MainController implements IMainController {
 		connectionProvider = new ConnectionProvider();
 		// TODO Configure device name in GUI?
 		connectionContext.setDeviceName("brons");
-		connectionContext.setLoadedMaze(getSourceMaze());
-
-		// TODO Remove hard-coded loading of example maze
-		try {
-			getSourceMaze().setOrigin(new Pose(-20, -20, 0));
-			String path = MapController.class.getResource(
-					"/res/ExampleMaze.txt").getPath();
-			CharSequence contents = FileUtils.load(path);
-			new Parser(getSourceMaze()).parse(contents);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// End remove
+		connectionContext.setSourceMaze(getSourceMaze());
 
 		view = createView();
 		view.registerEventBus(getEventBus());
