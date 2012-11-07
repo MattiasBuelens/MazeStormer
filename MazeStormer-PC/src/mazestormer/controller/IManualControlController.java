@@ -14,6 +14,10 @@ public interface IManualControlController extends EventSource {
 
 	public void stop();
 
+	public void travel(float distance);
+
+	public void rotate(float angle);
+
 	public IParametersController parameters();
 
 	public IScanController scan();

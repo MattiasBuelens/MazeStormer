@@ -1,5 +1,6 @@
 package mazestormer.controller;
 
+import lejos.geom.Line;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.LineFinderEvent.EventType;
 import mazestormer.robot.CalibratedLightSensor;
@@ -12,6 +13,11 @@ public class LineFinderController extends SubController implements
 		ILineFinderController {
 
 	private final static double rotateAngle = 135.0;
+
+	// Correction angle
+	private final static double extraAngle = 0; // 3.5;
+
+	private LineFinderRunner runner;
 
 	public LineFinderController(MainController mainController) {
 		super(mainController);
@@ -37,15 +43,8 @@ public class LineFinderController extends SubController implements
 	}
 
 	@Override
-	public int measureLightValue() {
-		return getLightSensor().getNormalizedLightValue();
-	}
-
-	private LineFinderRunner runner;
-
-	@Override
-	public void startSearching(int highLightValue, int lowLightValue) {
-		runner = new LineFinderRunner(highLightValue, lowLightValue);
+	public void startSearching() {
+		runner = new LineFinderRunner();
 		runner.start();
 	}
 
@@ -63,27 +62,19 @@ public class LineFinderController extends SubController implements
 
 	private class LineFinderRunner implements Runnable {
 
-		private final int lowLightValue;
-		private final int highLightValue;
-
 		private final Pilot pilot;
+		private final CalibratedLightSensor sensor;
 		private boolean isRunning = false;
 
-		public LineFinderRunner(int highLightValue, int lowLightValue) {
+		public LineFinderRunner() {
 			this.pilot = getPilot();
-			this.lowLightValue = lowLightValue;
-			this.highLightValue = highLightValue;
+			this.sensor = getLightSensor();
 		}
 
 		public void start() {
-			if (lowLightValue >= highLightValue) {
-				getMainController().getLogger().warning(
-						"High light value is lower than low light value.");
-			} else {
-				isRunning = true;
-				new Thread(this).start();
-				postState(EventType.STARTED);
-			}
+			isRunning = true;
+			new Thread(this).start();
+			postState(EventType.STARTED);
 		}
 
 		public void stop() {
@@ -106,9 +97,6 @@ public class LineFinderController extends SubController implements
 			slowRotateSpeed = 20;
 			fastRotateSpeed = 50;
 
-			getLightSensor().setLow(lowLightValue);
-			getLightSensor().setHigh(highLightValue);
-
 			// TODO: Speed?
 			pilot.setTravelSpeed(5);
 
@@ -121,7 +109,7 @@ public class LineFinderController extends SubController implements
 			double angle1, angle2;
 
 			while (true) {
-				value = getLightSensor().getLightValue();
+				value = sensor.getLightValue();
 				if (value > threshold) {
 					log("Found line, start rotating left.");
 					pilot.stop();
@@ -135,7 +123,7 @@ public class LineFinderController extends SubController implements
 			}
 
 			while (true) {
-				value = getLightSensor().getLightValue();
+				value = sensor.getLightValue();
 				if (value > threshold) {
 					log("Found line, start rotating right.");
 					pilot.stop();
@@ -150,7 +138,7 @@ public class LineFinderController extends SubController implements
 			}
 
 			while (true) {
-				value = getLightSensor().getLightValue();
+				value = sensor.getLightValue();
 				if (value > threshold) {
 					pilot.stop();
 					angle2 = pilot.getMovement().getAngleTurned();
@@ -158,7 +146,7 @@ public class LineFinderController extends SubController implements
 				}
 
 			}
-			double ang1tmp, ang2tmp;
+			// double ang1tmp, ang2tmp;
 			// ang1tmp = Math.abs(angle1) + rotateAngle;
 			// ang2tmp = Math.abs(angle2) + rotateAngle;
 
@@ -169,17 +157,15 @@ public class LineFinderController extends SubController implements
 			angle1 = Math.abs(angle1) + rotateAngle;
 			angle2 = Math.abs(angle2) + rotateAngle;
 
-			// Correction angle
-			final double extra = 3.5;
 			pilot.setRotateSpeed(fastRotateSpeed);
 
 			double finalAngle;
 
 			if (isCross(angle1, angle2)) {
 				log("Cross detected.");
-				finalAngle = ((angle2 - angle1) / 2.0) - extra;
+				finalAngle = ((angle2 - angle1) / 2.0) - extraAngle;
 			} else {
-				finalAngle = ((angle2 - 360.0) / 2.0) - extra;
+				finalAngle = ((angle2 - 360.0) / 2.0) - extraAngle;
 			}
 
 			log("Positioning robot perpendicular to the line.");
@@ -197,21 +183,25 @@ public class LineFinderController extends SubController implements
 			double radAngle1 = Math.toRadians(angle1);
 			double radAngle2 = Math.toRadians(angle2);
 
-			double xp = 0;
-			double yp = Robot.sensorOffset;
+			float xp = 0;
+			float yp = Robot.sensorOffset;
 
-			double x0 = -Robot.sensorOffset * Math.sin(radAngle1);
-			double y0 = Robot.sensorOffset * Math.cos(radAngle1);
+			float x0 = (float) (-Robot.sensorOffset * Math.sin(radAngle1));
+			float y0 = (float) (Robot.sensorOffset * Math.cos(radAngle1));
 
-			double x1 = -Robot.sensorOffset * Math.sin(radAngle1 - radAngle2);
-			double y1 = Robot.sensorOffset * Math.cos(radAngle1 - radAngle2);
+			float x1 = (float) (-Robot.sensorOffset * Math.sin(radAngle1
+					- radAngle2));
+			float y1 = (float) (Robot.sensorOffset * Math.cos(radAngle1
+					- radAngle2));
 
-			double lambda = ((x1 - x0) * (xp - x0) + (y1 - y0) * (yp - y0))
-					/ (Math.pow((x1 - x0), 2) + Math.pow((y1 - y0), 2));
+			double afstand = new Line(x0, y0, x1, y1).ptLineDist(xp, yp);
 
-			double afstand = Math.sqrt(Math
-					.pow(xp - x0 - lambda * (x1 - x0), 2)
-					+ (Math.pow(yp - y0 - lambda * (y1 - y0), 2)));
+			// double lambda = ((x1 - x0) * (xp - x0) + (y1 - y0) * (yp - y0))
+			// / (Math.pow((x1 - x0), 2) + Math.pow((y1 - y0), 2));
+			//
+			// double afstand = Math.sqrt(Math
+			// .pow(xp - x0 - lambda * (x1 - x0), 2)
+			// + (Math.pow(yp - y0 - lambda * (y1 - y0), 2)));
 
 			return afstand > crossTreshold;
 		}

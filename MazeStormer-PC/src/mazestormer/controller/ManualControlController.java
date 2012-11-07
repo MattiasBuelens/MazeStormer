@@ -17,32 +17,37 @@ public class ManualControlController extends SubController implements
 
 	@Override
 	public void moveForward() {
-		Pilot pilot = getPilot();
-		pilot.forward();
+		getPilot().forward();
 	}
 
 	@Override
 	public void moveBackward() {
-		Pilot pilot = getPilot();
-		pilot.backward();
+		getPilot().backward();
 	}
 
 	@Override
 	public void rotateLeft() {
-		Pilot pilot = getPilot();
-		pilot.rotateLeft();
+		getPilot().rotateLeft();
 	}
 
 	@Override
 	public void rotateRight() {
-		Pilot pilot = getPilot();
-		pilot.rotateRight();
+		getPilot().rotateRight();
+	}
+
+	@Override
+	public void travel(float distance) {
+		getPilot().travel(distance, true);
+	}
+
+	@Override
+	public void rotate(float angle) {
+		getPilot().rotate(angle, true);
 	}
 
 	@Override
 	public void stop() {
-		Pilot pilot = getPilot();
-		pilot.stop();
+		getPilot().stop();
 	}
 
 	@Override

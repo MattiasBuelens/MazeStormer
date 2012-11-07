@@ -7,46 +7,43 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
-
-import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
-import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 
 import mazestormer.controller.ILineFinderController;
 import net.miginfocom.swing.MigLayout;
+
+import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
+import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 
 public class LineFinderPanel extends ViewPanel {
 
 	private static final long serialVersionUID = 1L;
 	private final ILineFinderController controller;
 	private JPanel container;
-	
-	//Actions
+
+	// Actions
 	private final Action startAction = new StartAction();
 	private final Action stopAction = new StopAction();
-	
-	//The buttons to start/stop finding the line
+
+	// The buttons to start/stop finding the line
 	private JButton btnStart;
 	private JButton btnStop;
 
 	public LineFinderPanel(ILineFinderController controller) {
 		this.controller = controller;
-		
+
 		setBorder(new TitledBorder(null, "Linefinder control",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
+
 		this.container = new JPanel();
 		container.setLayout(new MigLayout("", "[grow]", "[]"));
 		add(this.container);
-		
+
 		createStartStopButtons();
 	}
-	
+
 	private void createStartStopButtons() {
 		JPanel buttons = new JPanel();
 		container.add(buttons, "cell 0 0,grow");
@@ -64,16 +61,15 @@ public class LineFinderPanel extends ViewPanel {
 		btnStop.setIcon(new MediaPlaybackStopIcon(32, 32));
 		buttons.add(btnStop);
 	}
-	
+
 	public void startSearching() {
 		controller.startSearching();
 	}
-	
+
 	public void stopSearching() {
 		controller.stopSearching();
 	}
-	
-	
+
 	private class StartAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 

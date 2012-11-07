@@ -8,8 +8,11 @@ import java.beans.Beans;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 import javax.swing.border.TitledBorder;
@@ -20,9 +23,11 @@ import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoDownIcon;
+import com.javarichclient.icon.tango.actions.GoJumpIcon;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.GoPreviousIcon;
 import com.javarichclient.icon.tango.actions.GoUpIcon;
+import javax.swing.SpinnerNumberModel;
 
 public class ManualControlPanel extends ViewPanel {
 
@@ -35,12 +40,16 @@ public class ManualControlPanel extends ViewPanel {
 	private final Action turnLeft = new RotateLeftAction();
 	private final Action turnRight = new RotateRightAction();
 	private final Action stop = new StopAction();
+	private final Action turnCW = new TurnClockwiseAction();
+	private final Action turnCCW = new TurnCounterClockwiseAction();
 
 	private JPanel container;
 	private JToggleButton btnForward;
 	private JToggleButton btnLeft;
 	private JToggleButton btnBackward;
 	private JToggleButton btnRight;
+	private JButton btnTurnCCW;
+	private JButton btnTurnCW;
 	private ParametersPanel parametersPanel;
 	private ScanPanel scanPanel;
 
@@ -53,18 +62,20 @@ public class ManualControlPanel extends ViewPanel {
 		this.controller = controller;
 
 		registerKeyboardActions();
-		setLayout(new MigLayout("", "[grow]", "[][][]"));
+		setLayout(new MigLayout("", "[grow][grow]", "[][][]"));
 
 		container = new JPanel();
 		container.setLayout(new MigLayout("", "[][][]", "[][]"));
-		add(container, "cell 0 0,alignx center,aligny top");
+		add(container, "cell 0 0 2 1,alignx center,aligny top");
 		createControls();
 
-		parametersPanel = new ParametersPanel(controller.parameters());
-		add(parametersPanel, "cell 0 1,grow");
+		createMovePanel();
 
-		scanPanel = new ScanPanel(controller.scan());
-		add(scanPanel, "cell 0 2,grow");
+		parametersPanel = new ParametersPanel(controller.parameters());
+		add(parametersPanel, "cell 1 1,grow");
+		
+				scanPanel = new ScanPanel(controller.scan());
+				add(scanPanel, "cell 0 2 2 1,grow");
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -75,23 +86,39 @@ public class ManualControlPanel extends ViewPanel {
 	}
 
 	private void createControls() {
+		Icon iconCW = new GoJumpIcon(32, 32);
+		TransformIcon iconCCW = new TransformIcon(new GoJumpIcon(32, 32));
+		iconCCW.reflectVertical();
+
+		btnTurnCCW = new JButton();
+		btnTurnCCW.setAction(turnCCW);
+		btnTurnCCW.setText("");
+		btnTurnCCW.setIcon(iconCCW);
+		container.add(btnTurnCCW, "cell 0 0");
+
 		btnForward = new JToggleButton();
 		btnForward.addItemListener(new ControlListener(moveForward, stop));
 		btnForward.setIcon(new GoUpIcon(32, 32));
 		btnForward.setToolTipText("Forward");
-		container.add(btnForward, "cell 1 0,grow");
+		container.add(btnForward, "cell 1 0");
+
+		btnTurnCW = new JButton();
+		btnTurnCW.setAction(turnCW);
+		btnTurnCW.setText("");
+		btnTurnCW.setIcon(iconCW);
+		container.add(btnTurnCW, "cell 2 0");
 
 		btnLeft = new JToggleButton();
 		btnLeft.addItemListener(new ControlListener(turnLeft, stop));
 		btnLeft.setIcon(new GoPreviousIcon(32, 32));
 		btnLeft.setToolTipText("Left");
-		container.add(btnLeft, "cell 0 1,grow");
+		container.add(btnLeft, "cell 0 1");
 
 		btnBackward = new JToggleButton();
 		btnBackward.addItemListener(new ControlListener(moveBackward, stop));
 		btnBackward.setIcon(new GoDownIcon(32, 32));
 		btnBackward.setToolTipText("Backward");
-		container.add(btnBackward, "cell 1 1,grow");
+		container.add(btnBackward, "cell 1 1");
 
 		btnRight = new JToggleButton();
 		btnRight.addItemListener(new ControlListener(turnRight, stop));
@@ -105,6 +132,27 @@ public class ManualControlPanel extends ViewPanel {
 		btnBackward.setSelected(button == btnBackward);
 		btnLeft.setSelected(button == btnLeft);
 		btnRight.setSelected(button == btnRight);
+	}
+
+	private void createMovePanel() {
+		movePanel = new JPanel();
+		add(movePanel, "cell 0 1,grow");
+		movePanel.setLayout(new MigLayout("", "[grow,fill][fill]", "[][]"));
+
+		spinTravelDistance = new JSpinner();
+		spinTravelDistance.setModel(new SpinnerNumberModel(new Integer(0),
+				new Integer(0), null, new Integer(1)));
+		movePanel.add(spinTravelDistance, "cell 0 0");
+
+		btnTravel = new JButton("Travel");
+		movePanel.add(btnTravel, "cell 1 0");
+
+		spinRotateAngle = new JSpinner();
+		spinRotateAngle.setModel(new SpinnerNumberModel(0, -180, 180, 1));
+		movePanel.add(spinRotateAngle, "cell 0 1");
+
+		btnRotate = new JButton("Rotate");
+		movePanel.add(btnRotate, "cell 1 1");
 	}
 
 	public void moveForward() {
@@ -132,6 +180,10 @@ public class ManualControlPanel extends ViewPanel {
 		controller.stop();
 	}
 
+	public void rotate(float angle) {
+		controller.rotate(angle);
+	}
+
 	@Subscribe
 	public void onStopped(StopEvent e) {
 		setCurrentButton(null);
@@ -141,6 +193,11 @@ public class ManualControlPanel extends ViewPanel {
 	 * The currently executing keyboard action.
 	 */
 	private Action currentAction;
+	private JPanel movePanel;
+	private JSpinner spinTravelDistance;
+	private JSpinner spinRotateAngle;
+	private JButton btnTravel;
+	private JButton btnRotate;
 
 	private void registerKeyboardActions() {
 		bindKeyboardAction(KeyEvent.VK_Z, moveForward, stop);
@@ -289,4 +346,33 @@ public class ManualControlPanel extends ViewPanel {
 			stop();
 		}
 	}
+
+	private class TurnClockwiseAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public TurnClockwiseAction() {
+			putValue(NAME, "Turn clockwise");
+			putValue(SHORT_DESCRIPTION, "Turn 90° clockwise");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			rotate(-90f);
+		}
+	}
+
+	private class TurnCounterClockwiseAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public TurnCounterClockwiseAction() {
+			putValue(NAME, "Turn clockwise");
+			putValue(SHORT_DESCRIPTION, "Turn 90° clockwise");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			rotate(90f);
+		}
+	}
+
 }

@@ -36,8 +36,7 @@ public class ScanPanel extends ViewPanel {
 		setLayout(new BorderLayout(0, 0));
 
 		container = new JPanel();
-		container.setLayout(new MigLayout("", "[grow 75][grow 25][right]",
-				"[][][]"));
+		container.setLayout(new MigLayout("", "[grow 75][grow 25][right][fill]", "[][]"));
 		add(container, BorderLayout.NORTH);
 
 		createRange();
@@ -66,11 +65,17 @@ public class ScanPanel extends ViewPanel {
 		spinRange.setModel(rangeModel);
 		container.add(spinRange, "cell 1 0,grow");
 
-		JLabel lblUnit = new JLabel("degrees");
+		JLabel lblUnit = new JLabel("\u00B0");
 		container.add(lblUnit, "cell 2 0,grow");
 	}
 
 	private void createAngleIncrement() {
+		
+				JButton btnScan = new JButton();
+				btnScan.setAction(scanAction);
+				btnScan.setText("");
+				btnScan.setIcon(new SystemSearchIcon(32, 32));
+				container.add(btnScan, "cell 3 0 1 2,alignx center");
 		JLabel lblScanCount = new JLabel("Scan count");
 		container.add(lblScanCount, "cell 0 1,grow");
 
@@ -81,12 +86,6 @@ public class ScanPanel extends ViewPanel {
 
 		JLabel lblUnit = new JLabel("scans");
 		container.add(lblUnit, "cell 2 1,grow");
-
-		JButton btnScan = new JButton();
-		btnScan.setAction(scanAction);
-		btnScan.setText("");
-		btnScan.setIcon(new SystemSearchIcon(32, 32));
-		container.add(btnScan, "cell 0 2 3 1,alignx center");
 	}
 
 	private class ScanAction extends AbstractAction {

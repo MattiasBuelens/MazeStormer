@@ -3,6 +3,7 @@ package mazestormer.controller;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.awt.EventQueue;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +24,7 @@ import mazestormer.robot.Robot;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
+import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
@@ -46,7 +48,8 @@ public class MainController implements IMainController {
 	/*
 	 * Events
 	 */
-	private EventBus eventBus = new EventBus(getClass().getSimpleName());
+	private EventBus eventBus = new AsyncEventBus(getClass().getSimpleName(),
+			Executors.newSingleThreadExecutor());
 
 	/*
 	 * Models
@@ -140,11 +143,11 @@ public class MainController implements IMainController {
 
 	@Override
 	public ICalibrationController calibration() {
-		if(calibration == null)
+		if (calibration == null)
 			calibration = new CalibrationController(this);
 		return calibration;
 	}
-	
+
 	@Override
 	public IParametersController parameters() {
 		if (parameters == null) {

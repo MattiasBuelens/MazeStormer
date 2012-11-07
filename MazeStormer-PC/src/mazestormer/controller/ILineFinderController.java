@@ -4,10 +4,8 @@ import mazestormer.util.EventSource;
 
 public interface ILineFinderController extends EventSource {
 
-	public int measureLightValue();
-	
-	public void startSearching(int highLightValue, int lowLightValue);
-	
+	public void startSearching();
+
 	public void stopSearching();
 
 }

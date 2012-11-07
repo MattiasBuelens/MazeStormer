@@ -109,7 +109,7 @@ public class ParametersPanel extends ViewPanel {
 		spinRotateSpeed.setModel(rotateSpeedModel);
 		container.add(spinRotateSpeed, "cell 1 1,grow");
 
-		JLabel lblUnit = new JLabel("degrees/sec");
+		JLabel lblUnit = new JLabel("\u00B0/sec");
 		container.add(lblUnit, "cell 2 1,grow");
 	}
 
