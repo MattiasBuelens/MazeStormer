@@ -11,10 +11,12 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.IManualControlController;
@@ -27,7 +29,6 @@ import com.javarichclient.icon.tango.actions.GoJumpIcon;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.GoPreviousIcon;
 import com.javarichclient.icon.tango.actions.GoUpIcon;
-import javax.swing.SpinnerNumberModel;
 
 public class ManualControlPanel extends ViewPanel {
 
@@ -35,23 +36,27 @@ public class ManualControlPanel extends ViewPanel {
 
 	private final IManualControlController controller;
 
-	private final Action moveForward = new MoveForwardAction();
-	private final Action moveBackward = new MoveBackwardAction();
-	private final Action turnLeft = new RotateLeftAction();
-	private final Action turnRight = new RotateRightAction();
-	private final Action stop = new StopAction();
-	private final Action turnCW = new TurnClockwiseAction();
-	private final Action turnCCW = new TurnCounterClockwiseAction();
+	private final Action forwardAction = new ForwardAction();
+	private final Action backwardAction = new BackwardAction();
+	private final Action leftAction = new LeftAction();
+	private final Action rightAction = new RightAction();
+	private final Action turnCWAction = new TurnClockwiseAction();
+	private final Action turnCCWAction = new TurnCounterClockwiseAction();
+	private final Action travelAction = new TravelAction();
+	private final Action rotateAction = new RotateAction();
+	private final Action stopAction = new StopAction();
 
 	private JPanel container;
 	private JToggleButton btnForward;
 	private JToggleButton btnLeft;
 	private JToggleButton btnBackward;
 	private JToggleButton btnRight;
-	private JButton btnTurnCCW;
-	private JButton btnTurnCW;
+	private JPanel movePanel;
 	private ParametersPanel parametersPanel;
 	private ScanPanel scanPanel;
+
+	private SpinnerNumberModel travelDistanceModel;
+	private SpinnerNumberModel rotateAngleModel;
 
 	/**
 	 * Create the panel.
@@ -64,6 +69,8 @@ public class ManualControlPanel extends ViewPanel {
 		registerKeyboardActions();
 		setLayout(new MigLayout("", "[grow][grow]", "[][][]"));
 
+		createModels();
+
 		container = new JPanel();
 		container.setLayout(new MigLayout("", "[][][]", "[][]"));
 		add(container, "cell 0 0 2 1,alignx center,aligny top");
@@ -73,9 +80,9 @@ public class ManualControlPanel extends ViewPanel {
 
 		parametersPanel = new ParametersPanel(controller.parameters());
 		add(parametersPanel, "cell 1 1,grow");
-		
-				scanPanel = new ScanPanel(controller.scan());
-				add(scanPanel, "cell 0 2 2 1,grow");
+
+		scanPanel = new ScanPanel(controller.scan());
+		add(scanPanel, "cell 0 2 2 1,grow");
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -85,43 +92,55 @@ public class ManualControlPanel extends ViewPanel {
 		registerEventBus(controller.getEventBus());
 	}
 
+	private void createModels() {
+		travelDistanceModel = new SpinnerNumberModel(new Float(0f), new Float(
+				0f), null, new Float(1f));
+		rotateAngleModel = new SpinnerNumberModel(new Float(0f), new Float(
+				-180f), new Float(180f), new Float(1f));
+	}
+
 	private void createControls() {
 		Icon iconCW = new GoJumpIcon(32, 32);
 		TransformIcon iconCCW = new TransformIcon(new GoJumpIcon(32, 32));
 		iconCCW.reflectVertical();
 
-		btnTurnCCW = new JButton();
-		btnTurnCCW.setAction(turnCCW);
+		// Icon iconCW = new EditRedoIcon(32, 32);
+		// Icon iconCCW = new EditUndoIcon(32, 32);
+
+		JButton btnTurnCCW = new JButton();
+		btnTurnCCW.setAction(turnCCWAction);
 		btnTurnCCW.setText("");
 		btnTurnCCW.setIcon(iconCCW);
 		container.add(btnTurnCCW, "cell 0 0");
 
 		btnForward = new JToggleButton();
-		btnForward.addItemListener(new ControlListener(moveForward, stop));
+		btnForward.addItemListener(new ControlListener(forwardAction,
+				stopAction));
 		btnForward.setIcon(new GoUpIcon(32, 32));
 		btnForward.setToolTipText("Forward");
 		container.add(btnForward, "cell 1 0");
 
-		btnTurnCW = new JButton();
-		btnTurnCW.setAction(turnCW);
+		JButton btnTurnCW = new JButton();
+		btnTurnCW.setAction(turnCWAction);
 		btnTurnCW.setText("");
 		btnTurnCW.setIcon(iconCW);
 		container.add(btnTurnCW, "cell 2 0");
 
 		btnLeft = new JToggleButton();
-		btnLeft.addItemListener(new ControlListener(turnLeft, stop));
+		btnLeft.addItemListener(new ControlListener(leftAction, stopAction));
 		btnLeft.setIcon(new GoPreviousIcon(32, 32));
 		btnLeft.setToolTipText("Left");
 		container.add(btnLeft, "cell 0 1");
 
 		btnBackward = new JToggleButton();
-		btnBackward.addItemListener(new ControlListener(moveBackward, stop));
+		btnBackward.addItemListener(new ControlListener(backwardAction,
+				stopAction));
 		btnBackward.setIcon(new GoDownIcon(32, 32));
 		btnBackward.setToolTipText("Backward");
 		container.add(btnBackward, "cell 1 1");
 
 		btnRight = new JToggleButton();
-		btnRight.addItemListener(new ControlListener(turnRight, stop));
+		btnRight.addItemListener(new ControlListener(rightAction, stopAction));
 		btnRight.setIcon(new GoNextIcon(32, 32));
 		btnRight.setToolTipText("Right");
 		container.add(btnRight, "cell 2 1,grow");
@@ -137,22 +156,29 @@ public class ManualControlPanel extends ViewPanel {
 	private void createMovePanel() {
 		movePanel = new JPanel();
 		add(movePanel, "cell 0 1,grow");
-		movePanel.setLayout(new MigLayout("", "[grow,fill][fill]", "[][]"));
+		movePanel.setLayout(new MigLayout("", "[fill][grow,fill][]", "[fill][fill]"));
 
-		spinTravelDistance = new JSpinner();
-		spinTravelDistance.setModel(new SpinnerNumberModel(new Integer(0),
-				new Integer(0), null, new Integer(1)));
-		movePanel.add(spinTravelDistance, "cell 0 0");
+		JButton btnTravel = new JButton();
+		btnTravel.setAction(travelAction);
+		movePanel.add(btnTravel, "cell 0 0");
 
-		btnTravel = new JButton("Travel");
-		movePanel.add(btnTravel, "cell 1 0");
+		JSpinner spinTravelDistance = new JSpinner();
+		spinTravelDistance.setModel(travelDistanceModel);
+		movePanel.add(spinTravelDistance, "cell 1 0");
 
-		spinRotateAngle = new JSpinner();
-		spinRotateAngle.setModel(new SpinnerNumberModel(0, -180, 180, 1));
-		movePanel.add(spinRotateAngle, "cell 0 1");
+		JLabel lblTravelUnit = new JLabel("cm");
+		movePanel.add(lblTravelUnit, "cell 2 0");
 
-		btnRotate = new JButton("Rotate");
-		movePanel.add(btnRotate, "cell 1 1");
+		JButton btnRotate = new JButton("Rotate");
+		btnRotate.setAction(rotateAction);
+		movePanel.add(btnRotate, "cell 0 1");
+
+		JSpinner spinRotateAngle = new JSpinner();
+		spinRotateAngle.setModel(rotateAngleModel);
+		movePanel.add(spinRotateAngle, "cell 1 1");
+
+		JLabel lblRotateUnit = new JLabel("\u00B0");
+		movePanel.add(lblRotateUnit, "cell 2 1");
 	}
 
 	public void moveForward() {
@@ -180,6 +206,10 @@ public class ManualControlPanel extends ViewPanel {
 		controller.stop();
 	}
 
+	public void travel(float distance) {
+		controller.travel(distance);
+	}
+
 	public void rotate(float angle) {
 		controller.rotate(angle);
 	}
@@ -193,17 +223,12 @@ public class ManualControlPanel extends ViewPanel {
 	 * The currently executing keyboard action.
 	 */
 	private Action currentAction;
-	private JPanel movePanel;
-	private JSpinner spinTravelDistance;
-	private JSpinner spinRotateAngle;
-	private JButton btnTravel;
-	private JButton btnRotate;
 
 	private void registerKeyboardActions() {
-		bindKeyboardAction(KeyEvent.VK_Z, moveForward, stop);
-		bindKeyboardAction(KeyEvent.VK_S, moveBackward, stop);
-		bindKeyboardAction(KeyEvent.VK_Q, turnLeft, stop);
-		bindKeyboardAction(KeyEvent.VK_D, turnRight, stop);
+		bindKeyboardAction(KeyEvent.VK_Z, forwardAction, stopAction);
+		bindKeyboardAction(KeyEvent.VK_S, backwardAction, stopAction);
+		bindKeyboardAction(KeyEvent.VK_Q, leftAction, stopAction);
+		bindKeyboardAction(KeyEvent.VK_D, rightAction, stopAction);
 	}
 
 	private void bindKeyboardAction(int key, Action startAction,
@@ -277,10 +302,10 @@ public class ManualControlPanel extends ViewPanel {
 		}
 	}
 
-	private class MoveForwardAction extends ImmediateAction {
+	private class ForwardAction extends ImmediateAction {
 		private static final long serialVersionUID = 1L;
 
-		public MoveForwardAction() {
+		public ForwardAction() {
 			putValue(NAME, "Move forward");
 			putValue(SHORT_DESCRIPTION, "Move the robot forward");
 		}
@@ -291,10 +316,10 @@ public class ManualControlPanel extends ViewPanel {
 		}
 	}
 
-	private class MoveBackwardAction extends ImmediateAction {
+	private class BackwardAction extends ImmediateAction {
 		private static final long serialVersionUID = 1L;
 
-		public MoveBackwardAction() {
+		public BackwardAction() {
 			putValue(NAME, "Move backward");
 			putValue(SHORT_DESCRIPTION, "Move the robot backward");
 		}
@@ -305,10 +330,10 @@ public class ManualControlPanel extends ViewPanel {
 		}
 	}
 
-	private class RotateLeftAction extends ImmediateAction {
+	private class LeftAction extends ImmediateAction {
 		private static final long serialVersionUID = 1L;
 
-		public RotateLeftAction() {
+		public LeftAction() {
 			putValue(NAME, "Rotate left");
 			putValue(SHORT_DESCRIPTION, "Rotate the robot counter-clockwise");
 		}
@@ -319,10 +344,10 @@ public class ManualControlPanel extends ViewPanel {
 		}
 	}
 
-	private class RotateRightAction extends ImmediateAction {
+	private class RightAction extends ImmediateAction {
 		private static final long serialVersionUID = 1L;
 
-		public RotateRightAction() {
+		public RightAction() {
 			putValue(NAME, "Rotate right");
 			putValue(SHORT_DESCRIPTION, "Rotate the robot clockwise");
 		}
@@ -330,6 +355,62 @@ public class ManualControlPanel extends ViewPanel {
 		@Override
 		public void go() {
 			rotateRight();
+		}
+	}
+
+	private class TurnClockwiseAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public TurnClockwiseAction() {
+			putValue(NAME, "Turn clockwise");
+			putValue(SHORT_DESCRIPTION, "Turn 90\u00B0 clockwise");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			rotate(-90f);
+		}
+	}
+
+	private class TurnCounterClockwiseAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public TurnCounterClockwiseAction() {
+			putValue(NAME, "Turn clockwise");
+			putValue(SHORT_DESCRIPTION, "Turn 90\u00B0 counter-clockwise");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			rotate(90f);
+		}
+	}
+
+	private class TravelAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public TravelAction() {
+			putValue(NAME, "Travel");
+			putValue(SHORT_DESCRIPTION, "Travel the given distance");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			travel((float) travelDistanceModel.getValue());
+		}
+	}
+
+	private class RotateAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public RotateAction() {
+			putValue(NAME, "Rotate ");
+			putValue(SHORT_DESCRIPTION, "Rotate along the given angle");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			rotate((float) rotateAngleModel.getValue());
 		}
 	}
 
@@ -344,34 +425,6 @@ public class ManualControlPanel extends ViewPanel {
 		@Override
 		public void go() {
 			stop();
-		}
-	}
-
-	private class TurnClockwiseAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public TurnClockwiseAction() {
-			putValue(NAME, "Turn clockwise");
-			putValue(SHORT_DESCRIPTION, "Turn 90° clockwise");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			rotate(-90f);
-		}
-	}
-
-	private class TurnCounterClockwiseAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public TurnCounterClockwiseAction() {
-			putValue(NAME, "Turn clockwise");
-			putValue(SHORT_DESCRIPTION, "Turn 90° clockwise");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			rotate(90f);
 		}
 	}
 

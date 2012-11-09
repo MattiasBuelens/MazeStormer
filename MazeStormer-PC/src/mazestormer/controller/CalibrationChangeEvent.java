@@ -17,4 +17,5 @@ public class CalibrationChangeEvent {
 	public int getValue() {
 		return value;
 	}
+
 }

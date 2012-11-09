@@ -22,7 +22,7 @@ public class StatePanel extends ViewPanel {
 	private IStateController controller;
 
 	private JTable table;
-	
+
 	private JTextPane textPane;
 
 	public StatePanel(IStateController controller) {
@@ -34,7 +34,7 @@ public class StatePanel extends ViewPanel {
 
 		table = new JTable();
 		add(table);
-		
+
 		textPane = new JTextPane();
 		textPane.setEditable(false);
 		add(textPane, BorderLayout.CENTER);
@@ -55,48 +55,60 @@ public class StatePanel extends ViewPanel {
 	public void onConnected(ConnectEvent e) {
 		updateState(e.isConnected());
 	}
-	
+
 	@Subscribe
-	public void onMove(MoveEvent me) {
-		String text = "POSE BEFORE ASSIGNMENT:" +
-					  "\n   x-position= " + controller.getXPosition() +
-					  "\n   y-position= " + controller.getYPosition() +
-					  "\n   heading= " + controller.getHeading() +
-					  "\n" +
-					  "\nCURRENT ASSIGNMENT: \n   ";
-		
-		if(me.getEventType() == EventType.STOPPED) {
+	public void onMove(MoveEvent e) {
+		String x = String.format("%.2f", controller.getXPosition());
+		String y = String.format("%.2f", controller.getYPosition());
+		String heading = String.format("%.2f", controller.getHeading());
+		String text = "POSE BEFORE ASSIGNMENT:" + "\n   x-position= " + x
+				+ "\n   y-position= " + y + "\n   heading= " + heading + "\n"
+				+ "\nCURRENT ASSIGNMENT: \n   ";
+
+		if (e.getEventType() == EventType.STOPPED) {
 			text = text + "stand still";
-		}
-		
-		else if(me.getEventType() == EventType.STARTED) {
-			Move move = me.getMove();
-			switch(move.getMoveType()){
+		} else if (e.getEventType() == EventType.STARTED) {
+			Move move = e.getMove();
+			switch (move.getMoveType()) {
 			case TRAVEL:
-				float speed = Math.round(Math.abs(move.getTravelSpeed())*10)/10;
-				if(move.getDistanceTraveled() == Float.POSITIVE_INFINITY) text = text + "translate forward at " + speed + "cm/s";
-				else if(move.getDistanceTraveled() == Float.NEGATIVE_INFINITY) text = text + "translate backward at " + speed + "cm/s";
-				else if(move.getTravelSpeed() >=0 ) text = text + "translate " + Math.abs(move.getDistanceTraveled()) + "cm forward at " + speed + "cm/s";
-				else if(move.getTravelSpeed() < 0 ) text = text + "translate " + Math.abs(move.getDistanceTraveled()) + "cm backward at " + speed + "cm/s";
+				float speed = Math.round(Math.abs(move.getTravelSpeed()) * 10) / 10;
+				if (move.getDistanceTraveled() == Float.POSITIVE_INFINITY)
+					text = text + "translate forward at " + speed + "cm/s";
+				else if (move.getDistanceTraveled() == Float.NEGATIVE_INFINITY)
+					text = text + "translate backward at " + speed + "cm/s";
+				else if (move.getTravelSpeed() >= 0)
+					text = text + "translate "
+							+ Math.abs(move.getDistanceTraveled())
+							+ "cm forward at " + speed + "cm/s";
+				else if (move.getTravelSpeed() < 0)
+					text = text + "translate "
+							+ Math.abs(move.getDistanceTraveled())
+							+ "cm backward at " + speed + "cm/s";
 				break;
 			case ROTATE:
-				float rotateSpeed = Math.round(Math.abs(move.getRotateSpeed())*10)/10;
-				if(move.getAngleTurned() == Float.POSITIVE_INFINITY) text = text + "rotate counter-clockwise at " + rotateSpeed + "deg/s";
-				else if(move.getAngleTurned() == Float.NEGATIVE_INFINITY) text = text + "rotate clockwise at " + rotateSpeed + "deg/s";
-				else if(move.getRotateSpeed() >=0 ) text = text + "rotate " + Math.abs(move.getAngleTurned()) + "deg counter-clockwise at " + rotateSpeed + "deg/s";
-				else if(move.getRotateSpeed() < 0 ) text = text + "rotate " + Math.abs(move.getAngleTurned()) + "deg clockwise at " + rotateSpeed + "deg/s";
+				float rotateSpeed = Math
+						.round(Math.abs(move.getRotateSpeed()) * 10) / 10;
+				if (move.getAngleTurned() == Float.POSITIVE_INFINITY)
+					text = text + "rotate counter-clockwise at " + rotateSpeed
+							+ "deg/s";
+				else if (move.getAngleTurned() == Float.NEGATIVE_INFINITY)
+					text = text + "rotate clockwise at " + rotateSpeed
+							+ "deg/s";
+				else if (move.getRotateSpeed() >= 0)
+					text = text + "rotate " + Math.abs(move.getAngleTurned())
+							+ "deg counter-clockwise at " + rotateSpeed
+							+ "deg/s";
+				else if (move.getRotateSpeed() < 0)
+					text = text + "rotate " + Math.abs(move.getAngleTurned())
+							+ "deg clockwise at " + rotateSpeed + "deg/s";
 				break;
-			case ARC:
-				// n/a
-			case STOP:
+			default:
 				// n/a
 			}
-		}
-				
-		else {
+		} else {
 			text = text + "UNKNOWN";
 		}
-	
+
 		textPane.setText(text);
 	}
 

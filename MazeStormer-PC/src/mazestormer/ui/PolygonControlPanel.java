@@ -54,8 +54,7 @@ public class PolygonControlPanel extends ViewPanel {
 		setLayout(new MigLayout("", "[grow,fill]", "[][]"));
 
 		container = new JPanel();
-		container.setLayout(new MigLayout("", "[grow 75][grow][right]",
-				"[][][][]"));
+		container.setLayout(new MigLayout("", "[grow 75][grow][]", "[][][][]"));
 		add(container);
 
 		createNbSides();

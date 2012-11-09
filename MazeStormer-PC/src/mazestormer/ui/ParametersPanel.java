@@ -1,10 +1,8 @@
 package mazestormer.ui;
 
-import java.awt.BorderLayout;
 import java.beans.Beans;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -23,7 +21,6 @@ public class ParametersPanel extends ViewPanel {
 
 	private final IParametersController controller;
 
-	private JPanel container;
 
 	private SpinnerNumberModel travelSpeedModel;
 	private SpinnerNumberModel rotateSpeedModel;
@@ -32,12 +29,7 @@ public class ParametersPanel extends ViewPanel {
 		this.controller = controller;
 
 		setBorder(null);
-		setLayout(new BorderLayout(0, 0));
-
-		container = new JPanel();
-		container.setLayout(new MigLayout("", "[grow 75][grow 25][right]",
-				"[][]"));
-		add(container, BorderLayout.NORTH);
+		setLayout(new MigLayout("", "[grow 75][grow 25][]", "[grow,fill][grow,fill]"));
 
 		createModels();
 
@@ -77,7 +69,7 @@ public class ParametersPanel extends ViewPanel {
 
 	private void createTravelSpeed() {
 		JLabel lblTravelSpeed = new JLabel("Travel speed");
-		container.add(lblTravelSpeed, "cell 0 0,grow");
+		add(lblTravelSpeed, "cell 0 0,grow");
 
 		travelSpeedModel.addChangeListener(new ChangeListener() {
 			@Override
@@ -88,15 +80,15 @@ public class ParametersPanel extends ViewPanel {
 
 		JSpinner spinTravelSpeed = new JSpinner();
 		spinTravelSpeed.setModel(travelSpeedModel);
-		container.add(spinTravelSpeed, "cell 1 0,grow");
+		add(spinTravelSpeed, "cell 1 0,grow");
 
 		JLabel lblUnit = new JLabel("cm/sec");
-		container.add(lblUnit, "cell 2 0,grow");
+		add(lblUnit, "cell 2 0,grow");
 	}
 
 	private void createRotateSpeed() {
 		JLabel lblRotateSpeed = new JLabel("Rotate speed");
-		container.add(lblRotateSpeed, "cell 0 1,grow");
+		add(lblRotateSpeed, "cell 0 1,grow");
 
 		rotateSpeedModel.addChangeListener(new ChangeListener() {
 			@Override
@@ -107,10 +99,10 @@ public class ParametersPanel extends ViewPanel {
 
 		JSpinner spinRotateSpeed = new JSpinner();
 		spinRotateSpeed.setModel(rotateSpeedModel);
-		container.add(spinRotateSpeed, "cell 1 1,grow");
+		add(spinRotateSpeed, "cell 1 1,grow");
 
 		JLabel lblUnit = new JLabel("\u00B0/sec");
-		container.add(lblUnit, "cell 2 1,grow");
+		add(lblUnit, "cell 2 1,grow");
 	}
 
 	@Subscribe

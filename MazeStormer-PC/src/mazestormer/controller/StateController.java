@@ -7,15 +7,15 @@ public class StateController extends SubController implements IStateController {
 	}
 
 	public float getXPosition() {
-		return Math.round(getMainController().getPose().getX() * 10) / 10;
+		return getMainController().getPose().getX();
 	}
 
 	public float getYPosition() {
-		return Math.round(getMainController().getPose().getY() * 10) / 10;
+		return getMainController().getPose().getY();
 	}
 
 	public float getHeading() {
-		return Math.round(getMainController().getPose().getHeading() * 10) / 10;
+		return getMainController().getPose().getHeading();
 	}
 
 }

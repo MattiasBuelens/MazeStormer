@@ -4,14 +4,16 @@ import mazestormer.util.EventSource;
 
 public interface ICalibrationController extends EventSource {
 
-	public int measureLightValue();
+	public int getLowValue();
 
-	public void setHighValue(int value);
+	public int getHighValue();
 
 	public void setLowValue(int value);
 
-	public int getHighValue();
-	
-	public int getLowValue();
+	public void setHighValue(int value);
+
+	public void calibrateLowValue();
+
+	public void calibrateHighValue();
 
 }

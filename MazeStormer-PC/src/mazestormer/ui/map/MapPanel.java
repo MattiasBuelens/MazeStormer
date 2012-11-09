@@ -52,7 +52,7 @@ public class MapPanel extends ViewPanel {
 	private JPopupMenu menuLayers;
 	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
 
-	public static final double zoomFactor = 1.25d;
+	public static final double zoomFactor = 1.5d;
 
 	public MapPanel(IMapController controller) {
 		this.controller = controller;
