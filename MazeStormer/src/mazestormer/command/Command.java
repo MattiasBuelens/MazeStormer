@@ -11,15 +11,11 @@ public abstract class Command implements Transmittable {
 	private CommandType type;
 	private double parameter;
 
-	protected Command(CommandType type) {
-		this.type = type;
-	}
-
-	public final CommandType getType() {
+	public CommandType getType() {
 		return type;
 	}
 
-	private void setType(CommandType type) {
+	public void setType(CommandType type) {
 		this.type = type;
 	}
 

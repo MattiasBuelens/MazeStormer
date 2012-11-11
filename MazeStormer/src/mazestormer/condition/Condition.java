@@ -11,15 +11,11 @@ public abstract class Condition implements Transmittable {
 	private ConditionType type;
 	private double parameter;
 
-	protected Condition(ConditionType type) {
-		this.type = type;
-	}
-
-	public final ConditionType getType() {
+	public ConditionType getType() {
 		return type;
 	}
 
-	private void setType(ConditionType type) {
+	public void setType(ConditionType type) {
 		this.type = type;
 	}
 
