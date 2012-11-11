@@ -134,7 +134,7 @@ public class VirtualPilot implements Pilot {
 			waitComplete();
 	}
 
-	@Override
+	//@Override
 	public void arcForward(double radius) {
 		float angle, distance;
 		if (radius > 0) {
@@ -147,7 +147,7 @@ public class VirtualPilot implements Pilot {
 		movementStart(MoveType.ARC, distance, angle, (float) radius);
 	}
 
-	@Override
+	//@Override
 	public void arcBackward(double radius) {
 		float angle, distance;
 		if (radius > 0) {
@@ -160,12 +160,12 @@ public class VirtualPilot implements Pilot {
 		movementStart(MoveType.ARC, distance, angle, (float) radius);
 	}
 
-	@Override
+	//@Override
 	public void arc(double radius, double angle) {
 		arc(radius, angle, false);
 	}
 
-	@Override
+	//@Override
 	public void arc(double radius, double angle, boolean immediateReturn) {
 		if (radius == Double.POSITIVE_INFINITY
 				|| radius == Double.NEGATIVE_INFINITY) {
@@ -175,12 +175,12 @@ public class VirtualPilot implements Pilot {
 		steer(turnRate(radius), angle, immediateReturn);
 	}
 
-	@Override
+	//@Override
 	public void travelArc(double radius, double distance) {
 		travelArc(radius, distance, false);
 	}
 
-	@Override
+	//@Override
 	public void travelArc(double radius, double distance,
 			boolean immediateReturn) {
 		if (radius == Double.POSITIVE_INFINITY
@@ -322,12 +322,12 @@ public class VirtualPilot implements Pilot {
 	 * Implementation note: the minimum turning circle radius is not actually
 	 * used in the PC version of DifferentialPilot.
 	 */
-	@Override
+	//@Override
 	public void setMinRadius(double radius) {
 		minRadius = radius;
 	}
 
-	@Override
+	//@Override
 	public double getMinRadius() {
 		return minRadius;
 	}

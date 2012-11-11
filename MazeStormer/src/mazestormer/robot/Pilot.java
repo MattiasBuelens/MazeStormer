@@ -1,8 +1,8 @@
 package mazestormer.robot;
 
-import lejos.robotics.navigation.ArcRotateMoveController;
+import lejos.robotics.navigation.RotateMoveController;
 
-public interface Pilot extends ArcRotateMoveController{
+public interface Pilot extends RotateMoveController {
 
 	/**
 	 * Starts the robot turning left (counter-clockwise).
