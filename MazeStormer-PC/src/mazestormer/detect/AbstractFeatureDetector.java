@@ -47,6 +47,14 @@ public abstract class AbstractFeatureDetector implements FeatureDetector {
 		setDelay(delay);
 	}
 
+	/**
+	 * Create a new feature detector with no delay. The detector is initialized
+	 * as disabled, call {@link #enableDetection(boolean)} to start detecting.
+	 */
+	public AbstractFeatureDetector() {
+		this(0);
+	}
+
 	@Override
 	public boolean isEnabled() {
 		return enabled;
