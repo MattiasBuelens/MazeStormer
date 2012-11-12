@@ -1,6 +1,6 @@
 package mazestormer.connect;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.IOException;
 
@@ -9,6 +9,7 @@ import lejos.pc.comm.NXTComm;
 import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTCommandConnector;
 import lejos.pc.comm.NXTConnector;
+import lejos.pc.comm.NXTInfo;
 import mazestormer.robot.PhysicalRobot;
 import mazestormer.robot.Robot;
 
@@ -42,19 +43,58 @@ public class PhysicalConnector implements Connector {
 		robot = new PhysicalRobot();
 	}
 
+	// private boolean createConnection(String deviceName) {
+	// // Search for NXT by name and connect over LCP
+	// NXTConnector conn = new NXTConnector();
+	// boolean isConnected = conn.connectTo(deviceName, null,
+	// NXTCommFactory.ALL_PROTOCOLS, NXTComm.LCP);
+	// if (!isConnected)
+	// return false;
+	//
+	// // Set up command connector
+	// comm = conn.getNXTComm();
+	// command = new NXTCommand(comm);
+	// NXTCommandConnector.setNXTCommand(command);
+	// return true;
+	// }
+
 	private boolean createConnection(String deviceName) {
-		// Search for NXT by name and connect over LCP
-		NXTConnector conn = new NXTConnector();
-		boolean isConnected = conn.connectTo(deviceName, null,
-				NXTCommFactory.ALL_PROTOCOLS, NXTComm.LCP);
+		boolean isConnected = false;
+
+		// Search for NXT
+		NXTConnector connector = new NXTConnector();
+		NXTInfo[] devices = connector.search(deviceName, null,
+				NXTCommFactory.BLUETOOTH);
+		if (devices.length == 0)
+			return false;
+
+		// Connect to LeJOS firmware
+		isConnected = connector.connectTo(devices[0], NXTComm.LCP);
+		if (!isConnected)
+			return false;
+
+		// Start program
+		NXTComm comm = connector.getNXTComm();
+		NXTCommand command = new NXTCommand(comm);
+		try {
+			command.startProgram("Program.nxj");
+			connector.close();
+		} catch (IOException e) {
+			return false;
+		}
+
+		// Connect to program
+		connector = new NXTConnector();
+		isConnected = connector.connectTo(devices[0], NXTComm.LCP);
 		if (!isConnected)
 			return false;
 
 		// Set up command connector
-		comm = conn.getNXTComm();
-		command = new NXTCommand(comm);
+		this.comm = connector.getNXTComm();
+		this.command = new NXTCommand(comm);
 		NXTCommandConnector.setNXTCommand(command);
-		return true;
+
+		return isConnected;
 	}
 
 	@Override
