@@ -193,6 +193,9 @@ public class LineFinderController extends SubController implements
 			if (shouldStop())
 				return;
 			pilot.travel(dist);
+			
+			pilot.setTravelSpeed(originalTravelSpeed);
+			pilot.setRotateSpeed(originalRotateSpeed);
 
 		}
 
