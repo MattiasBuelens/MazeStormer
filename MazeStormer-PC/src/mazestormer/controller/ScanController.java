@@ -48,5 +48,14 @@ public class ScanController extends SubController implements IScanController {
 			postEvent(new RangeFeatureDetectEvent(feature));
 		}
 	}
+	
+	@Override
+	public float getMaxDistance(){
+		return getMainController().getRobot().getRangeDetector().getMaxDistance();
+	}
 
+	@Override
+	public void setMaxDistance(float distance) {
+		getMainController().getRobot().getRangeDetector().setMaxDistance(distance);
+	}
 }

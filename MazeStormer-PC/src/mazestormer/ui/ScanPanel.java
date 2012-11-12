@@ -9,6 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import mazestormer.controller.IScanController;
 import net.miginfocom.swing.MigLayout;
@@ -23,6 +25,7 @@ public class ScanPanel extends ViewPanel {
 
 	private SpinnerNumberModel rangeModel;
 	private SpinnerNumberModel countModel;
+	private SpinnerNumberModel maxDistanceModel;
 	private final Action scanAction = new ScanAction();
 
 	public ScanPanel(IScanController controller) {
@@ -30,10 +33,11 @@ public class ScanPanel extends ViewPanel {
 
 		setBorder(null);
 		setLayout(new MigLayout("", "[grow 75][grow 25][][fill]",
-				"[grow,fill][grow,fill]"));
+				"[grow,fill][grow,fill][]"));
 
 		createRange();
 		createAngleIncrement();
+		createMaxDistance();
 		createButtons();
 
 		if (!Beans.isDesignTime())
@@ -48,6 +52,10 @@ public class ScanPanel extends ViewPanel {
 		int range = (int) rangeModel.getValue();
 		int count = (int) countModel.getValue();
 		controller.scan(range, count);
+	}
+
+	public void setMaxDistance() {
+		controller.setMaxDistance((int) maxDistanceModel.getValue());
 	}
 
 	private void createRange() {
@@ -76,6 +84,20 @@ public class ScanPanel extends ViewPanel {
 		add(lblUnit, "cell 2 1,grow");
 	}
 
+	private void createMaxDistance() {
+		JLabel lblMaximumScanDistance = new JLabel("Maximum scan distance");
+		add(lblMaximumScanDistance, "cell 0 2, grow");
+
+		JSpinner spinMaxDistance = new JSpinner();
+		maxDistanceModel = new SpinnerNumberModel(100, 1, 255, 1);
+		spinMaxDistance.setModel(maxDistanceModel);
+		add(spinMaxDistance, "cell 1 2, grow");
+		maxDistanceModel.addChangeListener(new MaxDistanceChangeListener());
+
+		JLabel lblUnit = new JLabel("cm");
+		add(lblUnit, "cell 2 2, grow");
+	}
+
 	private void createButtons() {
 		JButton btnScan = new JButton();
 		btnScan.setAction(scanAction);
@@ -96,6 +118,14 @@ public class ScanPanel extends ViewPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			scan();
+		}
+	}
+
+	private class MaxDistanceChangeListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			setMaxDistance();
 		}
 	}
 
