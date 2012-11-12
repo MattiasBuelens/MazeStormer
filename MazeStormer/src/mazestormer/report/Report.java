@@ -20,12 +20,12 @@ public abstract class Report implements Transmittable {
 
 	@Override
 	public void dumpObject(DataOutputStream dos) throws IOException {
-		dos.writeInt(getType().ordinal());
+		//dos.writeInt(getType().ordinal());
 	}
 
 	@Override
 	public void loadObject(DataInputStream dis) throws IOException {
-		setType(ReportType.values()[dis.readInt()]);
+		//setType(ReportType.values()[dis.readInt()]);
 	}
 
 }

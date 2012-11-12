@@ -7,12 +7,14 @@ import java.io.IOException;
 import lejos.pc.comm.NXTComm;
 import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTConnector;
-import mazestormer.robot.PhysicalRobot;
+import mazestormer.remote.RemoteCommunicator;
+import mazestormer.remote.RemoteRobot;
 import mazestormer.robot.Robot;
 
 public class RemoteConnector implements Connector {
 
 	private NXTConnector connector;
+	private RemoteCommunicator communicator;
 
 	private Robot robot;
 
@@ -29,18 +31,23 @@ public class RemoteConnector implements Connector {
 
 	@Override
 	public void connect(ConnectionContext context) {
+		// Initialize connection
 		if (!createConnection(context.getDeviceName())) {
 			return;
 		}
 
-		// TODO Pass packet handler to constructor
-		robot = new PhysicalRobot();
+		// Create communicator
+		communicator = new RemoteCommunicator(connector);
+
+		// Create robot
+		robot = new RemoteRobot(communicator);
 	}
 
 	private boolean createConnection(String deviceName) {
 		// Search for NXT by name and connect over packet
 		connector = new NXTConnector();
-		boolean isConnected = connector.connectTo(deviceName, null, NXTCommFactory.BLUETOOTH, NXTComm.PACKET);
+		boolean isConnected = connector.connectTo(deviceName, null,
+				NXTCommFactory.BLUETOOTH, NXTComm.PACKET);
 		return isConnected;
 	}
 
@@ -53,7 +60,11 @@ public class RemoteConnector implements Connector {
 		robot = null;
 
 		try {
-			// TODO Send shutdown command to robot
+			if (communicator != null) {
+				// TODO Send shutdown command to robot
+				// communicator.send(new ShutdownCommand());
+				communicator.terminate();
+			}
 			if (connector != null) {
 				connector.close();
 			}
@@ -61,6 +72,7 @@ public class RemoteConnector implements Connector {
 			e.printStackTrace();
 		} finally {
 			connector = null;
+			communicator = null;
 		}
 	}
 

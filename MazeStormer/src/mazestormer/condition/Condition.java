@@ -29,13 +29,13 @@ public abstract class Condition implements Transmittable {
 
 	@Override
 	public void dumpObject(DataOutputStream dos) throws IOException {
-		dos.writeInt(getType().ordinal());
+		//dos.writeInt(getType().ordinal());
 		dos.writeDouble(getParameter());
 	}
 
 	@Override
 	public void loadObject(DataInputStream dis) throws IOException {
-		setType(ConditionType.values()[dis.readInt()]);
+		//setType(ConditionType.values()[dis.readInt()]);
 		setParameter(dis.readDouble());
 	}
 

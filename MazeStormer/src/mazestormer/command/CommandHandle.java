@@ -2,8 +2,6 @@ package mazestormer.command;
 
 public interface CommandHandle {
 
-	public long getId();
-
 	public Command getCommand();
 
 	public boolean isDone();

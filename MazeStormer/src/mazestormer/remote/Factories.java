@@ -20,14 +20,23 @@ public class Factories {
 			ReportType.class);
 
 	public Factory<? extends Command> get(CommandType type) {
+		if (!commands.containsKey(type)) {
+			throw new IllegalStateException("No factory registered for " + type);
+		}
 		return commands.get(type);
 	}
 
 	public Factory<? extends Condition> get(ConditionType type) {
+		if (!conditions.containsKey(type)) {
+			throw new IllegalStateException("No factory registered for " + type);
+		}
 		return conditions.get(type);
 	}
 
 	public Factory<? extends Report> get(ReportType type) {
+		if (!reports.containsKey(type)) {
+			throw new IllegalStateException("No factory registered for " + type);
+		}
 		return reports.get(type);
 	}
 
@@ -42,6 +51,23 @@ public class Factories {
 
 	public void register(ReportType type, Factory<? extends Report> factory) {
 		reports.put(type, factory);
+	}
+
+	private static Factories instance;
+
+	public static Factories getInstance() {
+		if (instance == null) {
+			throw new IllegalStateException("No factories registered.");
+		}
+		return instance;
+	}
+
+	public static void setInstance(Factories factories) {
+		if (factories == null) {
+			throw new IllegalArgumentException(
+					"Factories instance must be effective.");
+		}
+		instance = factories;
 	}
 
 }

@@ -8,8 +8,17 @@ import lejos.robotics.Transmittable;
 
 public abstract class Command implements Transmittable {
 
+	private long id;
 	private CommandType type;
 	private double parameter;
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
 
 	public CommandType getType() {
 		return type;
@@ -29,13 +38,15 @@ public abstract class Command implements Transmittable {
 
 	@Override
 	public void dumpObject(DataOutputStream dos) throws IOException {
-		dos.writeInt(getType().ordinal());
+		//dos.writeInt(getType().ordinal());
+		dos.writeLong(getId());
 		dos.writeDouble(getParameter());
 	}
 
 	@Override
 	public void loadObject(DataInputStream dis) throws IOException {
-		setType(CommandType.values()[dis.readInt()]);
+		//setType(CommandType.values()[dis.readInt()]);
+		setId(dis.readLong());
 		setParameter(dis.readDouble());
 	}
 
