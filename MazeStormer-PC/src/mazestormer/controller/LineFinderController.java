@@ -110,7 +110,7 @@ public class LineFinderController extends SubController implements
 			final int threshold = 30;
 
 			double slowRotateSpeed, fastRotateSpeed;
-			slowRotateSpeed = 20;
+			slowRotateSpeed = 30;
 			fastRotateSpeed = 50;
 
 			// TODO: Speed?
