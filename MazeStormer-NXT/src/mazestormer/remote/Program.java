@@ -3,27 +3,16 @@ package mazestormer.remote;
 import lejos.nxt.Button;
 import lejos.nxt.LCD;
 import lejos.nxt.NXT;
-import lejos.nxt.comm.Bluetooth;
+import lejos.nxt.comm.LCPBTResponder;
 import lejos.nxt.comm.LCPResponder;
-import lejos.nxt.comm.NXTCommConnector;
-import lejos.util.Delay;
 
 public class Program {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		LCD.drawString("LCP setup", 0, 0);
-		NXTCommConnector connector = Bluetooth.getConnector();
-		LCPResponder responder = new LCPResponder(connector);
+		LCPResponder responder = new LCPBTResponder();
 		responder.start();
-		
-		Delay.msDelay(5000);
-
-		while (responder.isConnected()) {
-			Thread.yield();
-		}
+		responder.join(10000);
 
 		LCD.drawString("LCP exit", 0, 1);
 		Button.waitForAnyPress();
