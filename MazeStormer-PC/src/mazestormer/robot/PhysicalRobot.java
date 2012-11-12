@@ -7,7 +7,6 @@ import lejos.robotics.RangeScanner;
 import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 
 public class PhysicalRobot implements Robot {
@@ -47,7 +46,7 @@ public class PhysicalRobot implements Robot {
 	}
 
 	@Override
-	public RangeFeatureDetector getRangeDetector() {
+	public RangeScannerFeatureDetector getRangeDetector() {
 		if (detector == null) {
 			detector = new RangeScannerFeatureDetector(getRangeScanner());
 			detector.setPoseProvider(getPoseProvider());

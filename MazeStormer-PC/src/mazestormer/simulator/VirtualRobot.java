@@ -3,7 +3,6 @@ package mazestormer.simulator;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
@@ -50,7 +49,7 @@ public class VirtualRobot implements Robot {
 	}
 
 	@Override
-	public RangeFeatureDetector getRangeDetector() {
+	public RangeScannerFeatureDetector getRangeDetector() {
 		if (detector == null) {
 			detector = new RangeScannerFeatureDetector(getRangeScanner());
 			detector.setPoseProvider(getPoseProvider());

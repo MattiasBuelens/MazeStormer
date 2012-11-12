@@ -56,5 +56,14 @@ public class ScanController extends SubController implements IScanController {
 		// TODO Do we need to update any models here?
 		postEvent(new RangeClearEvent());
 	}
+	
+	@Override
+	public float getMaxDistance(){
+		return getMainController().getRobot().getRangeDetector().getMaxDistance();
+	}
 
+	@Override
+	public void setMaxDistance(float distance) {
+		getMainController().getRobot().getRangeDetector().setMaxDistance(distance);
+	}
 }

@@ -2,7 +2,7 @@ package mazestormer.robot;
 
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.detect.RangeFeatureDetector;
+import mazestormer.detect.RangeScannerFeatureDetector;
 
 public interface Robot {
 
@@ -44,7 +44,7 @@ public interface Robot {
 	/**
 	 * Get the range feature detector of this robot.
 	 */
-	public RangeFeatureDetector getRangeDetector();
+	public RangeScannerFeatureDetector getRangeDetector();
 
 	/**
 	 * Get the pose provider of this robot.
