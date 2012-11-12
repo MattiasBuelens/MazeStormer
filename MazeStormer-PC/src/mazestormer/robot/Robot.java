@@ -18,7 +18,7 @@ public interface Robot {
 	/**
 	 * Distance between center of wheels, in centimeters.
 	 */
-	public final static float trackWidth = 13.97f;
+	public final static float trackWidth = 14.3f;//13.97f;
 
 	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.

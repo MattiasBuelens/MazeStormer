@@ -15,7 +15,7 @@ public class LineFinderController extends SubController implements
 	private final static double rotateAngle = 135.0;
 
 	// Correction angle
-	private final static double extraAngle = 4.0;
+	private final static double extraAngle = 0.0;//4.0;
 
 	private LineFinderRunner runner;
 
