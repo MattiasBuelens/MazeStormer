@@ -7,6 +7,7 @@ import java.util.List;
 import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.detect.RangeClearEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.util.MapUtils;
 
@@ -74,11 +75,6 @@ public class RangesLayer extends MapLayer {
 		return circle;
 	}
 
-	@Override
-	public int getZIndex() {
-		return 10;
-	}
-
 	public void clear() {
 		// Remove all child nodes
 		invokeDOMChange(new Runnable() {
@@ -87,5 +83,15 @@ public class RangesLayer extends MapLayer {
 				SVGUtils.removeChildNodes(getElement());
 			}
 		});
+	}
+
+	@Subscribe
+	public void onRangeCleared(RangeClearEvent e) {
+		clear();
+	}
+
+	@Override
+	public int getZIndex() {
+		return 10;
 	}
 }

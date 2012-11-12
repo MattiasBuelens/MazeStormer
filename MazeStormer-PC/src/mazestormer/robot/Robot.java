@@ -2,6 +2,7 @@ package mazestormer.robot;
 
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.detect.RangeFeatureDetector;
 
 public interface Robot {
 
@@ -18,7 +19,7 @@ public interface Robot {
 	/**
 	 * Distance between center of wheels, in centimeters.
 	 */
-	public final static float trackWidth = 14.3f;//13.97f;
+	public final static float trackWidth = 14.3f;// 13.97f;
 
 	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.
@@ -39,6 +40,11 @@ public interface Robot {
 	 * Get the range scanner of this robot.
 	 */
 	public RangeScanner getRangeScanner();
+
+	/**
+	 * Get the range feature detector of this robot.
+	 */
+	public RangeFeatureDetector getRangeDetector();
 
 	/**
 	 * Get the pose provider of this robot.

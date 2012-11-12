@@ -1,10 +1,10 @@
 package mazestormer.controller;
 
-import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
-import lejos.robotics.navigation.Pose;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.detect.RangeClearEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
+import mazestormer.detect.RangeFeatureDetector;
 
 public class ScanController extends SubController implements IScanController {
 
@@ -20,8 +20,8 @@ public class ScanController extends SubController implements IScanController {
 		return getMainController().getRobot().getRangeScanner();
 	}
 
-	private Pose getPose() {
-		return getMainController().getPose();
+	private RangeFeatureDetector getRangeDetector() {
+		return getMainController().getRobot().getRangeDetector();
 	}
 
 	@Override
@@ -36,15 +36,25 @@ public class ScanController extends SubController implements IScanController {
 		for (int i = 0; i < count; i++) {
 			angles[i] = start + i * increment;
 		}
-
-		// Get readings
+		// Configure scanner
 		RangeScanner scanner = getRangeScanner();
 		scanner.setAngles(angles);
-		RangeReadings readings = scanner.getRangeValues();
 
-		// Publish readings
-		RangeFeature feature = new RangeFeature(readings, getPose());
-		postEvent(new RangeFeatureDetectEvent(feature));
+		// Scan for readings
+		RangeFeatureDetector detector = getRangeDetector();
+		RangeFeature feature = detector.scan();
+
+		// Publish
+		if (feature != null) {
+			postEvent(new RangeFeatureDetectEvent(feature));
+		}
+	}
+
+	@Override
+	public void clear() {
+		// Clear detected ranges
+		// TODO Do we need to update any models here?
+		postEvent(new RangeClearEvent());
 	}
 
 }
