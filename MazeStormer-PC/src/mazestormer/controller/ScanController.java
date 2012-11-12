@@ -2,7 +2,6 @@ package mazestormer.controller;
 
 import lejos.robotics.RangeScanner;
 import lejos.robotics.objectdetection.RangeFeature;
-import mazestormer.detect.RangeClearEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.detect.RangeFeatureDetector;
 
@@ -48,13 +47,6 @@ public class ScanController extends SubController implements IScanController {
 		if (feature != null) {
 			postEvent(new RangeFeatureDetectEvent(feature));
 		}
-	}
-
-	@Override
-	public void clear() {
-		// Clear detected ranges
-		// TODO Do we need to update any models here?
-		postEvent(new RangeClearEvent());
 	}
 
 }

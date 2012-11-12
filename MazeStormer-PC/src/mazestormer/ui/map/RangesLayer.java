@@ -11,7 +11,6 @@ import java.util.Set;
 import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.objectdetection.RangeFeature;
-import mazestormer.detect.RangeClearEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.util.MapUtils;
 
@@ -95,7 +94,8 @@ public class RangesLayer extends MapLayer {
 			int index = it.previousIndex();
 			Set<Element> set = it.previous();
 			// Get color position
-			int colorIndex = Math.max(1, length - index);
+			int colorIndex = Math.min(pointColorThreshold,
+					Math.max(0, length - index));
 			float colorPosition = (float) colorIndex
 					/ (float) pointColorThreshold;
 			// Set color
@@ -136,11 +136,6 @@ public class RangesLayer extends MapLayer {
 				SVGUtils.removeChildNodes(getElement());
 			}
 		});
-	}
-
-	@Subscribe
-	public void onRangeCleared(RangeClearEvent e) {
-		clear();
 	}
 
 	@Override

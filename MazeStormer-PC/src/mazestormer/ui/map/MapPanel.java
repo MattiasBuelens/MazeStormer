@@ -31,6 +31,7 @@ import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
+import javax.swing.JButton;
 
 public class MapPanel extends ViewPanel {
 
@@ -48,6 +49,7 @@ public class MapPanel extends ViewPanel {
 	private final Action zoomInAction = new ZoomInAction();
 	private final Action zoomOutAction = new ZoomOutAction();
 	private final Action resetZoomAction = new ResetZoomAction();
+	private final Action clearRangesAction = new ClearRangesAction();
 
 	private JPopupMenu menuLayers;
 	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
@@ -95,14 +97,13 @@ public class MapPanel extends ViewPanel {
 			}
 		});
 		actionBar.add(btnFollow);
-
 		actionBar.add(createGoButton());
 
 		Component horizontalGlue = Box.createHorizontalGlue();
 		actionBar.add(horizontalGlue);
 
+		actionBar.add(createClearRangesButton());
 		actionBar.add(createZoomButton());
-
 		actionBar.add(createLayersButton());
 	}
 
@@ -124,6 +125,12 @@ public class MapPanel extends ViewPanel {
 		addPopup(this, menuGo);
 
 		return btnGo;
+	}
+
+	private JButton createClearRangesButton() {
+		JButton btnClearRanges = new JButton("Clear ranges");
+		btnClearRanges.setAction(clearRangesAction);
+		return btnClearRanges;
 	}
 
 	private SplitButton createZoomButton() {
@@ -297,6 +304,19 @@ public class MapPanel extends ViewPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			canvas.resetZoom();
+		}
+	}
+
+	private class ClearRangesAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public ClearRangesAction() {
+			putValue(NAME, "Clear ranges");
+			putValue(SHORT_DESCRIPTION, "Clear the detected ranges on the map.");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			controller.clearRanges();
 		}
 	}
 
