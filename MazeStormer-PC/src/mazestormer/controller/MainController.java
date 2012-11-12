@@ -308,7 +308,8 @@ public class MainController implements IMainController {
 	 */
 
 	private Pose getStartPose() {
-		return new Pose(0f, 0f, 90f);
+		// return new Pose(0f, 0f, 90f);
+		return new Pose(20f, 20f, 90f);
 	}
 
 	public Pose getPose() {
