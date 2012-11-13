@@ -10,6 +10,15 @@ public class MoveReport extends Report {
 
 	private Move move;
 
+	public MoveReport(ReportType type) {
+		super(type);
+	}
+
+	public MoveReport(ReportType type, Move move) {
+		this(type);
+		setMove(move);
+	}
+
 	public Move getMove() {
 		return move;
 	}
@@ -23,19 +32,19 @@ public class MoveReport extends Report {
 	}
 
 	@Override
-	public void dumpObject(DataOutputStream dos) throws IOException {
-		super.dumpObject(dos);
-		// Dump move
-		getMove().dumpObject(dos);
-	}
-
-	@Override
-	public void loadObject(DataInputStream dis) throws IOException {
-		super.loadObject(dis);
+	public void read(DataInputStream dis) throws IOException {
+		super.read(dis);
 		// Load move
 		Move move = createMove();
 		move.loadObject(dis);
 		setMove(move);
+	}
+
+	@Override
+	public void write(DataOutputStream dos) throws IOException {
+		super.write(dos);
+		// Dump move
+		getMove().dumpObject(dos);
 	}
 
 }

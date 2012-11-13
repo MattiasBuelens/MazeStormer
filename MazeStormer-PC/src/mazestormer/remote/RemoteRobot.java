@@ -2,22 +2,28 @@ package mazestormer.remote;
 
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.command.Command;
+import mazestormer.report.Report;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
 public class RemoteRobot implements Robot {
 
-	private final RemoteCommunicator communicator;
+	private RemotePilot pilot;
 
-	public RemoteRobot(RemoteCommunicator communicator) {
+	private final Communicator<Command, Report> communicator;
+
+	public RemoteRobot(Communicator<Command, Report> communicator) {
 		this.communicator = communicator;
 	}
 
 	@Override
 	public Pilot getPilot() {
-		// TODO Auto-generated method stub
-		return null;
+		if (pilot == null) {
+			pilot = new RemotePilot(getCommunicator());
+		}
+		return pilot;
 	}
 
 	@Override
@@ -36,6 +42,18 @@ public class RemoteRobot implements Robot {
 	public PoseProvider getPoseProvider() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public Communicator<Command, Report> getCommunicator() {
+		return communicator;
+	}
+
+	public void setupCommunicator() {
+		Communicator<Command, Report> comm = getCommunicator();
+
+		// Report listeners
+
+		// Commanders
 	}
 
 	@Override

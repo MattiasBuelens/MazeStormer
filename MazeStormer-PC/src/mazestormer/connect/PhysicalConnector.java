@@ -15,7 +15,7 @@ import mazestormer.robot.Robot;
 
 public class PhysicalConnector implements Connector {
 
-	private NXTComm comm;
+	private NXTConnector connector;
 	private NXTCommand command;
 
 	private Robot robot;
@@ -36,31 +36,16 @@ public class PhysicalConnector implements Connector {
 		if (isConnected())
 			return;
 
-		boolean isConnected = createConnection(context.getDeviceName());
-		if (!isConnected)
+		// Initialize connection
+		if (!createConnection(context.getDeviceName())) {
 			return;
+		}
 
+		// Create robot
 		robot = new PhysicalRobot();
 	}
 
-	// private boolean createConnection(String deviceName) {
-	// // Search for NXT by name and connect over LCP
-	// NXTConnector conn = new NXTConnector();
-	// boolean isConnected = conn.connectTo(deviceName, null,
-	// NXTCommFactory.ALL_PROTOCOLS, NXTComm.LCP);
-	// if (!isConnected)
-	// return false;
-	//
-	// // Set up command connector
-	// comm = conn.getNXTComm();
-	// command = new NXTCommand(comm);
-	// NXTCommandConnector.setNXTCommand(command);
-	// return true;
-	// }
-
 	private boolean createConnection(String deviceName) {
-		boolean isConnected = false;
-
 		// Search for NXT
 		NXTConnector connector = new NXTConnector();
 		NXTInfo[] devices = connector.search(deviceName, null,
@@ -69,32 +54,15 @@ public class PhysicalConnector implements Connector {
 			return false;
 
 		// Connect to LeJOS firmware
-		isConnected = connector.connectTo(devices[0], NXTComm.LCP);
-		if (!isConnected)
-			return false;
-
-		// Start program
-		NXTComm comm = connector.getNXTComm();
-		NXTCommand command = new NXTCommand(comm);
-		try {
-			command.startProgram("Program.nxj");
-			connector.close();
-		} catch (IOException e) {
-			return false;
-		}
-
-		// Connect to program
-		connector = new NXTConnector();
-		isConnected = connector.connectTo(devices[0], NXTComm.LCP);
+		boolean isConnected = connector.connectTo(devices[0], NXTComm.LCP);
 		if (!isConnected)
 			return false;
 
 		// Set up command connector
-		this.comm = connector.getNXTComm();
-		this.command = new NXTCommand(comm);
+		this.connector = connector;
+		this.command = new NXTCommand(connector.getNXTComm());
 		NXTCommandConnector.setNXTCommand(command);
-
-		return isConnected;
+		return true;
 	}
 
 	@Override
@@ -109,14 +77,14 @@ public class PhysicalConnector implements Connector {
 			if (command != null) {
 				command.disconnect();
 			}
-			if (comm != null) {
-				comm.close();
+			if (connector != null) {
+				connector.close();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			command = null;
-			comm = null;
+			connector = null;
 		}
 	}
 

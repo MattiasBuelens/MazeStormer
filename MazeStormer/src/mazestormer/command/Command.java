@@ -4,13 +4,21 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import lejos.robotics.Transmittable;
+import mazestormer.remote.Message;
 
-public abstract class Command implements Transmittable {
+public abstract class Command implements Message {
 
+	private final CommandType type;
 	private long id;
-	private CommandType type;
 	private double parameter;
+
+	public Command(CommandType type) {
+		this.type = type;
+	}
+
+	public CommandType getType() {
+		return type;
+	}
 
 	public long getId() {
 		return id;
@@ -18,14 +26,6 @@ public abstract class Command implements Transmittable {
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public CommandType getType() {
-		return type;
-	}
-
-	public void setType(CommandType type) {
-		this.type = type;
 	}
 
 	public double getParameter() {
@@ -37,17 +37,17 @@ public abstract class Command implements Transmittable {
 	}
 
 	@Override
-	public void dumpObject(DataOutputStream dos) throws IOException {
-		//dos.writeInt(getType().ordinal());
-		dos.writeLong(getId());
-		dos.writeDouble(getParameter());
+	public void read(DataInputStream dis) throws IOException {
+		// setType(CommandType.values()[dis.readInt()]);
+		setId(dis.readLong());
+		setParameter(dis.readDouble());
 	}
 
 	@Override
-	public void loadObject(DataInputStream dis) throws IOException {
-		//setType(CommandType.values()[dis.readInt()]);
-		setId(dis.readLong());
-		setParameter(dis.readDouble());
+	public void write(DataOutputStream dos) throws IOException {
+		// dos.writeInt(getType().ordinal());
+		dos.writeLong(getId());
+		dos.writeDouble(getParameter());
 	}
 
 }

@@ -4,19 +4,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import lejos.robotics.Transmittable;
+import mazestormer.remote.Message;
 
-public abstract class Condition implements Transmittable {
+public abstract class Condition implements Message {
 
-	private ConditionType type;
+	private final ConditionType type;
 	private double parameter;
+
+	public Condition(ConditionType type) {
+		this.type = type;
+	}
 
 	public ConditionType getType() {
 		return type;
-	}
-
-	public void setType(ConditionType type) {
-		this.type = type;
 	}
 
 	public double getParameter() {
@@ -28,15 +28,15 @@ public abstract class Condition implements Transmittable {
 	}
 
 	@Override
-	public void dumpObject(DataOutputStream dos) throws IOException {
-		//dos.writeInt(getType().ordinal());
-		dos.writeDouble(getParameter());
+	public void read(DataInputStream dis) throws IOException {
+		// setType(ConditionType.values()[dis.readInt()]);
+		setParameter(dis.readDouble());
 	}
 
 	@Override
-	public void loadObject(DataInputStream dis) throws IOException {
-		//setType(ConditionType.values()[dis.readInt()]);
-		setParameter(dis.readDouble());
+	public void write(DataOutputStream dos) throws IOException {
+		// dos.writeInt(getType().ordinal());
+		dos.writeDouble(getParameter());
 	}
 
 }

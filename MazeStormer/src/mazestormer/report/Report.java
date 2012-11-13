@@ -4,28 +4,28 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import lejos.robotics.Transmittable;
+import mazestormer.remote.Message;
 
-public abstract class Report implements Transmittable {
+public abstract class Report implements Message {
 
-	private ReportType type;
+	private final ReportType type;
+
+	public Report(ReportType type) {
+		this.type = type;
+	}
 
 	public ReportType getType() {
 		return type;
 	}
 
-	public void setType(ReportType type) {
-		this.type = type;
+	@Override
+	public void read(DataInputStream dis) throws IOException {
+		// setType(ReportType.values()[dis.readInt()]);
 	}
 
 	@Override
-	public void dumpObject(DataOutputStream dos) throws IOException {
-		//dos.writeInt(getType().ordinal());
-	}
-
-	@Override
-	public void loadObject(DataInputStream dis) throws IOException {
-		//setType(ReportType.values()[dis.readInt()]);
+	public void write(DataOutputStream dos) throws IOException {
+		// dos.writeInt(getType().ordinal());
 	}
 
 }

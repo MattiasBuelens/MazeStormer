@@ -47,12 +47,6 @@ public class VirtualPilot implements Pilot {
 	}
 
 	@Override
-	public void terminate() {
-		stop();
-		executor.shutdownNow();
-	}
-
-	@Override
 	public void setTravelSpeed(double speed) {
 		this.travelSpeed = speed;
 	}
@@ -434,6 +428,12 @@ public class VirtualPilot implements Pilot {
 	public Move getMovement() {
 		return new Move(move.getMoveType(), getMovementIncrement(),
 				getAngleIncrement(), isMoving());
+	}
+
+	@Override
+	public void terminate() {
+		stop();
+		executor.shutdownNow();
 	}
 
 	private class MoveEndRunner implements Runnable {
