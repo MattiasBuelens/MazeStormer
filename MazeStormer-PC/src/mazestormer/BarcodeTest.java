@@ -155,7 +155,7 @@ public class BarcodeTest {
 				if(index<0)
 					finished = true;
 				else{
-					values[index] = Math.abs((i%2)-1);
+					values[index] = Math.abs(i%2);
 					System.out.println("i: " + i + " j: " + j);
 					System.out.println(values[index]);
 					index--;
