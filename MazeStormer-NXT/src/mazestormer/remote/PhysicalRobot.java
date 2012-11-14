@@ -1,5 +1,8 @@
 package mazestormer.remote;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
@@ -10,11 +13,7 @@ import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.Command;
-import mazestormer.command.RotateCommandListener;
 import mazestormer.command.ShutdownCommandListener;
-import mazestormer.command.StopCommandListener;
-import mazestormer.command.TravelCommandListener;
-import mazestormer.report.MoveReporter;
 import mazestormer.report.Report;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
@@ -29,36 +28,25 @@ public class PhysicalRobot implements Robot {
 
 	private final Communicator<Report, Command> communicator;
 
+	private List<MessageListener<Command>> messageListeners = new ArrayList<MessageListener<Command>>();
+
 	public PhysicalRobot(Communicator<Report, Command> communicator) {
 		this.communicator = communicator;
-		setupCommunicator();
+		setup();
 	}
 
 	@Override
 	public Pilot getPilot() {
-		if (pilot == null) {
-			pilot = new PhysicalPilot(Robot.leftWheelDiameter,
-					Robot.rightWheelDiameter, Robot.trackWidth, Motor.A,
-					Motor.B, false);
-		}
 		return pilot;
 	}
 
 	@Override
 	public CalibratedLightSensor getLightSensor() {
-		if (light == null) {
-			light = new PhysicalLightSensor(SensorPort.S1);
-		}
 		return light;
 	}
 
 	@Override
 	public RangeScanner getRangeScanner() {
-		if (scanner == null) {
-			RangeFinder sensor = new UltrasonicSensor(SensorPort.S2);
-			RegulatedMotor headMotor = Motor.C;
-			scanner = new RotatingRangeScanner(headMotor, sensor);
-		}
 		return scanner;
 	}
 
@@ -74,25 +62,40 @@ public class PhysicalRobot implements Robot {
 		return communicator;
 	}
 
-	public void setupCommunicator() {
-		Communicator<Report, Command> comm = getCommunicator();
+	public void setup() {
+		// Pilot
+		pilot = new PhysicalPilot(communicator);
+
+		// Light sensor
+		light = new PhysicalLightSensor(communicator);
+
+		// Scanner
+		RangeFinder sensor = new UltrasonicSensor(SensorPort.S2);
+		RegulatedMotor headMotor = Motor.C;
+		scanner = new RotatingRangeScanner(headMotor, sensor);
 
 		// Command listeners
-		comm.addListener(new TravelCommandListener(this));
-		comm.addListener(new RotateCommandListener(this));
-		comm.addListener(new StopCommandListener(this));
-		comm.addListener(new ShutdownCommandListener(this));
+		addMessageListener(new ShutdownCommandListener(this));
 
 		// Reporters
-		getPilot().addMoveListener(new MoveReporter(comm));
 	}
 
 	@Override
 	public void terminate() {
 		// Stop all communications
 		getCommunicator().stop();
+		// Remove registered message listeners
+		for (MessageListener<Command> listener : messageListeners) {
+			communicator.removeListener(listener);
+		}
 		// Release resources
 		getPilot().terminate();
+	}
+
+	private void addMessageListener(MessageListener<Command> listener) {
+		// Add and store message listener
+		messageListeners.add(listener);
+		communicator.addListener(listener);
 	}
 
 }

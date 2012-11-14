@@ -1,50 +1,55 @@
 package mazestormer.remote;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import lejos.robotics.navigation.Move;
+import lejos.robotics.navigation.Move.MoveType;
 import lejos.robotics.navigation.MoveListener;
 import mazestormer.command.Command;
 import mazestormer.command.CommandType;
+import mazestormer.command.PilotParameterCommand;
 import mazestormer.command.RotateCommand;
 import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
+import mazestormer.report.MoveReport;
 import mazestormer.report.Report;
 import mazestormer.robot.Pilot;
 
-public class RemotePilot implements Pilot {
+public class RemotePilot extends RemoteComponent implements Pilot {
 
+	private boolean isMoving = false;
 	private double travelSpeed;
 	private double rotateSpeed;
-
-	private final Communicator<Command, ? super Report> communicator;
+	private Move movement;
 
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
-	public RemotePilot(Communicator<Command, ? super Report> communicator) {
-		this.communicator = communicator;
+	public RemotePilot(Communicator<Command, Report> communicator) {
+		super(communicator);
+		resetMovement();
+		setup();
 	}
 
-	private void send(Command command) {
-		try {
-			communicator.send(command);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private void setup() {
+		addMessageListener(new MoveReportListener());
 	}
 
 	@Override
 	public void setTravelSpeed(double speed) {
 		travelSpeed = speed;
-		// TODO Auto-generated method stub
+		send(new PilotParameterCommand(CommandType.SET_TRAVEL_SPEED, speed));
 	}
 
 	@Override
 	public double getTravelSpeed() {
 		return travelSpeed;
+	}
+
+	@Override
+	public void setAcceleration(int acceleration) {
+		send(new PilotParameterCommand(CommandType.SET_ACCELERATION,
+				acceleration));
 	}
 
 	@Override
@@ -56,7 +61,7 @@ public class RemotePilot implements Pilot {
 	@Override
 	public void setRotateSpeed(double speed) {
 		rotateSpeed = speed;
-		// TODO Auto-generated method stub
+		send(new PilotParameterCommand(CommandType.SET_ROTATE_SPEED, speed));
 	}
 
 	@Override
@@ -121,15 +126,38 @@ public class RemotePilot implements Pilot {
 			waitComplete();
 	}
 
-	@Override
-	public boolean isMoving() {
-		// TODO Auto-generated method stub
-		return false;
+	protected synchronized void movementStart(Move move) {
+		isMoving = true;
+		setMovement(new Move(move.getMoveType(), 0, 0, isMoving()));
+
+		// Publish the *targeted* move
+		for (MoveListener ml : moveListeners) {
+			ml.moveStarted(move, this);
+		}
 	}
 
-	private void waitComplete() {
-		// TODO Auto-generated method stub
+	protected synchronized void movementStop(Move move) {
+		isMoving = false;
+		setMovement(move);
 
+		// Publish the *travelled* move
+		for (MoveListener ml : moveListeners) {
+			ml.moveStopped(move, this);
+		}
+	}
+
+	@Override
+	public boolean isMoving() {
+		return isMoving;
+	}
+
+	/**
+	 * Waits for the current move to complete.
+	 */
+	private void waitComplete() {
+		while (isMoving()) {
+			Thread.yield();
+		}
 	}
 
 	@Override
@@ -139,12 +167,40 @@ public class RemotePilot implements Pilot {
 
 	@Override
 	public Move getMovement() {
-		// TODO Auto-generated method stub
-		return null;
+		return movement;
 	}
 
-	@Override
-	public void terminate() {
+	public void setMovement(Move move) {
+		movement = new Move(move.getMoveType(), move.getDistanceTraveled(),
+				move.getAngleTurned(), (float) getTravelSpeed(),
+				(float) getRotateSpeed(), isMoving());
+	}
+
+	public void resetMovement() {
+		setMovement(new Move(MoveType.STOP, 0, 0, false));
+	}
+
+	private class MoveReportListener implements MessageListener<Report> {
+		@Override
+		public void messageReceived(Report report) {
+			if (!(report instanceof MoveReport))
+				return;
+
+			MoveReport moveReport = (MoveReport) report;
+			switch (moveReport.getType()) {
+			case MOVE_STARTED:
+				movementStart(moveReport.getMove());
+				break;
+			case MOVE_STOPPED:
+				movementStop(moveReport.getMove());
+				break;
+			case MOVEMENT:
+				setMovement(moveReport.getMove());
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 }

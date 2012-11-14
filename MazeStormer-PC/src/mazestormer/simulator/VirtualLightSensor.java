@@ -121,20 +121,32 @@ public class VirtualLightSensor implements LampLightDetector {
 		return 0;
 	}
 
+	/**
+	 * Not implemented.
+	 */
 	@Override
 	public void setFloodlight(boolean floodlight) {
 	}
 
+	/**
+	 * Not implemented.
+	 */
 	@Override
 	public boolean isFloodlightOn() {
 		return true;
 	}
 
+	/**
+	 * Not implemented.
+	 */
 	@Override
 	public int getFloodlight() {
 		return 0;
 	}
 
+	/**
+	 * Not implemented.
+	 */
 	@Override
 	public boolean setFloodlight(int color) {
 		return false;

@@ -13,7 +13,7 @@ public class ShutdownCommandListener implements MessageListener<Command> {
 
 	@Override
 	public void messageReceived(Command command) {
-		if (!(command instanceof RotateCommand))
+		if (!(command instanceof ShutdownCommand))
 			return;
 
 		robot.terminate();

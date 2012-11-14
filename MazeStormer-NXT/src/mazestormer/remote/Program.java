@@ -16,10 +16,10 @@ public class Program implements Runnable, ButtonListener {
 	private NXTCommunicator communicator;
 
 	private boolean isRunning = false;
+	private boolean isConnected = false;
 
 	public static void main(String[] args) throws Exception {
 		new Program().run();
-		NXT.shutDown();
 	}
 
 	@Override
@@ -27,37 +27,62 @@ public class Program implements Runnable, ButtonListener {
 		isRunning = true;
 		Button.ESCAPE.addButtonListener(this);
 
+		while (isRunning) {
+			clear();
+			println("ESC to quit");
+
+			connect();
+			waitComplete();
+			disconnect();
+		}
+
+		NXT.shutDown();
+	}
+
+	private void connect() {
 		// Wait for Bluetooth connection from PC
 		println("Connecting");
 		NXTConnection connection = Bluetooth.waitForConnection();
-		if (connection != null) {
-			println("Connected");
-			println("ESC to quit");
-			// Create communicator
-			communicator = new NXTCommunicator(connection);
-			// Create robot
-			robot = new PhysicalRobot(communicator);
-			// Start communicator
-			communicator.start();
+
+		if (connection == null) {
+			stop();
 		}
 
-		while (isRunning)
-			Thread.yield();
+		// Connect
+		isConnected = true;
+		println("Connected");
+		// Create communicator
+		communicator = new NXTCommunicator(connection);
+		// Create robot
+		robot = new PhysicalRobot(communicator);
+		// Start communicator
+		communicator.start();
+	}
+
+	private void waitComplete() {
+		communicator.waitComplete();
+	}
+
+	private void disconnect() {
+		if (isConnected) {
+			isConnected = false;
+			println("Disconnecting");
+			if (robot != null) {
+				robot.terminate();
+			}
+			if (communicator != null) {
+				try {
+					communicator.terminate();
+				} catch (IOException e) {
+				}
+			}
+			println("Disconnected");
+		}
 	}
 
 	public void stop() {
-		println("Disconnecting");
-		if (robot != null) {
-			robot.terminate();
-		}
-		if (communicator != null) {
-			try {
-				communicator.terminate();
-			} catch (IOException e) {
-			}
-		}
-		println("Disconnected");
 		isRunning = false;
+		disconnect();
 	}
 
 	@Override
@@ -77,15 +102,14 @@ public class Program implements Runnable, ButtonListener {
 	private int cursorY = 0;
 
 	private void println(String str) {
-		LCD.drawString(padRight(str, LCD.DISPLAY_CHAR_WIDTH, ' '), 0, cursorY++);
+		LCD.clear(cursorY);
+		LCD.drawString(str, 0, cursorY);
+		cursorY++;
 	}
 
-	private static String padRight(String str, int size, char padding) {
-		StringBuilder padded = new StringBuilder(str);
-		while (padded.length() < size) {
-			padded.append(padding);
-		}
-		return padded.toString();
+	private void clear() {
+		LCD.clear();
+		cursorY = 0;
 	}
 
 }

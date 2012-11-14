@@ -5,8 +5,9 @@ import mazestormer.remote.MessageType;
 public enum ReportType implements MessageType<Report> {
 
 	/*
-	 * Pilot movements
+	 * Pilot
 	 */
+
 	MOVE_STARTED {
 		@Override
 		public Report build() {
@@ -18,6 +19,23 @@ public enum ReportType implements MessageType<Report> {
 		@Override
 		public Report build() {
 			return new MoveReport(this);
+		}
+	},
+	MOVEMENT {
+		@Override
+		public Report build() {
+			return new MoveReport(this);
+		}
+	},
+
+	/*
+	 * Light sensor
+	 */
+
+	LIGHT_VALUE {
+		@Override
+		public Report build() {
+			return new LightValueReport(this);
 		}
 	};
 

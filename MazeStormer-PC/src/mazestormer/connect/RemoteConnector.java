@@ -8,6 +8,8 @@ import lejos.pc.comm.NXTComm;
 import lejos.pc.comm.NXTCommFactory;
 import lejos.pc.comm.NXTConnector;
 import lejos.pc.comm.NXTInfo;
+import mazestormer.command.CommandType;
+import mazestormer.command.ShutdownCommand;
 import mazestormer.remote.RemoteCommunicator;
 import mazestormer.remote.RemoteRobot;
 import mazestormer.robot.Robot;
@@ -15,9 +17,7 @@ import mazestormer.robot.Robot;
 public class RemoteConnector implements Connector {
 
 	private NXTConnector connector;
-
 	private RemoteCommunicator communicator;
-
 	private Robot robot;
 
 	@Override
@@ -28,7 +28,8 @@ public class RemoteConnector implements Connector {
 
 	@Override
 	public boolean isConnected() {
-		return communicator.isListening() && robot != null;
+		return communicator != null && communicator.isListening()
+				&& robot != null;
 	}
 
 	@Override
@@ -41,11 +42,14 @@ public class RemoteConnector implements Connector {
 			return;
 		}
 
-		// TODO Create communicator
+		// Create communicator
 		communicator = new RemoteCommunicator(connector);
 
 		// Create robot
 		robot = new RemoteRobot(communicator);
+
+		// Start communicating
+		communicator.start();
 	}
 
 	private boolean createConnection(String deviceName) {
@@ -76,7 +80,9 @@ public class RemoteConnector implements Connector {
 		robot = null;
 
 		try {
+			// Shut down
 			if (communicator != null) {
+				communicator.send(new ShutdownCommand(CommandType.SHUTDOWN));
 				communicator.terminate();
 			}
 			if (connector != null) {

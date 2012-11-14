@@ -35,22 +35,35 @@ public enum CommandType implements MessageType<Command> {
 	SET_TRAVEL_SPEED {
 		@Override
 		public Command build() {
-			// TODO Auto-generated method stub
-			return null;
+			return new PilotParameterCommand(this);
 		}
 	},
 	SET_ROTATE_SPEED {
 		@Override
 		public Command build() {
-			// TODO Auto-generated method stub
-			return null;
+			return new PilotParameterCommand(this);
 		}
 	},
 	SET_ACCELERATION {
 		@Override
 		public Command build() {
-			// TODO Auto-generated method stub
-			return null;
+			return new PilotParameterCommand(this);
+		}
+	},
+
+	/*
+	 * Light sensor
+	 */
+	LIGHT_READ {
+		@Override
+		public Command build() {
+			return new LightReadCommand(this);
+		}
+	},
+	LIGHT_FLOODLIGHT {
+		@Override
+		public Command build() {
+			return new LightFloodlightCommand(this);
 		}
 	},
 

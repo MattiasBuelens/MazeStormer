@@ -61,7 +61,7 @@ public abstract class Communicator<S extends Message, R extends Message>
 
 		beforeStart();
 		setListening(true);
-		thread = new Thread(this, getClass().getSimpleName());
+		thread = new Thread(this);
 		thread.setDaemon(false);
 		thread.start();
 	}
