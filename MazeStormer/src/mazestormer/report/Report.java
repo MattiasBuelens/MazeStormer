@@ -25,7 +25,7 @@ public abstract class Report implements Message {
 
 	@Override
 	public void write(DataOutputStream dos) throws IOException {
-		// dos.writeInt(getType().ordinal());
+		dos.writeInt(getType().ordinal());
 	}
 
 }

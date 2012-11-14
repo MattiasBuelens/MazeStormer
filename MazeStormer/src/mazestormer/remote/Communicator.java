@@ -133,6 +133,7 @@ public abstract class Communicator<S extends Message, R extends Message>
 
 	public synchronized void send(S message) throws IOException {
 		message.write(dos());
+		dos().flush();
 	}
 
 	public R receive() throws IllegalStateException, IOException {

@@ -1,6 +1,12 @@
 package mazestormer.command;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class TravelCommand extends Command {
+
+	private double distance;
 
 	public TravelCommand(CommandType type) {
 		super(type);
@@ -12,11 +18,23 @@ public class TravelCommand extends Command {
 	}
 
 	public double getDistance() {
-		return getParameter();
+		return distance;
 	}
 
 	public void setDistance(double distance) {
-		setParameter(distance);
+		this.distance = distance;
+	}
+
+	@Override
+	public void read(DataInputStream dis) throws IOException {
+		super.read(dis);
+		setDistance(dis.readDouble());
+	}
+
+	@Override
+	public void write(DataOutputStream dos) throws IOException {
+		super.write(dos);
+		dos.writeDouble(getDistance());
 	}
 
 }
