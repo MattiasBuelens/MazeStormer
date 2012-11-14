@@ -50,6 +50,11 @@ public interface Robot {
 	 * Get the pose provider of this robot.
 	 */
 	public PoseProvider getPoseProvider();
+	
+	/**
+	 * Get the sound player of this robot.
+	 */
+	public SoundPlayer getSoundPlayer();
 
 	/**
 	 * Terminate this robot.

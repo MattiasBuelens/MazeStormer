@@ -61,6 +61,11 @@ public class PhysicalRobot implements Robot {
 		}
 		return poseProvider;
 	}
+	
+	@Override
+	public SoundPlayer getSoundPlayer(){
+		return PhysicalSoundPlayer.getInstance();
+	}
 
 	@Override
 	public void terminate() {

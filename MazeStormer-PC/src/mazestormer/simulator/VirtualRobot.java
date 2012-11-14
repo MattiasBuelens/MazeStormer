@@ -8,6 +8,7 @@ import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
+import mazestormer.robot.SoundPlayer;
 
 public class VirtualRobot implements Robot {
 
@@ -65,6 +66,11 @@ public class VirtualRobot implements Robot {
 			poseProvider = new OdometryPoseProvider(getPilot());
 		}
 		return poseProvider;
+	}
+	
+	@Override
+	public SoundPlayer getSoundPlayer(){
+		return VirtualSoundPlayer.getInstance();
 	}
 
 	@Override
