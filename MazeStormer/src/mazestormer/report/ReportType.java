@@ -35,7 +35,7 @@ public enum ReportType implements MessageType<Report> {
 	LIGHT_VALUE {
 		@Override
 		public Report build() {
-			return new LightValueReport(this);
+			return new LightReadReport(this);
 		}
 	};
 

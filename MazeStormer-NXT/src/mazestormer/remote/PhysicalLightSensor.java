@@ -8,7 +8,7 @@ import lejos.nxt.SensorPort;
 import mazestormer.command.Command;
 import mazestormer.command.LightFloodlightCommand;
 import mazestormer.command.LightReadCommand;
-import mazestormer.report.LightValueReport;
+import mazestormer.report.LightReadReport;
 import mazestormer.report.Report;
 import mazestormer.report.ReportType;
 import mazestormer.robot.CalibratedLightSensor;
@@ -71,8 +71,10 @@ public class PhysicalLightSensor extends LightSensor implements
 			if (!(command instanceof LightReadCommand))
 				return;
 
+			int requestId = ((LightReadCommand) command).getRequestId();
 			int lightValue = getNormalizedLightValue();
-			report(new LightValueReport(ReportType.LIGHT_VALUE, lightValue));
+			report(new LightReadReport(ReportType.LIGHT_VALUE, requestId,
+					lightValue));
 		}
 
 	}

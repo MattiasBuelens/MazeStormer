@@ -18,6 +18,8 @@ public abstract class Communicator<S extends Message, R extends Message>
 	private DataInputStream dis;
 	private DataOutputStream dos;
 
+	private int nextRequestId = 0;
+
 	private List<MessageListener<? super R>> listeners = new ArrayList<MessageListener<? super R>>();
 
 	public Communicator(DataInputStream dis, DataOutputStream dos) {
@@ -132,8 +134,14 @@ public abstract class Communicator<S extends Message, R extends Message>
 	}
 
 	public synchronized void send(S message) throws IOException {
-		message.write(dos());
-		dos().flush();
+		if (isListening()) {
+			message.write(dos());
+			dos().flush();
+		}
+	}
+
+	public int nextRequestId() {
+		return nextRequestId++;
 	}
 
 	public R receive() throws IllegalStateException, IOException {

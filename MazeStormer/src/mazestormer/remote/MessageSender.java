@@ -11,13 +11,11 @@ public abstract class MessageSender<M extends Message> {
 	}
 
 	protected void report(M message) {
-		if (communicator.isListening()) {
-			try {
-				communicator.send(message);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-			}
+		try {
+			communicator.send(message);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
 		}
 	}
 

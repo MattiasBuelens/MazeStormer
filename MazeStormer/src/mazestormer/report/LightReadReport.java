@@ -4,16 +4,17 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class LightValueReport extends Report {
+public class LightReadReport extends RequestReport {
 
 	private int lightValue;
 
-	public LightValueReport(ReportType type) {
+	public LightReadReport(ReportType type) {
 		super(type);
 	}
 
-	public LightValueReport(ReportType type, int lightValue) {
+	public LightReadReport(ReportType type, int requestId, int lightValue) {
 		this(type);
+		setRequestId(requestId);
 		setLightValue(lightValue);
 	}
 

@@ -117,14 +117,10 @@ public interface Future<V> {
 	 * its result.
 	 * 
 	 * @return the computed result
-	 * @throws Exception
+	 * @throws CancellationException
 	 *             if the computation was cancelled
-	 * @throws Exception
-	 *             if the computation threw an exception
-	 * @throws InterruptedException
-	 *             if the current thread was interrupted while waiting
 	 */
-	V get() throws InterruptedException;
+	V get() throws CancellationException;
 
 	/**
 	 * Waits if necessary for at most the given time for the computation to
@@ -133,14 +129,10 @@ public interface Future<V> {
 	 * @param timeout
 	 *            the maximum time to wait, in milliseconds
 	 * @return the computed result
-	 * @throws Exception
+	 * @throws CancellationException
 	 *             if the computation was cancelled
-	 * @throws Exception
-	 *             if the computation threw an exception
-	 * @throws InterruptedException
-	 *             if the current thread was interrupted while waiting
-	 * @throws Exception
+	 * @throws TimeoutException
 	 *             if the wait timed out
 	 */
-	V get(long timeout) throws InterruptedException, Exception;
+	V get(long timeout) throws CancellationException, TimeoutException;
 }
