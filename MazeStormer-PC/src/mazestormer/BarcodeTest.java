@@ -146,20 +146,21 @@ public class BarcodeTest {
 		boolean finished = false;
 		for(int i=0; !finished && i<request.size(); i++){
 			float d = request.get(i);
-			System.out.println("Dist: " + d);
 			
-			int a = ((Double)(Math.max((d/BAR_LENGTH),1))).intValue();
-			if(i==0)
-				a--;
+			int x = (i==0) ? 1 : 0;
+			int a = ((Double)(Math.max(((d-1.8*x)/BAR_LENGTH),1))).intValue();
+			
 			for(int j=0; j<a; j++){
 				if(index<0)
 					finished = true;
 				else{
 					values[index] = Math.abs(i%2);
-					System.out.println("i: " + i + " j: " + j);
-					System.out.println(values[index]);
 					index--;
 				}
+			}
+			
+			for(i=NUMBER_OF_BARS-1; i>=0; i--){
+				System.out.println(i);
 			}
 		}
 		return values;
