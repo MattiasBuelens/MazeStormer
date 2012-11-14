@@ -16,12 +16,12 @@ import mazestormer.robot.Robot;
 
 public class BarcodeTest {
 	
-	private static final double TRAVEL_SPEED = 5; // [cm/sec]
-	private static final double SLOW_TRAVEL_SPEED = 1; // [cm/sec]
+	private static final double TRAVEL_SPEED = 10; // [cm/sec]
+	private static final double SLOW_TRAVEL_SPEED = 2; // [cm/sec]
 	private static final double BAR_LENGTH = 1.8; // [cm]
 	private static final int NUMBER_OF_BARS = 6;
 	
-	private static final int BLACK_WHITE_THRESHOLD = 30;
+	private static final int BLACK_WHITE_THRESHOLD = 50;
 			
 	public static void main(String[] args) throws IOException, InterruptedException{
 		Connector connector = new ConnectionProvider().getConnector(RobotType.Physical);
@@ -34,8 +34,8 @@ public class BarcodeTest {
 		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(TRAVEL_SPEED);
 		light.setFloodlight(true);
-		light.setLow(363);
-		light.setHigh(585);
+		light.setLow(354);
+		light.setHigh(576);
 		
 		pilot.forward();
 		
@@ -48,8 +48,9 @@ public class BarcodeTest {
 			if(oldValue < BLACK_WHITE_THRESHOLD){
 				pilot.stop();
 				pilot.setTravelSpeed(SLOW_TRAVEL_SPEED);
-				pilot.travel(BAR_LENGTH/2);
-				while(getTotalSum(distances)>= (NUMBER_OF_BARS+1)*BAR_LENGTH){
+				pilot.travel(BAR_LENGTH/2, false);
+				pilot.forward();
+				while(getTotalSum(distances) <= (NUMBER_OF_BARS+1)*BAR_LENGTH){
 					int newValue = light.getLightValue();
 					Pose newPose =  robot.getPoseProvider().getPose();
 					if(areOnDifferentSideOfTreshold(oldValue, newValue)){
@@ -132,21 +133,28 @@ public class BarcodeTest {
 	
 	private static float getTotalSum(List<Float> request){
 		float temp = 0;
-		for(Float f : request)
-			temp = temp + f;
+	
+		for (int i = 1; i < request.size(); i++){
+			temp = temp + request.get(i);
+		}
+		
 		return temp;
 	}
 	
 	private static int[] convertToIntArray(List<Float> request){
 		int[] values = new int[NUMBER_OF_BARS];
 		boolean finished = false;
-		for(int i=0; !finished ;i++){
+		for(int i=1; !finished && i < request.size() ;i++){
 			float d = request.get(i);
-			for(int j=0; j<((Double)(d % BAR_LENGTH)).intValue(); j++){
-				if(i+j>=NUMBER_OF_BARS)
+			System.out.println("Dist: " + d);
+			for(int j=0; j< ((Double)(Math.max((d / BAR_LENGTH),1))).intValue(); j++){
+				if(NUMBER_OF_BARS-(i+j+1) < 0)
 					finished = true;
-				else
-					values[i+j] = Math.abs((i%2)-1);
+				else {
+					values[NUMBER_OF_BARS-(i+j+1)] = Math.abs((i%2)-1);
+					System.out.println("i: " + i + " j: " + j);
+					System.out.println(values[i+j]);
+				}
 			}
 		}
 		return values;

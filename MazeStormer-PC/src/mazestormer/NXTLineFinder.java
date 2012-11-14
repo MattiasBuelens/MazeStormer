@@ -34,7 +34,7 @@ public class NXTLineFinder {
 		double safetyAngle = 10.0;
 		double fastRotateAngle = -(90 - maxAttackAngle - safetyAngle);
 		
-		final int threshold = 30;
+		final int threshold = 50;
 
 		double slowRotateSpeed, fastRotateSpeed;
 		slowRotateSpeed = 20;
