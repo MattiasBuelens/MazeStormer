@@ -70,46 +70,6 @@ public class BarcodeTest {
 		connector.disconnect();
 	}
 	
-
-	public static void mainn(String[] args) throws IOException, InterruptedException{
-		Connector connector = new ConnectionProvider().getConnector(RobotType.Physical);
-		ConnectionContext context = new ConnectionContext();
-		context.setDeviceName("brons");
-		connector.connect(context);
-		
-		Robot robot = connector.getRobot();
-		CalibratedLightSensor light = robot.getLightSensor();
-		Pilot pilot = robot.getPilot();
-		pilot.setTravelSpeed(TRAVEL_SPEED);
-		light.setFloodlight(true);
-		light.setLow(363);
-		light.setHigh(585);
-		
-		pilot.forward();
-		byte result = 0;		
-		
-		while(true){
-			int value = light.getLightValue();
-			if(value < BLACK_WHITE_THRESHOLD){
-				pilot.stop();
-				pilot.setTravelSpeed(SLOW_TRAVEL_SPEED);
-				pilot.travel(BAR_LENGTH/2);
-				int[] values = new int[NUMBER_OF_BARS];
-				for(int i=NUMBER_OF_BARS-1; i>=0; i--){
-					pilot.travel(BAR_LENGTH/2);
-					values[i] = (light.getLightValue() < BLACK_WHITE_THRESHOLD) ? 0 : 1;				
-					pilot.travel(BAR_LENGTH/2);
-				}
-				result = convertToByte(values);
-				break;
-			}
-		}
-		
-		System.out.println(result);
-		pilot.stop();
-		connector.disconnect();
-	}
-	
 	private static byte convertToByte(int[] request){
 		int temp = 0;
 		for(int i=request.length-1; i>0; i--){
