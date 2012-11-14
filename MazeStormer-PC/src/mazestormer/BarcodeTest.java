@@ -30,7 +30,7 @@ public class BarcodeTest {
 		Robot robot = connector.getRobot();
 		CalibratedLightSensor light = robot.getLightSensor();
 		Pilot pilot = robot.getPilot();
-		pilot.setRotateSpeed(TRAVEL_SPEED);
+		pilot.setTravelSpeed(TRAVEL_SPEED);
 		light.setFloodlight(true);
 		light.setLow(363);
 		light.setHigh(585);
