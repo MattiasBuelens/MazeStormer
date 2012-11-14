@@ -18,7 +18,7 @@ public class BarcodeTest {
 	
 	private static final double TRAVEL_SPEED = 10; // [cm/sec]
 	private static final double SLOW_TRAVEL_SPEED = 2; // [cm/sec]
-	private static final double BAR_LENGTH = 1.8; // [cm]
+	private static final double BAR_LENGTH = 2; // [cm]
 	private static final int NUMBER_OF_BARS = 6;
 	
 	private static final int BLACK_WHITE_THRESHOLD = 50;
@@ -39,8 +39,7 @@ public class BarcodeTest {
 		
 		pilot.forward();
 		
-		byte result = 0;	
-		
+		byte result = 0;
 		List<Float> distances = new ArrayList<Float>();
 		while(true){
 			int oldValue = light.getLightValue();
@@ -48,8 +47,10 @@ public class BarcodeTest {
 			if(oldValue < BLACK_WHITE_THRESHOLD){
 				pilot.stop();
 				pilot.setTravelSpeed(SLOW_TRAVEL_SPEED);
-				pilot.travel(BAR_LENGTH/2, false);
-				pilot.forward();
+				pilot.travel(-BAR_LENGTH/2, false);
+				oldValue = light.getLightValue();
+				oldPose = robot.getPoseProvider().getPose();
+				pilot.forward();	
 				while(getTotalSum(distances) <= (NUMBER_OF_BARS+1)*BAR_LENGTH){
 					int newValue = light.getLightValue();
 					Pose newPose =  robot.getPoseProvider().getPose();
@@ -58,8 +59,7 @@ public class BarcodeTest {
 						oldValue = newValue;
 						oldPose = newPose;
 					}
-				}
-				
+				}				
 				result = convertToByte(convertToIntArray(distances));
 				break;
 			}
@@ -133,8 +133,7 @@ public class BarcodeTest {
 	
 	private static float getTotalSum(List<Float> request){
 		float temp = 0;
-	
-		for (int i = 1; i < request.size(); i++){
+		for(int i=0; i<request.size(); i++){
 			temp = temp + request.get(i);
 		}
 		
@@ -144,16 +143,21 @@ public class BarcodeTest {
 	private static int[] convertToIntArray(List<Float> request){
 		int[] values = new int[NUMBER_OF_BARS];
 		boolean finished = false;
-		for(int i=1; !finished && i < request.size() ;i++){
+		
+		for(int i=0; !finished && i<request.size(); i++){
 			float d = request.get(i);
 			System.out.println("Dist: " + d);
-			for(int j=0; j< ((Double)(Math.max((d / BAR_LENGTH),1))).intValue(); j++){
-				if(NUMBER_OF_BARS-(i+j+1) < 0)
+			
+			int a = ((Double)(Math.max((d/BAR_LENGTH),1))).intValue();
+			if(i==0)
+				a--;
+			for(int j=0; j<a; j++){
+				if(NUMBER_OF_BARS-(i+j+1)<0)
 					finished = true;
-				else {
+				else{
 					values[NUMBER_OF_BARS-(i+j+1)] = Math.abs((i%2)-1);
 					System.out.println("i: " + i + " j: " + j);
-					System.out.println(values[i+j]);
+					System.out.println(values[NUMBER_OF_BARS-(i+j+1)]);
 				}
 			}
 		}
