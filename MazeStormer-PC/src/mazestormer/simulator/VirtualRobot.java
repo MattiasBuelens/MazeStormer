@@ -16,11 +16,13 @@ public class VirtualRobot implements Robot {
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
 	private PoseProvider poseProvider;
+	private VirtualCollisionDetector collisionDetect;
 
 	private final Maze maze;
 
 	public VirtualRobot(Maze maze) {
 		this.maze = maze;
+		this.collisionDetect = new VirtualCollisionDetector(maze, getPoseProvider());
 	}
 
 	@Override

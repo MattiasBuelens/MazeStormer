@@ -1,8 +1,5 @@
 package mazestormer.simulator;
 
-import java.awt.geom.Rectangle2D;
-
-import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.LampLightDetector;
 import lejos.robotics.localization.PoseProvider;
@@ -14,8 +11,8 @@ import mazestormer.robot.Robot;
 
 public class VirtualLightSensor implements LampLightDetector {
 
-	public static final int BROWN_VALUE = 410;
-	public static final int WHITE_VALUE = 450;
+	public static final int BROWN_VALUE = 512;
+	public static final int WHITE_VALUE = 582;
 
 	private Maze maze;
 	private PoseProvider poseProvider;
@@ -75,34 +72,12 @@ public class VirtualLightSensor implements LampLightDetector {
 
 		// Check if robot is on open side of tile
 		for (Orientation orientation : tile.getOpenSides()) {
-			if (getSide(tile, orientation).contains(relativePosition)) {
+			if (tile.getSide(orientation, getMaze()).contains(relativePosition)) {
 				return WHITE_VALUE;
 			}
 		}
 
 		return BROWN_VALUE;
-	}
-
-	private Rectangle2D getSide(Tile tile, Orientation orientation) {
-		// Get edge points in tile coordinates
-		Line line = orientation.getLine();
-		Point tilePosition = tile.getPosition().toPoint();
-		Point p1 = line.getP1().add(tilePosition);
-		Point p2 = line.getP2().add(tilePosition);
-
-		// Convert to relative coordinates
-		p1 = getMaze().fromTile(p1);
-		p2 = getMaze().fromTile(p2);
-
-		// Shift points to account for edge size
-		float halfLineThickness = getMaze().getEdgeSize() / 2f;
-		Point shift = new Point(halfLineThickness, halfLineThickness);
-		p1 = p1.subtract(shift);
-		p2 = p2.add(shift);
-
-		// Return bounding box
-		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX()
-				- p1.getX(), p2.getY() - p1.getY());
 	}
 
 	/**
