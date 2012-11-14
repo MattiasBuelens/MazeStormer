@@ -18,7 +18,7 @@ public class BarcodeTest {
 	
 	private static final double TRAVEL_SPEED = 10; // [cm/sec]
 	private static final double SLOW_TRAVEL_SPEED = 2; // [cm/sec]
-	private static final double BAR_LENGTH = 2; // [cm]
+	private static final double BAR_LENGTH = 1.9; // [cm]
 	private static final int NUMBER_OF_BARS = 6;
 	
 	private static final int BLACK_WHITE_THRESHOLD = 50;
