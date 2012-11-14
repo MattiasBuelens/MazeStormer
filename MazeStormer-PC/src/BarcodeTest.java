@@ -30,8 +30,8 @@ public class BarcodeTest {
 		Pilot pilot = robot.getPilot();
 		pilot.setRotateSpeed(TRAVEL_SPEED);
 		light.setFloodlight(true);
-		light.setLow(388);
-		light.setHigh(428);
+		light.setLow(363);
+		light.setHigh(585);
 		
 		pilot.forward();
 		byte result = 0;		
