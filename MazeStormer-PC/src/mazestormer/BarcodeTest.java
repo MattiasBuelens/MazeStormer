@@ -54,14 +54,16 @@ public class BarcodeTest {
 				pilot.travel(-START_BAR_LENGTH/2, false);
 				int oldValue = light.getLightValue();
 				Pose oldPose = robot.getPoseProvider().getPose();
-				pilot.forward();	
+				boolean blackToWhite = true;
+				pilot.forward();
 				while(getTotalSum(distances) <= (NUMBER_OF_BARS+1)*BAR_LENGTH){
 					int newValue = light.getLightValue();
 					Pose newPose =  robot.getPoseProvider().getPose();
-					if(areOnDifferentSideOfTreshold(oldValue, newValue)){
+					if(isTresholdPassed(oldValue, newValue, blackToWhite)){
 						distances.add(getPoseDiff(oldPose, newPose));
 						oldValue = newValue;
 						oldPose = newPose;
+						blackToWhite = (blackToWhite == true) ? false : true;
 					}
 				}				
 				result = convertToByte(convertToBitArray(distances));
@@ -82,8 +84,11 @@ public class BarcodeTest {
 		return ((Integer) temp).byteValue();
 	}
 	
-	private static boolean areOnDifferentSideOfTreshold(int one, int two){
-		return (one<BLACK_WHITE_THRESHOLD && two>BLACK_WHITE_THRESHOLD) || (one>BLACK_WHITE_THRESHOLD && two<BLACK_WHITE_THRESHOLD);
+	private static boolean isTresholdPassed(int one, int two, boolean blackToWhite){
+		if(blackToWhite)
+			return (one<BLACK_WHITE_THRESHOLD && two>BLACK_WHITE_THRESHOLD);
+		return (one>WHITE_BLACK_THRESHOLD && two<WHITE_BLACK_THRESHOLD);
+		
 	}
 	
 	private static float getPoseDiff(Pose one, Pose two){
