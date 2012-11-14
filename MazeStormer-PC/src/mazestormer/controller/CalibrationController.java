@@ -1,5 +1,8 @@
 package mazestormer.controller;
 
+import com.google.common.eventbus.Subscribe;
+
+import mazestormer.connect.ConnectEvent;
 import mazestormer.robot.CalibratedLightSensor;
 
 public class CalibrationController extends SubController implements
@@ -61,6 +64,14 @@ public class CalibrationController extends SubController implements
 
 		getLightSensor().calibrateHigh();
 		postEvent(new CalibrationChangeEvent("high", getHighValue()));
+	}
+	
+	@Subscribe
+	public void onConnected(ConnectEvent e) {
+		if(e.isConnected()) {
+			setHighValue(582);
+			setLowValue(512);
+		}
 	}
 
 }
