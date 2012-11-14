@@ -18,7 +18,7 @@ public class BarcodeTest {
 	
 	private static final double TRAVEL_SPEED = 10; // [cm/sec]
 	private static final double SLOW_TRAVEL_SPEED = 2; // [cm/sec]
-	private static final double BAR_LENGTH = 1.9; // [cm]
+	private static final double BAR_LENGTH = 1.85; // [cm]
 	private static final int NUMBER_OF_BARS = 6;
 	
 	private static final int BLACK_WHITE_THRESHOLD = 50;
@@ -148,7 +148,7 @@ public class BarcodeTest {
 			float d = request.get(i);
 			
 			int x = (i==0) ? 1 : 0;
-			int a = ((Double)(Math.max(((d-1.8*x)/BAR_LENGTH),1))).intValue();
+			int a = ((Double)(Math.max(((d-1.8*x)/BAR_LENGTH),1-x))).intValue();
 			
 			for(int j=0; j<a; j++){
 				if(index<0)
@@ -159,9 +159,10 @@ public class BarcodeTest {
 				}
 			}
 			
-			for(i=NUMBER_OF_BARS-1; i>=0; i--){
-				System.out.println(i);
-			}
+
+		}
+		for(int i=NUMBER_OF_BARS-1; i>=0; i--){
+			System.out.println(values[i]);
 		}
 		return values;
 	}
