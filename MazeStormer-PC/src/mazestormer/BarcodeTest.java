@@ -16,12 +16,18 @@ import mazestormer.robot.Robot;
 
 public class BarcodeTest {
 	
-	private static final double TRAVEL_SPEED = 10; // [cm/sec]
-	private static final double SLOW_TRAVEL_SPEED = 2; // [cm/sec]
-	private static final double BAR_LENGTH = 1.85; // [cm]
-	private static final int NUMBER_OF_BARS = 6;
+	private static final double TRAVEL_SPEED = 10; 			// [cm/sec]
+	private static final double SLOW_TRAVEL_SPEED = 2; 		// [cm/sec]
 	
+	private static final double START_BAR_LENGTH = 1.8; 	// [cm]
+	private static final double BAR_LENGTH = 1.85; 			// [cm]
+	private static final int NUMBER_OF_BARS = 6;			// without black start bars
+	
+	private static final int BLACK_THRESHOLD = 50;
 	private static final int BLACK_WHITE_THRESHOLD = 50;
+	private static final int WHITE_BLACK_THRESHOLD = 50;
+	private static final int LOW = 354;
+	private static final int HIGH = 576;
 			
 	public static void main(String[] args) throws IOException, InterruptedException{
 		Connector connector = new ConnectionProvider().getConnector(RobotType.Physical);
@@ -34,22 +40,20 @@ public class BarcodeTest {
 		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(TRAVEL_SPEED);
 		light.setFloodlight(true);
-		light.setLow(354);
-		light.setHigh(576);
+		light.setLow(LOW);
+		light.setHigh(HIGH);
 		
 		pilot.forward();
 		
 		byte result = 0;
 		List<Float> distances = new ArrayList<Float>();
 		while(true){
-			int oldValue = light.getLightValue();
-			Pose oldPose = robot.getPoseProvider().getPose();
-			if(oldValue < BLACK_WHITE_THRESHOLD){
+			if(light.getLightValue() < BLACK_THRESHOLD){
 				pilot.stop();
 				pilot.setTravelSpeed(SLOW_TRAVEL_SPEED);
-				pilot.travel(-BAR_LENGTH/2, false);
-				oldValue = light.getLightValue();
-				oldPose = robot.getPoseProvider().getPose();
+				pilot.travel(-START_BAR_LENGTH/2, false);
+				int oldValue = light.getLightValue();
+				Pose oldPose = robot.getPoseProvider().getPose();
 				pilot.forward();	
 				while(getTotalSum(distances) <= (NUMBER_OF_BARS+1)*BAR_LENGTH){
 					int newValue = light.getLightValue();
@@ -60,7 +64,7 @@ public class BarcodeTest {
 						oldPose = newPose;
 					}
 				}				
-				result = convertToByte(convertToIntArray(distances));
+				result = convertToByte(convertToBitArray(distances));
 				break;
 			}
 		}
@@ -72,9 +76,8 @@ public class BarcodeTest {
 	
 	private static byte convertToByte(int[] request){
 		int temp = 0;
-		for(int i=request.length-1; i>0; i--){
+		for(int i=request.length-1; i>0; i--)
 			temp = (temp + request[i])*2;
-		}
 		temp = temp + request[0];
 		return ((Integer) temp).byteValue();
 	}
@@ -93,39 +96,31 @@ public class BarcodeTest {
 	
 	private static float getTotalSum(List<Float> request){
 		float temp = 0;
-		for(int i=0; i<request.size(); i++){
+		for(int i=0; i<request.size(); i++)
 			temp = temp + request.get(i);
-		}
-		
 		return temp;
 	}
 	
-	private static int[] convertToIntArray(List<Float> request){
+	private static int[] convertToBitArray(List<Float> request){
 		int[] values = new int[NUMBER_OF_BARS];
 		int index = NUMBER_OF_BARS-1;
-		boolean finished = false;
-		for(int i=0; !finished && i<request.size(); i++){
+		for(int i=0; index>=0 && i<request.size(); i++){
 			float d = request.get(i);
-			
 			int x = (i==0) ? 1 : 0;
-			int a = ((Double)(Math.max(((d-1.8*x)/BAR_LENGTH),1-x))).intValue();
-			
+			int a = ((Double)(Math.max(((d-START_BAR_LENGTH*x)/BAR_LENGTH),1-x))).intValue();
 			for(int j=0; j<a; j++){
-				if(index<0)
-					finished = true;
-				else{
+				if(index>=0){
 					values[index] = Math.abs(i%2);
 					index--;
 				}
 			}
-
-			
-
 		}
-		for(int i=NUMBER_OF_BARS-1; i>=0; i--){
-			System.out.println(values[i]);
-
-		}
+		
+		String s = "";
+		for(int i=NUMBER_OF_BARS-1; i>=0; i--)
+			s=s+values[i];
+		System.out.println(s);
+		
 		return values;
 	}
 }
