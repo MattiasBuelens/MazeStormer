@@ -1,3 +1,5 @@
+package mazestormer;
+
 import java.io.IOException;
 
 import mazestormer.connect.ConnectionContext;
