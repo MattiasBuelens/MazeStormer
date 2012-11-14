@@ -12,10 +12,10 @@ import com.google.common.eventbus.Subscribe;
 public class LineFinderController extends SubController implements
 		ILineFinderController {
 
-	private final static double rotateAngle = 135.0;
+	private final static double ROTATE_ANGLE = 135.0;
 
 	// Correction angle
-	private final static double extraAngle = 0.0;//4.0;
+	private final static double EXTRA_ANGLE = 0.0;//4.0;
 
 	private LineFinderRunner runner;
 
@@ -110,7 +110,7 @@ public class LineFinderController extends SubController implements
 			final int threshold = 30;
 
 			double slowRotateSpeed, fastRotateSpeed;
-			slowRotateSpeed = 20;
+			slowRotateSpeed = 30;
 			fastRotateSpeed = 50;
 
 			// TODO: Speed?
@@ -132,7 +132,7 @@ public class LineFinderController extends SubController implements
 					pilot.setRotateSpeed(fastRotateSpeed);
 					if (shouldStop())
 						return;
-					pilot.rotate(rotateAngle, false);
+					pilot.rotate(ROTATE_ANGLE, false);
 					pilot.setRotateSpeed(slowRotateSpeed);
 					if (shouldStop())
 						return;
@@ -151,7 +151,7 @@ public class LineFinderController extends SubController implements
 					pilot.setRotateSpeed(fastRotateSpeed);
 					if (shouldStop())
 						return;
-					pilot.rotate(-rotateAngle, false);
+					pilot.rotate(-ROTATE_ANGLE, false);
 					pilot.setRotateSpeed(slowRotateSpeed);
 					if (shouldStop())
 						return;
@@ -169,8 +169,8 @@ public class LineFinderController extends SubController implements
 				}
 			}
 
-			angle1 = Math.abs(angle1) + rotateAngle;
-			angle2 = Math.abs(angle2) + rotateAngle;
+			angle1 = Math.abs(angle1) + ROTATE_ANGLE;
+			angle2 = Math.abs(angle2) + ROTATE_ANGLE;
 
 			pilot.setRotateSpeed(fastRotateSpeed);
 
@@ -178,9 +178,9 @@ public class LineFinderController extends SubController implements
 
 			if (isCross(angle1, angle2)) {
 				log("Cross detected.");
-				finalAngle = ((angle2 - angle1) / 2.0) - extraAngle;
+				finalAngle = ((angle2 - angle1) / 2.0) - EXTRA_ANGLE;
 			} else {
-				finalAngle = ((angle2 - 360.0) / 2.0) - extraAngle;
+				finalAngle = ((angle2 - 360.0) / 2.0) - EXTRA_ANGLE;
 			}
 
 			log("Positioning robot perpendicular to the line.");
@@ -193,6 +193,9 @@ public class LineFinderController extends SubController implements
 			if (shouldStop())
 				return;
 			pilot.travel(dist);
+			
+			pilot.setTravelSpeed(originalTravelSpeed);
+			pilot.setRotateSpeed(originalRotateSpeed);
 
 		}
 

@@ -93,9 +93,9 @@ public class ManualControlPanel extends ViewPanel {
 	}
 
 	private void createModels() {
-		travelDistanceModel = new SpinnerNumberModel(new Float(0f), new Float(
+		travelDistanceModel = new SpinnerNumberModel(new Float(40f), new Float(
 				0f), null, new Float(1f));
-		rotateAngleModel = new SpinnerNumberModel(new Float(0f), new Float(
+		rotateAngleModel = new SpinnerNumberModel(new Float(180f), new Float(
 				-180f), new Float(180f), new Float(1f));
 	}
 

@@ -1,8 +1,12 @@
 package mazestormer.ui.map;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
@@ -18,7 +22,11 @@ import com.google.common.eventbus.Subscribe;
 public class RangesLayer extends MapLayer {
 
 	private static final float pointRadius = 1f;
-	private static final String pointColor = CSS_RED_VALUE;
+	private static final Color pointStartColor = Color.GREEN;
+	private static final Color pointEndColor = Color.RED;
+	private static final int pointColorThreshold = 5;
+
+	private List<Set<Element>> points = new ArrayList<Set<Element>>();
 
 	public RangesLayer(String name) {
 		super(name);
@@ -35,7 +43,7 @@ public class RangesLayer extends MapLayer {
 	}
 
 	private void addRangeFeature(RangeFeature feature) {
-		final List<Point2D> points = new ArrayList<Point2D>();
+		final Set<Element> newPoints = new HashSet<Element>();
 
 		// Get robot pose at time of reading
 		Pose robotPose = feature.getPose();
@@ -47,20 +55,25 @@ public class RangesLayer extends MapLayer {
 			// Get reading point in robot coordinates
 			Point2D robotPoint = robotPose.pointAt(reading.getRange(),
 					reading.getAngle() + robotPose.getHeading());
-			// Convert to map coordinates and store
+			// Convert to map coordinates
 			Point2D mapPoint = MapUtils.toMapCoordinates(robotPoint);
-			points.add(mapPoint);
+			// Create point element and store
+			Element pointElement = createPoint(mapPoint.getX(), mapPoint.getY());
+			newPoints.add(pointElement);
 		}
+
+		// Store newly added points
+		points.add(newPoints);
 
 		// Append points
 		invokeDOMChange(new Runnable() {
 			@Override
 			public void run() {
 				Element container = getElement();
-				for (Point2D point : points) {
-					Element element = createPoint(point.getX(), point.getY());
-					container.appendChild(element);
+				for (Element newPoint : newPoints) {
+					container.appendChild(newPoint);
 				}
+				updatePoints();
 			}
 		});
 	}
@@ -70,13 +83,49 @@ public class RangesLayer extends MapLayer {
 		circle.setAttribute(SVG_CX_ATTRIBUTE, x + "");
 		circle.setAttribute(SVG_CY_ATTRIBUTE, y + "");
 		circle.setAttribute(SVG_R_ATTRIBUTE, pointRadius + "");
-		circle.setAttribute(SVG_FILL_ATTRIBUTE, pointColor);
 		return circle;
 	}
 
-	@Override
-	public int getZIndex() {
-		return 10;
+	private void updatePoints() {
+		int length = points.size();
+		// Loop backwards
+		ListIterator<Set<Element>> it = points.listIterator(length);
+		while (it.hasPrevious()) {
+			int index = it.previousIndex();
+			Set<Element> set = it.previous();
+			// Get color position
+			int colorIndex = Math.min(pointColorThreshold,
+					Math.max(0, length - index));
+			float colorPosition = (float) colorIndex
+					/ (float) pointColorThreshold;
+			// Set color
+			Color color = interpolateColor(pointStartColor, pointEndColor,
+					colorPosition);
+			setFillColor(set, color);
+		}
+	}
+
+	private void setFillColor(Iterable<Element> points, Color color) {
+		String colorString = String.format("rgb(%d,%d,%d)", color.getRed(),
+				color.getGreen(), color.getBlue());
+		for (Element element : points) {
+			element.setAttribute(SVG_FILL_ATTRIBUTE, colorString);
+		}
+	}
+
+	private Color interpolateColor(Color start, Color end, float position) {
+		int red = interpolateComponent(start.getRed(), end.getRed(), position);
+		int green = interpolateComponent(start.getGreen(), end.getGreen(),
+				position);
+		int blue = interpolateComponent(start.getBlue(), end.getBlue(),
+				position);
+		int alpha = interpolateComponent(start.getAlpha(), end.getAlpha(),
+				position);
+		return new Color(red, green, blue, alpha);
+	}
+
+	private int interpolateComponent(int start, int end, float position) {
+		return start + (int) ((end - start) * position);
 	}
 
 	public void clear() {
@@ -87,5 +136,10 @@ public class RangesLayer extends MapLayer {
 				SVGUtils.removeChildNodes(getElement());
 			}
 		});
+	}
+
+	@Override
+	public int getZIndex() {
+		return 10;
 	}
 }

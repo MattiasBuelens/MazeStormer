@@ -10,13 +10,13 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
-import lejos.robotics.objectdetection.Feature;
 import lejos.robotics.objectdetection.RangeFeature;
 
 /**
  * A range feature detector which uses a range scanner to locate objects.
  */
-public class RangeScannerFeatureDetector extends AbstractFeatureDetector {
+public class RangeScannerFeatureDetector extends AbstractFeatureDetector
+		implements RangeFeatureDetector {
 
 	private static final float defaultMaxDistance = 100f;
 
@@ -25,15 +25,20 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector {
 	private PoseProvider pp = null;
 	private static final Point sensorPosition = new Point(-3.4f, -0.6f); //relative position of ultrasonic sensor from rotation center of robot, in cm
 
-	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance,
-			int delay) {
-		super(delay);
+	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance) {
 		this.scanner = checkNotNull(scanner);
 		this.maxDistance = maxDistance;
 	}
 
-	public RangeScannerFeatureDetector(RangeScanner scanner, int delay) {
-		this(scanner, defaultMaxDistance, delay);
+	public RangeScannerFeatureDetector(RangeScanner scanner) {
+		this(scanner, defaultMaxDistance);
+	}
+
+	/**
+	 * Get the range scanner used by this feature detector.
+	 */
+	public RangeScanner getScanner() {
+		return scanner;
 	}
 
 	/**
@@ -69,7 +74,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector {
 	}
 
 	@Override
-	public Feature scan() {
+	public RangeFeature scan() {
 		// Get the range readings
 		RangeReadings rawReadings = scanner.getRangeValues();
 
