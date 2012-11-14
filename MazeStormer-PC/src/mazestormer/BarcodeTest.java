@@ -158,10 +158,6 @@ public class BarcodeTest {
 					index--;
 				}
 			}
-			
-			for(i=NUMBER_OF_BARS-1; i>=0; i--){
-				System.out.println(i);
-			}
 		}
 		return values;
 	}
