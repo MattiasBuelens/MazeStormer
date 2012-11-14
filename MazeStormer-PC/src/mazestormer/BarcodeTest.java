@@ -142,8 +142,8 @@ public class BarcodeTest {
 	
 	private static int[] convertToIntArray(List<Float> request){
 		int[] values = new int[NUMBER_OF_BARS];
+		int index = NUMBER_OF_BARS-1;
 		boolean finished = false;
-		
 		for(int i=0; !finished && i<request.size(); i++){
 			float d = request.get(i);
 			System.out.println("Dist: " + d);
@@ -152,12 +152,13 @@ public class BarcodeTest {
 			if(i==0)
 				a--;
 			for(int j=0; j<a; j++){
-				if(NUMBER_OF_BARS-(i+j+1)<0)
+				if(index<0)
 					finished = true;
 				else{
-					values[NUMBER_OF_BARS-(i+j+1)] = Math.abs((i%2)-1);
+					values[index] = Math.abs((i%2)-1);
 					System.out.println("i: " + i + " j: " + j);
-					System.out.println(values[NUMBER_OF_BARS-(i+j+1)]);
+					System.out.println(values[index]);
+					index--;
 				}
 			}
 		}
