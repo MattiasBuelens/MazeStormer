@@ -5,20 +5,16 @@ import java.io.IOException;
 import lejos.pc.comm.NXTConnector;
 import mazestormer.command.Command;
 import mazestormer.report.Report;
-import mazestormer.report.ReportType;
+import mazestormer.report.ReportReader;
 
 public class RemoteCommunicator extends Communicator<Command, Report> {
 
 	private NXTConnector connector;
 
 	public RemoteCommunicator(NXTConnector connector) {
-		super(connector.getInputStream(), connector.getOutputStream());
+		super(connector.getInputStream(), connector.getOutputStream(),
+				new ReportReader());
 		this.connector = connector;
-	}
-
-	@Override
-	public MessageType<? extends Report> getType(int typeId) {
-		return ReportType.values()[typeId];
 	}
 
 	@Override

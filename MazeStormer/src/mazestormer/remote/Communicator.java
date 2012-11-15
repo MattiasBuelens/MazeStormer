@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Communicator<S extends Message, R extends Message>
-		implements Runnable {
+public class Communicator<S extends Message, R extends Message> implements
+		Runnable {
 
 	private boolean isListening = false;
 	private boolean isTerminated = false;
@@ -17,32 +17,26 @@ public abstract class Communicator<S extends Message, R extends Message>
 
 	private DataInputStream dis;
 	private DataOutputStream dos;
+	private final MessageReader<? extends R> reader;
 
 	private int nextRequestId = 0;
 
 	private List<MessageListener<? super R>> listeners = new ArrayList<MessageListener<? super R>>();
 
-	public Communicator(DataInputStream dis, DataOutputStream dos) {
+	public Communicator(DataInputStream dis, DataOutputStream dos,
+			MessageReader<? extends R> reader) {
 		this.dis = dis;
 		this.dos = dos;
+		this.reader = reader;
 	}
 
-	public Communicator(InputStream is, OutputStream os) {
-		this(new DataInputStream(is), new DataOutputStream(os));
+	public Communicator(InputStream is, OutputStream os,
+			MessageReader<? extends R> reader) {
+		this(new DataInputStream(is), new DataOutputStream(os), reader);
 	}
 
-	protected final DataInputStream dis() {
-		if (dis == null) {
-			throw new IllegalStateException("Input stream is closed.");
-		}
-		return dis;
-	}
-
-	private final DataOutputStream dos() {
-		if (dos == null) {
-			throw new IllegalStateException("Output stream is closed.");
-		}
-		return dos;
+	public MessageReader<? extends R> getReader() {
+		return reader;
 	}
 
 	public boolean isListening() {
@@ -124,8 +118,8 @@ public abstract class Communicator<S extends Message, R extends Message>
 	public void run() {
 		while (isListening()) {
 			try {
-				R message = receive();
-				triggerListeners(message);
+				R message = getReader().read(dis);
+				trigger(message);
 			} catch (IOException e) {
 				stop();
 				break;
@@ -135,31 +129,14 @@ public abstract class Communicator<S extends Message, R extends Message>
 
 	public synchronized void send(S message) throws IOException {
 		if (isListening()) {
-			message.write(dos());
-			dos().flush();
+			message.write(dos);
+			dos.flush();
 		}
 	}
 
 	public int nextRequestId() {
 		return nextRequestId++;
 	}
-
-	public R receive() throws IllegalStateException, IOException {
-		// Read message type
-		int typeId = dis().readInt();
-		MessageType<? extends R> type = getType(typeId);
-		if (type == null) {
-			throw new IllegalStateException("Unknown message type identifier: "
-					+ typeId);
-		}
-
-		// Read message
-		R message = type.build();
-		message.read(dis());
-		return message;
-	}
-
-	public abstract MessageType<? extends R> getType(int typeId);
 
 	public void addListener(MessageListener<? super R> listener) {
 		listeners.add(listener);
@@ -169,7 +146,7 @@ public abstract class Communicator<S extends Message, R extends Message>
 		listeners.remove(listener);
 	}
 
-	protected void triggerListeners(R message) {
+	public void trigger(R message) {
 		for (MessageListener<? super R> listener : listeners) {
 			listener.messageReceived(message);
 		}

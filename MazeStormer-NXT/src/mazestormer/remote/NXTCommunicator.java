@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import lejos.nxt.comm.NXTConnection;
 import mazestormer.command.Command;
-import mazestormer.command.CommandType;
+import mazestormer.command.CommandReader;
 import mazestormer.report.Report;
 
 public class NXTCommunicator extends Communicator<Report, Command> {
@@ -12,13 +12,9 @@ public class NXTCommunicator extends Communicator<Report, Command> {
 	private NXTConnection connection;
 
 	public NXTCommunicator(NXTConnection connection) {
-		super(connection.openInputStream(), connection.openOutputStream());
+		super(connection.openInputStream(), connection.openOutputStream(),
+				new CommandReader());
 		this.connection = connection;
-	}
-
-	@Override
-	public MessageType<? extends Command> getType(int typeId) {
-		return CommandType.values()[typeId];
 	}
 
 	@Override

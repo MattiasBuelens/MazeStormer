@@ -68,6 +68,16 @@ public enum CommandType implements MessageType<Command> {
 	},
 
 	/*
+	 * Conditional
+	 */
+	WHEN {
+		@Override
+		public Command build() {
+			return new ConditionalCommand(this);
+		}
+	},
+
+	/*
 	 * General
 	 */
 
