@@ -11,16 +11,14 @@ public enum ConditionType implements MessageType<Condition> {
 	LIGHT_HIGHER_THAN {
 		@Override
 		public Condition build() {
-			// TODO Auto-generated method stub
-			return null;
+			return new LightCompareCondition(this);
 		}
 	},
 
 	LIGHT_LOWER_THAN {
 		@Override
 		public Condition build() {
-			// TODO Auto-generated method stub
-			return null;
+			return new LightCompareCondition(this);
 		}
 	};
 

@@ -38,6 +38,17 @@ public enum ReportType implements MessageType<Report<?>> {
 		public Report<Integer> build() {
 			return new LightReadReport(this);
 		}
+	},
+
+	/*
+	 * Conditions
+	 */
+
+	CONDITION_RESOLVED {
+		@Override
+		public Report<Void> build() {
+			return new ConditionReport(this);
+		}
 	};
 
 }

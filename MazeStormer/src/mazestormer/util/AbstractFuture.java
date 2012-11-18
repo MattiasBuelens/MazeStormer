@@ -1,5 +1,7 @@
 package mazestormer.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -7,27 +9,9 @@ public class AbstractFuture<V> implements Future<V> {
 
 	private boolean isCancelled = false;
 	private boolean isResolved = false;
-
 	private V result;
 
-	@Override
-	public boolean cancel(boolean mayInterruptIfRunning) {
-		if (!isCancelled()) {
-			isCancelled = true;
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean isCancelled() {
-		return isCancelled;
-	}
-
-	@Override
-	public boolean isDone() {
-		return isCancelled() || isResolved();
-	}
+	private List<FutureListener<V>> listeners = new ArrayList<FutureListener<V>>();
 
 	private boolean isResolved() {
 		return isResolved;
@@ -37,8 +21,29 @@ public class AbstractFuture<V> implements Future<V> {
 		if (!isDone()) {
 			this.result = result;
 			isResolved = true;
+			fireResolved();
 		}
 		return isResolved();
+	}
+
+	@Override
+	public boolean isCancelled() {
+		return isCancelled;
+	}
+
+	@Override
+	public boolean cancel(boolean mayInterruptIfRunning) {
+		if (!isCancelled()) {
+			isCancelled = true;
+			fireCancelled();
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isDone() {
+		return isCancelled() || isResolved();
 	}
 
 	@Override
@@ -79,6 +84,28 @@ public class AbstractFuture<V> implements Future<V> {
 			throw new TimeoutException();
 		} else {
 			return null;
+		}
+	}
+
+	@Override
+	public void addFutureListener(FutureListener<V> listener) {
+		listeners.add(listener);
+	}
+
+	@Override
+	public void removeFutureListener(FutureListener<V> listener) {
+		listeners.remove(listener);
+	}
+
+	private void fireResolved() {
+		for (FutureListener<V> listener : listeners) {
+			listener.futureResolved(this);
+		}
+	}
+
+	private void fireCancelled() {
+		for (FutureListener<V> listener : listeners) {
+			listener.futureCancelled(this);
 		}
 	}
 
