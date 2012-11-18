@@ -1,6 +1,10 @@
 # Java
 *.class
 
+# LeJOS
+*.nxd
+*.nxj
+
 # Windows
 *.db
 
