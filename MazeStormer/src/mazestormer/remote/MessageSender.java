@@ -10,7 +10,11 @@ public abstract class MessageSender<M extends Message> {
 		this.communicator = communicator;
 	}
 
-	protected void report(M message) {
+	public Communicator<? super M, ?> getCommunicator() {
+		return communicator;
+	}
+
+	protected void send(M message) {
 		try {
 			communicator.send(message);
 		} catch (IOException e) {

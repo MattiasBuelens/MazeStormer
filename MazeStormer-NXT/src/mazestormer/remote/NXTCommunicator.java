@@ -7,7 +7,7 @@ import mazestormer.command.Command;
 import mazestormer.command.CommandReader;
 import mazestormer.report.Report;
 
-public class NXTCommunicator extends Communicator<Report, Command> {
+public class NXTCommunicator extends Communicator<Report<?>, Command> {
 
 	private NXTConnection connection;
 

@@ -1,8 +1,9 @@
 package mazestormer.report;
 
+import lejos.robotics.navigation.Move;
 import mazestormer.remote.MessageType;
 
-public enum ReportType implements MessageType<Report> {
+public enum ReportType implements MessageType<Report<?>> {
 
 	/*
 	 * Pilot
@@ -10,20 +11,20 @@ public enum ReportType implements MessageType<Report> {
 
 	MOVE_STARTED {
 		@Override
-		public Report build() {
+		public Report<Move> build() {
 			return new MoveReport(this);
 		}
 	},
 
 	MOVE_STOPPED {
 		@Override
-		public Report build() {
+		public Report<Move> build() {
 			return new MoveReport(this);
 		}
 	},
 	MOVEMENT {
 		@Override
-		public Report build() {
+		public Report<Move> build() {
 			return new MoveReport(this);
 		}
 	},
@@ -34,7 +35,7 @@ public enum ReportType implements MessageType<Report> {
 
 	LIGHT_VALUE {
 		@Override
-		public Report build() {
+		public Report<Integer> build() {
 			return new LightReadReport(this);
 		}
 	};

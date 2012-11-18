@@ -3,24 +3,20 @@ package mazestormer.remote;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.command.Command;
-import mazestormer.report.Report;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 import mazestormer.simulator.DelegatedCalibratedLightSensor;
 
-public class RemoteRobot implements Robot {
+public class RemoteRobot extends RemoteComponent implements Robot {
 
 	private RemotePilot pilot;
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
 	private PoseProvider poseProvider;
 
-	private final Communicator<Command, Report> communicator;
-
-	public RemoteRobot(Communicator<Command, Report> communicator) {
-		this.communicator = communicator;
+	public RemoteRobot(RemoteCommunicator communicator) {
+		super(communicator);
 		setup();
 	}
 
@@ -35,8 +31,7 @@ public class RemoteRobot implements Robot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new DelegatedCalibratedLightSensor(new RemoteLightSensor(
-					getCommunicator()));
+			light = new DelegatedCalibratedLightSensor(new RemoteLightSensor(getCommunicator()));
 		}
 		return light;
 	}
@@ -57,10 +52,6 @@ public class RemoteRobot implements Robot {
 		return poseProvider;
 	}
 
-	public Communicator<Command, Report> getCommunicator() {
-		return communicator;
-	}
-
 	public void setup() {
 		// Communicator<Command, Report> comm = getCommunicator();
 
@@ -71,7 +62,12 @@ public class RemoteRobot implements Robot {
 
 	@Override
 	public void terminate() {
-		getPilot().stop();
+		// Terminate the pilot
+		getPilot().terminate();
+		// Stop all communications
+		getCommunicator().stop();
+		// Remove registered message listeners
+		super.terminate();
 	}
 
 }

@@ -9,14 +9,14 @@ import mazestormer.report.Report;
 
 public abstract class RemoteComponent {
 
-	private final Communicator<Command, Report> communicator;
-	private List<MessageListener<Report>> messageListeners = new ArrayList<MessageListener<Report>>();
+	private final RemoteCommunicator communicator;
+	private List<MessageListener<Report<?>>> messageListeners = new ArrayList<MessageListener<Report<?>>>();
 
-	public RemoteComponent(Communicator<Command, Report> communicator) {
+	public RemoteComponent(RemoteCommunicator communicator) {
 		this.communicator = communicator;
 	}
 
-	protected Communicator<Command, Report> getCommunicator() {
+	protected RemoteCommunicator getCommunicator() {
 		return communicator;
 	}
 
@@ -36,23 +36,23 @@ public abstract class RemoteComponent {
 	}
 
 	/**
-	 * Adds a message listener.
+	 * Add a report listener.
 	 * 
 	 * @param listener
-	 *            The message listener.
+	 *            The report listener.
 	 */
-	protected void addMessageListener(MessageListener<Report> listener) {
+	protected void addMessageListener(MessageListener<Report<?>> listener) {
 		// Add and store message listener
 		messageListeners.add(listener);
 		communicator.addListener(listener);
 	}
 
 	/**
-	 * Terminates this remote component.
+	 * Terminate this component.
 	 */
 	public void terminate() {
 		// Remove registered message listeners
-		for (MessageListener<Report> listener : messageListeners) {
+		for (MessageListener<Report<?>> listener : messageListeners) {
 			communicator.removeListener(listener);
 		}
 	}

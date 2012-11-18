@@ -1,21 +1,18 @@
 package mazestormer.remote;
 
 import lejos.robotics.LampLightDetector;
-import mazestormer.command.Command;
 import mazestormer.command.CommandType;
 import mazestormer.command.LightFloodlightCommand;
-import mazestormer.command.LightReadCommand;
-import mazestormer.report.LightReadReport;
-import mazestormer.report.Report;
-import mazestormer.report.RequestFuture;
+import mazestormer.util.Future;
 
-public class RemoteLightSensor extends RemoteComponent implements
-		LampLightDetector {
+public class RemoteLightSensor extends RemoteComponent implements LampLightDetector {
 
 	private boolean isFloodlight = false;
+	private final LightValueRequester lightValueRequester;
 
-	public RemoteLightSensor(Communicator<Command, Report> communicator) {
+	public RemoteLightSensor(RemoteCommunicator communicator) {
 		super(communicator);
+		lightValueRequester = new LightValueRequester(communicator);
 	}
 
 	/**
@@ -28,15 +25,12 @@ public class RemoteLightSensor extends RemoteComponent implements
 
 	@Override
 	public int getNormalizedLightValue() {
-		// Create command
-		LightReadCommand command = new LightReadCommand(CommandType.LIGHT_READ);
-		command.setRequestId(getCommunicator().nextRequestId());
-		// Create future listener
-		LightReadFuture future = new LightReadFuture(command);
-		// Send command
-		send(command);
-		// Wait for response
-		return future.get();
+		try {
+			return lightValueRequester.request().get(1000);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
 	}
 
 	/**
@@ -57,8 +51,7 @@ public class RemoteLightSensor extends RemoteComponent implements
 
 	@Override
 	public void setFloodlight(boolean floodlight) {
-		send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT,
-				floodlight));
+		send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT, floodlight));
 	}
 
 	@Override
@@ -82,21 +75,14 @@ public class RemoteLightSensor extends RemoteComponent implements
 		return false;
 	}
 
-	private class LightReadFuture extends RequestFuture<Integer> {
+	public static class LightValueRequester extends ReportRequester<Integer> {
 
-		public LightReadFuture(LightReadCommand request) {
-			super(request, getCommunicator());
+		public LightValueRequester(RemoteCommunicator communicator) {
+			super(communicator);
 		}
 
-		@Override
-		protected boolean isResponse(RequestMessage message) {
-			return (message instanceof LightReadReport);
-		}
-
-		@Override
-		protected Integer getResponse(RequestMessage message) {
-			LightReadReport report = (LightReadReport) message;
-			return report.getLightValue();
+		public Future<Integer> request() {
+			return request(CommandType.LIGHT_READ);
 		}
 
 	}

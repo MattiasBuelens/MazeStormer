@@ -19,8 +19,6 @@ public class Communicator<S extends Message, R extends Message> implements
 	private DataOutputStream dos;
 	private final MessageReader<? extends R> reader;
 
-	private int nextRequestId = 0;
-
 	private List<MessageListener<? super R>> listeners = new ArrayList<MessageListener<? super R>>();
 
 	public Communicator(DataInputStream dis, DataOutputStream dos,
@@ -132,10 +130,6 @@ public class Communicator<S extends Message, R extends Message> implements
 			message.write(dos);
 			dos.flush();
 		}
-	}
-
-	public int nextRequestId() {
-		return nextRequestId++;
 	}
 
 	public void addListener(MessageListener<? super R> listener) {

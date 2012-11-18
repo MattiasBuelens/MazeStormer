@@ -2,7 +2,7 @@ package mazestormer.report;
 
 import mazestormer.remote.MessageTypeReader;
 
-public class ReportReader extends MessageTypeReader<Report> {
+public class ReportReader extends MessageTypeReader<Report<?>> {
 
 	@Override
 	public ReportType getType(int typeId) {

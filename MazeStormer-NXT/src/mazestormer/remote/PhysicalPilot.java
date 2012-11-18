@@ -12,18 +12,17 @@ import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
 import mazestormer.report.MoveReporter;
 import mazestormer.report.MovementReporter;
-import mazestormer.report.Report;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
 public class PhysicalPilot extends DifferentialPilot implements Pilot {
 
-	private final Communicator<Report, Command> communicator;
+	private final NXTCommunicator communicator;
 	private List<MessageListener<Command>> messageListeners = new ArrayList<MessageListener<Command>>();
 
 	private MovementReporter movementReporter;
 
-	public PhysicalPilot(Communicator<Report, Command> communicator) {
+	public PhysicalPilot(NXTCommunicator communicator) {
 		super(Robot.leftWheelDiameter, Robot.rightWheelDiameter,
 				Robot.trackWidth, Motor.A, Motor.B, false);
 

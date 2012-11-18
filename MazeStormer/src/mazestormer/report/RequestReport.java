@@ -6,7 +6,8 @@ import java.io.IOException;
 
 import mazestormer.remote.RequestMessage;
 
-public abstract class RequestReport extends Report implements RequestMessage {
+public abstract class RequestReport<V> extends Report<V> implements
+		RequestMessage {
 
 	private int requestId;
 

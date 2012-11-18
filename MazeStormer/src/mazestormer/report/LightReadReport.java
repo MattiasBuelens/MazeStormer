@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class LightReadReport extends RequestReport {
+public class LightReadReport extends RequestReport<Integer> {
 
 	private int lightValue;
 
@@ -24,6 +24,16 @@ public class LightReadReport extends RequestReport {
 
 	public void setLightValue(int lightValue) {
 		this.lightValue = lightValue;
+	}
+
+	@Override
+	public Integer getValue() {
+		return getLightValue();
+	}
+
+	@Override
+	public void setValue(Integer value) {
+		setLightValue(value);
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import lejos.robotics.navigation.Move;
 
-public class MoveReport extends Report {
+public class MoveReport extends Report<Move> {
 
 	private Move move;
 
@@ -29,6 +29,16 @@ public class MoveReport extends Report {
 
 	private Move createMove() {
 		return new Move(0, 0, false);
+	}
+
+	@Override
+	public Move getValue() {
+		return getMove();
+	}
+
+	@Override
+	public void setValue(Move value) {
+		setMove(value);
 	}
 
 	@Override

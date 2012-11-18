@@ -7,14 +7,19 @@ import mazestormer.command.Command;
 import mazestormer.report.Report;
 import mazestormer.report.ReportReader;
 
-public class RemoteCommunicator extends Communicator<Command, Report> {
+public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 
 	private NXTConnector connector;
 
+	private int nextRequestId = 0;
+
 	public RemoteCommunicator(NXTConnector connector) {
-		super(connector.getInputStream(), connector.getOutputStream(),
-				new ReportReader());
+		super(connector.getInputStream(), connector.getOutputStream(), new ReportReader());
 		this.connector = connector;
+	}
+
+	public int nextRequestId() {
+		return nextRequestId++;
 	}
 
 	@Override
@@ -25,4 +30,5 @@ public class RemoteCommunicator extends Communicator<Command, Report> {
 			connector = null;
 		}
 	}
+
 }

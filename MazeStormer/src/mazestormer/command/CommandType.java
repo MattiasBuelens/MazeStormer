@@ -77,6 +77,13 @@ public enum CommandType implements MessageType<Command> {
 		}
 	},
 
+	CANCEL {
+		@Override
+		public Command build() {
+			return new CancelRequestCommand(this);
+		}
+	},
+
 	/*
 	 * General
 	 */

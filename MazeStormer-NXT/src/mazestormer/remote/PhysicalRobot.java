@@ -1,8 +1,5 @@
 package mazestormer.remote;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
@@ -12,26 +9,20 @@ import lejos.robotics.RegulatedMotor;
 import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.command.Command;
 import mazestormer.command.ShutdownCommandListener;
-import mazestormer.report.Report;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
-public class PhysicalRobot implements Robot {
+public class PhysicalRobot extends NXTComponent implements Robot {
 
 	private PhysicalPilot pilot;
 	private PhysicalLightSensor light;
 	private RangeScanner scanner;
 	private PoseProvider poseProvider;
 
-	private final Communicator<Report, Command> communicator;
-
-	private List<MessageListener<Command>> messageListeners = new ArrayList<MessageListener<Command>>();
-
-	public PhysicalRobot(Communicator<Report, Command> communicator) {
-		this.communicator = communicator;
+	public PhysicalRobot(NXTCommunicator communicator) {
+		super(communicator);
 		setup();
 	}
 
@@ -58,16 +49,12 @@ public class PhysicalRobot implements Robot {
 		return poseProvider;
 	}
 
-	public Communicator<Report, Command> getCommunicator() {
-		return communicator;
-	}
-
 	public void setup() {
 		// Pilot
-		pilot = new PhysicalPilot(communicator);
+		pilot = new PhysicalPilot(getCommunicator());
 
 		// Light sensor
-		light = new PhysicalLightSensor(communicator);
+		light = new PhysicalLightSensor(getCommunicator());
 
 		// Scanner
 		RangeFinder sensor = new UltrasonicSensor(SensorPort.S2);
@@ -85,17 +72,9 @@ public class PhysicalRobot implements Robot {
 		// Stop all communications
 		getCommunicator().stop();
 		// Remove registered message listeners
-		for (MessageListener<Command> listener : messageListeners) {
-			communicator.removeListener(listener);
-		}
+		super.terminate();
 		// Release resources
 		getPilot().terminate();
-	}
-
-	private void addMessageListener(MessageListener<Command> listener) {
-		// Add and store message listener
-		messageListeners.add(listener);
-		communicator.addListener(listener);
 	}
 
 }

@@ -14,7 +14,7 @@ import mazestormer.condition.ConditionReader;
 import mazestormer.remote.Message;
 import mazestormer.remote.MessageReader;
 
-public class ConditionalCommand extends RequestCommand {
+public class ConditionalCommand extends RequestCommand<Void> {
 
 	private Condition condition;
 	private List<Command> commands = new ArrayList<Command>();

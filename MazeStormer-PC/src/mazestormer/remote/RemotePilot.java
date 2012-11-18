@@ -6,7 +6,6 @@ import java.util.List;
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.Move.MoveType;
 import lejos.robotics.navigation.MoveListener;
-import mazestormer.command.Command;
 import mazestormer.command.CommandType;
 import mazestormer.command.PilotParameterCommand;
 import mazestormer.command.RotateCommand;
@@ -25,7 +24,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
-	public RemotePilot(Communicator<Command, Report> communicator) {
+	public RemotePilot(RemoteCommunicator communicator) {
 		super(communicator);
 		resetMovement();
 		setup();
@@ -48,8 +47,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public void setAcceleration(int acceleration) {
-		send(new PilotParameterCommand(CommandType.SET_ACCELERATION,
-				acceleration));
+		send(new PilotParameterCommand(CommandType.SET_ACCELERATION, acceleration));
 	}
 
 	@Override
@@ -171,18 +169,17 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 	}
 
 	public void setMovement(Move move) {
-		movement = new Move(move.getMoveType(), move.getDistanceTraveled(),
-				move.getAngleTurned(), (float) getTravelSpeed(),
-				(float) getRotateSpeed(), isMoving());
+		movement = new Move(move.getMoveType(), move.getDistanceTraveled(), move.getAngleTurned(),
+				(float) getTravelSpeed(), (float) getRotateSpeed(), isMoving());
 	}
 
 	public void resetMovement() {
 		setMovement(new Move(MoveType.STOP, 0, 0, false));
 	}
 
-	private class MoveReportListener implements MessageListener<Report> {
+	private class MoveReportListener implements MessageListener<Report<?>> {
 		@Override
-		public void messageReceived(Report report) {
+		public void messageReceived(Report<?> report) {
 			if (!(report instanceof MoveReport))
 				return;
 

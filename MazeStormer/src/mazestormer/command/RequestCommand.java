@@ -4,9 +4,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import mazestormer.remote.MessageType;
 import mazestormer.remote.RequestMessage;
+import mazestormer.report.Report;
+import mazestormer.report.RequestReport;
 
-public abstract class RequestCommand extends Command implements RequestMessage {
+public abstract class RequestCommand<V> extends Command implements
+		RequestMessage {
 
 	private int requestId;
 
@@ -22,6 +26,15 @@ public abstract class RequestCommand extends Command implements RequestMessage {
 	@Override
 	public void setRequestId(int requestId) {
 		this.requestId = requestId;
+	}
+
+	public RequestReport<V> createResponse(MessageType<Report<?>> reportType,
+			V value) {
+		@SuppressWarnings("unchecked")
+		RequestReport<V> report = (RequestReport<V>) reportType.build();
+		report.setRequestId(getRequestId());
+		report.setValue(value);
+		return report;
 	}
 
 	@Override

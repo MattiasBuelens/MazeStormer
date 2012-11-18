@@ -6,20 +6,20 @@ import java.util.List;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import mazestormer.command.Command;
+import mazestormer.command.CommandReplier;
+import mazestormer.command.CommandType;
 import mazestormer.command.LightFloodlightCommand;
 import mazestormer.command.LightReadCommand;
-import mazestormer.report.LightReadReport;
-import mazestormer.report.Report;
 import mazestormer.report.ReportType;
 import mazestormer.robot.CalibratedLightSensor;
 
 public class PhysicalLightSensor extends LightSensor implements
 		CalibratedLightSensor {
 
-	private final Communicator<Report, Command> communicator;
+	private final NXTCommunicator communicator;
 	private List<MessageListener<Command>> messageListeners = new ArrayList<MessageListener<Command>>();
 
-	public PhysicalLightSensor(Communicator<Report, Command> communicator) {
+	public PhysicalLightSensor(NXTCommunicator communicator) {
 		super(SensorPort.S1);
 
 		this.communicator = communicator;
@@ -60,7 +60,7 @@ public class PhysicalLightSensor extends LightSensor implements
 		}
 	}
 
-	private class LightValueReplier extends MessageReplier<Report, Command> {
+	private class LightValueReplier extends CommandReplier<Integer> {
 
 		public LightValueReplier() {
 			super(communicator);
@@ -71,10 +71,15 @@ public class PhysicalLightSensor extends LightSensor implements
 			if (!(command instanceof LightReadCommand))
 				return;
 
-			int requestId = ((LightReadCommand) command).getRequestId();
-			int lightValue = getNormalizedLightValue();
-			report(new LightReadReport(ReportType.LIGHT_VALUE, requestId,
-					lightValue));
+			reply((LightReadCommand) command, getNormalizedLightValue());
+		}
+
+		@Override
+		protected ReportType getResponseType(MessageType<Command> requestType) {
+			if (requestType == CommandType.LIGHT_READ) {
+				return ReportType.LIGHT_VALUE;
+			}
+			return null;
 		}
 
 	}

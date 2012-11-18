@@ -34,11 +34,11 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	protected boolean resolve(V result) {
-		if (isDone())
-			return false;
-		this.result = result;
-		isResolved = true;
-		return true;
+		if (!isDone()) {
+			this.result = result;
+			isResolved = true;
+		}
+		return isResolved();
 	}
 
 	@Override
