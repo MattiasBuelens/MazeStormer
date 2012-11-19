@@ -12,7 +12,7 @@ import java.util.Map;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
-import java.awt.Rectangle;
+import lejos.geom.Rectangle;
 import lejos.robotics.navigation.Pose;
 import mazestormer.util.AbstractEventSource;
 import mazestormer.util.LongPoint;
@@ -126,11 +126,15 @@ public class Maze extends AbstractEventSource {
 				x = (int) tile.getX();
 		if(y > tile.getY())
 				y = (int) tile.getY();
-		getBoundingRectangle().setBounds((int) x,(int) y,(int) (width*getTileSize()),(int) (height*getTileSize()));	
+		setBoundingRectangle(new Rectangle((int) x,(int) y,(int) (width*getTileSize()),(int) (height*getTileSize())));	
 	}
 	
 	public Rectangle getBoundingRectangle(){
 		return this.boundingRectangle;
+	}
+	
+	private void setBoundingRectangle(Rectangle request){
+		this.boundingRectangle = request;
 	}
 
 	/**
