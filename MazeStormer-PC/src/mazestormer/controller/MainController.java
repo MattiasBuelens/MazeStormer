@@ -166,7 +166,6 @@ public class MainController implements IMainController {
 		if (barcodeControl == null) {
 			barcodeControl = new BarcodeController(this);
 		}
-
 		return barcodeControl;
 	}
 

@@ -387,28 +387,38 @@ public class Maze extends AbstractEventSource {
 		return heading;
 	}
 	
+	@Deprecated
 	public Path findPath(Tile startTile, Tile goalTile){
 		float gridspace = getTileSize();
 		float clearance = getTileSize()/2;
 		Line[] lines = getLines().toArray(new Line[0]);
+		
 		LineMap map = new LineMap(lines, getBoundingRectangle());
 		FourWayGridMesh mesh = new FourWayGridMesh(map, gridspace, clearance);
 		
-		Node startNode = getClosestNodeOfTile(mesh.getMesh(),startTile);
-		Node goalNode = getClosestNodeOfTile(mesh.getMesh(),goalTile);
+		System.out.println("Size: " + mesh.getMesh().size());
+		for(Node n : mesh.getMesh())
+			System.out.println(" X: " + n.x + " Y: " + n.y + " N: " + n.neighbors());		
 		
-		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
-		return astar.findPath(startNode, goalNode);
+//		Node startNode = getClosestNodeOfTile(mesh.getMesh(),startTile);
+//		Node goalNode = getClosestNodeOfTile(mesh.getMesh(),goalTile);
+//		
+//		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
+//		return astar.findPath(startNode, goalNode);
+		return null;
 	}
 	
+	@Deprecated
 	private Node getClosestNodeOfTile(Collection<Node> nodes, Tile tile){
 		Node closest = new GridNode(100000,100000, getTileSize());
 		for(Node node : nodes)
-			if(Math.sqrt(Math.pow(Math.abs(tile.getX()-node.x),2)+Math.pow(Math.abs(tile.getY()-node.y),2)) < Math.sqrt(Math.pow(Math.abs(tile.getX()-closest.x),2)+Math.pow(Math.abs(tile.getY()-closest.y),2)))
+			if(Math.sqrt(Math.pow(Math.abs(tile.getX()-node.x),2)+Math.pow(Math.abs(tile.getY()-node.y),2))
+					< Math.sqrt(Math.pow(Math.abs(tile.getX()-closest.x),2)+Math.pow(Math.abs(tile.getY()-closest.y),2)))
 				closest = node;
 		return closest;
 	}
 	
+	@Deprecated
 	private Map<Tile, Node> getMesh(){
 		Map<Tile, Node> nodes = new HashMap<Tile, Node>();
 		for(Tile tile : getTiles())
