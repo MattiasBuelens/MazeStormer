@@ -409,16 +409,16 @@ public class Maze extends AbstractEventSource {
 		return closest;
 	}
 	
-//	private Map<Tile, Node> getMesh(){
-//		Map<Tile, Node> nodes = new HashMap<Tile, Node>();
-//		for(Tile tile : getTiles())
-//			nodes.put(tile, new GridNode(tile.getX()+getTileSize()/2, tile.getY()+getTileSize()/2, getTileSize()));
-//		for(Tile tile : getTiles()){
-//			Node node = nodes.get(tile);
-//			for(int i=0; i<Orientation.values().length; i++)
-//				if(tile.hasEdgeAt(Orientation.values()[i])){}
-//					//node.addNeighbour(nodes.get(getTileTo(tile, Orientation.values()[i])));
-//		}
-//		return nodes;
-//	}
+	private Map<Tile, Node> getMesh(){
+		Map<Tile, Node> nodes = new HashMap<Tile, Node>();
+		for(Tile tile : getTiles())
+			nodes.put(tile, new GridNode(tile.getX()+getTileSize()/2, tile.getY()+getTileSize()/2, getTileSize()));
+		for(Tile tile : getTiles()){
+			Node node = nodes.get(tile);
+			for(int i=0; i<Orientation.values().length; i++)
+				if(tile.hasEdgeAt(Orientation.values()[i]))
+					node.addNeighbor(nodes.get(getNeighbor(tile, Orientation.values()[i])));
+		}
+		return nodes;
+	}
 }
