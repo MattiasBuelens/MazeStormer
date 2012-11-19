@@ -110,6 +110,12 @@ public class Maze extends AbstractEventSource {
 		return getTileAt(new LongPoint(tilePosition));
 	}
 
+	public Tile getNeighbor(Tile givenTile, Orientation direction) {
+		LongPoint neighborCoordinates = direction.shift(givenTile.getPosition());
+		Tile neighbor = getTileAt(neighborCoordinates);
+		return neighbor;
+	}
+
 	/**
 	 * Get all tiles on this maze.
 	 */
