@@ -117,21 +117,21 @@ public class Maze extends AbstractEventSource {
 		long height = (long) (getBoundingRectangle().getHeight()/getTileSize());
 			
 		if(!((x <= tile.getX() && tile.getX() <= x+width) || (x >= tile.getX() && tile.getX() >= x+width))){
-			if(Math.signum(x) == Math.signum(width))
-				width = (int) Math.abs(tile.getX()-x);
+			if(Math.signum(tile.getX()) == Math.signum(x))
+				width = (long) Math.abs(tile.getX()-x);
 			else
-				width = (int) (Math.abs(tile.getX())+Math.abs(x));
+				width = (long) (Math.abs(tile.getX())+Math.abs(x));
 		}
 		if(!((y <= tile.getY() && tile.getY() <= y+height) || (y >= tile.getY() && tile.getY() >= y+height))){
-			if(Math.signum(y) == Math.signum(height))
-				width = (int) Math.abs(tile.getY()-y);
+			if(Math.signum(tile.getY()) == Math.signum(y))
+				height = (long) Math.abs(tile.getY()-y);
 			else
-				height = (int) (Math.abs(tile.getY())+Math.abs(y));
+				height = (long) (Math.abs(tile.getY())+Math.abs(y));
 		}
 		if(x > tile.getX())
-				x = (int) tile.getX();
+				x = (long) tile.getX();
 		if(y > tile.getY())
-				y = (int) tile.getY();
+				y = (long) tile.getY();
 		setBoundingRectangle(new Rectangle((int) x,(int) y,(int) (width*getTileSize()),(int) (height*getTileSize())));	
 	}
 	
