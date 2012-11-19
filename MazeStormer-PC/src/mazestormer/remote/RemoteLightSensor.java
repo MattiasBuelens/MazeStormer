@@ -5,7 +5,8 @@ import mazestormer.command.CommandType;
 import mazestormer.command.LightFloodlightCommand;
 import mazestormer.util.Future;
 
-public class RemoteLightSensor extends RemoteComponent implements LampLightDetector {
+public class RemoteLightSensor extends RemoteComponent implements
+		LampLightDetector {
 
 	private boolean isFloodlight = false;
 	private final LightValueRequester lightValueRequester;
@@ -13,6 +14,11 @@ public class RemoteLightSensor extends RemoteComponent implements LampLightDetec
 	public RemoteLightSensor(RemoteCommunicator communicator) {
 		super(communicator);
 		lightValueRequester = new LightValueRequester(communicator);
+		setup();
+	}
+
+	private void setup() {
+		addMessageListener(lightValueRequester);
 	}
 
 	/**
@@ -51,7 +57,8 @@ public class RemoteLightSensor extends RemoteComponent implements LampLightDetec
 
 	@Override
 	public void setFloodlight(boolean floodlight) {
-		send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT, floodlight));
+		send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT,
+				floodlight));
 	}
 
 	@Override

@@ -13,11 +13,15 @@ import mazestormer.simulator.DelegatedCalibratedLightSensor;
 public class RemoteRobot extends RemoteComponent implements Robot {
 
 	private RemotePilot pilot;
-	private CalibratedLightSensor light;
+	private PoseProvider poseProvider;
+
+	private RemoteLightSensor light;
+	private CalibratedLightSensor calibratedLight;
+
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
+
 	private SoundPlayer soundPlayer;
-	private PoseProvider poseProvider;
 
 	public RemoteRobot(RemoteCommunicator communicator) {
 		super(communicator);
@@ -33,11 +37,11 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 
 	@Override
 	public CalibratedLightSensor getLightSensor() {
-		if (light == null) {
-			light = new DelegatedCalibratedLightSensor(new RemoteLightSensor(
-					getCommunicator()));
+		if (calibratedLight == null) {
+			light = new RemoteLightSensor(getCommunicator());
+			calibratedLight = new DelegatedCalibratedLightSensor(light);
 		}
-		return light;
+		return calibratedLight;
 	}
 
 	@Override
@@ -75,8 +79,9 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 
 	@Override
 	public void terminate() {
-		// Terminate the pilot
+		// Terminate components
 		getPilot().terminate();
+		light.terminate();
 		// Stop all communications
 		getCommunicator().stop();
 		// Remove registered message listeners
