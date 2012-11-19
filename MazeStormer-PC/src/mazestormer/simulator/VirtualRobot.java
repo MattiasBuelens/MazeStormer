@@ -9,6 +9,8 @@ import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 import mazestormer.robot.SoundPlayer;
+import mazestormer.simulator.collision.CollisionObserver;
+import mazestormer.simulator.collision.VirtualCollisionDetector;
 
 public class VirtualRobot implements Robot {
 
@@ -18,14 +20,15 @@ public class VirtualRobot implements Robot {
 	private RangeScannerFeatureDetector detector;
 	private SoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
-	private VirtualCollisionDetector collisionDetect;
+	private final CollisionObserver collisionObserver;
+	private VirtualCollisionDetector collisionDetector;
 
 	private final Maze maze;
 
 	public VirtualRobot(Maze maze) {
 		this.maze = maze;
-		this.collisionDetect = new VirtualCollisionDetector(maze,
-				getPoseProvider());
+		this.collisionObserver = new CollisionObserver(this);
+		collisionObserver.start();
 	}
 
 	@Override
@@ -77,10 +80,19 @@ public class VirtualRobot implements Robot {
 		}
 		return soundPlayer;
 	}
+	
+	public VirtualCollisionDetector getCollisionDetector() {
+		if(collisionDetector == null)
+			collisionDetector = new VirtualCollisionDetector(maze, getPoseProvider());
+		return collisionDetector;
+	}
+	
+	public CollisionObserver getCollisionObserver() {
+		return collisionObserver;
+	}
 
 	@Override
 	public void terminate() {
 		pilot.terminate();
 	}
-
 }

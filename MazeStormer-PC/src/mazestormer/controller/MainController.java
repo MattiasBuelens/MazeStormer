@@ -19,6 +19,8 @@ import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
+import mazestormer.simulator.VirtualRobot;
+import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
 
@@ -301,6 +303,22 @@ public class MainController implements IMainController {
 			postEvent(new MoveEvent(MoveEvent.EventType.STOPPED, event));
 		}
 
+	}
+	
+	@Subscribe
+	public void registerCollisionListener(ConnectEvent e) {
+		if(e.isConnected() && getRobot() instanceof VirtualRobot) {
+			VirtualRobot vRobot = (VirtualRobot) getRobot();
+			vRobot.getCollisionObserver().addCollisionListener(new CollisionPublisher());
+		}
+	}
+	
+	private class CollisionPublisher implements CollisionListener {
+		
+		@Override
+		public void brutalCrashOccured() {
+			getLogger().severe("A collision occured, please retreat.");
+		}
 	}
 
 	/*
