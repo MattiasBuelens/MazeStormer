@@ -9,7 +9,8 @@ import mazestormer.report.Report;
 import mazestormer.report.RequestReport;
 import mazestormer.util.Future;
 
-public class ReportRequester<V> extends MessageSender<RequestCommand<V>> implements MessageListener<Report<?>> {
+public class ReportRequester<V> extends MessageSender<RequestCommand<V>>
+		implements MessageListener<Report<?>> {
 
 	private Map<Integer, RequestFuture<V>> futures = new HashMap<Integer, RequestFuture<V>>();
 
@@ -26,6 +27,12 @@ public class ReportRequester<V> extends MessageSender<RequestCommand<V>> impleme
 		// Create request
 		@SuppressWarnings("unchecked")
 		RequestCommand<V> request = (RequestCommand<V>) requestType.build();
+
+		return request(request);
+	}
+
+	protected Future<V> request(RequestCommand<V> request) {
+		// Set request identifier
 		int requestId = getCommunicator().nextRequestId();
 		request.setRequestId(requestId);
 

@@ -23,7 +23,18 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 	private final RangeScanner scanner;
 	private float maxDistance;
 	private PoseProvider pp = null;
-	private static final Point sensorPosition = new Point(-3.4f, -0.6f); //relative position of ultrasonic sensor from rotation center of robot, in cm
+	private static final Point sensorPosition = new Point(-3.4f, -0.6f); // relative
+																			// position
+																			// of
+																			// ultrasonic
+																			// sensor
+																			// from
+																			// rotation
+																			// center
+																			// of
+																			// robot,
+																			// in
+																			// cm
 
 	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance) {
 		this.scanner = checkNotNull(scanner);
@@ -41,23 +52,12 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		return scanner;
 	}
 
-	/**
-	 * Returns the maximum distance this detector will return for detected
-	 * features.
-	 * 
-	 * @return The maximum distance.
-	 */
+	@Override
 	public float getMaxDistance() {
 		return this.maxDistance;
 	}
 
-	/**
-	 * Sets the maximum distance to register detected objects from the range
-	 * scanner.
-	 * 
-	 * @param distance
-	 *            The maximum distance.
-	 */
+	@Override
 	public void setMaxDistance(float distance) {
 		this.maxDistance = distance;
 	}
@@ -83,13 +83,15 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		RangeReadings readings = new RangeReadings(0);
 
 		for (RangeReading rawReading : rawReadings) {
-			// Change coordinate system from sensor (where O is the rotation center of the sensor-servo)
-			// 							to nxt (where 0 is the rotation center of the robot)
-			Point position = sensorPosition.pointAt(rawReading.getRange(), rawReading.getAngle());
-			float angle = (float)Math.toDegrees(position.angle());
+			// Change coordinate system from sensor (where O is the rotation
+			// center of the sensor-servo)
+			// to nxt (where 0 is the rotation center of the robot)
+			Point position = sensorPosition.pointAt(rawReading.getRange(),
+					rawReading.getAngle());
+			float angle = (float) Math.toDegrees(position.angle());
 			float range = position.length();
 			RangeReading reading = new RangeReading(angle, range);
-			
+
 			// Only retain positive readings smaller than the maximum distance
 			if (reading.getRange() > 0
 					&& reading.getRange() <= getMaxDistance()) {
@@ -106,7 +108,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		// Check to make sure it retrieved some readings
 		if (readings.isEmpty())
 			return null;
-		
+
 		// Add current pose if pose provider available
 		if (pp != null) {
 			return new RangeFeature(readings, pp.getPose());

@@ -28,9 +28,21 @@ public class DelegatedCalibratedLightSensor implements CalibratedLightSensor {
 
 	@Override
 	public int getLightValue() {
+		return getLightValue(getNormalizedLightValue());
+	}
+
+	@Override
+	public int getNormalizedLightValue(int lightValue) {
+		if (hundred == zero)
+			return zero;
+		return (int) ((lightValue / 100f) * (hundred - zero) + zero);
+	}
+
+	@Override
+	public int getLightValue(int normalizedLightValue) {
 		if (hundred == zero)
 			return 0;
-		return 100 * (getNormalizedLightValue() - zero) / (hundred - zero);
+		return 100 * (normalizedLightValue - zero) / (hundred - zero);
 	}
 
 	@Override

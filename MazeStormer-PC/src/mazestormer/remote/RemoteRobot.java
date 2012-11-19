@@ -3,6 +3,11 @@ package mazestormer.remote;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.command.CommandType;
+import mazestormer.condition.Condition;
+import mazestormer.condition.ConditionType;
+import mazestormer.condition.LightCompareCondition;
+import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
@@ -53,7 +58,7 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	}
 
 	@Override
-	public RangeScannerFeatureDetector getRangeDetector() {
+	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
 			detector = new RangeScannerFeatureDetector(getRangeScanner());
 			detector.setPoseProvider(getPoseProvider());
@@ -75,6 +80,33 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 			soundPlayer = new RemoteSoundPlayer(getCommunicator());
 		}
 		return soundPlayer;
+	}
+
+	@Override
+	public CommandBuilder when(ConditionSource source,
+			CompareOperator operator, double value) {
+		Condition condition = null;
+		switch (source) {
+		case LIGHT:
+			ConditionType type = null;
+			switch (operator) {
+			case GREATER_THAN:
+				type = ConditionType.LIGHT_GREATER_THAN;
+				break;
+			case SMALLER_THAN:
+				type = ConditionType.LIGHT_SMALLER_THAN;
+				break;
+			default:
+				break;
+			}
+			condition = new LightCompareCondition(type, (int) value);
+			break;
+		}
+
+		RemoteCommandBuilder builder = new RemoteCommandBuilder(
+				getCommunicator(), CommandType.WHEN, condition);
+		addMessageListener(builder);
+		return builder;
 	}
 
 	@Override
