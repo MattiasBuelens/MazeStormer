@@ -17,6 +17,7 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
+import mazestormer.maze.Tile;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.simulator.VirtualRobot;
@@ -165,6 +166,7 @@ public class MainController implements IMainController {
 		if (barcodeControl == null) {
 			barcodeControl = new BarcodeController(this);
 		}
+
 		return barcodeControl;
 	}
 
