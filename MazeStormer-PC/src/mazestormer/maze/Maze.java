@@ -13,7 +13,13 @@ import java.util.Map;
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.geom.Rectangle;
+import lejos.robotics.mapping.LineMap;
 import lejos.robotics.navigation.Pose;
+import lejos.robotics.pathfinding.AstarSearchAlgorithm;
+import lejos.robotics.pathfinding.FourWayGridMesh;
+import lejos.robotics.pathfinding.GridNode;
+import lejos.robotics.pathfinding.Node;
+import lejos.robotics.pathfinding.Path;
 import mazestormer.util.AbstractEventSource;
 import mazestormer.util.LongPoint;
 
@@ -374,4 +380,39 @@ public class Maze extends AbstractEventSource {
 			heading -= 360;
 		return heading;
 	}
+	
+	public Path findPath(Tile startTile, Tile goalTile){
+		float gridspace = getTileSize();
+		float clearance = getTileSize()/2;
+		Line[] lines = getLines().toArray(new Line[0]);
+		LineMap map = new LineMap(lines, getBoundingRectangle());
+		FourWayGridMesh mesh = new FourWayGridMesh(map, gridspace, clearance);
+		
+		Node startNode = getClosestNodeOfTile(mesh.getMesh(),startTile);
+		Node goalNode = getClosestNodeOfTile(mesh.getMesh(),goalTile);
+		
+		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
+		return astar.findPath(startNode, goalNode);
+	}
+	
+	private Node getClosestNodeOfTile(Collection<Node> nodes, Tile tile){
+		Node closest = new GridNode(100000,100000, getTileSize());
+		for(Node node : nodes)
+			if(Math.sqrt(Math.abs(tile.getX()-node.x)+Math.abs(tile.getY()-node.y)) < Math.sqrt(Math.abs(tile.getX()-closest.x)+Math.abs(tile.getY()-closest.y)))
+				closest = node;
+		return closest;
+	}
+	
+//	private Map<Tile, Node> getMesh(){
+//		Map<Tile, Node> nodes = new HashMap<Tile, Node>();
+//		for(Tile tile : getTiles())
+//			nodes.put(tile, new GridNode(tile.getX()+getTileSize()/2, tile.getY()+getTileSize()/2, getTileSize()));
+//		for(Tile tile : getTiles()){
+//			Node node = nodes.get(tile);
+//			for(int i=0; i<Orientation.values().length; i++)
+//				if(tile.hasEdgeAt(Orientation.values()[i])){}
+//					//node.addNeighbour(nodes.get(getTileTo(tile, Orientation.values()[i])));
+//		}
+//		return nodes;
+//	}
 }
