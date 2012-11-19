@@ -4,9 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import mazestormer.condition.Condition;
@@ -49,7 +47,7 @@ public class ConditionalCommand extends RequestCommand<Void> {
 	}
 
 	public List<Command> getCommands() {
-		return Collections.unmodifiableList(commands);
+		return commands;
 	}
 
 	private void setCommands(List<Command> commands) {
@@ -65,7 +63,9 @@ public class ConditionalCommand extends RequestCommand<Void> {
 	}
 
 	public void addCommands(Command... commands) {
-		addCommands(Arrays.asList(commands));
+		for (Command command : commands) {
+			addCommand(command);
+		}
 	}
 
 	@Override
