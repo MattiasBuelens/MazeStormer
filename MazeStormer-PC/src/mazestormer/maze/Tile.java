@@ -10,6 +10,7 @@ import java.util.EnumSet;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
 public class Tile {
@@ -17,6 +18,7 @@ public class Tile {
 	private final LongPoint position;
 	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
 			Orientation.class);
+	private boolean isExplored = false;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -64,6 +66,25 @@ public class Tile {
 		}
 	}
 
+	//TODO: nodig?
+	public boolean hasUnknownEdges(){
+		for(Edge currentEdge : getEdges()){
+			if(currentEdge.getType() == EdgeType.UNKNOWN){
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean isExplored(){
+		return isExplored;
+	}
+	
+	public void setExplored(){
+		isExplored = true;
+	}
+	
 	public EnumSet<Orientation> getClosedSides() {
 		EnumSet<Orientation> result = EnumSet.noneOf(Orientation.class);
 		for (Orientation orientation : Orientation.values()) {
