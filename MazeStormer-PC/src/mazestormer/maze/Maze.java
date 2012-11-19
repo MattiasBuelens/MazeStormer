@@ -398,7 +398,7 @@ public class Maze extends AbstractEventSource {
 	private Node getClosestNodeOfTile(Collection<Node> nodes, Tile tile){
 		Node closest = new GridNode(100000,100000, getTileSize());
 		for(Node node : nodes)
-			if(Math.sqrt(Math.abs(tile.getX()-node.x)+Math.abs(tile.getY()-node.y)) < Math.sqrt(Math.abs(tile.getX()-closest.x)+Math.abs(tile.getY()-closest.y)))
+			if(Math.sqrt(Math.pow(Math.abs(tile.getX()-node.x),2)+Math.pow(Math.abs(tile.getY()-node.y),2)) < Math.sqrt(Math.pow(Math.abs(tile.getX()-closest.x),2)+Math.pow(Math.abs(tile.getY()-closest.y),2)))
 				closest = node;
 		return closest;
 	}
