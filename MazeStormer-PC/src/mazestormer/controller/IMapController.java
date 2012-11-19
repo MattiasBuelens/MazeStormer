@@ -24,9 +24,9 @@ public interface IMapController extends EventSource {
 	 * Set the visibility of a map layer.
 	 * 
 	 * @param layer
-	 * 			The map layer.
+	 *            The map layer.
 	 * @param isVisible
-	 * 			Whether the layer should be visible.
+	 *            Whether the layer should be visible.
 	 */
 	public void setLayerVisible(MapLayer layer, boolean isVisible);
 
@@ -34,5 +34,10 @@ public interface IMapController extends EventSource {
 	 * Get the robot's current pose, in map coordinates.
 	 */
 	public Pose getRobotPose();
+
+	/**
+	 * Clear the detected points on the map.
+	 */
+	public void clearRanges();
 
 }

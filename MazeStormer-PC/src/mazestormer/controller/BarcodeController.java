@@ -31,17 +31,17 @@ public class BarcodeController extends SubController implements IBarcodeControll
 	}
 	
 	private static IAction getAction(String action){
-		if("Play sound".equals(action))
+		if(ACTIONS[0].equals(action))
 			return new mazestormer.barcode.SoundAction();
-		if("Rotate 360 degrees clockwise".equals(action))
+		if(ACTIONS[1].equals(action))
 			return new mazestormer.barcode.RotateClockwiseAction();
-		if("Rotate 360 degrees counter-clockwise".equals(action))
+		if(ACTIONS[2].equals(action))
 			return new mazestormer.barcode.RotateCounterClockwiseAction();		
-		if("Travel at high speed".equals(action))
+		if(ACTIONS[3].equals(action))
 			return new mazestormer.barcode.HighSpeedAction();			
-		if("Travel at low speed".equals(action))
+		if(ACTIONS[4].equals(action))
 			return new mazestormer.barcode.LowSpeedAction();	
-		if("Wait for 5 seconds".equals(action))
+		if(ACTIONS[5].equals(action))
 			return new mazestormer.barcode.WaitAction();
 		return mazestormer.barcode.NoAction.getInstance();
 	}

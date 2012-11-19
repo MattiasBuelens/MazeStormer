@@ -167,13 +167,18 @@ public class MapController extends SubController implements IMapController {
 		}
 	}
 
+	@Override
+	public void clearRanges() {
+		rangesLayer.clear();
+	}
+
 	@Subscribe
 	public void clearMazeOnConnect(ConnectEvent e) {
 		if (e.isConnected()) {
 			// Clear detected maze
 			getMainController().getMaze().clear();
 			// Clear detected ranges
-			rangesLayer.clear();
+			clearRanges();
 		}
 	}
 

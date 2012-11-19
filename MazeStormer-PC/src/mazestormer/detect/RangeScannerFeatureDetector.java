@@ -5,33 +5,40 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Collections;
 import java.util.Comparator;
 
+import lejos.geom.Point;
 import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
-import lejos.robotics.objectdetection.Feature;
 import lejos.robotics.objectdetection.RangeFeature;
 
 /**
  * A range feature detector which uses a range scanner to locate objects.
  */
-public class RangeScannerFeatureDetector extends AbstractFeatureDetector {
+public class RangeScannerFeatureDetector extends AbstractFeatureDetector
+		implements RangeFeatureDetector {
 
 	private static final float defaultMaxDistance = 100f;
 
 	private final RangeScanner scanner;
 	private float maxDistance;
 	private PoseProvider pp = null;
+	private static final Point sensorPosition = new Point(-3.4f, -0.6f); //relative position of ultrasonic sensor from rotation center of robot, in cm
 
-	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance,
-			int delay) {
-		super(delay);
+	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance) {
 		this.scanner = checkNotNull(scanner);
 		this.maxDistance = maxDistance;
 	}
 
-	public RangeScannerFeatureDetector(RangeScanner scanner, int delay) {
-		this(scanner, defaultMaxDistance, delay);
+	public RangeScannerFeatureDetector(RangeScanner scanner) {
+		this(scanner, defaultMaxDistance);
+	}
+
+	/**
+	 * Get the range scanner used by this feature detector.
+	 */
+	public RangeScanner getScanner() {
+		return scanner;
 	}
 
 	/**
@@ -67,7 +74,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector {
 	}
 
 	@Override
-	public Feature scan() {
+	public RangeFeature scan() {
 		// Get the range readings
 		RangeReadings rawReadings = scanner.getRangeValues();
 
@@ -75,7 +82,14 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector {
 		Comparator<RangeReading> comparator = new ReadingRangeComparator();
 		RangeReadings readings = new RangeReadings(0);
 
-		for (RangeReading reading : rawReadings) {
+		for (RangeReading rawReading : rawReadings) {
+			// Change coordinate system from sensor (where O is the rotation center of the sensor-servo)
+			// 							to nxt (where 0 is the rotation center of the robot)
+			Point position = sensorPosition.pointAt(rawReading.getRange(), rawReading.getAngle());
+			float angle = (float)Math.toDegrees(position.angle());
+			float range = position.length();
+			RangeReading reading = new RangeReading(angle, range);
+			
 			// Only retain positive readings smaller than the maximum distance
 			if (reading.getRange() > 0
 					&& reading.getRange() <= getMaxDistance()) {
@@ -92,7 +106,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector {
 		// Check to make sure it retrieved some readings
 		if (readings.isEmpty())
 			return null;
-
+		
 		// Add current pose if pose provider available
 		if (pp != null) {
 			return new RangeFeature(readings, pp.getPose());

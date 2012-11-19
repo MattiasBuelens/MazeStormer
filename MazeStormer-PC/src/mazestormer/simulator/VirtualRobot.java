@@ -3,22 +3,29 @@ package mazestormer.simulator;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
+import mazestormer.robot.SoundPlayer;
 
 public class VirtualRobot implements Robot {
 
 	private VirtualPilot pilot;
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
+	private RangeScannerFeatureDetector detector;
+	private SoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
+	private VirtualCollisionDetector collisionDetect;
 
 	private final Maze maze;
 
 	public VirtualRobot(Maze maze) {
 		this.maze = maze;
+		this.collisionDetect = new VirtualCollisionDetector(maze,
+				getPoseProvider());
 	}
 
 	@Override
@@ -33,7 +40,7 @@ public class VirtualRobot implements Robot {
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
 			light = new DelegatedCalibratedLightSensor(new VirtualLightSensor(
-					maze, poseProvider));
+					maze, getPoseProvider()));
 		}
 		return light;
 	}
@@ -41,9 +48,18 @@ public class VirtualRobot implements Robot {
 	@Override
 	public RangeScanner getRangeScanner() {
 		if (scanner == null) {
-			scanner = new VirtualRangeScanner(maze, poseProvider);
+			scanner = new VirtualRangeScanner(maze, getPoseProvider());
 		}
 		return scanner;
+	}
+
+	@Override
+	public RangeScannerFeatureDetector getRangeDetector() {
+		if (detector == null) {
+			detector = new RangeScannerFeatureDetector(getRangeScanner());
+			detector.setPoseProvider(getPoseProvider());
+		}
+		return detector;
 	}
 
 	@Override
@@ -52,6 +68,14 @@ public class VirtualRobot implements Robot {
 			poseProvider = new OdometryPoseProvider(getPilot());
 		}
 		return poseProvider;
+	}
+
+	@Override
+	public SoundPlayer getSoundPlayer() {
+		if (soundPlayer == null) {
+			soundPlayer = new VirtualSoundPlayer();
+		}
+		return soundPlayer;
 	}
 
 	@Override

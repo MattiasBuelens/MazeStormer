@@ -3,9 +3,11 @@ package mazestormer.remote;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
+import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.DelegatedCalibratedLightSensor;
 
 public class RemoteRobot extends RemoteComponent implements Robot {
@@ -13,11 +15,12 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	private RemotePilot pilot;
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
+	private RangeScannerFeatureDetector detector;
+	private SoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
 
 	public RemoteRobot(RemoteCommunicator communicator) {
 		super(communicator);
-		setup();
 	}
 
 	@Override
@@ -31,7 +34,8 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new DelegatedCalibratedLightSensor(new RemoteLightSensor(getCommunicator()));
+			light = new DelegatedCalibratedLightSensor(new RemoteLightSensor(
+					getCommunicator()));
 		}
 		return light;
 	}
@@ -45,6 +49,15 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	}
 
 	@Override
+	public RangeScannerFeatureDetector getRangeDetector() {
+		if (detector == null) {
+			detector = new RangeScannerFeatureDetector(getRangeScanner());
+			detector.setPoseProvider(getPoseProvider());
+		}
+		return detector;
+	}
+
+	@Override
 	public PoseProvider getPoseProvider() {
 		if (poseProvider == null) {
 			poseProvider = new OdometryPoseProvider(getPilot());
@@ -52,12 +65,12 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 		return poseProvider;
 	}
 
-	public void setup() {
-		// Communicator<Command, Report> comm = getCommunicator();
-
-		// Report listeners
-
-		// Commanders
+	@Override
+	public SoundPlayer getSoundPlayer() {
+		if (soundPlayer == null) {
+			soundPlayer = new RemoteSoundPlayer(getCommunicator());
+		}
+		return soundPlayer;
 	}
 
 	@Override
