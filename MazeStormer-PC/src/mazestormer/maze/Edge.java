@@ -10,6 +10,8 @@ public final class Edge {
 
 	private final LongPoint position;
 	private final Orientation orientation;
+	private EdgeType type;
+	public enum EdgeType{WALL, OPEN, UNKNOWN};
 
 	/**
 	 * Create a new edge.
@@ -58,6 +60,14 @@ public final class Edge {
 	 */
 	public Orientation getOrientation() {
 		return orientation;
+	}
+	
+	public EdgeType getType(){
+		return type;
+	}
+	
+	public void setType(EdgeType type){
+		this.type = type;
 	}
 
 	/**
