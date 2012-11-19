@@ -19,10 +19,12 @@ public class LineFinderController extends SubController implements
 	private final static double rotateAngle = 135.0;
 	private final static double extraAngle = 0.0; // 4.0;
 
-	private final static int threshold = 30;
-	private final static double crossTreshold = 3.0;
+	private final static double travelSpeed = 5;
 	private final static double slowRotateSpeed = 30;
 	private final static double fastRotateSpeed = 50;
+
+	private final static int threshold = 30;
+	private final static double crossTreshold = 3.0;
 
 	private LineFinderRunner runner;
 
@@ -155,13 +157,14 @@ public class LineFinderController extends SubController implements
 
 		@Override
 		public void run() {
+			// Save original speeds
 			originalTravelSpeed = pilot.getTravelSpeed();
 			originalRotateSpeed = pilot.getRotateSpeed();
 
-			// TODO: Speed?
-			pilot.setTravelSpeed(10);
+			// Set travel speed
+			pilot.setTravelSpeed(travelSpeed);
 
-			// Start looking for line
+			// Travel forward and fine line
 			log("Start looking for line.");
 			pilot.forward();
 			findLine(new Runnable() {
@@ -173,18 +176,18 @@ public class LineFinderController extends SubController implements
 		}
 
 		private void foundFirstLine() {
+			if (shouldStop())
+				return;
 			log("Found line, start rotating left.");
 
-			pilot.stop();
+			// Rotate fixed angle
 			pilot.setRotateSpeed(fastRotateSpeed);
-			if (shouldStop())
-				return;
-
 			pilot.rotate(rotateAngle, false);
-			pilot.setRotateSpeed(slowRotateSpeed);
 			if (shouldStop())
 				return;
 
+			// Rotate left and find line
+			pilot.setRotateSpeed(slowRotateSpeed);
 			pilot.rotateLeft();
 			findLine(new Runnable() {
 				@Override
@@ -195,19 +198,21 @@ public class LineFinderController extends SubController implements
 		}
 
 		private void foundSecondLine() {
+			if (shouldStop())
+				return;
 			log("Found line, start rotating right.");
 
-			pilot.stop();
+			// Get first angle
 			angle1 = pilot.getMovement().getAngleTurned();
+
+			// Rotate fixed angle
 			pilot.setRotateSpeed(fastRotateSpeed);
-			if (shouldStop())
-				return;
-
 			pilot.rotate(-rotateAngle, false);
-			pilot.setRotateSpeed(slowRotateSpeed);
 			if (shouldStop())
 				return;
 
+			// Rotate right and find line
+			pilot.setRotateSpeed(slowRotateSpeed);
 			pilot.rotateRight();
 			findLine(new Runnable() {
 				@Override
@@ -221,14 +226,14 @@ public class LineFinderController extends SubController implements
 			if (shouldStop())
 				return;
 
-			pilot.stop();
+			// Get second angle
 			angle2 = pilot.getMovement().getAngleTurned();
 
+			// Get absolute angles
 			angle1 = Math.abs(angle1) + rotateAngle;
 			angle2 = Math.abs(angle2) + rotateAngle;
 
-			pilot.setRotateSpeed(fastRotateSpeed);
-
+			// Get final angle
 			double finalAngle;
 			if (isCross(angle1, angle2)) {
 				log("Cross detected.");
@@ -237,13 +242,18 @@ public class LineFinderController extends SubController implements
 				finalAngle = ((angle2 - 360.0) / 2.0) - extraAngle;
 			}
 
+			// Position robot
 			log("Positioning robot perpendicular to the line.");
+			pilot.setRotateSpeed(fastRotateSpeed);
 			pilot.rotate(finalAngle);
-			double dist = Robot.sensorOffset
-					* Math.cos(Math.toRadians(finalAngle));
 			if (shouldStop())
 				return;
+
+			double dist = Robot.sensorOffset
+					* Math.cos(Math.toRadians(finalAngle));
 			pilot.travel(dist);
+			if (shouldStop())
+				return;
 
 			// Restore original speed
 			pilot.setTravelSpeed(originalTravelSpeed);
