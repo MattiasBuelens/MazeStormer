@@ -107,26 +107,31 @@ public class ExplorerController extends SubController implements
 		private float[] getScanAngles(Tile givenTile){
 			ArrayList<Float> list = new ArrayList<Float>();
 			
+			//TODO: pas heading vastzetten als we linefinder gedaan hebben.
+			float heading = getPose().getHeading();
+			
 			for(Orientation direction : Orientation.values()){
 				if(givenTile.getEdgeAt(direction).getType() == Edge.EdgeType.UNKNOWN){
 					switch(direction){
 					case EAST:
-						list.add(new Float(-90f));
+						list.add(new Float(-90f - heading));
 						break;
 					case NORTH:
-						list.add(new Float(0f));
+						list.add(new Float(0f - heading));
 						break;
 					case SOUTH:
-						list.add(new Float(-180f));
+						list.add(new Float(-180f - heading));
 						break;
 					case WEST:
-						list.add(new Float(90f));
+						list.add(new Float(90f - heading));
 						break;
 					}
 				}
 			}
 			
-			//Arrays.sort(arg0);
+			Float[] angles = (Float[])list.toArray();
+			//TODO:
+			return null;
 		}
 		
 		//Adds tiles to the queue if the edge in its direction is open and it is not explored yet
