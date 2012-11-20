@@ -16,14 +16,31 @@ public class Mesh{
 		mesh.setUpTest();
 		mesh.generateNodes();
 		mesh.printNodeMap();
+		System.out.println(mesh.findPath());
 	}
 	
+	@Deprecated
 	public void setUpTest() throws Exception{
 		String mazeFilePath = "C:/Users/Matthias/git/MazeStormer/MazeStormer-PC/src/res/mazes/Semester1_Demo2.txt";
 		CharSequence contents;
 		contents = FileUtils.load(mazeFilePath);
 		this.maze.clear();
 		new Parser(this.maze).parse(contents);
+	}
+	
+	@Deprecated
+	public Path findPath(){
+		Tile startTile = (Tile) this.maze.getTiles().toArray()[11];
+		Tile goalTile = (Tile) this.maze.getTiles().toArray()[12];
+		
+		System.out.println("Start Tile X: " + startTile.getX() + "\t" + " Y: " + startTile.getY() + "\t" + " | Borders: " + startTile.getEdges().size() + " | Openings: " + startTile.getOpenSides().size());
+		System.out.println("Goal Tile X: " + goalTile.getX() + "\t" + " Y: " + goalTile.getY() + "\t" + " | Borders: " + goalTile.getEdges().size() + " | Openings: " + goalTile.getOpenSides().size());		
+		
+		Node startNode = nodeMap.get(startTile);
+		Node goalNode = nodeMap.get(goalTile);
+		
+		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
+		return astar.findPath(startNode, goalNode);
 	}
 	
 	private Mesh(Maze maze){
