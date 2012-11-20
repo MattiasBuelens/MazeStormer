@@ -101,8 +101,8 @@ public class Mesh {
 					+ tile.getOpenSides().size());
 			Node node = this.nodeMap.get(tile);
 			System.out.println("Node X: " + node.x + "\t" + " Y: " + node.y
-					+ "\t" + " | Borders: " + node.getNeighbors().size()
-					+ " | Openings: " + (4 - node.getNeighbors().size()));
+					+ "\t" + " | Borders: " + (4 - node.getNeighbors().size())
+					+ " | Openings: " + node.getNeighbors().size());
 		}
 	}
 }
