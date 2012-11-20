@@ -74,7 +74,7 @@ public class Mesh{
 		for(Tile tile : getMaze().getTiles()){
 			Node node = nodes.get(tile);
 			for(int i=0; i<Orientation.values().length; i++)
-				if(tile.hasEdgeAt(Orientation.values()[i])){
+				if(!tile.hasEdgeAt(Orientation.values()[i])){
 					Tile nb = getMaze().getNeighbor(tile, Orientation.values()[i]);
 					if(nb != null)
 						node.addNeighbor(nodes.get(nb));
