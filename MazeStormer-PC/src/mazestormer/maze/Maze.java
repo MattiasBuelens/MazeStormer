@@ -416,31 +416,5 @@ public class Maze extends AbstractEventSource {
 //					< Math.sqrt(Math.pow(Math.abs(tile.getX()-closest.x),2)+Math.pow(Math.abs(tile.getY()-closest.y),2)))
 //				closest = node;
 //		return closest;
-//	}
-	
-	
-	public Path findPath(Tile startTile, Tile goalTile){
-		Map<Tile, Node> nodes = getMesh();
-		Node startNode = nodes.get(startTile);
-		Node goalNode = nodes.get(goalTile);
-		
-		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
-		return astar.findPath(startNode, goalNode);
-	}
-	
-	private Map<Tile, Node> getMesh(){
-		Map<Tile, Node> nodes = new HashMap<Tile, Node>();
-		for(Tile tile : getTiles())
-			nodes.put(tile, new Node(tile.getX(), tile.getY()));
-		for(Tile tile : getTiles()){
-			Node node = nodes.get(tile);
-			for(int i=0; i<Orientation.values().length; i++)
-				if(tile.hasEdgeAt(Orientation.values()[i])){
-					Tile nb = getNeighbor(tile, Orientation.values()[i]);
-					if(nb != null)
-						node.addNeighbor(nodes.get(nb));
-				}
-		}
-		return nodes;
-	}
+//	}	
 }
