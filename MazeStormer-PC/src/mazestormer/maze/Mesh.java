@@ -87,7 +87,7 @@ public class Mesh{
 		for(Tile tile : this.nodeMap.keySet()){
 			System.out.println("Tile X: " + tile.getX() + "\t" + " Y: " + tile.getY() + "\t" + " | Borders: " + tile.getEdges().size() + " | Openings: " + tile.getOpenSides().size());
 			Node node = this.nodeMap.get(tile);
-				System.out.println("Node X: " + node.x + "\t" + " Y: " + node.y + "\t" + " | Borders: " + node.getNeighbors().size() + " | Openings: " + (4-node.getNeighbors().size()));
+				System.out.println("Node X: " + node.x + "\t" + " Y: " + node.y + "\t" + " | Borders: " + (4-node.getNeighbors().size()) + " | Openings: " + (node.getNeighbors().size()));
 		}
 	}
 }
