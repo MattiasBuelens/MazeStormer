@@ -67,12 +67,15 @@ public class Mesh {
 	
 	public Tile[] findTilePath(Tile startTile, Tile goalTile) {
 		Path path = findNodePath(startTile, goalTile);
-		Tile[] tiles = new Tile[path.size()];
-		for(int i=0; i<path.size(); i++){
-			Waypoint wp = path.get(i);
-			tiles[i] = getMaze().getTileAt(new LongPoint((long) wp.x, (long) wp.y));
+		if(path != null){
+			Tile[] tiles = new Tile[path.size()];
+			for(int i=0; i<path.size(); i++){
+				Waypoint wp = path.get(i);
+				tiles[i] = getMaze().getTileAt(new LongPoint((long) wp.x, (long) wp.y));
+			}
+			return tiles;
 		}
-		return tiles;
+		return new Tile[0];
 	}
 
 	private Path findNodePath(Tile startTile, Tile goalTile) {
