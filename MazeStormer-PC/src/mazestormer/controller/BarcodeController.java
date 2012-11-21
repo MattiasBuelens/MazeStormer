@@ -192,19 +192,9 @@ public class BarcodeController extends SubController implements
 			this.newPose = getRobot().getPoseProvider().getPose();
 
 			if (this.blackToWhite) {
-				onTrespassOldBlack(new Runnable() {
-					@Override
-					public void run() {
-						onTrespassBW();
-					}
-				});
+				onTrespassBW();
 			} else {
-				onTrespassOldWhite(new Runnable() {
-					@Override
-					public void run() {
-						onTrespassWB();
-					}
-				});
+				onTrespassWB();
 			}
 		}
 
@@ -264,6 +254,7 @@ public class BarcodeController extends SubController implements
 					* BAR_LENGTH) {
 				loop();
 			} else {
+				this.pilot.stop();
 				encodeBarcode();
 				decodeBarcode();
 			}
