@@ -50,7 +50,7 @@ public class Mesh {
 		return astar.findPath(startNode, goalNode);
 	}
 
-	private Mesh(Maze maze) {
+	public Mesh(Maze maze) {
 		setMaze(maze);
 	}
 
@@ -74,7 +74,7 @@ public class Mesh {
 		return astar.findPath(startNode, goalNode);
 	}
 
-	private void generateNodes() {
+	public void generateNodes() {
 		// Create nodes
 		Map<Tile, Node> nodes = new HashMap<Tile, Node>();
 		for (Tile tile : getMaze().getTiles()) {

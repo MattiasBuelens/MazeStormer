@@ -29,6 +29,8 @@ public class Maze extends AbstractEventSource {
 	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
+	
+	private Mesh mesh;
 
 	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
@@ -340,5 +342,15 @@ public class Maze extends AbstractEventSource {
 		while (heading > 180)
 			heading -= 360;
 		return heading;
+	}
+	
+	public Mesh getMesh(boolean regenerate) {
+		if (this.mesh == null) {
+			this.mesh = new Mesh(this);
+		}
+		if (regenerate == true) {
+			this.mesh.generateNodes();
+		}	
+		return this.mesh;
 	}
 }
