@@ -3,52 +3,54 @@ package mazestormer.maze;
 import java.util.HashMap;
 import java.util.Map;
 
+import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.AstarSearchAlgorithm;
 import lejos.robotics.pathfinding.Node;
 import lejos.robotics.pathfinding.Path;
 import mazestormer.maze.parser.FileUtils;
 import mazestormer.maze.parser.Parser;
+import mazestormer.util.LongPoint;
 
 public class Mesh {
 
-	public static void main(String args[]) throws Exception {
-		Mesh mesh = new Mesh(new Maze());
-		mesh.setUpTest();
-		mesh.generateNodes();
-		mesh.printNodeMap();
-		System.out.println(mesh.findPath());
-	}
-
-	@Deprecated
-	public void setUpTest() throws Exception {
-		String mazeFilePath = Mesh.class.getResource(
-				"/res/mazes/Semester1_Demo2.txt").getPath();
-		CharSequence contents;
-		contents = FileUtils.load(mazeFilePath);
-		this.maze.clear();
-		new Parser(this.maze).parse(contents);
-	}
-
-	@Deprecated
-	public Path findPath() {
-		Tile startTile = (Tile) this.maze.getTiles().toArray()[11];
-		Tile goalTile = (Tile) this.maze.getTiles().toArray()[12];
-
-		System.out.println("Start Tile\tX: " + startTile.getX() + "\t" + " Y: "
-				+ startTile.getY() + "\t" + " | Borders: "
-				+ startTile.getClosedSides().size() + " | Openings: "
-				+ startTile.getOpenSides().size());
-		System.out.println("Goal Tile\tX: " + goalTile.getX() + "\t" + " Y: "
-				+ goalTile.getY() + "\t" + " | Borders: "
-				+ goalTile.getClosedSides().size() + " | Openings: "
-				+ goalTile.getOpenSides().size());
-
-		Node startNode = nodeMap.get(startTile);
-		Node goalNode = nodeMap.get(goalTile);
-
-		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
-		return astar.findPath(startNode, goalNode);
-	}
+//	public static void main(String args[]) throws Exception {
+//		Mesh mesh = new Mesh(new Maze());
+//		mesh.setUpTest();
+//		mesh.generateNodes();
+//		mesh.printNodeMap();
+//		System.out.println(mesh.findPath());
+//	}
+//
+//	@Deprecated
+//	public void setUpTest() throws Exception {
+//		String mazeFilePath = Mesh.class.getResource(
+//				"/res/mazes/Semester1_Demo2.txt").getPath();
+//		CharSequence contents;
+//		contents = FileUtils.load(mazeFilePath);
+//		this.maze.clear();
+//		new Parser(this.maze).parse(contents);
+//	}
+//
+//	@Deprecated
+//	public Path findPath() {
+//		Tile startTile = (Tile) this.maze.getTiles().toArray()[11];
+//		Tile goalTile = (Tile) this.maze.getTiles().toArray()[12];
+//
+//		System.out.println("Start Tile\tX: " + startTile.getX() + "\t" + " Y: "
+//				+ startTile.getY() + "\t" + " | Borders: "
+//				+ startTile.getClosedSides().size() + " | Openings: "
+//				+ startTile.getOpenSides().size());
+//		System.out.println("Goal Tile\tX: " + goalTile.getX() + "\t" + " Y: "
+//				+ goalTile.getY() + "\t" + " | Borders: "
+//				+ goalTile.getClosedSides().size() + " | Openings: "
+//				+ goalTile.getOpenSides().size());
+//
+//		Node startNode = nodeMap.get(startTile);
+//		Node goalNode = nodeMap.get(goalTile);
+//
+//		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
+//		return astar.findPath(startNode, goalNode);
+//	}
 
 	public Mesh(Maze maze) {
 		setMaze(maze);
@@ -65,8 +67,18 @@ public class Mesh {
 	}
 
 	private Map<Tile, Node> nodeMap = new HashMap<Tile, Node>();
+	
+	public Tile[] findTilePath(Tile startTile, Tile goalTile) {
+		Path path = findNodePath(startTile, goalTile);
+		Tile[] tiles = new Tile[path.size()];
+		for(int i=0; i<path.size(); i++){
+			Waypoint wp = path.get(i);
+			tiles[i] = getMaze().getTileAt(new LongPoint((long) wp.x, (long) wp.y));
+		}
+		return tiles;
+	}
 
-	public Path findPath(Tile startTile, Tile goalTile) {
+	private Path findNodePath(Tile startTile, Tile goalTile) {
 		Node startNode = nodeMap.get(startTile);
 		Node goalNode = nodeMap.get(goalTile);
 
