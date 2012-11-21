@@ -148,7 +148,7 @@ public class BarcodePanel extends ViewPanel {
 		this.container.add(lblScanTravelSpeed, "cell 0 6");
 		
 		JSpinner scanSpeedSpinner = new JSpinner();
-		this.scanSpeedModel = new SpinnerNumberModel(new Double(1), new Double(2), null, new Double(1));
+		this.scanSpeedModel = new SpinnerNumberModel(2, 1, 20, 1);
 		scanSpeedSpinner.setModel(this.scanSpeedModel);
 		this.container.add(scanSpeedSpinner, "cell 1 6,growx");
 		this.scanSpeedModel.addChangeListener(new scanSpeedChangeListener());
