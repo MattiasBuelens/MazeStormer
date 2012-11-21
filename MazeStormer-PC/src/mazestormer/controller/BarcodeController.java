@@ -185,7 +185,6 @@ public class BarcodeController extends SubController implements
 		}
 
 		private void loop() {
-			this.newPose = getRobot().getPoseProvider().getPose();
 
 			if (this.blackToWhite) {
 				onTrespassBW();
@@ -227,6 +226,7 @@ public class BarcodeController extends SubController implements
 		}
 
 		private void onChange() {
+			this.newPose = getRobot().getPoseProvider().getPose();
 			this.distances.add(getPoseDiff(oldPose, newPose));
 			this.oldPose = newPose;
 			this.blackToWhite = (blackToWhite == true) ? false : true;
