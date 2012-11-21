@@ -140,7 +140,11 @@ public class Communicator<S extends Message, R extends Message> implements
 		listeners.remove(listener);
 	}
 
-	public void trigger(R message) {
+	public void trigger(final R message) {
+		// Clone listeners to prevent concurrent modifications
+		final List<MessageListener<? super R>> listeners = new ArrayList<>(
+				this.listeners);
+		// Call listeners
 		for (MessageListener<? super R> listener : listeners) {
 			listener.messageReceived(message);
 		}

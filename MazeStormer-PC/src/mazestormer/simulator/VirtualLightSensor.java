@@ -1,7 +1,6 @@
 package mazestormer.simulator;
 
 import lejos.geom.Point;
-import lejos.robotics.LampLightDetector;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
@@ -9,7 +8,7 @@ import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.robot.Robot;
 
-public class VirtualLightSensor implements LampLightDetector {
+public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 
 	public static final int BROWN_VALUE = 512;
 	public static final int WHITE_VALUE = 582;
@@ -34,29 +33,6 @@ public class VirtualLightSensor implements LampLightDetector {
 		return poseProvider;
 	}
 
-	/**
-	 * Not implemented.
-	 */
-	@Override
-	public int getLightValue() {
-		return 0;
-	}
-
-	// private void waitUntil(long when) {
-	// long delay = when - System.currentTimeMillis();
-	// Delay.msDelay(delay);
-	// }
-
-	// @Override
-	// public int getNormalizedLightValue() {
-	// int value = nextValue;
-	// waitUntil(nextTime);
-	// nextValue = readNormalizedLightValue();
-	// nextTime = System.currentTimeMillis() + delay;
-	// return value;
-	// }
-
-	// private int readNormalizedLightValue() {
 	@Override
 	public int getNormalizedLightValue() {
 		// Get absolute robot pose
@@ -78,22 +54,6 @@ public class VirtualLightSensor implements LampLightDetector {
 		}
 
 		return BROWN_VALUE;
-	}
-
-	/**
-	 * Not implemented.
-	 */
-	@Override
-	public int getHigh() {
-		return 0;
-	}
-
-	/**
-	 * Not implemented.
-	 */
-	@Override
-	public int getLow() {
-		return 0;
 	}
 
 	/**
@@ -125,6 +85,11 @@ public class VirtualLightSensor implements LampLightDetector {
 	@Override
 	public boolean setFloodlight(int color) {
 		return false;
+	}
+
+	@Override
+	public float getSensorRadius() {
+		return 0;
 	}
 
 }

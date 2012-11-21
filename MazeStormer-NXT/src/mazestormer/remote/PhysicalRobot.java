@@ -10,9 +10,12 @@ import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.ShutdownCommandListener;
+import mazestormer.condition.Condition;
+import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
+import mazestormer.robot.SoundPlayer;
 
 public class PhysicalRobot extends NXTComponent implements Robot {
 
@@ -42,11 +45,23 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 	}
 
 	@Override
+	public RangeFeatureDetector getRangeDetector() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public PoseProvider getPoseProvider() {
 		if (poseProvider == null) {
 			poseProvider = new OdometryPoseProvider(getPilot());
 		}
 		return poseProvider;
+	}
+
+	@Override
+	public SoundPlayer getSoundPlayer() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public void setup() {
@@ -75,6 +90,14 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 		super.terminate();
 		// Release resources
 		getPilot().terminate();
+	}
+
+	/**
+	 * Not implemented on NXT.
+	 */
+	@Override
+	public CommandBuilder when(Condition condition) {
+		return null;
 	}
 
 }
