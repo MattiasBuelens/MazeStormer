@@ -7,6 +7,7 @@ import lejos.robotics.RangeScanner;
 import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 
@@ -73,8 +74,7 @@ public class PhysicalRobot implements Robot {
 	}
 
 	@Override
-	public CommandBuilder when(ConditionSource source,
-			CompareOperator operator, double value) {
+	public CommandBuilder when(Condition condition) {
 		// TODO Auto-generated method stub
 		return null;
 	}

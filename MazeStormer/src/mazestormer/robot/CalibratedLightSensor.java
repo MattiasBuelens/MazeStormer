@@ -50,4 +50,9 @@ public interface CalibratedLightSensor extends LampLightDetector {
 	 */
 	public int getLightValue(int normalizedLightValue);
 
+	/**
+	 * Get the approximate radius of the light sensor beam.
+	 */
+	public float getSensorRadius();
+
 }

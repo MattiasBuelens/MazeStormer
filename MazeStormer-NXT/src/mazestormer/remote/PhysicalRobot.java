@@ -10,6 +10,7 @@ import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.ShutdownCommandListener;
+import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
@@ -95,8 +96,7 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 	 * Not implemented on NXT.
 	 */
 	@Override
-	public CommandBuilder when(ConditionSource source,
-			CompareOperator operator, double value) {
+	public CommandBuilder when(Condition condition) {
 		return null;
 	}
 

@@ -1,17 +1,10 @@
 package mazestormer.command;
 
+import mazestormer.condition.Condition;
+
 public interface ConditionalCommandBuilder {
 
-	public CommandBuilder when(ConditionSource source,
-			CompareOperator operator, double value);
-
-	public enum ConditionSource {
-		LIGHT;
-	}
-
-	public enum CompareOperator {
-		GREATER_THAN, SMALLER_THAN;
-	}
+	public CommandBuilder when(Condition condition);
 
 	public interface CommandHandle {
 

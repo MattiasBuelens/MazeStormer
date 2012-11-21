@@ -1,32 +1,42 @@
 package mazestormer.remote;
 
-import lejos.robotics.LampLightDetector;
+import java.io.IOException;
+
+import mazestormer.command.Command;
 import mazestormer.command.CommandType;
 import mazestormer.command.LightFloodlightCommand;
+import mazestormer.robot.Robot;
+import mazestormer.simulator.AbstractCalibratedLightSensor;
 import mazestormer.util.Future;
 
-public class RemoteLightSensor extends RemoteComponent implements
-		LampLightDetector {
+public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 
 	private boolean isFloodlight = false;
 	private final LightValueRequester lightValueRequester;
 
+	private final RemoteCommunicator communicator;
+
 	public RemoteLightSensor(RemoteCommunicator communicator) {
-		super(communicator);
+		this.communicator = communicator;
 		lightValueRequester = new LightValueRequester(communicator);
 		setup();
 	}
 
 	private void setup() {
-		addMessageListener(lightValueRequester);
+		communicator.addListener(lightValueRequester);
 	}
 
-	/**
-	 * Not implemented.
-	 */
-	@Override
-	public int getLightValue() {
-		return 0;
+	public void terminate() {
+		communicator.removeListener(lightValueRequester);
+	}
+
+	private void send(Command command) {
+		try {
+			communicator.send(command);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -37,22 +47,6 @@ public class RemoteLightSensor extends RemoteComponent implements
 			e.printStackTrace();
 			return -1;
 		}
-	}
-
-	/**
-	 * Not implemented.
-	 */
-	@Override
-	public int getHigh() {
-		return 0;
-	}
-
-	/**
-	 * Not implemented.
-	 */
-	@Override
-	public int getLow() {
-		return 0;
 	}
 
 	@Override
@@ -92,6 +86,11 @@ public class RemoteLightSensor extends RemoteComponent implements
 			return request(CommandType.LIGHT_READ);
 		}
 
+	}
+
+	@Override
+	public float getSensorRadius() {
+		return Robot.sensorRadius;
 	}
 
 }

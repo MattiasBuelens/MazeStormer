@@ -28,6 +28,11 @@ public interface Robot extends ConditionalCommandBuilder {
 	public final static float sensorOffset = 7.2f;
 
 	/**
+	 * Approximate radius of the light sensor beam.
+	 */
+	public final static float sensorRadius = 1.0f;
+
+	/**
 	 * Get the pilot controlling this robot's movement.
 	 */
 	public Pilot getPilot();

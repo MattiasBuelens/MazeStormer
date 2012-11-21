@@ -28,4 +28,9 @@ public class PhysicalLightSensor extends LightSensor implements
 		return 100 * (normalizedLightValue - getLow()) / (getHigh() - getLow());
 	}
 
+	@Override
+	public float getSensorRadius() {
+		return Robot.sensorRadius;
+	}
+
 }

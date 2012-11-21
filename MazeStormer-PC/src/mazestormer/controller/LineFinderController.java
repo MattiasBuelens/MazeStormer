@@ -1,10 +1,9 @@
 package mazestormer.controller;
 
-import lejos.geom.Line;
-import mazestormer.command.ConditionalCommandBuilder.CommandBuilder;
 import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
-import mazestormer.command.ConditionalCommandBuilder.CompareOperator;
-import mazestormer.command.ConditionalCommandBuilder.ConditionSource;
+import mazestormer.condition.Condition;
+import mazestormer.condition.ConditionType;
+import mazestormer.condition.LightCompareCondition;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.LineFinderEvent.EventType;
 import mazestormer.robot.CalibratedLightSensor;
@@ -16,15 +15,16 @@ import com.google.common.eventbus.Subscribe;
 public class LineFinderController extends SubController implements
 		ILineFinderController {
 
-	private final static double rotateAngle = 135.0;
-	private final static double extraAngle = 0.0; // 4.0;
-
-	private final static double travelSpeed = 5;
 	private final static double slowRotateSpeed = 30;
 	private final static double fastRotateSpeed = 50;
+	private final static double slowTravelSpeed = 1.0;
+	private final static double fastTravelSpeed = 5.0;
 
-	private final static int threshold = 30;
-	private final static double crossTreshold = 3.0;
+	private final double maxAttackAngle = 20.0;
+	private final double safetyAngle = 10.0;
+	private final double fastRotateAngle = -(90 - maxAttackAngle - safetyAngle);
+
+	private final static int threshold = 50;
 
 	private LineFinderRunner runner;
 
@@ -73,48 +73,19 @@ public class LineFinderController extends SubController implements
 		postEvent(new LineFinderEvent(eventType));
 	}
 
-	private boolean isCross(double angle1, double angle2) {
-		double radAngle1 = Math.toRadians(angle1);
-		double radAngle2 = Math.toRadians(angle2);
-
-		float xp = 0;
-		float yp = Robot.sensorOffset;
-
-		float x0 = (float) (-Robot.sensorOffset * Math.sin(radAngle1));
-		float y0 = (float) (Robot.sensorOffset * Math.cos(radAngle1));
-
-		float x1 = (float) (-Robot.sensorOffset * Math.sin(radAngle1
-				- radAngle2));
-		float y1 = (float) (Robot.sensorOffset * Math
-				.cos(radAngle1 - radAngle2));
-
-		double distance = new Line(x0, y0, x1, y1).ptLineDist(xp, yp);
-
-		// double lambda = ((x1 - x0) * (xp - x0) + (y1 - y0) * (yp - y0))
-		// / (Math.pow((x1 - x0), 2) + Math.pow((y1 - y0), 2));
-		//
-		// double distance = Math.sqrt(Math
-		// .pow(xp - x0 - lambda * (x1 - x0), 2)
-		// + (Math.pow(yp - y0 - lambda * (y1 - y0), 2)));
-
-		return distance > crossTreshold;
-	}
-
 	private class LineFinderRunner implements Runnable {
 
 		private final Pilot pilot;
-		private final CalibratedLightSensor sensor;
+		private final CalibratedLightSensor light;
 		private boolean isRunning = false;
 
-		private double angle1;
-		private double angle2;
 		private CommandHandle handle;
 		private double originalTravelSpeed;
 		private double originalRotateSpeed;
 
 		public LineFinderRunner() {
 			this.pilot = getPilot();
-			this.sensor = getLightSensor();
+			this.light = getLightSensor();
 		}
 
 		public void start() {
@@ -146,13 +117,18 @@ public class LineFinderController extends SubController implements
 			return shouldStop;
 		}
 
-		private void findLine(final Runnable action) {
-			CommandBuilder builder = getRobot().when(ConditionSource.LIGHT,
-					CompareOperator.GREATER_THAN,
-					sensor.getNormalizedLightValue(threshold));
-			builder.stop();
-			builder.run(action);
-			handle = builder.build();
+		private void onLine(final Runnable action) {
+			int thresholdValue = light.getNormalizedLightValue(threshold);
+			Condition condition = new LightCompareCondition(
+					ConditionType.LIGHT_GREATER_THAN, thresholdValue);
+			handle = getRobot().when(condition).stop().run(action).build();
+		}
+
+		private void offLine(final Runnable action) {
+			int thresholdValue = light.getNormalizedLightValue(threshold);
+			Condition condition = new LightCompareCondition(
+					ConditionType.LIGHT_SMALLER_THAN, thresholdValue);
+			handle = getRobot().when(condition).stop().run(action).build();
 		}
 
 		@Override
@@ -161,99 +137,76 @@ public class LineFinderController extends SubController implements
 			originalTravelSpeed = pilot.getTravelSpeed();
 			originalRotateSpeed = pilot.getRotateSpeed();
 
-			// Set travel speed
-			pilot.setTravelSpeed(travelSpeed);
-
-			// Travel forward and fine line
+			// Travel forward until on line
 			log("Start looking for line.");
+			pilot.setTravelSpeed(fastTravelSpeed);
 			pilot.forward();
-			findLine(new Runnable() {
+			onLine(new Runnable() {
 				@Override
 				public void run() {
-					foundFirstLine();
+					onFirstLine();
 				}
 			});
 		}
 
-		private void foundFirstLine() {
+		private void onFirstLine() {
 			if (shouldStop())
 				return;
-			log("Found line, start rotating left.");
+			log("On line, start looking for end of line.");
 
-			// Rotate fixed angle
-			pilot.setRotateSpeed(fastRotateSpeed);
-			pilot.rotate(rotateAngle, false);
-			if (shouldStop())
-				return;
-
-			// Rotate left and find line
-			pilot.setRotateSpeed(slowRotateSpeed);
-			pilot.rotateLeft();
-			findLine(new Runnable() {
+			// Travel forward until off line
+			pilot.setTravelSpeed(slowTravelSpeed);
+			pilot.forward();
+			offLine(new Runnable() {
 				@Override
 				public void run() {
-					foundSecondLine();
+					offFirstLine();
 				}
 			});
 		}
 
-		private void foundSecondLine() {
+		private void offFirstLine() {
 			if (shouldStop())
 				return;
-			log("Found line, start rotating right.");
+			log("Off line, centering robot on line.");
+			double lineWidth = pilot.getMovement().getDistanceTraveled();
+			double centerOffset = Robot.sensorOffset - lineWidth / 2
+					- light.getSensorRadius();
+			log("Line width: " + lineWidth);
+			log("Offset from center: " + centerOffset);
 
-			// Get first angle
-			angle1 = pilot.getMovement().getAngleTurned();
+			// Travel forward to center robot on end of line
+			pilot.setTravelSpeed(fastTravelSpeed);
+			pilot.travel(centerOffset);
+			if (shouldStop())
+				return;
 
 			// Rotate fixed angle
 			pilot.setRotateSpeed(fastRotateSpeed);
-			pilot.rotate(-rotateAngle, false);
+			pilot.rotate(fastRotateAngle);
 			if (shouldStop())
 				return;
 
-			// Rotate right and find line
+			// Rotate until on line
+			log("Start looking for line again.");
 			pilot.setRotateSpeed(slowRotateSpeed);
 			pilot.rotateRight();
-			findLine(new Runnable() {
+			onLine(new Runnable() {
 				@Override
 				public void run() {
-					foundThirdLine();
+					onSecondLine();
 				}
 			});
 		}
 
-		private void foundThirdLine() {
+		private void onSecondLine() {
 			if (shouldStop())
 				return;
+			log("On line, rotating robot perpendicular to line.");
 
-			// Get second angle
-			angle2 = pilot.getMovement().getAngleTurned();
-
-			// Get absolute angles
-			angle1 = Math.abs(angle1) + rotateAngle;
-			angle2 = Math.abs(angle2) + rotateAngle;
-
-			// Get final angle
-			double finalAngle;
-			if (isCross(angle1, angle2)) {
-				log("Cross detected.");
-				finalAngle = ((angle2 - angle1) / 2.0) - extraAngle;
-			} else {
-				finalAngle = ((angle2 - 360.0) / 2.0) - extraAngle;
-			}
-
-			// Position robot
-			log("Positioning robot perpendicular to the line.");
+			// Position perpendicular
 			pilot.setRotateSpeed(fastRotateSpeed);
-			pilot.rotate(finalAngle);
-			if (shouldStop())
-				return;
-
-			double dist = Robot.sensorOffset
-					* Math.cos(Math.toRadians(finalAngle));
-			pilot.travel(dist);
-			if (shouldStop())
-				return;
+			pilot.rotate(90.0);
 
 			// Restore original speed
 			pilot.setTravelSpeed(originalTravelSpeed);

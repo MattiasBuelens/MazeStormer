@@ -3,9 +3,7 @@ package mazestormer.simulator;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.command.ConditionalCommandBuilder.CommandBuilder;
-import mazestormer.command.ConditionalCommandBuilder.CompareOperator;
-import mazestormer.command.ConditionalCommandBuilder.ConditionSource;
+import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
@@ -46,8 +44,7 @@ public class VirtualRobot implements Robot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new DelegatedCalibratedLightSensor(new VirtualLightSensor(
-					maze, getPoseProvider()));
+			light = new VirtualLightSensor(maze, getPoseProvider());
 		}
 		return light;
 	}
@@ -84,20 +81,20 @@ public class VirtualRobot implements Robot {
 		}
 		return soundPlayer;
 	}
-	
+
 	public VirtualCollisionDetector getCollisionDetector() {
-		if(collisionDetector == null)
-			collisionDetector = new VirtualCollisionDetector(maze, getPoseProvider());
+		if (collisionDetector == null)
+			collisionDetector = new VirtualCollisionDetector(maze,
+					getPoseProvider());
 		return collisionDetector;
 	}
-	
+
 	public CollisionObserver getCollisionObserver() {
 		return collisionObserver;
 	}
 
 	@Override
-	public CommandBuilder when(ConditionSource source,
-			CompareOperator operator, double value) {
+	public CommandBuilder when(Condition condition) {
 		// TODO Auto-generated method stub
 		return null;
 	}
