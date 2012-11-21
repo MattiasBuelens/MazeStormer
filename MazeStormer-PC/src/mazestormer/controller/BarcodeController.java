@@ -167,9 +167,7 @@ public class BarcodeController extends SubController implements
 			});
 		}
 
-		private int oldValue;
 		private Pose oldPose;
-		private int newValue;
 		private Pose newPose;
 		private boolean blackToWhite;
 		private List<Float> distances = new ArrayList<Float>();
@@ -179,7 +177,6 @@ public class BarcodeController extends SubController implements
 			log("Go to the begin of the barcode zone.");
 			this.pilot.setTravelSpeed(SLOW_TRAVEL_SPEED);
 			this.pilot.travel(-START_BAR_LENGTH / 2, false);
-			this.oldValue = this.light.getLightValue();
 			this.oldPose = getRobot().getPoseProvider().getPose();
 			this.blackToWhite = true;
 
@@ -188,7 +185,6 @@ public class BarcodeController extends SubController implements
 		}
 
 		private void loop() {
-			this.newValue = this.light.getLightValue();
 			this.newPose = getRobot().getPoseProvider().getPose();
 
 			if (this.blackToWhite) {
@@ -216,20 +212,6 @@ public class BarcodeController extends SubController implements
 			});
 		}
 
-		private void onTrespassOldBlack(final Runnable action) {
-			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_SMALLER_THAN,
-					Threshold.BLACK_WHITE.getThresholdValue());
-			this.handle = getRobot().when(condition).run(action).build();
-		}
-
-		private void onTrespassOldWhite(final Runnable action) {
-			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_GREATER_THAN,
-					Threshold.WHITE_BLACK.getThresholdValue());
-			this.handle = getRobot().when(condition).run(action).build();
-		}
-
 		private void onTrespassNewBlack(final Runnable action) {
 			Condition condition = new LightCompareCondition(
 					ConditionType.LIGHT_SMALLER_THAN,
@@ -246,7 +228,6 @@ public class BarcodeController extends SubController implements
 
 		private void onChange() {
 			this.distances.add(getPoseDiff(oldPose, newPose));
-			this.oldValue = newValue;
 			this.oldPose = newPose;
 			this.blackToWhite = (blackToWhite == true) ? false : true;
 
