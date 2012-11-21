@@ -15,9 +15,10 @@ public enum TileType {
 	 */
 	STRAIGHT("Straight") {
 		@Override
-		public EnumSet<Orientation> getEdges(Orientation orientation) {
+		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
-			return EnumSet.of(orientation.rotateClockwise(), orientation.rotateCounterClockwise());
+			return EnumSet.of(orientation.rotateClockwise(),
+					orientation.rotateCounterClockwise());
 		}
 
 		@Override
@@ -33,9 +34,10 @@ public enum TileType {
 	 */
 	CORNER("Corner") {
 		@Override
-		public EnumSet<Orientation> getEdges(Orientation orientation) {
+		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
-			return EnumSet.of(orientation, orientation.rotateCounterClockwise());
+			return EnumSet
+					.of(orientation, orientation.rotateCounterClockwise());
 		}
 	},
 
@@ -46,7 +48,7 @@ public enum TileType {
 	 */
 	T("T") {
 		@Override
-		public EnumSet<Orientation> getEdges(Orientation orientation) {
+		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
 			return EnumSet.of(orientation);
 		}
@@ -59,9 +61,10 @@ public enum TileType {
 	 */
 	DEAD_END("DeadEnd") {
 		@Override
-		public EnumSet<Orientation> getEdges(Orientation orientation) {
+		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
-			return EnumSet.of(orientation, orientation.rotateClockwise(), orientation.rotateCounterClockwise());
+			return EnumSet.of(orientation, orientation.rotateClockwise(),
+					orientation.rotateCounterClockwise());
 		}
 	},
 
@@ -72,7 +75,7 @@ public enum TileType {
 	 */
 	CROSS("Cross") {
 		@Override
-		public EnumSet<Orientation> getEdges(Orientation orientation) {
+		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			return EnumSet.noneOf(Orientation.class);
 		}
 
@@ -113,17 +116,29 @@ public enum TileType {
 	 * Get the orientations where closed edges should be placed.
 	 * 
 	 * @param orientation
-	 * 			The orientation of the tile.
+	 *            The orientation of the tile.
 	 * 
 	 * @return A set of edge orientations.
 	 */
-	public abstract EnumSet<Orientation> getEdges(Orientation orientation);
+	public abstract EnumSet<Orientation> getWalls(Orientation orientation);
+
+	/**
+	 * Get the orientations where open edges should be placed.
+	 * 
+	 * @param orientation
+	 *            The orientation of the tile.
+	 * 
+	 * @return A set of edge orientations.
+	 */
+	public EnumSet<Orientation> getOpenings(Orientation orientation) {
+		return EnumSet.complementOf(getWalls(orientation));
+	}
 
 	/**
 	 * Get the tile type associated with the given name.
 	 * 
 	 * @param name
-	 * 			The name of the tile type.
+	 *            The name of the tile type.
 	 * 
 	 * @return The tile type, or null if not found.
 	 */

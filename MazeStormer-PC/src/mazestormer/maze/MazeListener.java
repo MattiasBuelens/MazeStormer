@@ -1,6 +1,7 @@
 package mazestormer.maze;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.util.LongPoint;
 
 public interface MazeListener {
 
@@ -29,12 +30,12 @@ public interface MazeListener {
 	 */
 
 	/**
-	 * Invoked when an edge has been added to the maze.
+	 * Invoked when an edge has changed on the maze.
 	 * 
 	 * @param edge
-	 * 			The added edge.
+	 * 			The changed edge.
 	 */
-	void edgeAdded(Edge edge);
+	void edgeChanged(LongPoint position, Orientation direction, Edge.EdgeType type);
 
 	/*
 	 * Maze

@@ -15,6 +15,11 @@ public enum ControlMode {
 	 * Perpendicular on line
 	 */
 	PerpendicularOnLine("Perpendicular on line"),
+	
+	/**
+	 * Explore the maze
+	 */
+	Explorer("Explore the maze"),
 
 	/**
 	 * Barcode action tester

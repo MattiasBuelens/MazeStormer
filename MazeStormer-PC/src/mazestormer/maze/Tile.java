@@ -16,12 +16,20 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
-			Orientation.class);
+	private final EnumMap<Orientation, Edge> edges;
 	private boolean isExplored = false;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
+		
+		EnumMap<Orientation, Edge> tmp = new EnumMap<Orientation, Edge>(
+					Orientation.class);
+		for(Orientation direction : Orientation.values()){
+			Edge newEdge = new Edge(getPosition(),direction);
+			tmp.put(direction, newEdge);
+		}
+		
+		this.edges = tmp;
 	}
 
 	public long getX() {
@@ -55,27 +63,26 @@ public class Tile {
 		return edges.get(side);
 	}
 
-	public void addEdge(Edge edge) {
-		checkNotNull(edge);
-		edges.put(edge.getOrientationFrom(getPosition()), edge);
+	public void setEdge(Orientation direction, Edge.EdgeType type) {
+		getEdgeAt(direction).setType(type);
 	}
 
-	public void addEdges(Iterable<Edge> edges) {
-		for (Edge edge : edges) {
-			addEdge(edge);
-		}
-	}
+//	public void addEdges(Iterable<String> edges) {
+//		for (Edge edge : edges) {
+//			addWall(edge);
+//		}
+//	}
 
-	//TODO: nodig?
-	public boolean hasUnknownEdges(){
-		for(Edge currentEdge : getEdges()){
-			if(currentEdge.getType() == EdgeType.UNKNOWN){
-				return true;
-			}
-		}
-		
-		return false;
-	}
+//	//TODO: nodig?
+//	public boolean hasUnknownEdges(){
+//		for(Edge currentEdge : getEdges()){
+//			if(currentEdge.getType() == EdgeType.UNKNOWN){
+//				return true;
+//			}
+//		}
+//		
+//		return false;
+//	}
 	
 	public boolean isExplored(){
 		return isExplored;

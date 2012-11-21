@@ -31,6 +31,7 @@ public class MainView extends JFrame implements EventSource {
 	private JPanel configurationPanel;
 	private JPanel logPanel;
 	private JPanel statePanel;
+	private JPanel explorerPanel;
 
 	private JPanel mainPanel;
 
@@ -123,6 +124,10 @@ public class MainView extends JFrame implements EventSource {
 		case PerpendicularOnLine:
 			setControlPanel(new LineFinderPanel(
 					this.controller.lineFinderControl()));
+			break;
+		case Explorer:
+			setControlPanel(new ExplorerControlPanel(
+					this.controller.explorerControl()));
 			break;
 		}
 	}

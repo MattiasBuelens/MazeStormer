@@ -46,6 +46,7 @@ public final class Edge {
 
 		this.position = position;
 		this.orientation = orientation;
+		setType(EdgeType.UNKNOWN);
 	}
 
 	/**
