@@ -12,14 +12,7 @@ import java.util.Map;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
-import lejos.geom.Rectangle;
-import lejos.robotics.mapping.LineMap;
 import lejos.robotics.navigation.Pose;
-import lejos.robotics.pathfinding.AstarSearchAlgorithm;
-import lejos.robotics.pathfinding.FourWayGridMesh;
-import lejos.robotics.pathfinding.GridNode;
-import lejos.robotics.pathfinding.Node;
-import lejos.robotics.pathfinding.Path;
 import mazestormer.util.AbstractEventSource;
 import mazestormer.util.LongPoint;
 
@@ -37,12 +30,11 @@ public class Maze extends AbstractEventSource {
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 	
-	private Rectangle boundingRectangle;
+	private Mesh mesh;
 
 	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
-		this.boundingRectangle = new Rectangle(0,0,0,0);
 	}
 
 	public Maze(float tileSize) {
@@ -105,42 +97,8 @@ public class Maze extends AbstractEventSource {
 			tiles.put(tilePosition, tile);
 			// Fire tile added event
 			fireTileAdded(tile);
-			updateBoundingRectangle(tile);
 		}
 		return tile;
-	}
-	
-	private void updateBoundingRectangle(Tile tile){
-		long x = (long) getBoundingRectangle().getX();
-		long y = (long) getBoundingRectangle().getY();
-		long width = (long) (getBoundingRectangle().getWidth()/getTileSize());
-		long height = (long) (getBoundingRectangle().getHeight()/getTileSize());
-			
-		if(!((x <= tile.getX() && tile.getX() <= x+width) || (x >= tile.getX() && tile.getX() >= x-width))){
-			if(Math.signum(tile.getX()) == Math.signum(x))
-				width = (long) Math.abs(tile.getX()-x);
-			else
-				width = (long) (Math.abs(tile.getX())+Math.abs(x));
-		}
-		if(!((y <= tile.getY() && tile.getY() <= y+height) || (y >= tile.getY() && tile.getY() >= y-height))){
-			if(Math.signum(tile.getY()) == Math.signum(y))
-				height = (long) Math.abs(tile.getY()-y);
-			else
-				height = (long) (Math.abs(tile.getY())+Math.abs(y));
-		}
-		if(x > tile.getX())
-				x = (long) tile.getX();
-		if(y > tile.getY())
-				y = (long) tile.getY();
-		setBoundingRectangle(new Rectangle((int) x,(int) y,(int) (width*getTileSize()),(int) (height*getTileSize())));	
-	}
-	
-	public Rectangle getBoundingRectangle(){
-		return this.boundingRectangle;
-	}
-	
-	private void setBoundingRectangle(Rectangle request){
-		this.boundingRectangle = request;
 	}
 
 	/**
@@ -156,8 +114,7 @@ public class Maze extends AbstractEventSource {
 
 	public Tile getNeighbor(Tile givenTile, Orientation direction) {
 		LongPoint neighborCoordinates = direction.shift(givenTile.getPosition());
-		Tile neighbor = getTileAt(neighborCoordinates);
-		return neighbor;
+		return tiles.get(neighborCoordinates);
 	}
 
 	/**
@@ -387,38 +344,26 @@ public class Maze extends AbstractEventSource {
 		return heading;
 	}
 	
-	public Path findPath(Tile startTile, Tile goalTile){
-		float gridspace = getTileSize();
-		float clearance = getTileSize()/2;
-		Line[] lines = getLines().toArray(new Line[0]);
-		LineMap map = new LineMap(lines, getBoundingRectangle());
-		FourWayGridMesh mesh = new FourWayGridMesh(map, gridspace, clearance);
-		
-		Node startNode = getClosestNodeOfTile(mesh.getMesh(),startTile);
-		Node goalNode = getClosestNodeOfTile(mesh.getMesh(),goalTile);
-		
-		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
-		return astar.findPath(startNode, goalNode);
-	}
-	
-	private Node getClosestNodeOfTile(Collection<Node> nodes, Tile tile){
-		Node closest = new GridNode(100000,100000, getTileSize());
-		for(Node node : nodes)
-			if(Math.sqrt(Math.pow(Math.abs(tile.getX()-node.x),2)+Math.pow(Math.abs(tile.getY()-node.y),2)) < Math.sqrt(Math.pow(Math.abs(tile.getX()-closest.x),2)+Math.pow(Math.abs(tile.getY()-closest.y),2)))
-				closest = node;
-		return closest;
-	}
-	
-	private Map<Tile, Node> getMesh(){
-		Map<Tile, Node> nodes = new HashMap<Tile, Node>();
-		for(Tile tile : getTiles())
-			nodes.put(tile, new GridNode(tile.getX()+getTileSize()/2, tile.getY()+getTileSize()/2, getTileSize()));
-		for(Tile tile : getTiles()){
-			Node node = nodes.get(tile);
-			for(int i=0; i<Orientation.values().length; i++)
-				if(tile.hasEdgeAt(Orientation.values()[i]))
-					node.addNeighbor(nodes.get(getNeighbor(tile, Orientation.values()[i])));
+	/**
+	 * Returns the mesh of this maze.
+	 * 
+	 * @param 	regenerate
+	 * 			If regenerate is true, the nodes of the mesh of this maze will
+	 * 			be regenerated. If regenerate is false, the collection of nodes
+	 * 			of the current mesh stay unchanged and no regeneration calculation
+	 * 			is executed.
+	 * @speed	If regenerate is true, the calculation speed is
+	 * 			~O(t*d) with t the number of tiles of this maze and with d the average number
+	 * 			of open directions of a tile. (No storage time is included)
+	 * @return	The mesh of this maze.
+	 */
+	public Mesh getMesh(boolean regenerate) {
+		if (this.mesh == null) {
+			this.mesh = new Mesh(this);
 		}
-		return nodes;
+		if (regenerate == true) {
+			this.mesh.generateNodes();
+		}	
+		return this.mesh;
 	}
 }
