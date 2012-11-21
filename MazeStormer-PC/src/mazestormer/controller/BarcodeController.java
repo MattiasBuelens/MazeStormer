@@ -13,9 +13,7 @@ import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
-public class BarcodeController extends SubController implements
-		IBarcodeController {
-	private static final double TRAVEL_SPEED = 10; 		// [cm/sec]
+public class BarcodeController extends SubController implements IBarcodeController {
 	private static final double SLOW_TRAVEL_SPEED = 2; 	// [cm/sec]
 
 	private static final double START_BAR_LENGTH = 1.8; // [cm]
@@ -28,23 +26,32 @@ public class BarcodeController extends SubController implements
 		super(mainController);
 	}
 
-	private ActionRunner runner;
+	private ActionRunner actionRunner;
+	private BarcodeRunner barcodeRunner;
 
 	private Robot getRobot() {
 		return getMainController().getRobot();
 	}
+	
+	private void log(String logText) {
+		getMainController().getLogger().info(logText);
+	}
+
+	private void postState(EventType eventType) {
+		postEvent(new ActionEvent(eventType));
+	}
 
 	@Override
 	public void startAction(String action) {
-		this.runner = new ActionRunner(getAction(action));
-		this.runner.start();
+		this.actionRunner = new ActionRunner(getAction(action));
+		this.actionRunner.start();
 	}
 
 	@Override
 	public void stopAction() {
-		if (this.runner != null) {
-			this.runner.stop();
-			this.runner = null;
+		if (this.actionRunner != null) {
+			this.actionRunner.stop();
+			this.actionRunner = null;
 		}
 	}
 
@@ -64,16 +71,7 @@ public class BarcodeController extends SubController implements
 		return mazestormer.barcode.NoAction.getInstance();
 	}
 
-	private void log(String logText) {
-		getMainController().getLogger().info(logText);
-	}
-
-	private void postState(EventType eventType) {
-		postEvent(new ActionEvent(eventType));
-	}
-
 	private class ActionRunner implements Runnable {
-
 		private final Robot robot;
 		private boolean isRunning = false;
 		private IAction action;
@@ -107,6 +105,20 @@ public class BarcodeController extends SubController implements
 			stop();
 		}
 
+	}
+	
+	//TODO
+	public void startScan() {
+		this.barcodeRunner = new BarcodeRunner();
+		this.barcodeRunner.start();
+	}
+
+	//TODO
+	public void stopScan() {
+		if (this.barcodeRunner != null) {
+			this.barcodeRunner.stop();
+			this.barcodeRunner = null;
+		}
 	}
 
 	@Override
@@ -155,7 +167,6 @@ public class BarcodeController extends SubController implements
 		@Override
 		public void run() {
 			this.originalTravelSpeed = this.pilot.getTravelSpeed();
-			this.pilot.setTravelSpeed(TRAVEL_SPEED);
 			this.light.setFloodlight(true);
 			this.pilot.forward();
 			log("Start looking for black line.");
@@ -185,7 +196,6 @@ public class BarcodeController extends SubController implements
 		}
 
 		private void loop() {
-
 			if (this.blackToWhite) {
 				onTrespassBW();
 			} else {
@@ -231,11 +241,11 @@ public class BarcodeController extends SubController implements
 			this.oldPose = newPose;
 			this.blackToWhite = (blackToWhite == true) ? false : true;
 
-			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1)
-					* BAR_LENGTH) {
+			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1)* BAR_LENGTH) {
 				loop();
 			} else {
 				this.pilot.stop();
+				this.pilot.setTravelSpeed(this.originalTravelSpeed);
 				encodeBarcode();
 				decodeBarcode();
 			}
@@ -243,7 +253,7 @@ public class BarcodeController extends SubController implements
 
 		private void encodeBarcode() {
 			this.barcode = convertToByte(convertToBitArray(distances));
-			System.out.println(Integer.toBinaryString((int) this.barcode));
+			log("Scanned barcode: " + Integer.toBinaryString((int) this.barcode));
 		}
 
 		private void decodeBarcode() {
