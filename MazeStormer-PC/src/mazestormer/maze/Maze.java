@@ -13,6 +13,7 @@ import java.util.Map;
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.AbstractEventSource;
 import mazestormer.util.LongPoint;
 
@@ -92,12 +93,28 @@ public class Maze extends AbstractEventSource {
 		// Try to get tile
 		Tile tile = tiles.get(tilePosition);
 		if (tile == null) {
-			// Create and put tile
-			tile = new Tile(tilePosition);
-			tiles.put(tilePosition, tile);
-			// Fire tile added event
-			fireTileAdded(tile);
+			// Create tile
+			tile = createTile(tilePosition);
 		}
+		return tile;
+	}
+
+	private Tile createTile(LongPoint tilePosition) {
+		// Create and put tile
+		Tile tile = new Tile(tilePosition);
+		tiles.put(tilePosition, tile);
+
+		// Share edges with neighbours
+		for (Orientation orientation : Orientation.values()) {
+			Tile neighbour = getNeighbor(tile, orientation);
+			if (neighbour != null) {
+				Edge edge = neighbour.getEdgeAt(orientation.rotateClockwise(2));
+				tile.setEdge(edge);
+			}
+		}
+
+		// Fire tile added event
+		fireTileAdded(tile);
 		return tile;
 	}
 
@@ -112,15 +129,13 @@ public class Maze extends AbstractEventSource {
 		return getTileAt(new LongPoint(tilePosition));
 	}
 
-	public Tile getNeighbor(Tile givenTile, Orientation direction) {
-		LongPoint neighborCoordinates = direction
-				.shift(givenTile.getPosition());
+	public Tile getNeighbor(Tile tile, Orientation direction) {
+		LongPoint neighborCoordinates = direction.shift(tile.getPosition());
 		return tiles.get(neighborCoordinates);
 	}
 
-	public Tile getOrCreateNeighbor(Tile givenTile, Orientation direction) {
-		LongPoint neighborCoordinates = direction
-				.shift(givenTile.getPosition());
+	public Tile getOrCreateNeighbor(Tile tile, Orientation direction) {
+		LongPoint neighborCoordinates = direction.shift(tile.getPosition());
 		return getTileAt(neighborCoordinates);
 	}
 
@@ -150,27 +165,36 @@ public class Maze extends AbstractEventSource {
 	public void setEdge(LongPoint position, Orientation direction,
 			Edge.EdgeType type) {
 
-		// Fire edge changed event
-		fireEdgeChanged(position, direction, type);
-		addLine(position, direction);
-
 		Tile tile = getTileAt(position);
-
-		// tile.addWall(direction);
 		Edge edge = tile.getEdgeAt(direction);
+		edge.setType(type);
 
-		// Add edge to touching tiles
+		// Fire edge changed event
+		fireEdgeChanged(edge);
+		updateEdgeLine(edge);
+
+		// Fire tile changed events
 		for (LongPoint touchingPosition : edge.getTouching()) {
-			Tile touchingTile = getTileAt(touchingPosition);
-			touchingTile.setEdge(direction, type);
-			// Fire tile updated event
-			fireTileChanged(touchingTile);
+			fireTileChanged(getTileAt(touchingPosition));
 		}
 	}
 
-	private void addLine(LongPoint position, Orientation direction) {
+	private void updateEdgeLine(Edge edge) {
+		if (edge.getType() == EdgeType.WALL) {
+			// Add line
+			lines.put(edge, createEdgeLine(edge));
+		} else {
+			// Remove line
+			lines.remove(edge);
+		}
+	}
+
+	private Line createEdgeLine(Edge edge) {
+		LongPoint position = edge.getPosition();
+		Orientation orientation = edge.getOrientation();
+
 		// Get edge points in tile coordinates
-		Line line = direction.getLine();
+		Line line = orientation.getLine();
 		Point p1 = line.getP1().add(position.toPoint());
 		Point p2 = line.getP2().add(position.toPoint());
 
@@ -179,9 +203,7 @@ public class Maze extends AbstractEventSource {
 		p2 = fromTile(p2);
 
 		// Add line
-		Line l = new Line(p1.x, p1.y, p2.x, p2.y);
-		Edge edge = getTileAt(position).getEdgeAt(direction);
-		lines.put(edge, l);
+		return new Line(p1.x, p1.y, p2.x, p2.y);
 	}
 
 	/**
@@ -223,12 +245,10 @@ public class Maze extends AbstractEventSource {
 		}
 	}
 
-	private void fireEdgeChanged(LongPoint position, Orientation direction,
-			Edge.EdgeType type) {
-		checkNotNull(position);
-		checkNotNull(direction);
+	private void fireEdgeChanged(Edge edge) {
+		checkNotNull(edge);
 		for (MazeListener listener : listeners) {
-			listener.edgeChanged(position, direction, type);
+			listener.edgeChanged(edge);
 		}
 	}
 

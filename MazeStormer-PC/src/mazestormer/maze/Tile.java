@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Map;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -16,20 +17,16 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final EnumMap<Orientation, Edge> edges;
+	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
+			Orientation.class);
 	private boolean isExplored = false;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
-		
-		EnumMap<Orientation, Edge> tmp = new EnumMap<Orientation, Edge>(
-					Orientation.class);
-		for(Orientation direction : Orientation.values()){
-			Edge newEdge = new Edge(getPosition(),direction);
-			tmp.put(direction, newEdge);
+		// Fill edges with unlinked unknown edges
+		for (Orientation orientation : Orientation.values()) {
+			setEdge(new Edge(getPosition(), orientation));
 		}
-		
-		this.edges = tmp;
 	}
 
 	public long getX() {
@@ -53,49 +50,50 @@ public class Tile {
 		return edges.containsValue(edge);
 	}
 
-	public boolean hasEdgeAt(Orientation side) {
-		checkNotNull(side);
-		return edges.containsKey(side);
-	}
-
 	public Edge getEdgeAt(Orientation side) {
 		checkNotNull(side);
 		return edges.get(side);
+	}
+
+	public void setEdge(Edge edge) {
+		edges.put(edge.getOrientationFrom(getPosition()), edge);
 	}
 
 	public void setEdge(Orientation direction, Edge.EdgeType type) {
 		getEdgeAt(direction).setType(type);
 	}
 
-//	public void addEdges(Iterable<String> edges) {
-//		for (Edge edge : edges) {
-//			addWall(edge);
-//		}
-//	}
+	// public void addEdges(Iterable<String> edges) {
+	// for (Edge edge : edges) {
+	// addWall(edge);
+	// }
+	// }
 
-//	//TODO: nodig?
-//	public boolean hasUnknownEdges(){
-//		for(Edge currentEdge : getEdges()){
-//			if(currentEdge.getType() == EdgeType.UNKNOWN){
-//				return true;
-//			}
-//		}
-//		
-//		return false;
-//	}
-	
-	public boolean isExplored(){
+	// //TODO: nodig?
+	// public boolean hasUnknownEdges(){
+	// for(Edge currentEdge : getEdges()){
+	// if(currentEdge.getType() == EdgeType.UNKNOWN){
+	// return true;
+	// }
+	// }
+	//
+	// return false;
+	// }
+
+	public boolean isExplored() {
 		return isExplored;
 	}
-	
-	public void setExplored(){
+
+	public void setExplored() {
 		isExplored = true;
 	}
-	
+
 	public EnumSet<Orientation> getClosedSides() {
 		EnumSet<Orientation> result = EnumSet.noneOf(Orientation.class);
-		for (Orientation orientation : Orientation.values()) {
-			if (hasEdgeAt(orientation)) {
+		for (Map.Entry<Orientation, Edge> entry : edges.entrySet()) {
+			Orientation orientation = entry.getKey();
+			Edge edge = entry.getValue();
+			if (edge.getType() == EdgeType.WALL) {
 				result.add(orientation);
 			}
 		}
@@ -103,9 +101,17 @@ public class Tile {
 	}
 
 	public EnumSet<Orientation> getOpenSides() {
-		return EnumSet.complementOf(getClosedSides());
+		EnumSet<Orientation> result = EnumSet.noneOf(Orientation.class);
+		for (Map.Entry<Orientation, Edge> entry : edges.entrySet()) {
+			Orientation orientation = entry.getKey();
+			Edge edge = entry.getValue();
+			if (edge.getType() == EdgeType.OPEN) {
+				result.add(orientation);
+			}
+		}
+		return result;
 	}
-	
+
 	/**
 	 * Returns the rectangle in relative coordinates to the maze.
 	 */

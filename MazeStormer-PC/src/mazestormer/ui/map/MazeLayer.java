@@ -61,6 +61,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			mazeElement = (SVGGElement) createElement(SVG_G_TAG);
 			tilesGroup = (SVGGElement) createElement(SVG_G_TAG);
 			edgesGroup = (SVGGElement) createElement(SVG_G_TAG);
+			tilesGroup.setAttribute(SVG_ID_ATTRIBUTE, "tiles");
+			edgesGroup.setAttribute(SVG_ID_ATTRIBUTE, "edges");
 
 			mazeElement.appendChild(tilesGroup);
 			mazeElement.appendChild(edgesGroup);
@@ -82,13 +84,12 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		tiles.put(tile.getPosition(), tileElement);
 	}
 
-	private void setEdge(LongPoint position, Orientation direction,
-			Edge.EdgeType type) {
-		Edge edge = getMaze().getTileAt(position).getEdgeAt(direction);
+	private void setEdge(Edge edge) {
 		for (LongPoint tilePosition : edge.getTouching()) {
 			TileElement tileElement = tiles.get(tilePosition);
 			if (tileElement != null) {
-				tileElement.setEdge(direction, type);
+				tileElement.setEdge(edge.getOrientationFrom(tilePosition),
+						edge.getType());
 			}
 		}
 	}
@@ -115,9 +116,13 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	}
 
 	@Override
-	public void edgeChanged(LongPoint position, Orientation direction,
-			Edge.EdgeType type) {
-		setEdge(position, direction, type);
+	public void edgeChanged(final Edge edge) {
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				setEdge(edge);
+			}
+		});
 	}
 
 	@Override
@@ -206,12 +211,23 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		private void setEdge(Orientation orientation, Edge.EdgeType type) {
 			checkNotNull(orientation);
+
+			// Get or create edge element
 			EdgeElement edgeElement = edges.get(orientation);
 			if (edgeElement == null) {
 				edgeElement = new EdgeElement(getPosition(), orientation);
 				edges.put(orientation, edgeElement);
 			}
+
+			// Set type
 			edgeElement.setType(type);
+
+			// Detach edge element
+			Element element = edgeElement.get();
+			if (element.getParentNode() != null) {
+				element.getParentNode().removeChild(element);
+			}
+
 			// Put walls above lines
 			if (type == Edge.EdgeType.WALL) {
 				edgesGroup.appendChild(edgeElement.get());
@@ -220,16 +236,6 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 						edgesGroup.getFirstChild());
 			}
 		}
-
-		// public void addWall(final Edge edge) {
-		// checkNotNull(edge);
-		// invokeDOMChange(new Runnable() {
-		// @Override
-		// public void run() {
-		// setEdge(edge.getOrientationFrom(getPosition()), true);
-		// }
-		// });
-		// }
 
 	}
 

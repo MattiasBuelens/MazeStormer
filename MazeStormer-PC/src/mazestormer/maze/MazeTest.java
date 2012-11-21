@@ -1,6 +1,6 @@
 package mazestormer.maze;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import mazestormer.util.LongPoint;
 
 import org.junit.Before;

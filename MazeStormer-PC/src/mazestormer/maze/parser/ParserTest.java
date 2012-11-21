@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class ParserTest {
 		Maze maze = parse(source);
 
 		Tile tile = maze.getTileAt(new LongPoint(0, 0));
-		checkEdges(tile, expectedEdges);
+		checkWalls(tile, expectedEdges);
 	}
 
 	@Test
@@ -37,7 +38,7 @@ public class ParserTest {
 		Maze maze = parse(source);
 
 		Tile tile = maze.getTileAt(new LongPoint(0, 0));
-		checkEdges(tile, expectedEdges);
+		checkWalls(tile, expectedEdges);
 	}
 
 	@Test
@@ -46,13 +47,13 @@ public class ParserTest {
 		Maze maze = parse(source);
 
 		// Bottom left corner
-		checkEdges(maze.getTileAt(new LongPoint(0, 0)), SOUTH, WEST);
+		checkWalls(maze.getTileAt(new LongPoint(0, 0)), SOUTH, WEST);
 		// Bottom right corner
-		checkEdges(maze.getTileAt(new LongPoint(1, 0)), SOUTH, EAST);
+		checkWalls(maze.getTileAt(new LongPoint(1, 0)), SOUTH, EAST);
 		// Top left corner
-		checkEdges(maze.getTileAt(new LongPoint(0, 1)), NORTH, WEST);
+		checkWalls(maze.getTileAt(new LongPoint(0, 1)), NORTH, WEST);
 		// Top right corner
-		checkEdges(maze.getTileAt(new LongPoint(1, 1)), NORTH, EAST);
+		checkWalls(maze.getTileAt(new LongPoint(1, 1)), NORTH, EAST);
 	}
 
 	@Test
@@ -61,11 +62,11 @@ public class ParserTest {
 		Maze maze = parse(source);
 
 		// Left
-		checkEdges(maze.getTileAt(new LongPoint(0, 0)), NORTH, SOUTH, WEST);
+		checkWalls(maze.getTileAt(new LongPoint(0, 0)), NORTH, SOUTH, WEST);
 		// Center
-		checkEdges(maze.getTileAt(new LongPoint(1, 0)), NORTH, SOUTH);
+		checkWalls(maze.getTileAt(new LongPoint(1, 0)), NORTH, SOUTH);
 		// Right
-		checkEdges(maze.getTileAt(new LongPoint(2, 0)), NORTH, SOUTH, EAST);
+		checkWalls(maze.getTileAt(new LongPoint(2, 0)), NORTH, SOUTH, EAST);
 	}
 
 	@Test
@@ -74,11 +75,11 @@ public class ParserTest {
 		Maze maze = parse(source);
 
 		// Top
-		checkEdges(maze.getTileAt(new LongPoint(0, 2)), WEST, EAST, NORTH);
+		checkWalls(maze.getTileAt(new LongPoint(0, 2)), WEST, EAST, NORTH);
 		// Middle
-		checkEdges(maze.getTileAt(new LongPoint(0, 1)), WEST, EAST);
+		checkWalls(maze.getTileAt(new LongPoint(0, 1)), WEST, EAST);
 		// Bottom
-		checkEdges(maze.getTileAt(new LongPoint(0, 0)), WEST, EAST, SOUTH);
+		checkWalls(maze.getTileAt(new LongPoint(0, 0)), WEST, EAST, SOUTH);
 	}
 
 	@Test
@@ -173,15 +174,18 @@ public class ParserTest {
 	}
 
 	/**
-	 * Check whether the tiles has edges only at the given expected orientations.
+	 * Check whether the tiles has walls only at the given expected
+	 * orientations.
 	 */
-	private void checkEdges(Tile tile, Orientation... expectedEdges) {
-		EnumSet<Orientation> expectedEdgesSet = Sets.newEnumSet(Arrays.asList(expectedEdges), Orientation.class);
+	private void checkWalls(Tile tile, Orientation... expectedEdges) {
+		EnumSet<Orientation> expectedEdgesSet = Sets.newEnumSet(
+				Arrays.asList(expectedEdges), Orientation.class);
 		for (Orientation orientation : Orientation.values()) {
-			boolean expectEdge = expectedEdgesSet.contains(orientation);
-			String message = (expectEdge ? "Expected" : "Unexpected") + " " + orientation + " edge at "
-					+ tile.getPosition();
-			assertEquals(message, expectEdge, tile.hasEdgeAt(orientation));
+			boolean expectWall = expectedEdgesSet.contains(orientation);
+			String message = (expectWall ? "Expected" : "Unexpected") + " "
+					+ orientation + " wall at " + tile.getPosition();
+			boolean isWall = tile.getEdgeAt(orientation).getType() == EdgeType.WALL;
+			assertEquals(message, expectWall, isWall);
 		}
 	}
 }

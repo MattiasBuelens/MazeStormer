@@ -3,7 +3,6 @@ package mazestormer.remote;
 import java.util.ArrayList;
 import java.util.List;
 
-import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.SensorPortListener;
