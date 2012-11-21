@@ -118,16 +118,14 @@ public class LineFinderController extends SubController implements
 		}
 
 		private void onLine(final Runnable action) {
-			int thresholdValue = light.getNormalizedLightValue(threshold);
 			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_GREATER_THAN, thresholdValue);
+					ConditionType.LIGHT_GREATER_THAN, threshold);
 			handle = getRobot().when(condition).stop().run(action).build();
 		}
 
 		private void offLine(final Runnable action) {
-			int thresholdValue = light.getNormalizedLightValue(threshold);
 			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_SMALLER_THAN, thresholdValue);
+					ConditionType.LIGHT_SMALLER_THAN, threshold);
 			handle = getRobot().when(condition).stop().run(action).build();
 		}
 

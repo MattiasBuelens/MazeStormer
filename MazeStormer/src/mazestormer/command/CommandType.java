@@ -66,6 +66,18 @@ public enum CommandType implements MessageType<Command> {
 			return new LightFloodlightCommand(this);
 		}
 	},
+	LIGHT_SET_LOW {
+		@Override
+		public Command build() {
+			return new LightCalibrateCommand(this);
+		}
+	},
+	LIGHT_SET_HIGH {
+		@Override
+		public Command build() {
+			return new LightCalibrateCommand(this);
+		}
+	},
 
 	/*
 	 * Conditional

@@ -3,6 +3,7 @@ package mazestormer.remote;
 import java.util.ArrayList;
 import java.util.List;
 
+import lejos.nxt.LCD;
 import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.SensorPortListener;
@@ -10,6 +11,7 @@ import mazestormer.command.Command;
 import mazestormer.command.CommandReplier;
 import mazestormer.command.CommandType;
 import mazestormer.command.ConditionalCommandListener;
+import mazestormer.command.LightCalibrateCommand;
 import mazestormer.command.LightFloodlightCommand;
 import mazestormer.command.LightReadCommand;
 import mazestormer.condition.Condition;
@@ -45,6 +47,7 @@ public class PhysicalLightSensor extends LightSensor implements
 
 		// Add message listeners
 		addMessageListener(new LightFloodlightCommandListener());
+		addMessageListener(new LightCalibrateCommandListener());
 		addMessageListener(new LightValueReplier());
 		addMessageListener(new LightConditionListener());
 	}
@@ -104,6 +107,32 @@ public class PhysicalLightSensor extends LightSensor implements
 			boolean isFloodlight = ((LightFloodlightCommand) command)
 					.isFloodlight();
 			setFloodlight(isFloodlight);
+		}
+
+	}
+
+	/**
+	 * Handles calibration commands.
+	 */
+	private class LightCalibrateCommandListener implements
+			MessageListener<Command> {
+
+		@Override
+		public void messageReceived(Command command) {
+			if (!(command instanceof LightCalibrateCommand))
+				return;
+
+			int value = ((LightCalibrateCommand) command).getValue();
+			switch (command.getType()) {
+			case LIGHT_SET_LOW:
+				setLow(value);
+				break;
+			case LIGHT_SET_HIGH:
+				setHigh(value);
+				break;
+			default:
+				break;
+			}
 		}
 
 	}
@@ -176,19 +205,20 @@ public class PhysicalLightSensor extends LightSensor implements
 
 		@Override
 		public void lightValueChanged(int normalizedLightValue) {
-			if (matches(normalizedLightValue)) {
+			int lightValue = getLightValue(normalizedLightValue);
+			if (matches(lightValue)) {
 				removeLightListener(this);
 				resolve();
 			}
 		}
 
-		public boolean matches(int normalizedLightValue) {
+		public boolean matches(int lightValue) {
 			int threshold = getCondition().getThreshold();
 			switch (getCondition().getType()) {
 			case LIGHT_GREATER_THAN:
-				return normalizedLightValue >= threshold;
+				return lightValue >= threshold;
 			case LIGHT_SMALLER_THAN:
-				return normalizedLightValue <= threshold;
+				return lightValue <= threshold;
 			default:
 				return false;
 			}

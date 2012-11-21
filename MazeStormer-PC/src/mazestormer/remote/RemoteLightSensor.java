@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import mazestormer.command.Command;
 import mazestormer.command.CommandType;
+import mazestormer.command.LightCalibrateCommand;
 import mazestormer.command.LightFloodlightCommand;
 import mazestormer.robot.Robot;
 import mazestormer.simulator.AbstractCalibratedLightSensor;
@@ -47,6 +48,18 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 			e.printStackTrace();
 			return -1;
 		}
+	}
+
+	@Override
+	public void setLow(int low) {
+		super.setLow(low);
+		send(new LightCalibrateCommand(CommandType.LIGHT_SET_LOW, low));
+	}
+
+	@Override
+	public void setHigh(int high) {
+		super.setHigh(high);
+		send(new LightCalibrateCommand(CommandType.LIGHT_SET_HIGH, high));
 	}
 
 	@Override
