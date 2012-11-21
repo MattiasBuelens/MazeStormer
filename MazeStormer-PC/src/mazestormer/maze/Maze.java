@@ -12,15 +12,7 @@ import java.util.Map;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
-import lejos.geom.Rectangle;
-import lejos.robotics.mapping.LineMap;
 import lejos.robotics.navigation.Pose;
-import lejos.robotics.navigation.Waypoint;
-import lejos.robotics.pathfinding.AstarSearchAlgorithm;
-import lejos.robotics.pathfinding.FourWayGridMesh;
-import lejos.robotics.pathfinding.GridNode;
-import lejos.robotics.pathfinding.Node;
-import lejos.robotics.pathfinding.Path;
 import mazestormer.util.AbstractEventSource;
 import mazestormer.util.LongPoint;
 
@@ -37,13 +29,10 @@ public class Maze extends AbstractEventSource {
 	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
-	
-	private Rectangle boundingRectangle;
 
 	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
-		this.boundingRectangle = new Rectangle(0,0,0,0);
 	}
 
 	public Maze(float tileSize) {
@@ -106,42 +95,8 @@ public class Maze extends AbstractEventSource {
 			tiles.put(tilePosition, tile);
 			// Fire tile added event
 			fireTileAdded(tile);
-			updateBoundingRectangle(tile);
 		}
 		return tile;
-	}
-	
-	private void updateBoundingRectangle(Tile tile){
-		long x = (long) getBoundingRectangle().getX();
-		long y = (long) getBoundingRectangle().getY();
-		long width = (long) (getBoundingRectangle().getWidth()/getTileSize());
-		long height = (long) (getBoundingRectangle().getHeight()/getTileSize());
-			
-		if(!((x <= tile.getX() && tile.getX() <= x+width) || (x >= tile.getX() && tile.getX() >= x-width))){
-			if(Math.signum(tile.getX()) == Math.signum(x))
-				width = (long) Math.abs(tile.getX()-x);
-			else
-				width = (long) (Math.abs(tile.getX())+Math.abs(x));
-		}
-		if(!((y <= tile.getY() && tile.getY() <= y+height) || (y >= tile.getY() && tile.getY() >= y-height))){
-			if(Math.signum(tile.getY()) == Math.signum(y))
-				height = (long) Math.abs(tile.getY()-y);
-			else
-				height = (long) (Math.abs(tile.getY())+Math.abs(y));
-		}
-		if(x > tile.getX())
-				x = (long) tile.getX();
-		if(y > tile.getY())
-				y = (long) tile.getY();
-		setBoundingRectangle(new Rectangle((int) x,(int) y,(int) (width*getTileSize()),(int) (height*getTileSize())));	
-	}
-	
-	public Rectangle getBoundingRectangle(){
-		return this.boundingRectangle;
-	}
-	
-	private void setBoundingRectangle(Rectangle request){
-		this.boundingRectangle = request;
 	}
 
 	/**
