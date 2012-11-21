@@ -5,7 +5,6 @@ package mazestormer.util;
  * {@link Future}, cannot be retrieved because the task was cancelled.
  */
 public class CancellationException extends IllegalStateException {
-	private static final long serialVersionUID = -9202173006928992231L;
 
 	/**
 	 * Constructs a <tt>CancellationException</tt> with no detail message.
@@ -23,4 +22,5 @@ public class CancellationException extends IllegalStateException {
 	public CancellationException(String message) {
 		super(message);
 	}
+
 }

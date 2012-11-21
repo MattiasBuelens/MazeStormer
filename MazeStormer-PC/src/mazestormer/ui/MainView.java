@@ -31,7 +31,6 @@ public class MainView extends JFrame implements EventSource {
 	private JPanel configurationPanel;
 	private JPanel logPanel;
 	private JPanel statePanel;
-	private JPanel explorerPanel;
 
 	private JPanel mainPanel;
 

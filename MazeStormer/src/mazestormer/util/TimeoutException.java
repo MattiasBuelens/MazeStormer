@@ -8,7 +8,6 @@ package mazestormer.util;
  * <tt>TimeoutException</tt> should be declared and thrown.
  */
 public class TimeoutException extends Exception {
-	private static final long serialVersionUID = 1900926677490660714L;
 
 	/**
 	 * Constructs a <tt>TimeoutException</tt> with no specified detail message.
@@ -25,4 +24,5 @@ public class TimeoutException extends Exception {
 	public TimeoutException(String message) {
 		super(message);
 	}
+
 }
