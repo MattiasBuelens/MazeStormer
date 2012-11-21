@@ -272,6 +272,7 @@ public class BarcodeController extends SubController implements
 
 		private void encodeBarcode() {
 			this.barcode = convertToByte(convertToBitArray(distances));
+			System.out.println(Integer.toBinaryString((int) this.barcode));
 		}
 
 		private void decodeBarcode() {
