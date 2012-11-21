@@ -2,8 +2,10 @@ package mazestormer.robot;
 
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.command.ConditionalCommandBuilder;
+import mazestormer.detect.RangeFeatureDetector;
 
-public interface Robot {
+public interface Robot extends ConditionalCommandBuilder {
 
 	/**
 	 * Left wheel diameter, in centimeters.
@@ -18,12 +20,17 @@ public interface Robot {
 	/**
 	 * Distance between center of wheels, in centimeters.
 	 */
-	public final static float trackWidth = 13.97f;
+	public final static float trackWidth = 14.3f;// 13.97f;
 
 	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.
 	 */
 	public final static float sensorOffset = 7.2f;
+
+	/**
+	 * Approximate radius of the light sensor beam.
+	 */
+	public final static float sensorRadius = 1.0f;
 
 	/**
 	 * Get the pilot controlling this robot's movement.
@@ -41,9 +48,19 @@ public interface Robot {
 	public RangeScanner getRangeScanner();
 
 	/**
+	 * Get the range feature detector of this robot.
+	 */
+	public RangeFeatureDetector getRangeDetector();
+
+	/**
 	 * Get the pose provider of this robot.
 	 */
 	public PoseProvider getPoseProvider();
+
+	/**
+	 * Get the sound player of this robot.
+	 */
+	public SoundPlayer getSoundPlayer();
 
 	/**
 	 * Terminate this robot.

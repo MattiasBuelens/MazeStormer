@@ -47,7 +47,8 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public void setAcceleration(int acceleration) {
-		send(new PilotParameterCommand(CommandType.SET_ACCELERATION, acceleration));
+		send(new PilotParameterCommand(CommandType.SET_ACCELERATION,
+				acceleration));
 	}
 
 	@Override
@@ -75,12 +76,12 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public void forward() {
-		send(new TravelCommand(CommandType.TRAVEL, Double.POSITIVE_INFINITY));
+		travel(Double.POSITIVE_INFINITY, true);
 	}
 
 	@Override
 	public void backward() {
-		send(new TravelCommand(CommandType.TRAVEL, Double.NEGATIVE_INFINITY));
+		travel(Double.NEGATIVE_INFINITY, true);
 	}
 
 	@Override
@@ -90,12 +91,12 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public void rotateLeft() {
-		send(new RotateCommand(CommandType.ROTATE, Double.POSITIVE_INFINITY));
+		rotate(Double.POSITIVE_INFINITY, true);
 	}
 
 	@Override
 	public void rotateRight() {
-		send(new RotateCommand(CommandType.ROTATE, Double.NEGATIVE_INFINITY));
+		rotate(Double.NEGATIVE_INFINITY, true);
 	}
 
 	@Override
@@ -105,6 +106,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public void rotate(double angle, boolean immediateReturn) {
+		isMoving = true;
 		send(new RotateCommand(CommandType.ROTATE, angle));
 
 		if (!immediateReturn)
@@ -118,6 +120,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public void travel(double distance, boolean immediateReturn) {
+		isMoving = true;
 		send(new TravelCommand(CommandType.TRAVEL, distance));
 
 		if (!immediateReturn)
@@ -169,8 +172,9 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 	}
 
 	public void setMovement(Move move) {
-		movement = new Move(move.getMoveType(), move.getDistanceTraveled(), move.getAngleTurned(),
-				(float) getTravelSpeed(), (float) getRotateSpeed(), isMoving());
+		movement = new Move(move.getMoveType(), move.getDistanceTraveled(),
+				move.getAngleTurned(), (float) getTravelSpeed(),
+				(float) getRotateSpeed(), isMoving());
 	}
 
 	public void resetMovement() {

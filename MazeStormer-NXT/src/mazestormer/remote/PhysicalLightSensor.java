@@ -17,6 +17,7 @@ import mazestormer.condition.ConditionFuture;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.report.ReportType;
 import mazestormer.robot.CalibratedLightSensor;
+import mazestormer.robot.Robot;
 
 public class PhysicalLightSensor extends LightSensor implements
 		CalibratedLightSensor, SensorPortListener {
@@ -146,8 +147,8 @@ public class PhysicalLightSensor extends LightSensor implements
 		@Override
 		public ConditionFuture createFuture(Condition condition) {
 			switch (condition.getType()) {
-			case LIGHT_HIGHER_THAN:
-			case LIGHT_LOWER_THAN:
+			case LIGHT_GREATER_THAN:
+			case LIGHT_SMALLER_THAN:
 				return new LightConditionFuture(
 						(LightCompareCondition) condition);
 			default:
@@ -184,9 +185,9 @@ public class PhysicalLightSensor extends LightSensor implements
 		public boolean matches(int normalizedLightValue) {
 			int threshold = getCondition().getThreshold();
 			switch (getCondition().getType()) {
-			case LIGHT_HIGHER_THAN:
+			case LIGHT_GREATER_THAN:
 				return normalizedLightValue >= threshold;
-			case LIGHT_LOWER_THAN:
+			case LIGHT_SMALLER_THAN:
 				return normalizedLightValue <= threshold;
 			default:
 				return false;
@@ -199,6 +200,25 @@ public class PhysicalLightSensor extends LightSensor implements
 			return super.cancel(mayInterruptIfRunning);
 		}
 
+	}
+
+	@Override
+	public int getNormalizedLightValue(int lightValue) {
+		if (getHigh() == getLow())
+			return getLow();
+		return (int) ((lightValue / 100f) * (getHigh() - getLow()) + getLow());
+	}
+
+	@Override
+	public int getLightValue(int normalizedLightValue) {
+		if (getHigh() == getLow())
+			return 0;
+		return 100 * (normalizedLightValue - getLow()) / (getHigh() - getLow());
+	}
+
+	@Override
+	public float getSensorRadius() {
+		return Robot.sensorRadius;
 	}
 
 }

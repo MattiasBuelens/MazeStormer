@@ -3,6 +3,8 @@ package mazestormer.simulator;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.condition.Condition;
+import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
@@ -42,8 +44,7 @@ public class VirtualRobot implements Robot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new DelegatedCalibratedLightSensor(new VirtualLightSensor(
-					maze, getPoseProvider()));
+			light = new VirtualLightSensor(maze, getPoseProvider());
 		}
 		return light;
 	}
@@ -57,7 +58,7 @@ public class VirtualRobot implements Robot {
 	}
 
 	@Override
-	public RangeScannerFeatureDetector getRangeDetector() {
+	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
 			detector = new RangeScannerFeatureDetector(getRangeScanner());
 			detector.setPoseProvider(getPoseProvider());
@@ -80,15 +81,22 @@ public class VirtualRobot implements Robot {
 		}
 		return soundPlayer;
 	}
-	
+
 	public VirtualCollisionDetector getCollisionDetector() {
-		if(collisionDetector == null)
-			collisionDetector = new VirtualCollisionDetector(maze, getPoseProvider());
+		if (collisionDetector == null)
+			collisionDetector = new VirtualCollisionDetector(maze,
+					getPoseProvider());
 		return collisionDetector;
 	}
-	
+
 	public CollisionObserver getCollisionObserver() {
 		return collisionObserver;
+	}
+
+	@Override
+	public CommandBuilder when(Condition condition) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

@@ -3,21 +3,26 @@ package mazestormer.remote;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.command.CommandType;
+import mazestormer.condition.Condition;
+import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 import mazestormer.robot.SoundPlayer;
-import mazestormer.simulator.DelegatedCalibratedLightSensor;
 
 public class RemoteRobot extends RemoteComponent implements Robot {
 
 	private RemotePilot pilot;
-	private CalibratedLightSensor light;
+	private PoseProvider poseProvider;
+
+	private RemoteLightSensor light;
+
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
+
 	private SoundPlayer soundPlayer;
-	private PoseProvider poseProvider;
 
 	public RemoteRobot(RemoteCommunicator communicator) {
 		super(communicator);
@@ -34,8 +39,7 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new DelegatedCalibratedLightSensor(new RemoteLightSensor(
-					getCommunicator()));
+			light = new RemoteLightSensor(getCommunicator());
 		}
 		return light;
 	}
@@ -49,7 +53,7 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	}
 
 	@Override
-	public RangeScannerFeatureDetector getRangeDetector() {
+	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
 			detector = new RangeScannerFeatureDetector(getRangeScanner());
 			detector.setPoseProvider(getPoseProvider());
@@ -74,9 +78,18 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	}
 
 	@Override
+	public CommandBuilder when(Condition condition) {
+		RemoteCommandBuilder builder = new RemoteCommandBuilder(
+				getCommunicator(), CommandType.WHEN, condition);
+		addMessageListener(builder);
+		return builder;
+	}
+
+	@Override
 	public void terminate() {
-		// Terminate the pilot
+		// Terminate components
 		getPilot().terminate();
+		light.terminate();
 		// Stop all communications
 		getCommunicator().stop();
 		// Remove registered message listeners
