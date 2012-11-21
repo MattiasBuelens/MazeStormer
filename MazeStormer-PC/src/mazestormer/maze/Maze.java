@@ -29,7 +29,7 @@ public class Maze extends AbstractEventSource {
 	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
-	
+
 	private Mesh mesh;
 
 	public Maze(float tileSize, float edgeSize) {
@@ -113,8 +113,15 @@ public class Maze extends AbstractEventSource {
 	}
 
 	public Tile getNeighbor(Tile givenTile, Orientation direction) {
-		LongPoint neighborCoordinates = direction.shift(givenTile.getPosition());
+		LongPoint neighborCoordinates = direction
+				.shift(givenTile.getPosition());
 		return tiles.get(neighborCoordinates);
+	}
+
+	public Tile getOrCreateNeighbor(Tile givenTile, Orientation direction) {
+		LongPoint neighborCoordinates = direction
+				.shift(givenTile.getPosition());
+		return getTileAt(neighborCoordinates);
 	}
 
 	/**
@@ -140,28 +147,32 @@ public class Maze extends AbstractEventSource {
 	 *       for each point in edge.getTouching() : |
 	 *       getTileAt(point).hasEdge(edge)
 	 */
-	public void addEdge(Edge edge) {
-		checkNotNull(edge);
+	public void setEdge(LongPoint position, Orientation direction,
+			Edge.EdgeType type) {
 
-		// Fire edge added event
-		fireEdgeAdded(edge);
-		addLine(edge);
+		// Fire edge changed event
+		fireEdgeChanged(position, direction, type);
+		addLine(position, direction);
+
+		Tile tile = getTileAt(position);
+
+		// tile.addWall(direction);
+		Edge edge = tile.getEdgeAt(direction);
 
 		// Add edge to touching tiles
 		for (LongPoint touchingPosition : edge.getTouching()) {
 			Tile touchingTile = getTileAt(touchingPosition);
-			touchingTile.addEdge(edge);
+			touchingTile.setEdge(direction, type);
 			// Fire tile updated event
 			fireTileChanged(touchingTile);
 		}
 	}
 
-	private void addLine(Edge edge) {
+	private void addLine(LongPoint position, Orientation direction) {
 		// Get edge points in tile coordinates
-		Line line = edge.getOrientation().getLine();
-		Point position = edge.getPosition().toPoint();
-		Point p1 = line.getP1().add(position);
-		Point p2 = line.getP2().add(position);
+		Line line = direction.getLine();
+		Point p1 = line.getP1().add(position.toPoint());
+		Point p2 = line.getP2().add(position.toPoint());
 
 		// Convert to relative coordinates
 		p1 = fromTile(p1);
@@ -169,6 +180,7 @@ public class Maze extends AbstractEventSource {
 
 		// Add line
 		Line l = new Line(p1.x, p1.y, p2.x, p2.y);
+		Edge edge = getTileAt(position).getEdgeAt(direction);
 		lines.put(edge, l);
 	}
 
@@ -211,10 +223,12 @@ public class Maze extends AbstractEventSource {
 		}
 	}
 
-	private void fireEdgeAdded(Edge edge) {
-		checkNotNull(edge);
+	private void fireEdgeChanged(LongPoint position, Orientation direction,
+			Edge.EdgeType type) {
+		checkNotNull(position);
+		checkNotNull(direction);
 		for (MazeListener listener : listeners) {
-			listener.edgeAdded(edge);
+			listener.edgeChanged(position, direction, type);
 		}
 	}
 
@@ -343,19 +357,19 @@ public class Maze extends AbstractEventSource {
 			heading -= 360;
 		return heading;
 	}
-	
+
 	/**
 	 * Returns the mesh of this maze.
 	 * 
-	 * @param 	regenerate
-	 * 			If regenerate is true, the nodes of the mesh of this maze will
-	 * 			be regenerated. If regenerate is false, the collection of nodes
-	 * 			of the current mesh stay unchanged and no regeneration calculation
-	 * 			is executed.
-	 * @speed	If regenerate is true, the calculation speed is
-	 * 			~O(t*d) with t the number of tiles of this maze and with d the average number
-	 * 			of open directions of a tile. (No storage time is included)
-	 * @return	The mesh of this maze.
+	 * @param regenerate
+	 *            If regenerate is true, the nodes of the mesh of this maze will
+	 *            be regenerated. If regenerate is false, the collection of
+	 *            nodes of the current mesh stay unchanged and no regeneration
+	 *            calculation is executed.
+	 * @speed If regenerate is true, the calculation speed is ~O(t*d) with t the
+	 *        number of tiles of this maze and with d the average number of open
+	 *        directions of a tile. (No storage time is included)
+	 * @return The mesh of this maze.
 	 */
 	public Mesh getMesh(boolean regenerate) {
 		if (this.mesh == null) {
@@ -363,7 +377,7 @@ public class Maze extends AbstractEventSource {
 		}
 		if (regenerate == true) {
 			this.mesh.generateNodes();
-		}	
+		}
 		return this.mesh;
 	}
 }

@@ -24,7 +24,7 @@ public class MazeTest {
 		Edge edge = new Edge(position, orientation);
 		Tile tile = maze.getTileAt(position);
 
-		maze.addEdge(edge);
+		//maze.addWall(edge);
 
 		assertTrue(tile.hasEdge(edge));
 		assertTrue(edge.touches(position));

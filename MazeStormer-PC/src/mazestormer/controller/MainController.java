@@ -72,6 +72,7 @@ public class MainController implements IMainController {
 	private IPolygonControlController polygonControl;
 	private IBarcodeController barcodeControl;
 	private ILineFinderController lineFinderControl;
+	private IExplorerController explorerControl;
 
 	private IMapController map;
 	private ILogController log;
@@ -175,6 +176,14 @@ public class MainController implements IMainController {
 			lineFinderControl = new LineFinderController(this);
 		}
 		return lineFinderControl;
+	}
+	
+	@Override
+	public IExplorerController explorerControl() {
+		if (explorerControl == null) {
+			explorerControl = new ExplorerController(this);
+		}
+		return explorerControl;
 	}
 
 	@Override
