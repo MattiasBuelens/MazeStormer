@@ -10,5 +10,6 @@ public interface IBarcodeController extends EventSource{
 	
 	public static final String[] ACTIONS = {"Play sound", "Rotate 360 degrees clockwise", "Rotate 360 degrees counter-clockwise",
 		"Travel at high speed", "Travel at low speed", "Wait for 5 seconds"};
-
+	
+	public void scanAction();
 }

@@ -1,8 +1,8 @@
 package mazestormer.controller;
 
+import mazestormer.algorithms.BarcodeScan;
 import mazestormer.barcode.IAction;
 import mazestormer.robot.Robot;
-
 
 public class BarcodeController extends SubController implements IBarcodeController{
 
@@ -86,5 +86,11 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 	}
-
+	
+	@Override
+	public void scanAction(){
+		byte b = BarcodeScan.ScanBarcode(getRobot());
+		System.out.println(b);
+		// BarcodeDecoder.getAction(b).performAction(getRobot());
+	}
 }
