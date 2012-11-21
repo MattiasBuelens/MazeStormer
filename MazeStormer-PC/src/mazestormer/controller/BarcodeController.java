@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.algorithms.BarcodeScan;
 import mazestormer.barcode.IAction;
 import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
@@ -16,12 +15,12 @@ import mazestormer.robot.Robot;
 
 public class BarcodeController extends SubController implements
 		IBarcodeController {
-	private static final double TRAVEL_SPEED = 10; // [cm/sec]
-	private static final double SLOW_TRAVEL_SPEED = 2; // [cm/sec]
+	private static final double TRAVEL_SPEED = 10; 		// [cm/sec]
+	private static final double SLOW_TRAVEL_SPEED = 2; 	// [cm/sec]
 
 	private static final double START_BAR_LENGTH = 1.8; // [cm]
-	private static final double BAR_LENGTH = 1.85; // [cm]
-	private static final int NUMBER_OF_BARS = 6; // without black start bars
+	private static final double BAR_LENGTH = 1.85; 		// [cm]
+	private static final int NUMBER_OF_BARS = 6; 		// without black start bars
 
 	private static final int BLACK_THRESHOLD = 50;
 
@@ -272,6 +271,7 @@ public class BarcodeController extends SubController implements
 
 		private void encodeBarcode() {
 			this.barcode = convertToByte(convertToBitArray(distances));
+			System.out.println(Integer.toBinaryString((int) this.barcode));
 		}
 
 		private void decodeBarcode() {
