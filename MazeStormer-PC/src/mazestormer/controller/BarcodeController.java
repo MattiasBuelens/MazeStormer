@@ -14,8 +14,6 @@ import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
 public class BarcodeController extends SubController implements IBarcodeController {
-	private static final double SLOW_TRAVEL_SPEED = 2; 	// [cm/sec]
-
 	private static final double START_BAR_LENGTH = 1.8; // [cm]
 	private static final double BAR_LENGTH = 1.85; 		// [cm]
 	private static final int NUMBER_OF_BARS = 6; 		// without black start bars
@@ -107,23 +105,29 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 	}
 	
-	//TODO
+	@Override
 	public void startScan() {
 		this.barcodeRunner = new BarcodeRunner();
 		this.barcodeRunner.start();
 	}
 
-	//TODO
+	@Override
 	public void stopScan() {
 		if (this.barcodeRunner != null) {
 			this.barcodeRunner.stop();
 			this.barcodeRunner = null;
 		}
 	}
+	
+	private double scanTravelSpeed = 2; 	// [cm/sec]
+	
+	public double getScantravelSpeed() {
+		return this.scanTravelSpeed;
+	}
 
 	@Override
-	public void scanAction() {
-		new BarcodeRunner().run();
+	public void setScanSpeed(double speed) {
+		this.scanTravelSpeed = speed;
 	}
 
 	private class BarcodeRunner implements Runnable {
@@ -143,14 +147,14 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		public void start() {
 			this.isRunning = true;
 			new Thread(this).start();
-			postState(EventType.STARTED);
+			postState(EventType.SCAN_STARTED);
 		}
 
 		public void stop() {
 			if (isRunning()) {
 				this.isRunning = false;
 				this.pilot.stop();
-				postState(EventType.STOPPED);
+				postState(EventType.SCAN_STOPPED);
 			}
 		}
 
@@ -186,7 +190,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 		private void onBlackBackward() {
 			log("Go to the begin of the barcode zone.");
-			this.pilot.setTravelSpeed(SLOW_TRAVEL_SPEED);
+			this.pilot.setTravelSpeed(getScantravelSpeed());
 			this.pilot.travel(-START_BAR_LENGTH / 2, false);
 			this.oldPose = getRobot().getPoseProvider().getPose();
 			this.blackToWhite = true;
