@@ -344,6 +344,19 @@ public class Maze extends AbstractEventSource {
 		return heading;
 	}
 	
+	/**
+	 * Returns the mesh of this maze.
+	 * 
+	 * @param 	regenerate
+	 * 			If regenerate is true, the nodes of the mesh of this maze will
+	 * 			be regenerated. If regenerate is false, the collection of nodes
+	 * 			of the current mesh stay unchanged and no regeneration calculation
+	 * 			is executed.
+	 * @speed	If regenerate is true, the calculation speed is
+	 * 			~O(t*d) with t the number of tiles of this maze and with d the average number
+	 * 			of open directions of a tile. (No storage time is included)
+	 * @return	The mesh of this maze.
+	 */
 	public Mesh getMesh(boolean regenerate) {
 		if (this.mesh == null) {
 			this.mesh = new Mesh(this);
