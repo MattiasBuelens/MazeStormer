@@ -19,16 +19,12 @@ public class BarcodeScan {
 	private static final int NUMBER_OF_BARS = 6;			// without black start bars
 	
 	private static final int BLACK_THRESHOLD = 50;
-	private static int low = 354; //TODO
-	private static int high = 576; //TODO
 	
 	public static byte ScanBarcode(Robot robot){
 		CalibratedLightSensor light = robot.getLightSensor();
 		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(TRAVEL_SPEED);
 		light.setFloodlight(true);
-		light.setLow(low);
-		light.setHigh(high);
 		
 		pilot.forward();
 		
