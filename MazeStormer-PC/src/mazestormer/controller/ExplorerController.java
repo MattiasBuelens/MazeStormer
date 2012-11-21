@@ -8,6 +8,7 @@ import lejos.geom.Point;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.controller.ExplorerEvent.EventType;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.maze.Edge;
 import mazestormer.maze.Edge.EdgeType;
@@ -19,6 +20,8 @@ import mazestormer.robot.Pilot;
 public class ExplorerController extends SubController implements
 		IExplorerController {
 
+	private ExplorerRunner runner;
+	
 	public ExplorerController(MainController mainController) {
 		super(mainController);
 	}
@@ -39,20 +42,50 @@ public class ExplorerController extends SubController implements
 		return getMainController().getRobot().getRangeScanner();
 	}
 
+	private void postState(EventType eventType) {
+		postEvent(new ExplorerEvent(eventType));
+	}
+	
 	@Override
 	public void startExploring() {
-		// TODO Auto-generated method stub
-
+		runner = new ExplorerRunner();
+		runner.start();
 	}
 
 	@Override
 	public void stopExploring() {
-		// TODO Auto-generated method stub
-
+		if (runner != null) {
+			runner.stop();
+			runner = null;
+		}
 	}
 
 	private class ExplorerRunner implements Runnable {
-
+		private boolean isRunning = false;
+		private final Pilot pilot;
+		
+		public void start(){
+			isRunning = true;
+			new Thread(this).start();
+			postState(EventType.STARTED);
+		}
+		
+		public void stop(){
+			if (isRunning()) {
+				isRunning = false;
+				pilot.stop();
+				postState(EventType.STOPPED);
+			}
+		}
+		
+		public ExplorerRunner(){
+			this.pilot = getPilot();
+		}
+		
+		public synchronized boolean isRunning() {
+			return isRunning;
+		}
+		
 		@Override
 		public void run() {
 			// 1. QUEUE <-- path only containing the root;
@@ -68,12 +101,13 @@ public class ExplorerController extends SubController implements
 			// 2. WHILE QUEUE is not empty
 			Tile currentTile,neighborTile;
 			ArrayList<Tile> paths = new ArrayList<Tile>();
+			
 			while(!queue.empty()){
 				currentTile = queue.pop(); // DO remove the first path from the QUEUE (This is the tile the robot is currently on, because of peek and drive)
 				
 				//scannen en updaten
 				scanAndUpdate(queue, currentTile);
-				
+				currentTile.isExplored();
 				// create new paths (to all children);
 				selectTiles(queue, currentTile);
 				
@@ -89,16 +123,17 @@ public class ExplorerController extends SubController implements
 		
 		//Scans in the direction of UNKNOWN edges, and updates them accordingly
 		private void scanAndUpdate(Stack<Tile> givenQueue, Tile givenTile){
-			float scanRange = 180f;
-			float scanIncrement = 4f;
-
-			int scanCount = (int) (scanRange / scanIncrement) + 1;
-			float[] scanAngles = new float[scanCount];
-			float scanStart = -scanRange / 2f;
-			for (int i = 0; i < scanCount; i++) {
-				scanAngles[i] = scanStart + i * scanIncrement;
-			}
-			getRangeScanner().setAngles(scanAngles);
+//			float scanRange = 180f;
+//			float scanIncrement = 3f;
+//
+//			int scanCount = (int) (scanRange / scanIncrement) + 1;
+//			float[] scanAngles = new float[scanCount];
+//			float scanStart = -scanRange / 2f;
+//			for (int i = 0; i < scanCount; i++) {
+//				scanAngles[i] = scanStart + i * scanIncrement;
+//			}
+			
+			getRangeScanner().setAngles(getScanAngles(givenTile));
 			
 			RangeFeatureDetector detector = getMainController().getRobot().getRangeDetector();
 			RangeFeature feature = detector.scan();
@@ -111,6 +146,8 @@ public class ExplorerController extends SubController implements
 			float heading = getPose().getHeading();
 			
 			for(Orientation direction : Orientation.values()){
+				System.out.println(givenTile.getEdges());
+				System.out.println(givenTile.getEdgeAt(direction));
 				if(givenTile.getEdgeAt(direction).getType() == Edge.EdgeType.UNKNOWN){
 					switch(direction){
 					case EAST:
@@ -129,9 +166,12 @@ public class ExplorerController extends SubController implements
 				}
 			}
 			
-			Float[] angles = (Float[])list.toArray();
-			//TODO:
-			return null;
+			float[] floatList = new float[list.size()];
+			for(int i=0;i<=list.size();i++){
+				floatList[i] = list.get(i);
+			}
+			
+			return floatList;
 		}
 		
 		//Adds tiles to the queue if the edge in its direction is open and it is not explored yet
@@ -140,7 +180,7 @@ public class ExplorerController extends SubController implements
 			
 			for(Orientation direction : Orientation.values()){
 				if(givenTile.getEdgeAt(direction).getType() == Edge.EdgeType.OPEN){
-					neighborTile = getMaze().getNeighbor(givenTile, direction);
+					neighborTile = getMaze().getOrCreateNeighbor(givenTile, direction);
 					// reject the new paths with loops;
 					if(!neighborTile.isExplored()){
 						// add the new paths to front of QUEUE;
@@ -151,7 +191,7 @@ public class ExplorerController extends SubController implements
 		}
 		
 		//Drives to the given tile
-		private void driveTo(Tile tile){
+		private void driveTo(Tile start, Tile end){
 			//Matthias
 		}
 		

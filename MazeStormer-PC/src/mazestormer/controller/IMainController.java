@@ -26,4 +26,6 @@ public interface IMainController {
 
 	public void register(EventSource eventSource);
 
+	IExplorerController explorerControl();
+
 }

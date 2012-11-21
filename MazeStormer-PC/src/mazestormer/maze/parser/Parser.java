@@ -3,9 +3,8 @@ package mazestormer.maze.parser;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.text.ParseException;
-import java.util.Set;
 
-import mazestormer.maze.Edge;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
@@ -19,7 +18,7 @@ public class Parser {
 	 * Create a new parser which outputs to the given maze.
 	 * 
 	 * @param maze
-	 * 			The output maze.
+	 *            The output maze.
 	 */
 	public Parser(Maze maze) {
 		this.maze = checkNotNull(maze);
@@ -36,10 +35,10 @@ public class Parser {
 	 * Parse the given source into the output maze.
 	 * 
 	 * @param source
-	 * 			The source text.
+	 *            The source text.
 	 * 
 	 * @throws ParseException
-	 * 			If the source was invalid.
+	 *             If the source was invalid.
 	 */
 	public void parse(CharSequence source) throws ParseException {
 		Maze maze = getMaze();
@@ -58,11 +57,15 @@ public class Parser {
 				TileToken token = tokenizer.getTileToken(x == 0);
 				// Get position
 				LongPoint position = new LongPoint(x, y);
-				// Add edges
+				// Set edges
 				Tile tile = maze.getTileAt(position);
-				Set<Orientation> edgeOrientations = token.getType().getEdges(token.getOrientation());
-				for (Orientation edgeOrientation : edgeOrientations) {
-					maze.addEdge(new Edge(tile.getPosition(), edgeOrientation));
+				for (Orientation orientation : token.getType().getWalls(
+						token.getOrientation())) {
+					maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
+				}
+				for (Orientation orientation : token.getType().getOpenings(
+						token.getOrientation())) {
+					maze.setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
 				}
 				// TODO Add barcode
 				// maze.getTileAt(position).setBarcode(token.getBarcode())
