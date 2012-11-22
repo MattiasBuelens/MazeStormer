@@ -11,13 +11,62 @@ public class TileSequenceRunner implements Runnable {
 	private Tile goal;
 	private Tile[] tiles;
 	private int i = 1;
+	private boolean isRunning = false;
 
+	/**
+	 * Create a new tile sequence runner with given robot, maze and goal tile.
+	 * 
+	 * @param 	robot
+	 * 			The robot who must follow a tile sequence.
+	 * @param 	maze
+	 * 			The maze the robot is positioned in.
+	 * @param 	tiles
+	 * 			The tile sequence the robot must follow.
+	 */
 	public TileSequenceRunner(Robot robot, Maze maze, Tile goal) {
 		this.robot = robot;
 		this.maze = maze;
 		this.goal = goal;
 		
 		this.tiles = this.maze.getMesh(true).findTilePath(getStartTile(), this.goal);
+	}
+	
+	/**
+	 * Create a new tile sequence runner with given robot, maze and tile sequence.
+	 * 
+	 * @pre		If the tile sequence doesn't refer the null reference, the robot's
+	 * 			current tile must be the first tile in the sequence.
+	 * @pre		If the tile sequence doesn't refer the null reference, every two
+	 * 			consecutive tiles must be located next to each other in a four way grid
+	 * 			structure. (North, East, South, West)
+	 * @param 	robot
+	 * 			The robot who must follow a tile sequence.
+	 * @param 	maze
+	 * 			The maze the robot is positioned in.
+	 * @param 	tiles
+	 * 			The tile sequence the robot must follow.
+	 */
+	public TileSequenceRunner(Robot robot, Maze maze, Tile[] tiles) {
+		this.robot = robot;
+		this.maze = maze;
+		this.goal = goal;
+		this.tiles = tiles;
+	}	
+	
+	public void start() {
+		this.isRunning = true;
+		new Thread(this).start();
+	}
+
+	public void stop() {
+		if (isRunning()) {
+			this.isRunning = false;
+			this.robot.getPilot().stop();
+		}
+	}
+
+	public synchronized boolean isRunning() {
+		return this.isRunning;
 	}
 	
 	private Tile getStartTile() {
