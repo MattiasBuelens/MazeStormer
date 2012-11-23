@@ -92,7 +92,7 @@ public class TileSequenceRunner implements Runnable {
 		this.navigator.followPath();
 	}
 	
-	public void addWayPoints(){
+	private void addWayPoints(){
 		if(this.tiles != null)
 			for(int i=0; i<this.tiles.length; i++){
 				Point tilePosition = this.tiles[i].getPosition().toPoint();
