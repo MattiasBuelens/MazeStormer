@@ -17,7 +17,7 @@ public class Mesh {
 		Mesh mesh = new Mesh(new Maze());
 		mesh.setUpTest();
 		mesh.generateNodes();
-		mesh.findPath();
+		mesh.findPath();		
 	}
 
 	@Deprecated

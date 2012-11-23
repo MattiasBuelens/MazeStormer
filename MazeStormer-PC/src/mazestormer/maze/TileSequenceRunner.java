@@ -1,7 +1,9 @@
 package mazestormer.maze;
 
 import lejos.geom.Point;
+import lejos.robotics.navigation.Navigator;
 import lejos.robotics.navigation.Pose;
+import lejos.robotics.navigation.Waypoint;
 import mazestormer.robot.Robot;
 
 public class TileSequenceRunner implements Runnable {
@@ -10,7 +12,7 @@ public class TileSequenceRunner implements Runnable {
 	private Maze maze;
 	private Tile goal;
 	private Tile[] tiles;
-	private int i = 1;
+	private Navigator navigator;
 	private boolean isRunning = false;
 
 	/**
@@ -27,8 +29,8 @@ public class TileSequenceRunner implements Runnable {
 		this.robot = robot;
 		this.maze = maze;
 		this.goal = goal;
-		
 		this.tiles = this.maze.getMesh(true).findTilePath(getStartTile(), this.goal);
+		initializeNavigator();
 	}
 	
 	/**
@@ -49,9 +51,16 @@ public class TileSequenceRunner implements Runnable {
 	public TileSequenceRunner(Robot robot, Maze maze, Tile[] tiles) {
 		this.robot = robot;
 		this.maze = maze;
-		this.goal = goal;
 		this.tiles = tiles;
-	}	
+		this.goal = this.tiles[this.tiles.length-1];
+		initializeNavigator();
+	}
+	
+	private void initializeNavigator(){
+		this.navigator = new Navigator(this.robot.getPilot());
+		this.navigator.setPoseProvider(this.robot.getPoseProvider());
+		addWayPoints();
+	}
 	
 	public void start() {
 		this.isRunning = true;
@@ -78,40 +87,20 @@ public class TileSequenceRunner implements Runnable {
 		return this.maze.getTileAt(tilePosition);
 	}
 	
-	
 	@Override
 	public void run() {
-		if (this.tiles != null) {
-			while (this.i<this.tiles.length) {
-				runStep();
+		this.navigator.followPath();
+	}
+	
+	public void addWayPoints(){
+		if(this.tiles != null)
+			for(int i=0; i<this.tiles.length; i++){
+				Point tilePosition = this.tiles[i].getPosition().toPoint();
+				Point absolutePosition = this.maze.toAbsolute(tilePosition);
+				Waypoint w = new Waypoint((absolutePosition.x+0.5)*this.maze.getTileSize(),
+						(absolutePosition.y+0.5)*this.maze.getTileSize());
+				this.navigator.addWaypoint(w);
 			}
-		}
-	}
-	
-	public void runStep() {
-		if (this.tiles != null && this.i<this.tiles.length) {
-			turnToTile(this.tiles[i-1], this.tiles[i]);
-			move();
-			i++;
-		}
-	}
-	
-	// TODO: current orientation of the robot
-	private void turnToTile(Tile from, Tile to) {
-		double angle = 0;
-		if (from.getX()+1 == to.getX())
-			angle = 0;
-		else if (from.getX()-1 == to.getX())
-			angle = 0;
-		else if (from.getY()+1 == to.getY())
-			angle = 0;
-		else if (from.getY()-1 == to.getY())
-			angle = 0;
-		this.robot.getPilot().rotate(angle, false);
-	}
-	
-	private void move() {
-		this.robot.getPilot().travel(this.maze.getTileSize(), false);
 	}
 
 }
