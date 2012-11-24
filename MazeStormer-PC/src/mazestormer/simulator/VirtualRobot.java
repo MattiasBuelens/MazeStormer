@@ -4,6 +4,7 @@ import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.condition.Condition;
+import mazestormer.condition.ConditionFuture;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
@@ -22,15 +23,20 @@ public class VirtualRobot implements Robot {
 	private RangeScannerFeatureDetector detector;
 	private SoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
+	private final VirtualCollisionDetector collisionDetector;
 	private final CollisionObserver collisionObserver;
-	private VirtualCollisionDetector collisionDetector;
+	private final VirtualConditionResolvers conditionResolvers;
 
 	private final Maze maze;
 
 	public VirtualRobot(Maze maze) {
 		this.maze = maze;
+
+		this.collisionDetector = new VirtualCollisionDetector(maze, getPoseProvider());
 		this.collisionObserver = new CollisionObserver(this);
 		collisionObserver.start();
+
+		this.conditionResolvers = new VirtualConditionResolvers(this);
 	}
 
 	@Override
@@ -83,9 +89,6 @@ public class VirtualRobot implements Robot {
 	}
 
 	public VirtualCollisionDetector getCollisionDetector() {
-		if (collisionDetector == null)
-			collisionDetector = new VirtualCollisionDetector(maze,
-					getPoseProvider());
 		return collisionDetector;
 	}
 
@@ -95,12 +98,13 @@ public class VirtualRobot implements Robot {
 
 	@Override
 	public CommandBuilder when(Condition condition) {
-		// TODO Auto-generated method stub
-		return null;
+		ConditionFuture future = conditionResolvers.resolve(condition);
+		return new VirtualCommandBuilder(this, future);
 	}
 
 	@Override
 	public void terminate() {
 		pilot.terminate();
 	}
+
 }
