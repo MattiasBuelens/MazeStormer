@@ -22,9 +22,9 @@ import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 
+import mazestormer.barcode.Threshold;
 import mazestormer.controller.EventType;
 import mazestormer.controller.IBarcodeController;
-import mazestormer.controller.Threshold;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JSpinner;
 

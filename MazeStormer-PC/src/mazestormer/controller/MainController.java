@@ -17,7 +17,6 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
-import mazestormer.maze.Tile;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.simulator.VirtualRobot;
@@ -49,8 +48,7 @@ public class MainController implements IMainController {
 	/*
 	 * Events
 	 */
-	private EventBus eventBus = new AsyncEventBus(getClass().getSimpleName(),
-			Executors.newSingleThreadExecutor());
+	private EventBus eventBus = new AsyncEventBus(getClass().getSimpleName(), Executors.newSingleThreadExecutor());
 
 	/*
 	 * Models
@@ -177,7 +175,7 @@ public class MainController implements IMainController {
 		}
 		return lineFinderControl;
 	}
-	
+
 	@Override
 	public IExplorerController explorerControl() {
 		if (explorerControl == null) {
@@ -314,20 +312,22 @@ public class MainController implements IMainController {
 		}
 
 	}
-	
+
 	@Subscribe
 	public void registerCollisionListener(ConnectEvent e) {
-		if(e.isConnected() && getRobot() instanceof VirtualRobot) {
+		/*
+		 * TODO Remove explicit cast to VirtualRobot by defining the collision
+		 * detector and observer on the Robot interface. PhysicalRobot should
+		 * provide a physical collision detector or a dummy implementation.
+		 */
+		if (e.isConnected() && getRobot() instanceof VirtualRobot) {
 			VirtualRobot vRobot = (VirtualRobot) getRobot();
-			vRobot.getCollisionObserver().addCollisionListener(new CollisionPublisher());
-		}
-	}
-	
-	private class CollisionPublisher implements CollisionListener {
-		
-		@Override
-		public void brutalCrashOccured() {
-			getLogger().severe("A collision occured, please retreat.");
+			vRobot.getCollisionObserver().addCollisionListener(new CollisionListener() {
+				@Override
+				public void brutalCrashOccured() {
+					getLogger().severe("A collision occured, please retreat.");
+				}
+			});
 		}
 	}
 

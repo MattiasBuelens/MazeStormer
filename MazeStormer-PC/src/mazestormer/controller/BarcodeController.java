@@ -2,9 +2,11 @@ package mazestormer.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.IAction;
+import mazestormer.barcode.Threshold;
 import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
@@ -15,8 +17,8 @@ import mazestormer.robot.Robot;
 
 public class BarcodeController extends SubController implements IBarcodeController {
 	private static final double START_BAR_LENGTH = 1.8; // [cm]
-	private static final double BAR_LENGTH = 1.85; 		// [cm]
-	private static final int NUMBER_OF_BARS = 6; 		// without black start bars
+	private static final double BAR_LENGTH = 1.85; // [cm]
+	private static final int NUMBER_OF_BARS = 6; // without black start bars
 
 	private static final int BLACK_THRESHOLD = 50;
 
@@ -30,7 +32,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 	private Robot getRobot() {
 		return getMainController().getRobot();
 	}
-	
+
 	private void log(String logText) {
 		getMainController().getLogger().info(logText);
 	}
@@ -104,7 +106,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 	}
-	
+
 	@Override
 	public void startScan() {
 		this.barcodeRunner = new BarcodeRunner();
@@ -118,9 +120,9 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			this.barcodeRunner = null;
 		}
 	}
-	
-	private double scanTravelSpeed = 2; 	// [cm/sec]
-	
+
+	private double scanTravelSpeed = 2; // [cm/sec]
+
 	public double getScantravelSpeed() {
 		return this.scanTravelSpeed;
 	}
@@ -153,6 +155,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		public void stop() {
 			if (isRunning()) {
 				this.isRunning = false;
+				this.handle.cancel();
 				this.pilot.stop();
 				postState(EventType.SCAN_STOPPED);
 			}
@@ -163,8 +166,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void onBlack(final Runnable action) {
-			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
 			this.handle = getRobot().when(condition).stop().run(action).build();
 		}
 
@@ -226,15 +228,13 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void onTrespassNewBlack(final Runnable action) {
-			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_SMALLER_THAN,
+			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
 					Threshold.WHITE_BLACK.getThresholdValue());
 			this.handle = getRobot().when(condition).run(action).build();
 		}
 
 		private void onTrespassNewWhite(final Runnable action) {
-			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_GREATER_THAN,
+			Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
 					Threshold.BLACK_WHITE.getThresholdValue());
 			this.handle = getRobot().when(condition).run(action).build();
 		}
@@ -243,9 +243,9 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			this.newPose = getRobot().getPoseProvider().getPose();
 			this.distances.add(getPoseDiff(oldPose, newPose));
 			this.oldPose = newPose;
-			this.blackToWhite = (blackToWhite == true) ? false : true;
+			this.blackToWhite = !blackToWhite;
 
-			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1)* BAR_LENGTH) {
+			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1) * BAR_LENGTH) {
 				loop();
 			} else {
 				this.pilot.stop();
@@ -256,8 +256,8 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void encodeBarcode() {
-			this.barcode = convertToByte(convertToBitArray(distances));
-			log("Scanned barcode: " + Integer.toBinaryString((int) this.barcode));
+			this.barcode = (byte) readBarcode(distances);
+			log("Scanned barcode: " + Integer.toBinaryString(this.barcode));
 		}
 
 		private void decodeBarcode() {
@@ -265,45 +265,49 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 	}
 
-	private static byte convertToByte(int[] request) {
-		int temp = 0;
-		for (int i = request.length - 1; i > 0; i--)
-			temp = (temp + request[i]) * 2;
-		temp = temp + request[0];
-		return ((Integer) temp).byteValue();
-	}
-
 	private static float getPoseDiff(Pose one, Pose two) {
+		/*
+		 * TODO @Matthias Perhaps we just need:
+		 * one.getLocation().distance(two.getLocation()) ?
+		 */
 		float diffX = Math.abs(one.getX() - two.getX());
 		float diffY = Math.abs(one.getY() - two.getY());
-		if (diffX > diffY)
-			return diffX;
-		return diffY;
+		return Math.max(diffX, diffY);
 	}
 
-	private static float getTotalSum(List<Float> request) {
-		float temp = 0;
-		for (int i = 0; i < request.size(); i++)
-			temp = temp + request.get(i);
-		return temp;
+	private static float getTotalSum(Iterable<Float> values) {
+		float sum = 0;
+		for (float value : values) {
+			sum += value;
+		}
+		return sum;
 	}
 
-	private static int[] convertToBitArray(List<Float> request) {
-		int[] values = new int[NUMBER_OF_BARS];
+	private static int readBarcode(List<Float> distances) {
+		int result = 0;
 		int index = NUMBER_OF_BARS - 1;
-		for (int i = 0; index >= 0 && i < request.size(); i++) {
-			float d = request.get(i);
-			int x = (i == 0) ? 1 : 0;
-			int a = ((Double) (Math.max(
-					((d - START_BAR_LENGTH * x) / BAR_LENGTH), 1 - x)))
-					.intValue();
-			for (int j = 0; j < a; j++) {
-				if (index >= 0) {
-					values[index] = Math.abs(i % 2);
-					index--;
-				}
+		// Iterate over distances until barcode complete
+		ListIterator<Float> it = distances.listIterator();
+		while (it.hasNext() && index >= 0) {
+			int i = it.nextIndex();
+			float distance = it.next();
+			int at;
+			if (i == 0) {
+				// First bar
+				at = (int) Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH, 0);
+			} else {
+				// Other bars
+				at = (int) Math.max(distance / BAR_LENGTH, 1);
+			}
+			// Odd indices are white, even indices are white
+			int barBit = i & 1; // == i % 2
+			// Set bit from index to index-a
+			for (int j = 0; j < at && index >= 0; j++) {
+				result |= barBit << index;
+				index--;
 			}
 		}
-		return values;
+		return result;
 	}
+
 }
