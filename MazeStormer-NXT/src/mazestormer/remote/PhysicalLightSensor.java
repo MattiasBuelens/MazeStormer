@@ -36,10 +36,6 @@ public class PhysicalLightSensor extends LightSensor implements
 		setup();
 	}
 
-	public PhysicalLightSensor(NXTCommunicator communicator) {
-		this(communicator, SensorPort.S1);
-	}
-
 	private void setup() {
 		// Add as port listener
 		SensorPortListeners.get(port).addSensorPortListener(this);

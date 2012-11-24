@@ -6,8 +6,8 @@ import mazestormer.command.Command;
 import mazestormer.command.CommandType;
 import mazestormer.command.LightCalibrateCommand;
 import mazestormer.command.LightFloodlightCommand;
+import mazestormer.robot.AbstractCalibratedLightSensor;
 import mazestormer.robot.Robot;
-import mazestormer.simulator.AbstractCalibratedLightSensor;
 import mazestormer.util.Future;
 
 public class RemoteLightSensor extends AbstractCalibratedLightSensor {
@@ -43,7 +43,7 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 	@Override
 	public int getNormalizedLightValue() {
 		try {
-			return lightValueRequester.request().get(1000);
+			return lightValueRequester.request().get(RemoteRobot.requestTimeout);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
@@ -64,8 +64,7 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 
 	@Override
 	public void setFloodlight(boolean floodlight) {
-		send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT,
-				floodlight));
+		send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT, floodlight));
 	}
 
 	@Override
@@ -89,6 +88,11 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 		return false;
 	}
 
+	@Override
+	public float getSensorRadius() {
+		return Robot.sensorRadius;
+	}
+
 	public static class LightValueRequester extends ReportRequester<Integer> {
 
 		public LightValueRequester(RemoteCommunicator communicator) {
@@ -99,11 +103,6 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 			return request(CommandType.LIGHT_READ);
 		}
 
-	}
-
-	@Override
-	public float getSensorRadius() {
-		return Robot.sensorRadius;
 	}
 
 }

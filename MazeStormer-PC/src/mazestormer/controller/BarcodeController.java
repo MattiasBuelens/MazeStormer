@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.barcode.ActionType;
 import mazestormer.barcode.IAction;
+import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
 import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
@@ -42,8 +44,8 @@ public class BarcodeController extends SubController implements IBarcodeControll
 	}
 
 	@Override
-	public void startAction(String action) {
-		this.actionRunner = new ActionRunner(getAction(action));
+	public void startAction(ActionType actionType) {
+		this.actionRunner = new ActionRunner(getAction(actionType));
 		this.actionRunner.start();
 	}
 
@@ -55,20 +57,8 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 	}
 
-	private static IAction getAction(String action) {
-		if (ACTIONS[0].equals(action))
-			return new mazestormer.barcode.SoundAction();
-		if (ACTIONS[1].equals(action))
-			return new mazestormer.barcode.RotateClockwiseAction();
-		if (ACTIONS[2].equals(action))
-			return new mazestormer.barcode.RotateCounterClockwiseAction();
-		if (ACTIONS[3].equals(action))
-			return new mazestormer.barcode.HighSpeedAction();
-		if (ACTIONS[4].equals(action))
-			return new mazestormer.barcode.LowSpeedAction();
-		if (ACTIONS[5].equals(action))
-			return new mazestormer.barcode.WaitAction();
-		return mazestormer.barcode.NoAction.getInstance();
+	private static IAction getAction(ActionType actionType) {
+		return (actionType != null) ? actionType.build() : new NoAction();
 	}
 
 	private class ActionRunner implements Runnable {

@@ -1,4 +1,4 @@
-package mazestormer.simulator;
+package mazestormer.robot;
 
 import mazestormer.robot.CalibratedLightSensor;
 

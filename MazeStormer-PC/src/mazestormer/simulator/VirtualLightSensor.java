@@ -6,6 +6,7 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.robot.AbstractCalibratedLightSensor;
 import mazestormer.robot.Robot;
 
 public class VirtualLightSensor extends AbstractCalibratedLightSensor {
