@@ -259,6 +259,11 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		/*
 		 * TODO @Matthias Perhaps we just need:
 		 * one.getLocation().distance(two.getLocation()) ?
+		 * TODO @Mattias 	Kan ook maar hiervoor moet 1) de bar_length en start_bar_length
+		 * 					aangepast worden rekening houdende met de hoek van de robot
+		 * 					ten opzichte van de barcode en 2) een formule gevonden worden voor
+		 * 					this.pilot.travel(-START_BAR_LENGTH / 2, false) algemeen geldend te maken.
+		 * 					Hierna is het dan mogelijk om schuin ook barcodes te lezen.
 		 */
 		float diffX = Math.abs(one.getX() - two.getX());
 		float diffY = Math.abs(one.getY() - two.getY());
@@ -289,7 +294,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 				// Other bars
 				at = (int) Math.max(distance / BAR_LENGTH, 1);
 			}
-			// Odd indices are white, even indices are white
+			// Odd indices are white, even indices are black
 			int barBit = i & 1; // == i % 2
 			// Set bit from index to index-a
 			for (int j = 0; j < at && index >= 0; j++) {
