@@ -17,7 +17,6 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
-import mazestormer.maze.Tile;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.simulator.VirtualRobot;
@@ -71,6 +70,7 @@ public class MainController implements IMainController {
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
 	private IBarcodeController barcodeControl;
+	private IPathFindingController pathFindingControl;
 	private ILineFinderController lineFinderControl;
 	private IExplorerController explorerControl;
 
@@ -168,6 +168,14 @@ public class MainController implements IMainController {
 			barcodeControl = new BarcodeController(this);
 		}
 		return barcodeControl;
+	}
+	
+	@Override
+	public IPathFindingController pathFindingControl() {
+		if (pathFindingControl == null) {
+			pathFindingControl = new PathFindingController(this);
+		}
+		return pathFindingControl;
 	}
 
 	@Override
