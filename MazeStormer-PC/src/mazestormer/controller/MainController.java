@@ -69,6 +69,7 @@ public class MainController implements IMainController {
 	private IManualControlController manualControl;
 	private IPolygonControlController polygonControl;
 	private IBarcodeController barcodeControl;
+	private IPathFindingController pathFindingControl;
 	private ILineFinderController lineFinderControl;
 	private IExplorerController explorerControl;
 
@@ -166,6 +167,14 @@ public class MainController implements IMainController {
 			barcodeControl = new BarcodeController(this);
 		}
 		return barcodeControl;
+	}
+	
+	@Override
+	public IPathFindingController pathFindingControl() {
+		if (pathFindingControl == null) {
+			pathFindingControl = new PathFindingController(this);
+		}
+		return pathFindingControl;
 	}
 
 	@Override

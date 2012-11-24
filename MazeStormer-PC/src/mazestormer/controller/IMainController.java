@@ -15,6 +15,8 @@ public interface IMainController {
 	public IPolygonControlController polygonControl();
 
 	public IBarcodeController barcodeControl();
+	
+	public IPathFindingController pathFindingControl();
 
 	public ILineFinderController lineFinderControl();
 
