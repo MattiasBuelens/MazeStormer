@@ -44,7 +44,7 @@ public class PathFindingPanel extends ViewPanel {
 	private SpinnerNumberModel yModel;
 	private SpinnerNumberModel xModel;
 	
-	public PathFindingPanel(IPathFindingController controller){
+	public PathFindingPanel(IPathFindingController controller) {
 		this.controller = controller;
 		
 		setBorder(new TitledBorder(null, "Path Finder", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -57,7 +57,7 @@ public class PathFindingPanel extends ViewPanel {
 		createActionButtons();
 		createCoordinates();
 
-		if(!Beans.isDesignTime())
+		if (!Beans.isDesignTime())
 			registerController();
 	}
 	
@@ -66,7 +66,7 @@ public class PathFindingPanel extends ViewPanel {
 		setActionButtonState(false);
 	}
 	
-	private void createActionButtons(){
+	private void createActionButtons() {
 		JPanel buttons = new JPanel();
 		this.container.add(buttons, "cell 0 0 3 1,grow");
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -90,7 +90,7 @@ public class PathFindingPanel extends ViewPanel {
 		buttons.add(this.btnAddSourceMaze);
 	}
 	
-	private void createCoordinates(){
+	private void createCoordinates() {
 		JLabel lblCurrent = new JLabel("Current tile coordinates (X,Y)");
 		this.container.add(lblCurrent, "cell 0 1");
 		
@@ -116,17 +116,17 @@ public class PathFindingPanel extends ViewPanel {
 		this.container.add(ySpinner, "cell 2 2,growx");
 	}
 	
-	public void update(){
+	public void update() {
 		updateCurrentCoordinates();
 		updatePossibleGoalCoordinates();
 	}
 	
-	private void updateCurrentCoordinates(){
+	private void updateCurrentCoordinates() {
 		this.lblX.setText(""+ this.controller.getCurrentTileX());
 		this.lblY.setText(""+ this.controller.getCurrentTileY());
 	}
 	
-	private void updatePossibleGoalCoordinates(){
+	private void updatePossibleGoalCoordinates() {
 		this.xModel.setMinimum((int) this.controller.getTileMinX());
 		this.xModel.setMaximum((int) this.controller.getTileMaxX());
 		this.yModel.setMinimum((int) this.controller.getTileMinY());
@@ -136,27 +136,31 @@ public class PathFindingPanel extends ViewPanel {
 		this.yModel.setValue((int) this.controller.getCurrentTileY());
 	}
 	
-	public void startAction(){
+	public void startAction() {
 		this.controller.startAction((int) this.xModel.getValue(), (int) this.yModel.getValue());
 	}
 
-	public void stopAction(){
+	public void stopAction() {
 		this.controller.stopAction();
 	}
 
-	private void setActionButtonState(boolean isRunning){
+	private void setActionButtonState(boolean isRunning) {
 		this.btnStartAction.setEnabled(!isRunning);
 		this.btnStopAction.setEnabled(isRunning);
 	}
 	
-	public void addSourceMazeAction(){
+	public void addSourceMazeAction() {
 		this.controller.addSourceMaze();
 		update();
 	}
 	
 	@Subscribe
-	public void onActionEvent(mazestormer.controller.ActionEvent e){
+	public void onActionEvent(mazestormer.controller.ActionEvent e) {
 		setActionButtonState(e.getEventType() == EventType.STARTED);
+		
+		if(e.getEventType() == EventType.STOPPED) {
+			updateCurrentCoordinates();
+		}
 	}
 	
 	private class StartAction extends AbstractAction {
