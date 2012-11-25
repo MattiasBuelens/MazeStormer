@@ -191,6 +191,8 @@ public class PathFindingController extends SubController implements IPathFinding
 		@Override
 		public void run() {
 			this.navigator.followPath();
+			this.navigator.waitForStop();
+			stop();
 		}
 		
 		private void addWayPoints(){
