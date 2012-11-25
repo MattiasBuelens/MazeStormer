@@ -95,7 +95,6 @@ public class Maze extends AbstractEventSource {
 		if (tile == null) {
 			// Create tile
 			tile = createTile(tilePosition);
-			updateMinMax(tile);
 		}
 		return tile;
 	}
@@ -116,6 +115,7 @@ public class Maze extends AbstractEventSource {
 
 		// Fire tile added event
 		fireTileAdded(tile);
+		updateMinMax(tile);
 		return tile;
 	}
 	
