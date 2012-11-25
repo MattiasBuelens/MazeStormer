@@ -14,22 +14,24 @@ import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
+import mazestormer.robot.Runner;
+import mazestormer.robot.RunnerTask;
 
 public class BarcodeController extends SubController implements IBarcodeController {
 	private static final double START_BAR_LENGTH = 1.8; // [cm]
 	private static final double BAR_LENGTH = 1.85; // [cm]
 	private static final int NUMBER_OF_BARS = 6; // without black start bars
-
 	private static final int BLACK_THRESHOLD = 50;
+
+	private ActionRunner actionRunner;
+	private BarcodeRunner runner;
+
+	private double scanTravelSpeed = 2; // [cm/sec]
 
 	public BarcodeController(MainController mainController) {
 		super(mainController);
 	}
-
-	private ActionRunner actionRunner;
-	private BarcodeRunner barcodeRunner;
 
 	private Robot getRobot() {
 		return getMainController().getRobot();
@@ -99,21 +101,19 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 	@Override
 	public void startScan() {
-		this.barcodeRunner = new BarcodeRunner();
-		this.barcodeRunner.start();
+		this.runner = new BarcodeRunner();
+		this.runner.start();
 	}
 
 	@Override
 	public void stopScan() {
-		if (this.barcodeRunner != null) {
-			this.barcodeRunner.stop();
-			this.barcodeRunner = null;
+		if (this.runner != null) {
+			this.runner.cancel();
+			this.runner = null;
 		}
 	}
 
-	private double scanTravelSpeed = 2; // [cm/sec]
-
-	public double getScantravelSpeed() {
+	public double getScanSpeed() {
 		return this.scanTravelSpeed;
 	}
 
@@ -122,57 +122,12 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		this.scanTravelSpeed = speed;
 	}
 
-	private class BarcodeRunner implements Runnable {
+	private class BarcodeRunner extends Runner {
 
-		private final Pilot pilot;
 		private final CalibratedLightSensor light;
-		private boolean isRunning = false;
 		private CommandHandle handle;
 
 		private double originalTravelSpeed;
-
-		public BarcodeRunner() {
-			this.pilot = getRobot().getPilot();
-			this.light = getRobot().getLightSensor();
-		}
-
-		public void start() {
-			this.isRunning = true;
-			new Thread(this).start();
-			postState(EventType.SCAN_STARTED);
-		}
-
-		public void stop() {
-			if (isRunning()) {
-				this.isRunning = false;
-				this.handle.cancel();
-				this.pilot.stop();
-				postState(EventType.SCAN_STOPPED);
-			}
-		}
-
-		public synchronized boolean isRunning() {
-			return this.isRunning;
-		}
-
-		private void onBlack(final Runnable action) {
-			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
-			this.handle = getRobot().when(condition).stop().run(action).build();
-		}
-
-		@Override
-		public void run() {
-			this.originalTravelSpeed = this.pilot.getTravelSpeed();
-			this.light.setFloodlight(true);
-			this.pilot.forward();
-			log("Start looking for black line.");
-			onBlack(new Runnable() {
-				@Override
-				public void run() {
-					onBlackBackward();
-				}
-			});
-		}
 
 		private Pose oldPose;
 		private Pose newPose;
@@ -180,19 +135,65 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		private List<Float> distances = new ArrayList<Float>();
 		private byte barcode;
 
+		public BarcodeRunner() {
+			super(getRobot().getPilot());
+			light = getRobot().getLightSensor();
+		}
+
+		public void onStarted() {
+			super.onStarted();
+
+			// Post state
+			postState(EventType.SCAN_STARTED);
+		}
+
+		public void onCancelled() {
+			super.onCancelled();
+
+			// Cancel condition handle
+			if (handle != null)
+				handle.cancel();
+
+			// Restore original speed
+			getPilot().setTravelSpeed(originalTravelSpeed);
+
+			// Post state
+			postState(EventType.SCAN_STOPPED);
+		}
+
+		private void onBlack(final RunnerTask task) {
+			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+			this.handle = getRobot().when(condition).stop().run(wrap(task)).build();
+		}
+
+		@Override
+		public void run() {
+			originalTravelSpeed = getTravelSpeed();
+			light.setFloodlight(true);
+			forward();
+			log("Start looking for black line.");
+			onBlack(new RunnerTask() {
+				@Override
+				public void run() {
+					onBlackBackward();
+				}
+			});
+		}
+
 		private void onBlackBackward() {
 			log("Go to the begin of the barcode zone.");
-			this.pilot.setTravelSpeed(getScantravelSpeed());
-			this.pilot.travel(-START_BAR_LENGTH / 2, false);
-			this.oldPose = getRobot().getPoseProvider().getPose();
-			this.blackToWhite = true;
+			setTravelSpeed(getScanSpeed());
+			travel(-START_BAR_LENGTH / 2);
 
-			this.pilot.forward();
+			oldPose = getRobot().getPoseProvider().getPose();
+			blackToWhite = true;
+
+			forward();
 			loop();
 		}
 
 		private void loop() {
-			if (this.blackToWhite) {
+			if (blackToWhite) {
 				onTrespassBW();
 			} else {
 				onTrespassWB();
@@ -200,7 +201,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void onTrespassBW() {
-			onTrespassNewWhite(new Runnable() {
+			onTrespassNewWhite(new RunnerTask() {
 				@Override
 				public void run() {
 					onChange();
@@ -209,7 +210,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void onTrespassWB() {
-			onTrespassNewBlack(new Runnable() {
+			onTrespassNewBlack(new RunnerTask() {
 				@Override
 				public void run() {
 					onChange();
@@ -217,36 +218,38 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			});
 		}
 
-		private void onTrespassNewBlack(final Runnable action) {
+		private void onTrespassNewBlack(final RunnerTask task) {
 			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
 					Threshold.WHITE_BLACK.getThresholdValue());
-			this.handle = getRobot().when(condition).run(action).build();
+			handle = getRobot().when(condition).run(wrap(task)).build();
 		}
 
-		private void onTrespassNewWhite(final Runnable action) {
+		private void onTrespassNewWhite(final RunnerTask task) {
 			Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
 					Threshold.BLACK_WHITE.getThresholdValue());
-			this.handle = getRobot().when(condition).run(action).build();
+			handle = getRobot().when(condition).run(wrap(task)).build();
 		}
 
 		private void onChange() {
-			this.newPose = getRobot().getPoseProvider().getPose();
-			this.distances.add(getPoseDiff(oldPose, newPose));
-			this.oldPose = newPose;
-			this.blackToWhite = !blackToWhite;
+			newPose = getRobot().getPoseProvider().getPose();
+			distances.add(getPoseDiff(oldPose, newPose));
+			oldPose = newPose;
+			blackToWhite = !blackToWhite;
 
-			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1) * BAR_LENGTH) {
+			if (getTotalSum(distances) <= (NUMBER_OF_BARS + 1) * BAR_LENGTH) {
+				// Iterate
 				loop();
 			} else {
-				this.pilot.stop();
-				this.pilot.setTravelSpeed(this.originalTravelSpeed);
+				// Done
+				cancel();
+				// Read barcode
 				encodeBarcode();
 				decodeBarcode();
 			}
 		}
 
 		private void encodeBarcode() {
-			this.barcode = (byte) readBarcode(distances);
+			barcode = (byte) readBarcode(distances);
 			log("Scanned barcode: " + Integer.toBinaryString(this.barcode));
 		}
 
@@ -258,12 +261,12 @@ public class BarcodeController extends SubController implements IBarcodeControll
 	private static float getPoseDiff(Pose one, Pose two) {
 		/*
 		 * TODO @Matthias Perhaps we just need:
-		 * one.getLocation().distance(two.getLocation()) ?
-		 * TODO @Mattias 	Kan ook maar hiervoor moet 1) de bar_length en start_bar_length
-		 * 					aangepast worden rekening houdende met de hoek van de robot
-		 * 					ten opzichte van de barcode en 2) een formule gevonden worden voor
-		 * 					this.pilot.travel(-START_BAR_LENGTH / 2, false) algemeen geldend te maken.
-		 * 					Hierna is het dan mogelijk om schuin ook barcodes te lezen.
+		 * one.getLocation().distance(two.getLocation()) ? TODO @Mattias Kan ook
+		 * maar hiervoor moet 1) de bar_length en start_bar_length aangepast
+		 * worden rekening houdende met de hoek van de robot ten opzichte van de
+		 * barcode en 2) een formule gevonden worden voor
+		 * this.pilot.travel(-START_BAR_LENGTH / 2, false) algemeen geldend te
+		 * maken. Hierna is het dan mogelijk om schuin ook barcodes te lezen.
 		 */
 		float diffX = Math.abs(one.getX() - two.getX());
 		float diffY = Math.abs(one.getY() - two.getY());

@@ -1,8 +1,5 @@
 package mazestormer.controller;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
@@ -10,8 +7,10 @@ import mazestormer.condition.LightCompareCondition;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.LineFinderEvent.EventType;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
+import mazestormer.robot.Runner;
+import mazestormer.robot.RunnerTask;
+import mazestormer.util.CancellationException;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -38,10 +37,6 @@ public class LineFinderController extends SubController implements ILineFinderCo
 		return getMainController().getRobot();
 	}
 
-	private Pilot getPilot() {
-		return getRobot().getPilot();
-	}
-
 	private void log(String logText) {
 		getMainController().getLogger().info(logText);
 	}
@@ -66,7 +61,7 @@ public class LineFinderController extends SubController implements ILineFinderCo
 	@Override
 	public void stopSearching() {
 		if (runner != null) {
-			runner.stop();
+			runner.cancel();
 			runner = null;
 		}
 	}
@@ -75,74 +70,63 @@ public class LineFinderController extends SubController implements ILineFinderCo
 		postEvent(new LineFinderEvent(eventType));
 	}
 
-	private class LineFinderRunner implements Runnable {
+	private class LineFinderRunner extends Runner {
 
-		private final Pilot pilot;
 		private final CalibratedLightSensor light;
-		private boolean isRunning = false;
 		private double lineWidth;
 
 		private CommandHandle handle;
 		private double originalTravelSpeed;
 		private double originalRotateSpeed;
-		private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 		public LineFinderRunner() {
-			this.pilot = getPilot();
+			super(getRobot().getPilot());
 			this.light = getLightSensor();
 		}
 
-		public void start() {
-			isRunning = true;
-			executor.execute(this);
+		public void onStarted() {
+			super.onStarted();
+
+			// Post state
 			postState(EventType.STARTED);
 		}
 
-		public void stop() {
-			if (isRunning()) {
-				isRunning = false;
-				executor.shutdownNow();
-				pilot.stop();
-				postState(EventType.STOPPED);
-			}
-		}
+		public void onCancelled() {
+			super.onCancelled();
 
-		public synchronized boolean isRunning() {
-			return isRunning;
-		}
-
-		private boolean shouldStop() {
-			boolean shouldStop = !isRunning();
-			if (shouldStop) {
+			// Cancel condition handle
+			if (handle != null)
 				handle.cancel();
-				pilot.setTravelSpeed(originalTravelSpeed);
-				pilot.setRotateSpeed(originalRotateSpeed);
-				pilot.stop();
-			}
-			return shouldStop;
+
+			// Restore original speeds
+			getPilot().setTravelSpeed(originalTravelSpeed);
+			getPilot().setRotateSpeed(originalRotateSpeed);
+
+			// Post state
+			postState(EventType.STOPPED);
 		}
 
-		private void onLine(final Runnable action) {
+		private void onLine(final RunnerTask task) {
 			Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
-			handle = getRobot().when(condition).stop().run(action).build();
+			handle = getRobot().when(condition).stop().run(wrap(task)).build();
 		}
 
-		private void offLine(final Runnable action) {
+		private void offLine(final RunnerTask task) {
 			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, threshold);
-			handle = getRobot().when(condition).stop().run(action).build();
+			handle = getRobot().when(condition).stop().run(wrap(task)).build();
 		}
 
 		@Override
-		public void run() {
+		public void run() throws CancellationException {
 			// Save original speeds
-			originalTravelSpeed = pilot.getTravelSpeed();
-			originalRotateSpeed = pilot.getRotateSpeed();
+			originalTravelSpeed = getTravelSpeed();
+			originalRotateSpeed = getRotateSpeed();
 
 			// Travel forward until on line
 			log("Start looking for line.");
-			pilot.setTravelSpeed(fastTravelSpeed);
-			pilot.forward();
-			onLine(new Runnable() {
+			setTravelSpeed(fastTravelSpeed);
+			forward();
+			onLine(new RunnerTask() {
 				@Override
 				public void run() {
 					onFirstLine();
@@ -150,15 +134,13 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			});
 		}
 
-		private void onFirstLine() {
-			if (shouldStop())
-				return;
+		private void onFirstLine() throws CancellationException {
 			log("On line, start looking for end of line.");
 
 			// Travel forward until off line
-			pilot.setTravelSpeed(slowTravelSpeed);
-			pilot.forward();
-			offLine(new Runnable() {
+			setTravelSpeed(slowTravelSpeed);
+			forward();
+			offLine(new RunnerTask() {
 				@Override
 				public void run() {
 					offFirstLine();
@@ -166,32 +148,27 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			});
 		}
 
-		private void offFirstLine() {
-			if (shouldStop())
-				return;
+		private void offFirstLine() throws CancellationException {
 			log("Off line, positioning robot on line edge.");
-			lineWidth = pilot.getMovement().getDistanceTraveled();
+
+			lineWidth = getPilot().getMovement().getDistanceTraveled();
 			double centerOffset = Robot.sensorOffset - light.getSensorRadius();
 			log("Line width: " + lineWidth);
 			log("Offset from center: " + centerOffset);
 
 			// Travel forward to center robot on end of line
-			pilot.setTravelSpeed(fastTravelSpeed);
-			pilot.travel(centerOffset);
-			if (shouldStop())
-				return;
+			setTravelSpeed(fastTravelSpeed);
+			travel(centerOffset);
 
 			// Rotate fixed angle
-			pilot.setRotateSpeed(fastRotateSpeed);
-			pilot.rotate(fastRotateAngle);
-			if (shouldStop())
-				return;
+			setRotateSpeed(fastRotateSpeed);
+			rotate(fastRotateAngle);
 
 			// Rotate until on line
 			log("Start looking for line again.");
-			pilot.setRotateSpeed(slowRotateSpeed);
-			pilot.rotateRight();
-			onLine(new Runnable() {
+			setRotateSpeed(slowRotateSpeed);
+			rotateRight();
+			onLine(new RunnerTask() {
 				@Override
 				public void run() {
 					onSecondLine();
@@ -199,22 +176,37 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			});
 		}
 
-		private void onSecondLine() {
-			if (shouldStop())
-				return;
+		private void onSecondLine() throws CancellationException {
 			log("On line, rotating robot perpendicular to line.");
 
+			/*
+			 * The sensor radius causes the robot to rotate further than the
+			 * actual edge of the line. We can adjust for this by rotating by an
+			 * extra angle.
+			 * 
+			 * This angle corresponds to the central angle (alpha) of a secant
+			 * line in a circle. The circle has a radius of Robot.sensorOffset
+			 * (so) and the secant line has a length of light.getSensorRadius()
+			 * (sr).
+			 * 
+			 * The length of a secant line in a circle given its central angle
+			 * is: sr = 2*so*sin(alpha/2)
+			 * 
+			 * Therefore: alpha = 2*asin(sr/(2*so))
+			 */
+			double sensorAngle = 2 * Math.asin(light.getSensorRadius() / (2 * Robot.sensorOffset));
+			log("Angle adjusting for sensor radius: " + sensorAngle);
+
 			// Position perpendicular to line
-			pilot.setRotateSpeed(fastRotateSpeed);
-			pilot.rotate(90.0);
-			
+			setRotateSpeed(fastRotateSpeed);
+			rotate(90.0 + sensorAngle);
+
 			// Position robot center on center of line
 			log("Positioning on center of line.");
-			pilot.travel(-lineWidth / 2);
+			travel(-lineWidth / 2);
 
-			// Restore original speed
-			pilot.setTravelSpeed(originalTravelSpeed);
-			pilot.setRotateSpeed(originalRotateSpeed);
+			// Done
+			cancel();
 		}
 
 	}
