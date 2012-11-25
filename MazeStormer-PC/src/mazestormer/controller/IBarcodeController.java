@@ -12,6 +12,8 @@ public interface IBarcodeController extends EventSource {
 	public void startScan();
 
 	public void stopScan();
+	
+	public double getScanSpeed();
 
 	public void setScanSpeed(double speed);
 }
