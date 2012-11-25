@@ -1,8 +1,8 @@
 package mazestormer.simulator;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,7 +14,7 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 	private boolean isRunning = false;
 	private boolean isTerminated = false;
 
-	private final Set<Future> futures = new CopyOnWriteArraySet<Future>();
+	private final Set<Future> futures = new HashSet<Future>();
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	public ConditionFuture add(C condition) {
@@ -39,12 +39,16 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 
 	protected void start() {
 		isRunning = true;
+		// Start resolving
 		executor.execute(new Runner());
 	}
 
 	protected void stop() {
 		isRunning = false;
-		executor.shutdownNow();
+		// Cancel any remaining futures
+		for(Future future : futures) {
+			future.cancel(true);
+		}
 	}
 
 	protected boolean isRunning() {
@@ -81,7 +85,7 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 					future.check(value);
 					// Remove if done
 					if (future.isDone())
-						removeFuture(future);
+						it.remove();
 				}
 
 				// Stop if no more futures to check

@@ -34,7 +34,6 @@ public class VirtualRobot implements Robot {
 
 		this.collisionDetector = new VirtualCollisionDetector(maze, getPoseProvider());
 		this.collisionObserver = new CollisionObserver(this);
-		collisionObserver.start();
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
 	}
@@ -105,6 +104,7 @@ public class VirtualRobot implements Robot {
 	@Override
 	public void terminate() {
 		pilot.terminate();
+		collisionObserver.terminate();
 	}
 
 }
