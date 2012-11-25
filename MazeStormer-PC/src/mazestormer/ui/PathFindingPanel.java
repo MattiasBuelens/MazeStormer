@@ -127,17 +127,17 @@ public class PathFindingPanel extends ViewPanel {
 	}
 	
 	private void updatePossibleGoalCoordinates(){
-		this.xModel.setMinimum(this.controller.getTileMinX());
-		this.xModel.setMaximum(this.controller.getTileMaxX());
-		this.yModel.setMinimum(this.controller.getTileMinY());
-		this.yModel.setMaximum(this.controller.getTileMaxY());
+		this.xModel.setMinimum((int) this.controller.getTileMinX());
+		this.xModel.setMaximum((int) this.controller.getTileMaxX());
+		this.yModel.setMinimum((int) this.controller.getTileMinY());
+		this.yModel.setMaximum((int) this.controller.getTileMaxY());
 		
-		this.xModel.setValue(this.controller.getCurrentTileX());
-		this.yModel.setValue(this.controller.getCurrentTileY());
+		this.xModel.setValue((int) this.controller.getCurrentTileX());
+		this.yModel.setValue((int) this.controller.getCurrentTileY());
 	}
 	
 	public void startAction(){
-		this.controller.startAction((long) this.xModel.getValue(), (long) this.yModel.getValue());
+		this.controller.startAction((int) this.xModel.getValue(), (int) this.yModel.getValue());
 	}
 
 	public void stopAction(){
