@@ -12,20 +12,32 @@ public class PathFindingController extends SubController implements IPathFinding
 	
 	private TileSequenceRunner runner;
 
-	public PathFindingController(MainController mainController){
+	public PathFindingController(MainController mainController) {
 		super(mainController);
 	}
 
-	private Robot getRobot(){
+	private Robot getRobot() {
 		return getMainController().getRobot();
 	}
 	
 	private Maze getMaze(){
 		return getMainController().getMaze();
 	}
+	
+	private Maze getSourceMaze() {
+		return getMainController().getSourceMaze();
+	}
+	
+	private void setMaze(Maze maze) {
+		getMainController().setMaze(maze);
+	}
+	
+	private void log(String logText) {
+		getMainController().getLogger().info(logText);
+	}
 
 	@Override
-	public void startAction(long goalX, long goalY){
+	public void startAction(long goalX, long goalY) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
 		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile);
 		this.runner.start();
@@ -40,12 +52,12 @@ public class PathFindingController extends SubController implements IPathFinding
 	}
 	
 	@Override
-	public long getCurrentTileX(){
+	public long getCurrentTileX() {
 		return getCurrentTile().getX();
 	}
 	
 	@Override
-	public long getCurrentTileY(){
+	public long getCurrentTileY() {
 		return getCurrentTile().getY();
 	}
 	
@@ -60,26 +72,31 @@ public class PathFindingController extends SubController implements IPathFinding
 
 	@Override
 	public long getTileMinX() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getMaze().getMinX();
 	}
 
 	@Override
 	public long getTileMinY() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getMaze().getMinY();
 	}
 
 	@Override
 	public long getTileMaxX() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getMaze().getMaxX();
 	}
 
 	@Override
 	public long getTileMaxY() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getMaze().getMaxY();
 	}
-
+	
+	@Override
+	public void addSourceMaze(){
+		if (getSourceMaze().getTiles().size() > 1) {
+			setMaze(getSourceMaze());
+			log("The maze is set to the source maze.");
+		} else {
+			log("There is no source maze available.");
+		}
+	}
 }

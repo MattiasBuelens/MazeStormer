@@ -14,6 +14,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
 import com.google.common.eventbus.Subscribe;
+import com.javarichclient.icon.tango.actions.EditFindReplaceIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 
@@ -33,9 +34,11 @@ public class PathFindingPanel extends ViewPanel {
 
 	private JButton btnStartAction;
 	private JButton btnStopAction;
+	private JButton btnAddSourceMaze;
 	
 	private final Action startAction = new StartAction();
 	private final Action stopAction = new StopAction();
+	private final Action addSourceMazeAction = new AddSourceMazeAction();
 	private JLabel lblX;
 	private JLabel lblY;
 	private SpinnerNumberModel yModel;
@@ -79,6 +82,12 @@ public class PathFindingPanel extends ViewPanel {
 		this.btnStopAction.setText("");
 		this.btnStopAction.setIcon(new MediaPlaybackStopIcon(32, 32));
 		buttons.add(this.btnStopAction);
+		
+		this.btnAddSourceMaze = new JButton();
+		this.btnAddSourceMaze.setAction(this.addSourceMazeAction);
+		this.btnAddSourceMaze.setText("");
+		this.btnAddSourceMaze.setIcon(new EditFindReplaceIcon(32, 32));
+		buttons.add(this.btnAddSourceMaze);
 	}
 	
 	private void createCoordinates(){
@@ -140,6 +149,11 @@ public class PathFindingPanel extends ViewPanel {
 		this.btnStopAction.setEnabled(isRunning);
 	}
 	
+	public void addSourceMazeAction(){
+		this.controller.addSourceMaze();
+		update();
+	}
+	
 	@Subscribe
 	public void onActionEvent(mazestormer.controller.ActionEvent e){
 		setActionButtonState(e.getEventType() == EventType.STARTED);
@@ -169,5 +183,20 @@ public class PathFindingPanel extends ViewPanel {
 		public void actionPerformed(ActionEvent e) {
 			stopAction();
 		}
+	}
+	
+	private class AddSourceMazeAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		
+		public AddSourceMazeAction() {
+			putValue(NAME, "Add source maze");
+			putValue(SHORT_DESCRIPTION, "Add source maze");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			addSourceMazeAction();
+		}
+		
 	}
 }

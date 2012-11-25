@@ -95,6 +95,7 @@ public class Maze extends AbstractEventSource {
 		if (tile == null) {
 			// Create tile
 			tile = createTile(tilePosition);
+			updateMinMax(tile);
 		}
 		return tile;
 	}
@@ -116,6 +117,51 @@ public class Maze extends AbstractEventSource {
 		// Fire tile added event
 		fireTileAdded(tile);
 		return tile;
+	}
+	
+	private long minX = 0;
+	private long maxX = 0;
+	private long minY = 0;
+	private long maxY = 0;
+	
+	public long getMinX(){
+		return this.minX;
+	}
+	
+	public long getMaxX(){
+		return this.maxX;
+	}
+	
+	public long getMinY(){
+		return this.minY;
+	}
+	
+	public long getMaxY(){
+		return this.maxY;
+	}
+	
+	private void updateMinMax(Tile newTile){
+		updateMinX(newTile);
+		updateMaxX(newTile);
+		updateMinY(newTile);
+		updateMaxY(newTile);
+	}
+	
+	
+	private void updateMinX(Tile newTile) {
+		this.minX = Math.min(getMinX(), newTile.getX());
+	}
+	
+	private void updateMaxX(Tile newTile) {
+		this.maxX = Math.max(getMaxX(), newTile.getX());
+	}
+	
+	private void updateMinY(Tile newTile) {
+		this.minY = Math.min(getMinY(), newTile.getY());
+	}
+	
+	private void updateMaxY(Tile newTile) {
+		this.maxY = Math.max(getMaxY(), newTile.getY());
 	}
 
 	/**

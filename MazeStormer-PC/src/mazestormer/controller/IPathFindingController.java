@@ -19,4 +19,6 @@ public interface IPathFindingController extends EventSource{
 	public long getTileMaxX();
 	
 	public long getTileMaxY();
+	
+	public void addSourceMaze();
 }

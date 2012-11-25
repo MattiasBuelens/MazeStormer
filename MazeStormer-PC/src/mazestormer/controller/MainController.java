@@ -381,5 +381,8 @@ public class MainController implements IMainController {
 		}
 		return sourceMaze;
 	}
-
+	
+	public void setMaze(Maze maze){
+		this.maze = maze;
+	}
 }
