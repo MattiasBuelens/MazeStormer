@@ -1,5 +1,8 @@
 package mazestormer.controller;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
@@ -12,8 +15,7 @@ import mazestormer.robot.Robot;
 
 import com.google.common.eventbus.Subscribe;
 
-public class LineFinderController extends SubController implements
-		ILineFinderController {
+public class LineFinderController extends SubController implements ILineFinderController {
 
 	private final static double slowRotateSpeed = 30;
 	private final static double fastRotateSpeed = 50;
@@ -78,10 +80,12 @@ public class LineFinderController extends SubController implements
 		private final Pilot pilot;
 		private final CalibratedLightSensor light;
 		private boolean isRunning = false;
+		private double lineWidth;
 
 		private CommandHandle handle;
 		private double originalTravelSpeed;
 		private double originalRotateSpeed;
+		private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
 		public LineFinderRunner() {
 			this.pilot = getPilot();
@@ -90,13 +94,14 @@ public class LineFinderController extends SubController implements
 
 		public void start() {
 			isRunning = true;
-			new Thread(this).start();
+			executor.execute(this);
 			postState(EventType.STARTED);
 		}
 
 		public void stop() {
 			if (isRunning()) {
 				isRunning = false;
+				executor.shutdownNow();
 				pilot.stop();
 				postState(EventType.STOPPED);
 			}
@@ -118,14 +123,12 @@ public class LineFinderController extends SubController implements
 		}
 
 		private void onLine(final Runnable action) {
-			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_GREATER_THAN, threshold);
+			Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
 			handle = getRobot().when(condition).stop().run(action).build();
 		}
 
 		private void offLine(final Runnable action) {
-			Condition condition = new LightCompareCondition(
-					ConditionType.LIGHT_SMALLER_THAN, threshold);
+			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, threshold);
 			handle = getRobot().when(condition).stop().run(action).build();
 		}
 
@@ -166,10 +169,9 @@ public class LineFinderController extends SubController implements
 		private void offFirstLine() {
 			if (shouldStop())
 				return;
-			log("Off line, centering robot on line.");
-			double lineWidth = pilot.getMovement().getDistanceTraveled();
-			double centerOffset = Robot.sensorOffset - lineWidth / 2
-					- light.getSensorRadius();
+			log("Off line, positioning robot on line edge.");
+			lineWidth = pilot.getMovement().getDistanceTraveled();
+			double centerOffset = Robot.sensorOffset - light.getSensorRadius();
 			log("Line width: " + lineWidth);
 			log("Offset from center: " + centerOffset);
 
@@ -202,9 +204,13 @@ public class LineFinderController extends SubController implements
 				return;
 			log("On line, rotating robot perpendicular to line.");
 
-			// Position perpendicular
+			// Position perpendicular to line
 			pilot.setRotateSpeed(fastRotateSpeed);
 			pilot.rotate(90.0);
+			
+			// Position robot center on center of line
+			log("Positioning on center of line.");
+			pilot.travel(-lineWidth / 2);
 
 			// Restore original speed
 			pilot.setTravelSpeed(originalTravelSpeed);
