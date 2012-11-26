@@ -141,6 +141,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			this.light = getRobot().getLightSensor();
 		}
 
+		@Override
 		public void onStarted() {
 			super.onStarted();
 
@@ -148,6 +149,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			postState(EventType.SCAN_STARTED);
 		}
 
+		@Override
 		public void onCancelled() {
 			super.onCancelled();
 

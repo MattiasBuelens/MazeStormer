@@ -84,6 +84,7 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			this.light = getLightSensor();
 		}
 
+		@Override
 		public void onStarted() {
 			super.onStarted();
 
@@ -91,6 +92,7 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			postState(EventType.STARTED);
 		}
 
+		@Override
 		public void onCancelled() {
 			super.onCancelled();
 

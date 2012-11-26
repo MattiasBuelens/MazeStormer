@@ -2,6 +2,7 @@ package mazestormer.controller;
 
 import com.google.common.eventbus.Subscribe;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.Runner;
 import mazestormer.robot.StopEvent;
 
 public class PolygonControlController extends SubController implements
@@ -26,7 +27,7 @@ public class PolygonControlController extends SubController implements
 	@Override
 	public void stopPolygon() {
 		if (runner != null) {
-			runner.stop();
+			runner.cancel();
 			runner = null;
 		}
 	}
@@ -45,38 +46,33 @@ public class PolygonControlController extends SubController implements
 		postEvent(new PolygonEvent(eventType));
 	}
 
-	private class PolygonRunner implements Runnable {
+	private class PolygonRunner extends Runner {
 
 		private final int nbSides;
 		private final double sideLength;
 		private final Direction direction;
 
-		private final Pilot pilot;
-		private boolean isRunning = false;
-
 		public PolygonRunner(int nbSides, double sideLength, Direction direction) {
-			this.pilot = getPilot();
+			super(PolygonControlController.this.getPilot());
 			this.nbSides = nbSides;
 			this.sideLength = sideLength;
 			this.direction = direction;
 		}
 
-		public void start() {
-			isRunning = true;
-			new Thread(this).start();
+		@Override
+		public void onStarted() {
+			super.onStarted();
+
+			// Post state
 			postState(EventType.STARTED);
 		}
 
-		public void stop() {
-			if (isRunning()) {
-				isRunning = false;
-				pilot.stop();
-				postState(EventType.STOPPED);
-			}
-		}
+		@Override
+		public void onCancelled() {
+			super.onCancelled();
 
-		public synchronized boolean isRunning() {
-			return isRunning;
+			// Post state
+			postState(EventType.STOPPED);
 		}
 
 		@Override
@@ -85,15 +81,12 @@ public class PolygonControlController extends SubController implements
 			double angle = (double) parity * 360d / (double) nbSides;
 
 			for (int i = 0; i < nbSides; ++i) {
-				if (!isRunning())
-					return;
-				pilot.travel(sideLength);
-				if (!isRunning())
-					return;
-				pilot.rotate(angle);
+				travel(sideLength);
+				rotate(angle);
 			}
 
-			stop();
+			// Done
+			cancel();
 		}
 
 	}
