@@ -11,19 +11,17 @@ import mazestormer.command.ScanCommand;
 import mazestormer.report.Report;
 import mazestormer.report.ReportType;
 
-public class PhysicalRangeScanner extends NXTComponent implements RangeScanner {
+public class PhysicalRangeScanner extends CommandReplier<RangeReadings>
+		implements RangeScanner {
 
 	private final RotatingRangeScanner scanner;
 
 	public PhysicalRangeScanner(NXTCommunicator communicator,
 			RegulatedMotor head, RangeFinder rangeFinder) {
 		super(communicator);
-		scanner = new RotatingRangeScanner(head, rangeFinder);
-		setup();
-	}
+		communicator.addListener(this);
 
-	private void setup() {
-		addMessageListener(new ScanReplier());
+		scanner = new RotatingRangeScanner(head, rangeFinder);
 	}
 
 	@Override
@@ -44,32 +42,25 @@ public class PhysicalRangeScanner extends NXTComponent implements RangeScanner {
 	/**
 	 * Handles scan requests.
 	 */
-	private class ScanReplier extends CommandReplier<RangeReadings> {
 
-		public ScanReplier() {
-			super(PhysicalRangeScanner.this.getCommunicator());
-		}
+	@Override
+	public void messageReceived(Command command) {
+		if (!(command instanceof ScanCommand))
+			return;
 
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof ScanCommand))
-				return;
+		ScanCommand scanCommand = (ScanCommand) command;
+		// Scan at given angles
+		float[] angles = scanCommand.getAngles();
+		setAngles(angles);
+		RangeReadings readings = getRangeValues();
+		// Reply with readings
+		reply(scanCommand, readings);
+	}
 
-			ScanCommand scanCommand = (ScanCommand) command;
-			// Scan at given angles
-			float[] angles = scanCommand.getAngles();
-			setAngles(angles);
-			RangeReadings readings = getRangeValues();
-			// Reply with readings
-			reply(scanCommand, readings);
-		}
-
-		@Override
-		protected MessageType<Report<?>> getResponseType(
-				MessageType<Command> requestType) {
-			return ReportType.SCAN;
-		}
-
+	@Override
+	protected MessageType<Report<?>> getResponseType(
+			MessageType<Command> requestType) {
+		return ReportType.SCAN;
 	}
 
 }
