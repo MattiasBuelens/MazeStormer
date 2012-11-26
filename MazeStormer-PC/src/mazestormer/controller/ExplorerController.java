@@ -149,10 +149,10 @@ public class ExplorerController extends SubController implements
 
 		// Scans in the direction of UNKNOWN edges, and updates them accordingly
 		private void scanAndUpdate(Stack<Tile> givenQueue, Tile givenTile) {
-			// getRangeScanner().setAngles(getScanAngles(givenTile));
-			// TODO: repareren
-			float[] angles = { 90f, 0f, -90f, -180f };
-			getRangeScanner().setAngles(angles);
+			getRangeScanner().setAngles(getScanAngles(givenTile));
+
+			//float[] angles = { 90f, 0f, -90f, -180f };
+			//getRangeScanner().setAngles(angles);
 
 			RangeFeatureDetector detector = getMainController().getRobot()
 					.getRangeDetector();
@@ -193,19 +193,19 @@ public class ExplorerController extends SubController implements
 			float heading = getPose().getHeading();
 
 			for (Orientation direction : Orientation.values()) {
-				if (givenTile.getEdgeAt(direction).getType() == Edge.EdgeType.UNKNOWN) {
+				if (givenTile.getEdgeAt(direction).getType() == EdgeType.UNKNOWN) {
 					switch (direction) {
 					case WEST:
-						list.add(new Float(90f - heading));
+						list.add(new Float(180f + heading));
 						break;
 					case NORTH:
-						list.add(new Float(0f - heading));
+						list.add(new Float(90f + heading));
 						break;
 					case EAST:
-						list.add(new Float(-90f - heading));
+						list.add(new Float(0f + heading));
 						break;
 					case SOUTH:
-						list.add(new Float(-180f - heading));
+						list.add(new Float(-90f + heading));
 						break;
 					}
 				}
