@@ -12,6 +12,7 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineEvent.Type;
 import javax.sound.sampled.LineListener;
 
+import mazestormer.robot.RobotSound;
 import mazestormer.robot.SoundPlayer;
 
 public class VirtualSoundPlayer implements SoundPlayer {
@@ -20,18 +21,18 @@ public class VirtualSoundPlayer implements SoundPlayer {
 
 	@Override
 	public void playSound() {
-		playSound(RoboSound.MAIN);
+		playSound(RobotSound.MAIN);
 	}
 
 	@Override
-	public void playSound(RoboSound sound) {
-		if (sound != null && RoboSound.isEnabled()) {
+	public void playSound(RobotSound sound) {
+		if (sound != null && RobotSound.isEnabled()) {
 			URL soundUrl = getSoundUrl(sound);
 			playAudio(soundUrl);
 		}
 	}
 
-	public URL getSoundUrl(RoboSound sound) {
+	public URL getSoundUrl(RobotSound sound) {
 		Path path = Paths.get(soundDirectory, sound.getFileName());
 		String resPath = path.toString().replace(File.separatorChar, '/');
 		return VirtualSoundPlayer.class.getResource(resPath);

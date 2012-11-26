@@ -2,6 +2,7 @@ package mazestormer.remote;
 
 import mazestormer.command.CommandType;
 import mazestormer.command.SoundPlayCommand;
+import mazestormer.robot.RobotSound;
 import mazestormer.robot.SoundPlayer;
 
 public class RemoteSoundPlayer extends RemoteComponent implements SoundPlayer {
@@ -12,11 +13,11 @@ public class RemoteSoundPlayer extends RemoteComponent implements SoundPlayer {
 
 	@Override
 	public void playSound() {
-		playSound(RoboSound.MAIN);
+		playSound(RobotSound.MAIN);
 	}
 
 	@Override
-	public void playSound(RoboSound sound) {
+	public void playSound(RobotSound sound) {
 		send(new SoundPlayCommand(CommandType.PLAY_SOUND, sound));
 	}
 

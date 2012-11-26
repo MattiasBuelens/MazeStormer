@@ -28,7 +28,7 @@ public class RemoteRangeScanner extends RemoteComponent implements RangeScanner 
 
 	@Override
 	public void setAngles(float[] angles) {
-		this.angles = angles;
+		this.angles = angles.clone();
 	}
 
 	@Override

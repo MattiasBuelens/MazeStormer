@@ -6,12 +6,12 @@ public class PhysicalSoundPlayer implements SoundPlayer {
 
 	@Override
 	public void playSound() {
-		playSound(RoboSound.MAIN);
+		playSound(RobotSound.MAIN);
 	}
 
 	@Override
-	public void playSound(RoboSound sound) {
-		if (sound != null && RoboSound.isEnabled()) {
+	public void playSound(RobotSound sound) {
+		if (sound != null && RobotSound.isEnabled()) {
 			Sound.playSoundFile(sound.getFileName(), false);
 		}
 	}

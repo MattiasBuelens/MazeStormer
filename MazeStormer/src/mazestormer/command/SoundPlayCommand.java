@@ -4,33 +4,33 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import mazestormer.robot.SoundPlayer.RoboSound;
+import mazestormer.robot.RobotSound;
 
 public class SoundPlayCommand extends Command {
 
-	private RoboSound sound;
+	private RobotSound sound;
 
 	public SoundPlayCommand(CommandType type) {
 		super(type);
 	}
 
-	public SoundPlayCommand(CommandType type, RoboSound sound) {
+	public SoundPlayCommand(CommandType type, RobotSound sound) {
 		this(type);
 		setSound(sound);
 	}
 
-	public RoboSound getSound() {
+	public RobotSound getSound() {
 		return sound;
 	}
 
-	public void setSound(RoboSound sound) {
+	public void setSound(RobotSound sound) {
 		this.sound = sound;
 	}
 
 	@Override
 	public void read(DataInputStream dis) throws IOException {
 		super.read(dis);
-		setSound(RoboSound.values()[dis.readInt()]);
+		setSound(RobotSound.values()[dis.readInt()]);
 	}
 
 	@Override
