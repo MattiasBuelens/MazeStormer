@@ -237,9 +237,12 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 		private void onChange() {
 			this.newPose = getRobot().getPoseProvider().getPose();
-			this.distances.add(getPoseDiff(this.oldPose, this.newPose));
-			this.oldPose = this.newPose;
-			this.blackToWhite = !this.blackToWhite;
+			float tempdis = getPoseDiff(this.oldPose, this.newPose);
+			if (tempdis >= NOISE_LENGTH) {
+				this.distances.add(tempdis);
+				this.oldPose = this.newPose;
+				this.blackToWhite = !this.blackToWhite;
+			}
 
 			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1) * BAR_LENGTH) {
 				// Iterate
@@ -290,7 +293,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			if (i == 0) {
 				// First bar
 				at = (int) Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH, 0);
-			} else if (distance >= NOISE_LENGTH){
+			} else if (distance >= NOISE_LENGTH) {
 				at = (int) Math.max(distance / BAR_LENGTH, 1);
 			} else {
 				at = 0;
