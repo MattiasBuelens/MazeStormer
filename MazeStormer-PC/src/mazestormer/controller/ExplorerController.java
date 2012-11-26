@@ -1,7 +1,11 @@
 package mazestormer.controller;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Stack;
+
+import com.google.common.eventbus.DeadEvent;
+import com.google.common.eventbus.Subscribe;
 
 import lejos.geom.Point;
 import lejos.robotics.RangeReading;
@@ -11,10 +15,12 @@ import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.controller.ExplorerEvent.EventType;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.maze.Edge;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.robot.Pilot;
+import mazestormer.ui.map.event.MapDOMChangeRequest;
 
 public class ExplorerController extends SubController implements
 		IExplorerController {
@@ -59,6 +65,15 @@ public class ExplorerController extends SubController implements
 		}
 	}
 
+	boolean cont = false;
+
+	@Subscribe
+	public void onActionEvent(mazestormer.controller.ActionEvent e) {
+		if (e.getEventType() == mazestormer.controller.EventType.STOPPED) {
+			cont = true;
+		}
+	}
+
 	private class ExplorerRunner implements Runnable {
 		private boolean isRunning = false;
 		private final Pilot pilot;
@@ -99,23 +114,31 @@ public class ExplorerController extends SubController implements
 
 			queue.push(startTile);
 			// 2. WHILE QUEUE is not empty
-			Tile currentTile, neighborTile;
+			Tile currentTile, nextTile;
 			ArrayList<Tile> paths = new ArrayList<Tile>();
 
 			while (!queue.empty()) {
 				currentTile = queue.pop(); // DO remove the first path from the
-											// QUEUE (This is the tile the robot
+											// QUEUE
+											// (This is the tile the robot
 											// is currently on, because of peek
 											// and drive)
 
 				// scannen en updaten
 				scanAndUpdate(queue, currentTile);
-				currentTile.isExplored();
+				currentTile.setExplored();
 				// create new paths (to all children);
 				selectTiles(queue, currentTile);
 
 				// Rijd naar volgende tile (peek)
-				// queue.peek();
+				nextTile = queue.peek();
+				getMainController().pathFindingControl().startAction(
+						nextTile.getX(), nextTile.getY());
+
+				while (!cont) {
+				}
+
+				cont = false;
 			}
 
 			//
@@ -126,25 +149,40 @@ public class ExplorerController extends SubController implements
 
 		// Scans in the direction of UNKNOWN edges, and updates them accordingly
 		private void scanAndUpdate(Stack<Tile> givenQueue, Tile givenTile) {
-			getRangeScanner().setAngles(getScanAngles(givenTile));
+			// getRangeScanner().setAngles(getScanAngles(givenTile));
+			// TODO: repareren
+			float[] angles = { 90f, 0f, -90f, -180f };
+			getRangeScanner().setAngles(angles);
 
 			RangeFeatureDetector detector = getMainController().getRobot()
 					.getRangeDetector();
-			detector.setMaxDistance(28);//TODO: juist?
+			detector.setMaxDistance(28);// TODO: juist?
 			RangeFeature feature = detector.scan();
 
-			if (feature == null){
-				for(Edge currentEdge : givenTile.getEdges()){
-					currentEdge.setType(EdgeType.OPEN);
+			if (feature != null) {
+				Orientation orientation;
+				// TODO: min distance?
+				for (RangeReading reading : feature.getRangeReadings()) {
+					orientation = angleToOrientation(reading.getAngle()
+							+ getMaze().toRelative(getPose().getHeading()));
+					System.out.println("Wall in " + orientation);
+					getMaze().setEdge(givenTile.getPosition(), orientation,
+							EdgeType.WALL);
 				}
-				//TODO: queue
-				return;
 			}
-			
-			Orientation absolute;
-			for (RangeReading reading : feature.getRangeReadings()) {
-				absolute = toAbsolute(angleToOrientation(reading.getAngle()),getPose().getHeading());
-				givenTile.getEdgeAt(absolute).setType(EdgeType.WALL);
+
+			Tile nbTile;
+			for (Edge currentEdge : givenTile.getEdges()) {
+				if (currentEdge.getType() == EdgeType.UNKNOWN) {
+					System.out.println("Open in "
+							+ currentEdge.getOrientationFrom(givenTile.getPosition()));
+					getMaze().setEdge(givenTile.getPosition(),
+							currentEdge.getOrientationFrom(givenTile.getPosition()), EdgeType.OPEN);
+					nbTile = getMaze().getOrCreateNeighbor(givenTile,
+							currentEdge.getOrientationFrom(givenTile.getPosition()));
+					givenQueue.push(nbTile);
+
+				}
 			}
 		}
 
@@ -181,36 +219,22 @@ public class ExplorerController extends SubController implements
 			return floatList;
 		}
 
-		// Gives the absolute orientation (in the maze) of a direction, given the heading of the robot
-		private Orientation toAbsolute(Orientation direction, float heading){
-			float angle = 0;
-			switch(direction){
-			case EAST:
-				angle = -90;
-				break;
-			case SOUTH:
-				angle = -180;
-				break;
-			case WEST:
-				angle = 90;
-				break;
-			}
-			
-			return angleToOrientation(angle + heading);
-		}
-		
-		private Orientation angleToOrientation(float angle){
-			//System.out.println("Angle: " + angle);
-			if(angle > - 45 && angle < 45){
-				return Orientation.NORTH;
-			} else if(angle >= 45 && angle < 135) {
-				return Orientation.WEST;
-			} else if(angle >= 135 || angle < -135){
-				return Orientation.SOUTH;
-			} else {
+		// Pre: We verwachten angle tussen -360 en 360 graden
+		private Orientation angleToOrientation(float angle) {
+			if (angle > 180)
+				angle -= 360f;
+			if (angle < -180)
+				angle += 360f;
+
+			if (angle > -45 && angle <= 45)
 				return Orientation.EAST;
-			}
+			if (angle > 45 && angle <= 135)
+				return Orientation.NORTH;
+			if (angle > 135 || angle <= -135)
+				return Orientation.WEST;
+			return Orientation.SOUTH;
 		}
+
 		// Adds tiles to the queue if the edge in its direction is open and it
 		// is not explored yet
 		private void selectTiles(Stack<Tile> queue, Tile givenTile) {
