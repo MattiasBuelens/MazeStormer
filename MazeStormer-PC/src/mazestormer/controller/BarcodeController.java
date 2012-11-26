@@ -300,5 +300,4 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 		return result;
 	}
-
 }
