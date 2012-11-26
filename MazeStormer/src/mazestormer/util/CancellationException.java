@@ -6,6 +6,8 @@ package mazestormer.util;
  */
 public class CancellationException extends IllegalStateException {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Constructs a <tt>CancellationException</tt> with no detail message.
 	 */

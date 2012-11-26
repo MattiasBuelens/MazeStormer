@@ -14,6 +14,11 @@ import mazestormer.robot.SoundPlayer;
 
 public class RemoteRobot extends RemoteComponent implements Robot {
 
+	/**
+	 * Timeout for synchronous requests.
+	 */
+	public static final int requestTimeout = 1000;
+
 	private RemotePilot pilot;
 	private PoseProvider poseProvider;
 
@@ -47,7 +52,7 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	@Override
 	public RangeScanner getRangeScanner() {
 		if (scanner == null) {
-			scanner = new RemoteRangeScanner();
+			scanner = new RemoteRangeScanner(getCommunicator());
 		}
 		return scanner;
 	}
@@ -79,8 +84,7 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 
 	@Override
 	public CommandBuilder when(Condition condition) {
-		RemoteCommandBuilder builder = new RemoteCommandBuilder(
-				getCommunicator(), CommandType.WHEN, condition);
+		RemoteCommandBuilder builder = new RemoteCommandBuilder(getCommunicator(), CommandType.WHEN, condition);
 		addMessageListener(builder);
 		return builder;
 	}
@@ -89,7 +93,8 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	public void terminate() {
 		// Terminate components
 		getPilot().terminate();
-		light.terminate();
+		if (light != null)
+			light.terminate();
 		// Stop all communications
 		getCommunicator().stop();
 		// Remove registered message listeners

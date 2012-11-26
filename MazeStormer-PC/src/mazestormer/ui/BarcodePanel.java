@@ -22,73 +22,74 @@ import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 
+import mazestormer.barcode.ActionType;
+import mazestormer.barcode.Threshold;
 import mazestormer.controller.EventType;
 import mazestormer.controller.IBarcodeController;
-import mazestormer.controller.Threshold;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JSpinner;
 
 public class BarcodePanel extends ViewPanel {
-	
+
 	private static final long serialVersionUID = 12L;
-	
+
 	private final IBarcodeController controller;
-	
+
 	private JPanel container;
 	private JButton btnStartAction;
 	private JButton btnStopAction;
 	private JButton btnStartScan;
 	private JButton btnStopScan;
-	private ComboBoxModel<String> actionModel;
-	
+	private ComboBoxModel<ActionType> actionModel;
+
 	private final Action startAction = new StartAction();
 	private final Action stopAction = new StopAction();
-	
+
 	private SpinnerNumberModel wbModel;
 	private SpinnerNumberModel bwModel;
 	private SpinnerNumberModel scanSpeedModel;
 
-	public BarcodePanel(IBarcodeController controller){
+	public BarcodePanel(IBarcodeController controller) {
 		this.controller = controller;
-		
+
 		setBorder(new TitledBorder(null, "Barcode actions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.container = new JPanel();
-		this.container.setLayout(new MigLayout("", "[grow 75][grow]", "[][][][][][][]"));
+		this.container.setLayout(new MigLayout("", "[grow 75][grow][fill]", "[][][][][][][]"));
 		add(this.container);
-		
+
 		createActionChoicePanel();
 		createActionButtons();
 		createScanButtons();
 		createTresholdSpinners();
 		createScanSpeedSpinner();
 
-		if(!Beans.isDesignTime())
+		if (!Beans.isDesignTime())
 			registerController();
 	}
-	
+
 	private void registerController() {
 		registerEventBus(this.controller.getEventBus());
 
 		setActionButtonState(false);
 		setScanButtonState(false);
 	}
-	
-	private void createActionChoicePanel(){
-		this.actionModel = new DefaultComboBoxModel<String>(IBarcodeController.ACTIONS);
-		
+
+	private void createActionChoicePanel() {
+		this.actionModel = new DefaultComboBoxModel<ActionType>(ActionType.values());
+
 		JLabel lblAction = new JLabel("Action");
 		this.container.add(lblAction, "cell 0 0,grow");
 
-		JComboBox<String> cmbAction = new JComboBox<String>();
+		JComboBox<ActionType> cmbAction = new JComboBox<ActionType>();
 		cmbAction.setModel(this.actionModel);
-		this.container.add(cmbAction, "cell 1 0,grow");
+		this.container.add(cmbAction, "cell 1 0 2 1,grow");
 	}
-	
-	private void createActionButtons(){
+
+	private void createActionButtons() {
 		JPanel buttons = new JPanel();
-		this.container.add(buttons, "cell 0 1 2 1,grow");
+		this.container.add(buttons, "cell 0 1 3 1,grow");
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		this.btnStartAction = new JButton();
@@ -103,13 +104,13 @@ public class BarcodePanel extends ViewPanel {
 		this.btnStopAction.setIcon(new MediaPlaybackStopIcon(32, 32));
 		buttons.add(this.btnStopAction);
 	}
-	
-	private void createScanButtons(){
+
+	private void createScanButtons() {
 		JLabel lblScan = new JLabel("Scan");
 		this.container.add(lblScan, "cell 0 2");
-		
+
 		JPanel buttons = new JPanel();
-		this.container.add(buttons, "cell 0 3 2 1,grow");
+		this.container.add(buttons, "cell 0 3 3 1,grow");
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		this.btnStartScan = new JButton();
@@ -124,69 +125,78 @@ public class BarcodePanel extends ViewPanel {
 		this.btnStopScan.setIcon(new MediaPlaybackStopIcon(32, 32));
 		buttons.add(this.btnStopScan);
 	}
-	
-	private void createTresholdSpinners(){
-		JLabel lblBW = new JLabel("Black -> White Treshold");
+
+	private void createTresholdSpinners() {
+		JLabel lblBW = new JLabel("Black \u2192 White");
 		this.container.add(lblBW, "cell 0 4");
-		JSpinner bwSpinner = new JSpinner();
+		JSpinner spinBW = new JSpinner();
 		this.bwModel = new SpinnerNumberModel(50, 0, 100, 1);
-		bwSpinner.setModel(this.bwModel);
-		this.container.add(bwSpinner, "cell 1 4,growx");
+		spinBW.setModel(this.bwModel);
+		this.container.add(spinBW, "cell 1 4,growx");
 		this.bwModel.addChangeListener(new BWChangeListener());
-		
-		JLabel lblWB = new JLabel("White -> Black Treshold");
+
+		JLabel lblBWUnit = new JLabel("%");
+		container.add(lblBWUnit, "cell 2 4");
+
+		JLabel lblWB = new JLabel("White \u2192 Black");
 		this.container.add(lblWB, "cell 0 5");
-		JSpinner wbSpinner = new JSpinner();
+		JSpinner spinWB = new JSpinner();
 		this.wbModel = new SpinnerNumberModel(50, 0, 100, 1);
-		wbSpinner.setModel(this.wbModel);
-		this.container.add(wbSpinner, "cell 1 5,growx");
+		spinWB.setModel(this.wbModel);
+		this.container.add(spinWB, "cell 1 5,growx");
 		this.wbModel.addChangeListener(new WBChangeListener());
 	}
-	
-	private void createScanSpeedSpinner(){
-		JLabel lblScanTravelSpeed = new JLabel("Scan Travel Speed [cm/s]");
-		this.container.add(lblScanTravelSpeed, "cell 0 6");
-		
-		JSpinner scanSpeedSpinner = new JSpinner();
+
+	private void createScanSpeedSpinner() {
+
+		JLabel lblWBUnit = new JLabel("%");
+		container.add(lblWBUnit, "cell 2 5");
+		JLabel lblSpeed = new JLabel("Travel speed");
+		this.container.add(lblSpeed, "cell 0 6");
+
+		JSpinner spinSpeed = new JSpinner();
 		this.scanSpeedModel = new SpinnerNumberModel(2, 1, 20, 1);
-		scanSpeedSpinner.setModel(this.scanSpeedModel);
-		this.container.add(scanSpeedSpinner, "cell 1 6,growx");
+		spinSpeed.setModel(this.scanSpeedModel);
+		this.container.add(spinSpeed, "cell 1 6,growx");
+
+		JLabel lblSpeedUnit = new JLabel("cm/sec");
+		container.add(lblSpeedUnit, "cell 2 6");
 		this.scanSpeedModel.addChangeListener(new scanSpeedChangeListener());
 	}
 
-	public void startAction(){
-		String s = (String) this.actionModel.getSelectedItem();
-		this.controller.startAction(s);
+	public void startAction() {
+		ActionType actionType = (ActionType) actionModel.getSelectedItem();
+		this.controller.startAction(actionType);
 	}
 
-	public void stopAction(){
+	public void stopAction() {
 		this.controller.stopAction();
 	}
 
-	private void setActionButtonState(boolean isRunning){
+	private void setActionButtonState(boolean isRunning) {
 		this.btnStartAction.setEnabled(!isRunning);
 		this.btnStopAction.setEnabled(isRunning);
 	}
-	
-	public void startScan(){
+
+	public void startScan() {
 		this.controller.startScan();
 	}
-	
-	public void stopScan(){
+
+	public void stopScan() {
 		this.controller.stopScan();
 	}
-	
-	public void setScanSpeed(double speed){
+
+	public void setScanSpeed(double speed) {
 		this.controller.setScanSpeed(speed);
 	}
-	
-	private void setScanButtonState(boolean isRunning){
+
+	private void setScanButtonState(boolean isRunning) {
 		this.btnStartScan.setEnabled(!isRunning);
 		this.btnStopScan.setEnabled(isRunning);
 	}
-	
+
 	@Subscribe
-	public void onActionEvent(mazestormer.controller.ActionEvent e){
+	public void onActionEvent(mazestormer.controller.ActionEvent e) {
 		setActionButtonState(e.getEventType() == EventType.STARTED);
 		setScanButtonState(e.getEventType() == EventType.SCAN_STARTED);
 	}
@@ -216,7 +226,7 @@ public class BarcodePanel extends ViewPanel {
 			stopAction();
 		}
 	}
-	
+
 	private class StartScanAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -229,7 +239,7 @@ public class BarcodePanel extends ViewPanel {
 			startScan();
 		}
 	}
-	
+
 	private class StopScanAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -242,7 +252,7 @@ public class BarcodePanel extends ViewPanel {
 			stopScan();
 		}
 	}
-	
+
 	private class WBChangeListener implements ChangeListener {
 
 		@Override
@@ -250,7 +260,7 @@ public class BarcodePanel extends ViewPanel {
 			Threshold.WHITE_BLACK.setThresholdValue((int) wbModel.getValue());
 		}
 	}
-	
+
 	private class BWChangeListener implements ChangeListener {
 
 		@Override
@@ -258,7 +268,7 @@ public class BarcodePanel extends ViewPanel {
 			Threshold.BLACK_WHITE.setThresholdValue((int) bwModel.getValue());
 		}
 	}
-	
+
 	private class scanSpeedChangeListener implements ChangeListener {
 
 		@Override

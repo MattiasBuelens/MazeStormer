@@ -1,5 +1,6 @@
 package mazestormer.report;
 
+import lejos.robotics.RangeReadings;
 import lejos.robotics.navigation.Move;
 import mazestormer.remote.MessageType;
 
@@ -37,6 +38,17 @@ public enum ReportType implements MessageType<Report<?>> {
 		@Override
 		public Report<Integer> build() {
 			return new LightReadReport(this);
+		}
+	},
+	
+	/*
+	 * Light sensor
+	 */
+
+	SCAN {
+		@Override
+		public Report<RangeReadings> build() {
+			return new ScanReport(this);
 		}
 	},
 

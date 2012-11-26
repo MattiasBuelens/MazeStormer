@@ -1,39 +1,38 @@
 package mazestormer.barcode;
 
-public class BarcodeDecoder{
-	
+public class BarcodeDecoder {
+
 	private static final int RANGE = 64;
 	private static IAction[] actions = new IAction[RANGE];
-	
-	static{
+
+	static {
 		setActions();
 	}
-	
-	private static void setActions(){
-		getActions()[5] = new RotateCounterClockwiseAction();
-		getActions()[9] = new RotateClockwiseAction();
-		getActions()[15] = new SoundAction();
-		getActions()[19] = new WaitAction();
-		getActions()[25] = new LowSpeedAction();
-		getActions()[37] = new HighSpeedAction();
+
+	private static void setActions() {
+		actions[5] = new RotateCounterClockwiseAction();
+		actions[9] = new RotateClockwiseAction();
+		actions[15] = new SoundAction();
+		actions[19] = new WaitAction();
+		actions[25] = new LowSpeedAction();
+		actions[37] = new HighSpeedAction();
 		// TODO
-		getActions()[55] = NoAction.getInstance();
+		actions[55] = new NoAction();
 	}
-	
-	public static IAction[] getActions(){
+
+	public static IAction[] getActions() {
 		return actions.clone();
 	}
-	
-	private static IAction getActionAt(int index)
-			throws IndexOutOfBoundsException{
-		if(index<0 || index>= RANGE)
-			return NoAction.getInstance();
-		if(actions[index] == null)
-			return NoAction.getInstance();
+
+	private static IAction getActionAt(int index) throws IndexOutOfBoundsException {
+		if (index < 0 || index >= RANGE)
+			return new NoAction();
+		if (actions[index] == null)
+			return new NoAction();
 		return actions[index];
 	}
-	
-	public static IAction getAction(byte barcode){
-		return getActionAt(((Byte) barcode).intValue());
+
+	public static IAction getAction(byte barcode) {
+		return getActionAt((int) barcode);
 	}
 }

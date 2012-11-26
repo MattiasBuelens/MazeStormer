@@ -6,7 +6,6 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.RegulatedMotor;
-import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.ShutdownCommandListener;
@@ -21,7 +20,8 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 
 	private PhysicalPilot pilot;
 	private PhysicalLightSensor light;
-	private RangeScanner scanner;
+	private PhysicalRangeScanner scanner;
+	private PhysicalSoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
 
 	public PhysicalRobot(NXTCommunicator communicator) {
@@ -44,9 +44,11 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 		return scanner;
 	}
 
+	/**
+	 * Not implemented on NXT.
+	 */
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -60,8 +62,7 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 
 	@Override
 	public SoundPlayer getSoundPlayer() {
-		// TODO Auto-generated method stub
-		return null;
+		return soundPlayer;
 	}
 
 	public void setup() {
@@ -69,27 +70,31 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 		pilot = new PhysicalPilot(getCommunicator());
 
 		// Light sensor
-		light = new PhysicalLightSensor(getCommunicator());
+		light = new PhysicalLightSensor(getCommunicator(), SensorPort.S1);
 
 		// Scanner
 		RangeFinder sensor = new UltrasonicSensor(SensorPort.S2);
 		RegulatedMotor headMotor = Motor.C;
-		scanner = new RotatingRangeScanner(headMotor, sensor);
+		scanner = new PhysicalRangeScanner(getCommunicator(), headMotor, sensor);
+
+		// Sound player
+		soundPlayer = new PhysicalSoundPlayer(getCommunicator());
 
 		// Command listeners
 		addMessageListener(new ShutdownCommandListener(this));
-
-		// Reporters
 	}
 
 	@Override
 	public void terminate() {
 		// Stop all communications
 		getCommunicator().stop();
+		// Release resources
+		pilot.terminate();
+		light.terminate();
+		scanner.terminate();
+		soundPlayer.terminate();
 		// Remove registered message listeners
 		super.terminate();
-		// Release resources
-		getPilot().terminate();
 	}
 
 	/**

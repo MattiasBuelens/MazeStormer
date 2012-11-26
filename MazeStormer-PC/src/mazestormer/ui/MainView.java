@@ -128,6 +128,11 @@ public class MainView extends JFrame implements EventSource {
 			setControlPanel(new ExplorerControlPanel(
 					this.controller.explorerControl()));
 			break;
+		case PathFinder:
+			PathFindingPanel p = new PathFindingPanel(this.controller.pathFindingControl());
+			p.update();
+			setControlPanel(p);
+			break;
 		}
 	}
 

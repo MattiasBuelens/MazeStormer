@@ -24,7 +24,12 @@ public enum ControlMode {
 	/**
 	 * Barcode action tester
 	 */
-	Barcode("Barcode actions");
+	Barcode("Barcode actions"),
+	
+	/**
+	 * Path finder tester
+	 */
+	PathFinder("Find path");
 
 	private final String name;
 

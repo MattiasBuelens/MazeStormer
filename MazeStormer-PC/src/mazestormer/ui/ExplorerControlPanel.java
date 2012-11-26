@@ -2,28 +2,27 @@ package mazestormer.ui;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import javax.swing.Action;
+import java.beans.Beans;
+
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
+import mazestormer.controller.IExplorerController;
+import net.miginfocom.swing.MigLayout;
+
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 
-import net.miginfocom.swing.MigLayout;
+public class ExplorerControlPanel extends ViewPanel {
 
-import mazestormer.controller.IExplorerController;
-import mazestormer.controller.ILineFinderController;
-
-
-public class ExplorerControlPanel extends ViewPanel{
-	
 	private static final long serialVersionUID = 1L;
 	private final IExplorerController controller;
 	private JPanel container;
-	
+
 	// Actions
 	private final Action startAction = new StartAction();
 	private final Action stopAction = new StopAction();
@@ -31,21 +30,27 @@ public class ExplorerControlPanel extends ViewPanel{
 	// The buttons to start/stop finding the line
 	private JButton btnStart;
 	private JButton btnStop;
-	
+
 	public ExplorerControlPanel(IExplorerController controller) {
 		this.controller = controller;
-		
-		setBorder(new TitledBorder(null, "Maze Explorer",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+
+		setBorder(new TitledBorder(null, "Maze Explorer", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		this.container = new JPanel();
+		container = new JPanel();
 		container.setLayout(new MigLayout("", "[grow]", "[]"));
-		add(this.container);
-		
+		add(container);
+
 		createStartStopButtons();
+
+		if (!Beans.isDesignTime())
+			registerController();
 	}
-	
+
+	private void registerController() {
+		registerEventBus(controller.getEventBus());
+	}
+
 	private void createStartStopButtons() {
 		JPanel buttons = new JPanel();
 		container.add(buttons, "cell 0 0,grow");
@@ -62,6 +67,14 @@ public class ExplorerControlPanel extends ViewPanel{
 		btnStop.setText("");
 		btnStop.setIcon(new MediaPlaybackStopIcon(32, 32));
 		buttons.add(btnStop);
+	}
+
+	public void startExploring() {
+		controller.startExploring();
+	}
+
+	public void stopExploring() {
+		controller.stopExploring();
 	}
 
 	private class StartAction extends AbstractAction {
@@ -88,13 +101,5 @@ public class ExplorerControlPanel extends ViewPanel{
 		public void actionPerformed(ActionEvent e) {
 			stopExploring();
 		}
-	}
-	
-	public void startExploring() {
-		controller.startExploring();
-	}
-
-	public void stopExploring() {
-		controller.stopExploring();
 	}
 }

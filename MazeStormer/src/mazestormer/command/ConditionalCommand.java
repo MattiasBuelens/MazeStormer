@@ -82,7 +82,7 @@ public class ConditionalCommand extends RequestCommand<Void> {
 		writeList(dos, getCommands());
 	}
 
-	private <M extends Message> List<M> readList(DataInputStream dis,
+	public static <M extends Message> List<M> readList(DataInputStream dis,
 			MessageReader<M> reader) throws IOException {
 		int count = dis.readInt();
 		List<M> result = new ArrayList<M>(count);
@@ -92,7 +92,7 @@ public class ConditionalCommand extends RequestCommand<Void> {
 		return result;
 	}
 
-	private <M extends Message> void writeList(DataOutputStream dos,
+	public static <M extends Message> void writeList(DataOutputStream dos,
 			List<M> list) throws IOException {
 		dos.writeInt(list.size());
 		for (M message : list) {

@@ -54,6 +54,7 @@ public enum CommandType implements MessageType<Command> {
 	/*
 	 * Light sensor
 	 */
+
 	LIGHT_READ {
 		@Override
 		public Command build() {
@@ -80,8 +81,31 @@ public enum CommandType implements MessageType<Command> {
 	},
 
 	/*
+	 * Range scanner
+	 */
+
+	SCAN {
+		@Override
+		public Command build() {
+			return new ScanCommand(this);
+		}
+	},
+
+	/*
+	 * Sound player
+	 */
+
+	PLAY_SOUND {
+		@Override
+		public Command build() {
+			return new SoundPlayCommand(this);
+		}
+	},
+
+	/*
 	 * Conditional
 	 */
+
 	WHEN {
 		@Override
 		public Command build() {
