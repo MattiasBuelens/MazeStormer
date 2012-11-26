@@ -18,12 +18,13 @@ import mazestormer.robot.Robot;
 import mazestormer.robot.Runner;
 import mazestormer.robot.RunnerTask;
 
-public class BarcodeController extends SubController implements IBarcodeController {
+public class BarcodeController extends SubController implements
+		IBarcodeController {
 	private static final double START_BAR_LENGTH = 1.8; // [cm]
 	private static final double BAR_LENGTH = 1.85; // [cm]
 	private static final int NUMBER_OF_BARS = 6; // without black start bars
 	private static final int BLACK_THRESHOLD = 50;
-	
+
 	private static final float NOISE_LENGTH = 0.65f;
 
 	private ActionRunner actionRunner;
@@ -167,8 +168,10 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void onBlack(final RunnerTask task) {
-			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
-			this.handle = getRobot().when(condition).stop().run(wrap(task)).build();
+			Condition condition = new LightCompareCondition(
+					ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+			this.handle = getRobot().when(condition).stop().run(wrap(task))
+					.build();
 		}
 
 		@Override
@@ -224,13 +227,15 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void onTrespassNewBlack(final RunnerTask task) {
-			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
+			Condition condition = new LightCompareCondition(
+					ConditionType.LIGHT_SMALLER_THAN,
 					Threshold.WHITE_BLACK.getThresholdValue());
 			this.handle = getRobot().when(condition).run(wrap(task)).build();
 		}
 
 		private void onTrespassNewWhite(final RunnerTask task) {
-			Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
+			Condition condition = new LightCompareCondition(
+					ConditionType.LIGHT_GREATER_THAN,
 					Threshold.BLACK_WHITE.getThresholdValue());
 			this.handle = getRobot().when(condition).run(wrap(task)).build();
 		}
@@ -244,7 +249,8 @@ public class BarcodeController extends SubController implements IBarcodeControll
 				this.blackToWhite = !this.blackToWhite;
 			}
 
-			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1) * BAR_LENGTH) {
+			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1)
+					* BAR_LENGTH) {
 				// Iterate
 				loop();
 			} else {
@@ -262,7 +268,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		}
 
 		private void decodeBarcode() {
-			//TODO
+			// TODO
 			// BarcodeDecoder.getAction(this.barcode).performAction(getRobot());
 		}
 	}
@@ -292,11 +298,10 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			int at;
 			if (i == 0) {
 				// First bar
-				at = (int) Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH, 0);
-			} else if (distance >= NOISE_LENGTH) {
-				at = (int) Math.max(distance / BAR_LENGTH, 1);
+				at = (int) Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH,
+						0);
 			} else {
-				at = 0;
+				at = (int) Math.max(distance / BAR_LENGTH, 1);
 			}
 			// Odd indices are white, even indices are black
 			int barBit = i & 1; // == i % 2

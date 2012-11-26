@@ -11,6 +11,7 @@ import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.controller.ExplorerEvent.EventType;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.maze.Edge;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;

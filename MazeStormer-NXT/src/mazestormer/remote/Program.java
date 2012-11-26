@@ -28,15 +28,19 @@ public class Program implements Runnable, ButtonListener {
 		Button.ESCAPE.addButtonListener(this);
 
 		while (isRunning) {
-			clear();
-			println("ESC to quit");
-
-			connect();
-			waitComplete();
-			disconnect();
+			session();
 		}
 
 		NXT.shutDown();
+	}
+
+	private void session() {
+		clear();
+		println("ESC to quit");
+
+		connect();
+		communicator.waitComplete();
+		disconnect();
 	}
 
 	private void connect() {
@@ -57,10 +61,6 @@ public class Program implements Runnable, ButtonListener {
 		robot = new PhysicalRobot(communicator);
 		// Start communicator
 		communicator.start();
-	}
-
-	private void waitComplete() {
-		communicator.waitComplete();
 	}
 
 	private void disconnect() {

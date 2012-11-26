@@ -40,7 +40,7 @@ public enum ReportType implements MessageType<Report<?>> {
 			return new LightReadReport(this);
 		}
 	},
-	
+
 	/*
 	 * Light sensor
 	 */

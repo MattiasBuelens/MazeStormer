@@ -21,7 +21,7 @@ import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Robot;
 
 public class PhysicalLightSensor extends LightSensor implements
-		CalibratedLightSensor, SensorPortListener {
+		CalibratedLightSensor, SensorPortListener, MessageListener<Command> {
 
 	private final SensorPort port;
 	private List<LightValueListener> lightListeners = new ArrayList<LightValueListener>();
@@ -43,10 +43,28 @@ public class PhysicalLightSensor extends LightSensor implements
 		SensorPortListeners.get(port).addSensorPortListener(this);
 
 		// Add message listeners
-		addMessageListener(new LightFloodlightCommandListener());
-		addMessageListener(new LightCalibrateCommandListener());
+		addMessageListener(this);
 		addMessageListener(new LightValueReplier());
 		addMessageListener(new LightConditionListener());
+	}
+
+	@Override
+	public int getNormalizedLightValue(int lightValue) {
+		if (getHigh() == getLow())
+			return getLow();
+		return (int) ((lightValue / 100f) * (getHigh() - getLow()) + getLow());
+	}
+
+	@Override
+	public int getLightValue(int normalizedLightValue) {
+		if (getHigh() == getLow())
+			return 0;
+		return 100 * (normalizedLightValue - getLow()) / (getHigh() - getLow());
+	}
+
+	@Override
+	public float getSensorRadius() {
+		return Robot.sensorRadius;
 	}
 
 	private void addMessageListener(MessageListener<Command> listener) {
@@ -84,54 +102,49 @@ public class PhysicalLightSensor extends LightSensor implements
 		// Remove as port listener
 		SensorPortListeners.get(port).removeSensorPortListener(this);
 
+		// Remove registered light listeners
+		for (LightValueListener listener : lightListeners) {
+			removeLightListener(listener);
+		}
+
 		// Remove registered message listeners
 		// for (MessageListener<Command> listener : messageListeners) {
 		// communicator.removeListener(listener);
 		// }
 	}
 
+	@Override
+	public void messageReceived(Command command) {
+		if (command instanceof LightFloodlightCommand) {
+			onFloodLightCommand((LightFloodlightCommand) command);
+		}
+		if (command instanceof LightCalibrateCommand) {
+			onCalibrateCommand((LightCalibrateCommand) command);
+		}
+	}
+
 	/**
 	 * Handles flood light commands.
 	 */
-	private class LightFloodlightCommandListener implements
-			MessageListener<Command> {
-
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof LightFloodlightCommand))
-				return;
-
-			boolean isFloodlight = ((LightFloodlightCommand) command)
-					.isFloodlight();
-			setFloodlight(isFloodlight);
-		}
-
+	private void onFloodLightCommand(LightFloodlightCommand command) {
+		setFloodlight(command.isFloodlight());
 	}
 
 	/**
 	 * Handles calibration commands.
 	 */
-	private class LightCalibrateCommandListener implements
-			MessageListener<Command> {
-
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof LightCalibrateCommand))
-				return;
-
-			int value = ((LightCalibrateCommand) command).getValue();
-			switch (command.getType()) {
-			case LIGHT_SET_LOW:
-				setLow(value);
-				break;
-			case LIGHT_SET_HIGH:
-				setHigh(value);
-				break;
-			default:
-				break;
-			}
+	private void onCalibrateCommand(LightCalibrateCommand command) {
+		int value = command.getValue();
+		switch (command.getType()) {
+		case LIGHT_SET_LOW:
+			setLow(value);
+			break;
+		case LIGHT_SET_HIGH:
+			setHigh(value);
+			break;
+		default:
+			break;
 		}
-
 	}
 
 	/**
@@ -227,25 +240,6 @@ public class PhysicalLightSensor extends LightSensor implements
 			return super.cancel(mayInterruptIfRunning);
 		}
 
-	}
-
-	@Override
-	public int getNormalizedLightValue(int lightValue) {
-		if (getHigh() == getLow())
-			return getLow();
-		return (int) ((lightValue / 100f) * (getHigh() - getLow()) + getLow());
-	}
-
-	@Override
-	public int getLightValue(int normalizedLightValue) {
-		if (getHigh() == getLow())
-			return 0;
-		return 100 * (normalizedLightValue - getLow()) / (getHigh() - getLow());
-	}
-
-	@Override
-	public float getSensorRadius() {
-		return Robot.sensorRadius;
 	}
 
 }

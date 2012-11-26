@@ -87,7 +87,8 @@ public enum CommandType implements MessageType<Command> {
 	SCAN {
 		@Override
 		public Command build() {
-			return new ScanCommand(this);
+			//return new ScanCommand(this);
+			return null;
 		}
 	},
 
@@ -98,7 +99,8 @@ public enum CommandType implements MessageType<Command> {
 	PLAY_SOUND {
 		@Override
 		public Command build() {
-			return new SoundPlayCommand(this);
+			//return new SoundPlayCommand(this);
+			return null;
 		}
 	},
 

@@ -21,7 +21,6 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 	private PhysicalPilot pilot;
 	private PhysicalLightSensor light;
 	private PhysicalRangeScanner scanner;
-	private PhysicalSoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
 
 	public PhysicalRobot(NXTCommunicator communicator) {
@@ -62,7 +61,7 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 
 	@Override
 	public SoundPlayer getSoundPlayer() {
-		return soundPlayer;
+		return null;
 	}
 
 	public void setup() {
@@ -78,7 +77,7 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 		scanner = new PhysicalRangeScanner(getCommunicator(), headMotor, sensor);
 
 		// Sound player
-		soundPlayer = new PhysicalSoundPlayer(getCommunicator());
+		// soundPlayer = new PhysicalSoundPlayer(getCommunicator());
 
 		// Command listeners
 		addMessageListener(new ShutdownCommandListener(this));
@@ -91,8 +90,8 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 		// Release resources
 		pilot.terminate();
 		light.terminate();
-		scanner.terminate();
-		soundPlayer.terminate();
+		// scanner.terminate();
+		// soundPlayer.terminate();
 		// Remove registered message listeners
 		super.terminate();
 	}

@@ -1,8 +1,5 @@
 package mazestormer.remote;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.DifferentialPilot;
 import mazestormer.command.Command;
@@ -18,7 +15,8 @@ import mazestormer.robot.Robot;
 public class PhysicalPilot extends DifferentialPilot implements Pilot {
 
 	private final NXTCommunicator communicator;
-	private List<MessageListener<Command>> messageListeners = new ArrayList<MessageListener<Command>>();
+	// private List<MessageListener<Command>> messageListeners = new
+	// ArrayList<MessageListener<Command>>();
 
 	private MovementReporter movementReporter;
 
@@ -47,7 +45,7 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot {
 
 	private void addMessageListener(MessageListener<Command> listener) {
 		// Add and store message listener
-		messageListeners.add(listener);
+		// messageListeners.add(listener);
 		communicator.addListener(listener);
 	}
 
@@ -60,9 +58,9 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot {
 		movementReporter.stop();
 
 		// Remove registered message listeners
-		for (MessageListener<Command> listener : messageListeners) {
-			communicator.removeListener(listener);
-		}
+		// for (MessageListener<Command> listener : messageListeners) {
+		// communicator.removeListener(listener);
+		// }
 	}
 
 	private class TravelCommandListener implements MessageListener<Command> {
