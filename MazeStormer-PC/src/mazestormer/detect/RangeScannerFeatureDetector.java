@@ -84,6 +84,8 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 				continue;
 			
 			RangeReading reading;
+			//no need to change the coordinate system here.
+			//the point (0,0) is already the rotation center of the robot.
 			if(scanner instanceof VirtualRangeScanner)
 				reading = rawReading;
 			else {
