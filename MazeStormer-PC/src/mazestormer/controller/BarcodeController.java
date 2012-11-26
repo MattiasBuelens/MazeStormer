@@ -23,6 +23,8 @@ public class BarcodeController extends SubController implements IBarcodeControll
 	private static final double BAR_LENGTH = 1.85; // [cm]
 	private static final int NUMBER_OF_BARS = 6; // without black start bars
 	private static final int BLACK_THRESHOLD = 50;
+	
+	private static final float NOISE_LENGTH = 0.50f;
 
 	private ActionRunner actionRunner;
 	private BarcodeRunner runner;
@@ -288,9 +290,10 @@ public class BarcodeController extends SubController implements IBarcodeControll
 			if (i == 0) {
 				// First bar
 				at = (int) Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH, 0);
-			} else {
-				// Other bars
+			} else if (distance >= NOISE_LENGTH){
 				at = (int) Math.max(distance / BAR_LENGTH, 1);
+			} else {
+				at = 0;
 			}
 			// Odd indices are white, even indices are black
 			int barBit = i & 1; // == i % 2
