@@ -141,9 +141,10 @@ public class Communicator<S extends Message, R extends Message> implements
 	}
 
 	public void trigger(final R message) {
+		// TODO Do we need this?
 		// Clone listeners to prevent concurrent modifications
-		final List<MessageListener<? super R>> listeners = new ArrayList<>(
-				this.listeners);
+		// final List<MessageListener<? super R>> listeners = new
+		// ArrayList<>(this.listeners);
 		// Call listeners
 		for (MessageListener<? super R> listener : listeners) {
 			listener.messageReceived(message);

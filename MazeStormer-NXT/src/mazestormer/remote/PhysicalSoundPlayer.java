@@ -7,7 +7,8 @@ import mazestormer.command.Command;
 import mazestormer.command.SoundPlayCommand;
 import mazestormer.robot.SoundPlayer;
 
-public class PhysicalSoundPlayer extends NXTComponent implements SoundPlayer {
+public class PhysicalSoundPlayer extends NXTComponent implements SoundPlayer,
+		MessageListener<Command> {
 
 	public PhysicalSoundPlayer(NXTCommunicator communicator) {
 		super(communicator);
@@ -15,7 +16,7 @@ public class PhysicalSoundPlayer extends NXTComponent implements SoundPlayer {
 	}
 
 	private void setup() {
-		addMessageListener(new SoundPlayCommandListener());
+		addMessageListener(this);
 	}
 
 	@Override
@@ -33,16 +34,14 @@ public class PhysicalSoundPlayer extends NXTComponent implements SoundPlayer {
 	/**
 	 * Handles sound play commands.
 	 */
-	private class SoundPlayCommandListener implements MessageListener<Command> {
 
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof SoundPlayCommand))
-				return;
+	@Override
+	public void messageReceived(Command command) {
+		if (!(command instanceof SoundPlayCommand))
+			return;
 
-			RoboSound sound = ((SoundPlayCommand) command).getSound();
-			playSound(sound);
-		}
-
+		RoboSound sound = ((SoundPlayCommand) command).getSound();
+		playSound(sound);
 	}
+
 }

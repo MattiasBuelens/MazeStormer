@@ -27,7 +27,9 @@ public class PhysicalLightSensor extends LightSensor implements
 	private List<LightValueListener> lightListeners = new ArrayList<LightValueListener>();
 
 	private final NXTCommunicator communicator;
-	private List<MessageListener<Command>> messageListeners = new ArrayList<MessageListener<Command>>();
+
+	// private List<MessageListener<Command>> messageListeners = new
+	// ArrayList<MessageListener<Command>>();
 
 	public PhysicalLightSensor(NXTCommunicator communicator, SensorPort port) {
 		super(port);
@@ -49,7 +51,7 @@ public class PhysicalLightSensor extends LightSensor implements
 
 	private void addMessageListener(MessageListener<Command> listener) {
 		// Add and store message listener
-		messageListeners.add(listener);
+		// messageListeners.add(listener);
 		communicator.addListener(listener);
 	}
 
@@ -83,9 +85,9 @@ public class PhysicalLightSensor extends LightSensor implements
 		SensorPortListeners.get(port).removeSensorPortListener(this);
 
 		// Remove registered message listeners
-		for (MessageListener<Command> listener : messageListeners) {
-			communicator.removeListener(listener);
-		}
+		// for (MessageListener<Command> listener : messageListeners) {
+		// communicator.removeListener(listener);
+		// }
 	}
 
 	/**
