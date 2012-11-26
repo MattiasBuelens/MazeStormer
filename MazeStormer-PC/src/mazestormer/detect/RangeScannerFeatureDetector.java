@@ -23,18 +23,13 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 	private final RangeScanner scanner;
 	private float maxDistance;
 	private PoseProvider pp = null;
-	private static final Point sensorPosition = new Point(-3.4f, -0.6f); // relative
-																			// position
-																			// of
-																			// ultrasonic
-																			// sensor
-																			// from
-																			// rotation
-																			// center
-																			// of
-																			// robot,
-																			// in
-																			// cm
+
+	/**
+	 * Relative position of ultrasonic sensor from rotation center of robot, in
+	 * centimeters.
+	 */
+	// TODO Move to Robot?
+	private static final Point sensorPosition = new Point(-3.4f, -0.6f);
 
 	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance) {
 		this.scanner = checkNotNull(scanner);
@@ -83,6 +78,10 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		RangeReadings readings = new RangeReadings(0);
 
 		for (RangeReading rawReading : rawReadings) {
+			// Only retain positive readings
+			if (rawReading.getRange() < 0)
+				continue;
+
 			// Change coordinate system from sensor (where O is the rotation
 			// center of the sensor-servo)
 			// to nxt (where 0 is the rotation center of the robot)
@@ -92,9 +91,8 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 			float range = position.length();
 			RangeReading reading = new RangeReading(angle, range);
 
-			// Only retain positive readings smaller than the maximum distance
-			if (reading.getRange() > 0
-					&& reading.getRange() <= getMaxDistance()) {
+			// Only retain readings smaller than the maximum distance
+			if (reading.getRange() <= getMaxDistance()) {
 				// Sort the filtered readings
 				int index = Collections.binarySearch(readings, reading,
 						comparator);
