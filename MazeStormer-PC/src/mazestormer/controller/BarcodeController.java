@@ -24,7 +24,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 	private static final int NUMBER_OF_BARS = 6; // without black start bars
 	private static final int BLACK_THRESHOLD = 50;
 	
-	private static final float NOISE_LENGTH = 0.50f;
+	private static final float NOISE_LENGTH = 0.65f;
 
 	private ActionRunner actionRunner;
 	private BarcodeRunner runner;
