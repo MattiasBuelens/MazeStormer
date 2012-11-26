@@ -38,8 +38,8 @@ public class VirtualRangeScanner implements RangeScanner {
 	@Override
 	public RangeReadings getRangeValues() {
 		RangeReadings r = new RangeReadings(angles.length);
-		for (float angle : angles) {
-			r.add(new RangeReading(angle, generateRange(angle)));
+		for (int i = 0; i < angles.length; i++) {
+			r.set(i, new RangeReading(angles[i], generateRange(angles[i])));
 		}
 		return r;
 	}

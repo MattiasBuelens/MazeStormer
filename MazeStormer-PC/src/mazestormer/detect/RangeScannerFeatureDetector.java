@@ -11,6 +11,7 @@ import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.simulator.VirtualRangeScanner;
 
 /**
  * A range feature detector which uses a range scanner to locate objects.
@@ -81,15 +82,20 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 			// Only retain positive readings
 			if (rawReading.getRange() < 0)
 				continue;
-
-			// Change coordinate system from sensor (where O is the rotation
-			// center of the sensor-servo)
-			// to nxt (where 0 is the rotation center of the robot)
-			Point position = sensorPosition.pointAt(rawReading.getRange(),
-					rawReading.getAngle());
-			float angle = (float) Math.toDegrees(position.angle());
-			float range = position.length();
-			RangeReading reading = new RangeReading(angle, range);
+			
+			RangeReading reading;
+			if(scanner instanceof VirtualRangeScanner)
+				reading = rawReading;
+			else {
+				// Change coordinate system from sensor (where O is the rotation
+				// center of the sensor-servo)
+				// to nxt (where 0 is the rotation center of the robot)
+				Point position = sensorPosition.pointAt(rawReading.getRange(),
+						rawReading.getAngle());
+				float angle = (float) Math.toDegrees(position.angle());
+				float range = position.length();
+				reading = new RangeReading(angle, range);
+			}
 
 			// Only retain readings smaller than the maximum distance
 			if (reading.getRange() <= getMaxDistance()) {
