@@ -2,6 +2,7 @@ package mazestormer.controller;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -23,6 +24,7 @@ public class ExplorerController extends SubController implements
 		IExplorerController {
 
 	private ExplorerRunner runner;
+	private Deque<Tile> queue = new ArrayDeque<Tile>();
 
 	public ExplorerController(MainController mainController) {
 		super(mainController);
@@ -62,12 +64,12 @@ public class ExplorerController extends SubController implements
 		}
 	}
 
-	boolean cont = false;
+	boolean shouldContinue = false;
 
 	@Subscribe
 	public void onActionEvent(mazestormer.controller.ActionEvent e) {
 		if (e.getEventType() == mazestormer.controller.EventType.STOPPED) {
-			cont = true;
+			shouldContinue = true;
 		}
 	}
 
@@ -100,7 +102,6 @@ public class ExplorerController extends SubController implements
 		@Override
 		public void run() {
 			// 1. QUEUE <-- path only containing the root;
-			ArrayDeque<Tile> queue = new ArrayDeque<Tile>();
 
 			Pose startPose = getPose();
 			Pose relativeStartPose = getMaze().toRelative(startPose);
@@ -115,7 +116,7 @@ public class ExplorerController extends SubController implements
 			// 2. WHILE QUEUE is not empty
 			Tile currentTile, nextTile;
 
-			while (!queue.isEmpty()) {
+			while (!queue.isEmpty() && isRunning()) {
 				currentTile = queue.pollLast(); // DO remove the first path from the
 											// QUEUE
 											// (This is the tile the robot
@@ -128,21 +129,24 @@ public class ExplorerController extends SubController implements
 				// create new paths (to all children);
 				selectTiles(queue, currentTile);
 
+				
+				
 				// Rijd naar volgende tile (peek)
 				if (!queue.isEmpty()) {
 					nextTile = queue.peekLast();
 					getMainController().pathFindingControl().startAction(
 							nextTile.getX(), nextTile.getY());
-					while (!cont) {
-					}
+					while (!shouldContinue) {
+						//do not continue
+					} 
 				}
 
-				cont = false;
+				shouldContinue = false;
 			}
 		}
 
 		// Scans in the direction of UNKNOWN edges, and updates them accordingly
-		private void scanAndUpdate(ArrayDeque<Tile> givenQueue, Tile givenTile) {
+		private void scanAndUpdate(Deque<Tile> queue, Tile givenTile) {
 			getRangeScanner().setAngles(getScanAngles(givenTile));
 
 			RangeFeatureDetector detector = getMainController().getRobot()
@@ -224,7 +228,7 @@ public class ExplorerController extends SubController implements
 
 		// Adds tiles to the queue if the edge in its direction is open and it
 		// is not explored yet
-		private void selectTiles(ArrayDeque<Tile> queue, Tile givenTile) {
+		private void selectTiles(Deque<Tile> queue, Tile givenTile) {
 			Tile neighborTile;
 
 			for (Orientation direction : Orientation.values()) {

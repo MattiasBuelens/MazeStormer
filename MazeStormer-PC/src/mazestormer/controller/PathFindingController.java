@@ -194,14 +194,13 @@ public class PathFindingController extends SubController implements
 		@Override
 		public void run() {
 			this.navigator.followPath();
-			while (!this.navigator.waitForStop())
-				Thread.yield();
+			this.navigator.waitForStop();
 			stop();
 		}
 
 		private void addWayPoints() {
 			if (this.tiles != null)
-				for (int i = 1; i < this.tiles.length; i++) {
+				for (int i = 0; i < this.tiles.length; i++) {
 					Point tilePosition = this.tiles[i].getPosition().toPoint();
 					Point absolutePosition = this.maze.toAbsolute(tilePosition);
 					Waypoint w = new Waypoint((absolutePosition.x + 0.5)
