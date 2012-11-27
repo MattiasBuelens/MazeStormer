@@ -1,10 +1,8 @@
 package mazestormer.controller;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Stack;
 
-import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.Subscribe;
 
 import lejos.geom.Point;
@@ -20,7 +18,6 @@ import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.robot.Pilot;
-import mazestormer.ui.map.event.MapDOMChangeRequest;
 
 public class ExplorerController extends SubController implements
 		IExplorerController {
@@ -103,7 +100,7 @@ public class ExplorerController extends SubController implements
 		@Override
 		public void run() {
 			// 1. QUEUE <-- path only containing the root;
-			Stack<Tile> queue = new Stack<Tile>();
+			ArrayDeque<Tile> queue = new ArrayDeque<Tile>();
 
 			Pose startPose = getPose();
 			Pose relativeStartPose = getMaze().toRelative(startPose);
@@ -112,17 +109,21 @@ public class ExplorerController extends SubController implements
 			Point startPointTC = getMaze().toTile(startPoint);
 			Tile startTile = getMaze().getTileAt(startPointTC);
 
-			queue.push(startTile);
+			System.out.println(startTile);
+			
+			queue.addLast(startTile);
 			// 2. WHILE QUEUE is not empty
 			Tile currentTile, nextTile;
-			ArrayList<Tile> paths = new ArrayList<Tile>();
 
-			while (!queue.empty()) {
-				currentTile = queue.pop(); // DO remove the first path from the
+			while (!queue.isEmpty()) {
+				System.out.println("Queue size: " + queue.size());
+				currentTile = queue.pollLast(); // DO remove the first path from the
 											// QUEUE
 											// (This is the tile the robot
 											// is currently on, because of peek
 											// and drive)
+				
+				queue.remove(currentTile);//TODO: weirdness
 
 				// scannen en updaten
 				scanAndUpdate(queue, currentTile);
@@ -131,28 +132,21 @@ public class ExplorerController extends SubController implements
 				selectTiles(queue, currentTile);
 
 				// Rijd naar volgende tile (peek)
-				nextTile = queue.peek();
-				getMainController().pathFindingControl().startAction(
-						nextTile.getX(), nextTile.getY());
-
-				while (!cont) {
+				if (!queue.isEmpty()) {
+					nextTile = queue.peek();
+					getMainController().pathFindingControl().startAction(
+							nextTile.getX(), nextTile.getY());
+					while (!cont) {
+					}
 				}
 
 				cont = false;
 			}
-
-			//
-			// 3. IF goal reached
-			// THEN success;
-			// ELSE failure;
 		}
 
 		// Scans in the direction of UNKNOWN edges, and updates them accordingly
-		private void scanAndUpdate(Stack<Tile> givenQueue, Tile givenTile) {
+		private void scanAndUpdate(ArrayDeque<Tile> givenQueue, Tile givenTile) {
 			getRangeScanner().setAngles(getScanAngles(givenTile));
-
-			//float[] angles = { 90f, 0f, -90f, -180f };
-			//getRangeScanner().setAngles(angles);
 
 			RangeFeatureDetector detector = getMainController().getRobot()
 					.getRangeDetector();
@@ -161,11 +155,10 @@ public class ExplorerController extends SubController implements
 
 			if (feature != null) {
 				Orientation orientation;
-				// TODO: min distance?
 				for (RangeReading reading : feature.getRangeReadings()) {
 					orientation = angleToOrientation(reading.getAngle()
 							+ getMaze().toRelative(getPose().getHeading()));
-					System.out.println("Wall in " + orientation);
+					// System.out.println("Wall in " + orientation);
 					getMaze().setEdge(givenTile.getPosition(), orientation,
 							EdgeType.WALL);
 				}
@@ -174,12 +167,17 @@ public class ExplorerController extends SubController implements
 			Tile nbTile;
 			for (Edge currentEdge : givenTile.getEdges()) {
 				if (currentEdge.getType() == EdgeType.UNKNOWN) {
-					System.out.println("Open in "
-							+ currentEdge.getOrientationFrom(givenTile.getPosition()));
-					getMaze().setEdge(givenTile.getPosition(),
-							currentEdge.getOrientationFrom(givenTile.getPosition()), EdgeType.OPEN);
-					nbTile = getMaze().getOrCreateNeighbor(givenTile,
-							currentEdge.getOrientationFrom(givenTile.getPosition()));
+					// System.out.println("Open in "
+					// +
+					// currentEdge.getOrientationFrom(givenTile.getPosition()));
+					getMaze().setEdge(
+							givenTile.getPosition(),
+							currentEdge.getOrientationFrom(givenTile
+									.getPosition()), EdgeType.OPEN);
+					nbTile = getMaze().getOrCreateNeighbor(
+							givenTile,
+							currentEdge.getOrientationFrom(givenTile
+									.getPosition()));
 					givenQueue.push(nbTile);
 
 				}
@@ -188,7 +186,6 @@ public class ExplorerController extends SubController implements
 
 		private float[] getScanAngles(Tile givenTile) {
 			ArrayList<Float> list = new ArrayList<Float>();
-
 			// TODO: pas heading vastzetten als we linefinder gedaan hebben.
 			float heading = getPose().getHeading();
 
@@ -196,16 +193,16 @@ public class ExplorerController extends SubController implements
 				if (givenTile.getEdgeAt(direction).getType() == EdgeType.UNKNOWN) {
 					switch (direction) {
 					case WEST:
-						list.add(new Float(180f + heading));
+						list.add(new Float(180f - heading));
 						break;
 					case NORTH:
-						list.add(new Float(90f + heading));
+						list.add(new Float(90f - heading));
 						break;
 					case EAST:
-						list.add(new Float(0f + heading));
+						list.add(new Float(0f - heading));
 						break;
 					case SOUTH:
-						list.add(new Float(-90f + heading));
+						list.add(new Float(-90f - heading));
 						break;
 					}
 				}
@@ -237,7 +234,7 @@ public class ExplorerController extends SubController implements
 
 		// Adds tiles to the queue if the edge in its direction is open and it
 		// is not explored yet
-		private void selectTiles(Stack<Tile> queue, Tile givenTile) {
+		private void selectTiles(ArrayDeque<Tile> queue, Tile givenTile) {
 			Tile neighborTile;
 
 			for (Orientation direction : Orientation.values()) {
@@ -247,22 +244,11 @@ public class ExplorerController extends SubController implements
 					// reject the new paths with loops;
 					if (!neighborTile.isExplored()) {
 						// add the new paths to front of QUEUE;
-						queue.add(neighborTile);
+						queue.addLast(neighborTile);
 					}
 				}
 			}
 		}
-
-		// Drives to the given tile
-		private void driveTo(Tile start, Tile end) {
-			// Matthias
-		}
-
-		// Drives from the first to the last tile in path
-		private void drivePath(ArrayList<Tile> path) {
-
-		}
-
 	}
 
 }
