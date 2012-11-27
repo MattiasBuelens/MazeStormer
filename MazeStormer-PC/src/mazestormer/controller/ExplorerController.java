@@ -116,15 +116,12 @@ public class ExplorerController extends SubController implements
 			Tile currentTile, nextTile;
 
 			while (!queue.isEmpty()) {
-				System.out.println("Queue size: " + queue.size());
 				currentTile = queue.pollLast(); // DO remove the first path from the
 											// QUEUE
 											// (This is the tile the robot
 											// is currently on, because of peek
 											// and drive)
 				
-				queue.remove(currentTile);//TODO: weirdness
-
 				// scannen en updaten
 				scanAndUpdate(queue, currentTile);
 				currentTile.setExplored();
@@ -133,7 +130,7 @@ public class ExplorerController extends SubController implements
 
 				// Rijd naar volgende tile (peek)
 				if (!queue.isEmpty()) {
-					nextTile = queue.peek();
+					nextTile = queue.peekLast();
 					getMainController().pathFindingControl().startAction(
 							nextTile.getX(), nextTile.getY());
 					while (!cont) {
@@ -164,7 +161,6 @@ public class ExplorerController extends SubController implements
 				}
 			}
 
-			Tile nbTile;
 			for (Edge currentEdge : givenTile.getEdges()) {
 				if (currentEdge.getType() == EdgeType.UNKNOWN) {
 					// System.out.println("Open in "
@@ -174,12 +170,6 @@ public class ExplorerController extends SubController implements
 							givenTile.getPosition(),
 							currentEdge.getOrientationFrom(givenTile
 									.getPosition()), EdgeType.OPEN);
-					nbTile = getMaze().getOrCreateNeighbor(
-							givenTile,
-							currentEdge.getOrientationFrom(givenTile
-									.getPosition()));
-					givenQueue.push(nbTile);
-
 				}
 			}
 		}
@@ -242,7 +232,7 @@ public class ExplorerController extends SubController implements
 					neighborTile = getMaze().getOrCreateNeighbor(givenTile,
 							direction);
 					// reject the new paths with loops;
-					if (!neighborTile.isExplored()) {
+					if (!neighborTile.isExplored() && !queue.contains(neighborTile)) {
 						// add the new paths to front of QUEUE;
 						queue.addLast(neighborTile);
 					}
