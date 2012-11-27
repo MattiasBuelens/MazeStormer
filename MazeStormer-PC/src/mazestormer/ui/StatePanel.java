@@ -78,11 +78,11 @@ public class StatePanel extends ViewPanel {
 					text = text + "translate backward at " + speed + "cm/s";
 				else if (move.getTravelSpeed() >= 0)
 					text = text + "translate "
-							+ Math.abs(move.getDistanceTraveled())
+							+ Math.round(Math.abs(move.getDistanceTraveled() * 10) / 10)
 							+ "cm forward at " + speed + "cm/s";
 				else if (move.getTravelSpeed() < 0)
 					text = text + "translate "
-							+ Math.abs(move.getDistanceTraveled())
+							+ Math.round(Math.abs(move.getDistanceTraveled() * 10) / 10)
 							+ "cm backward at " + speed + "cm/s";
 				break;
 			case ROTATE:
@@ -95,11 +95,11 @@ public class StatePanel extends ViewPanel {
 					text = text + "rotate clockwise at " + rotateSpeed
 							+ "deg/s";
 				else if (move.getRotateSpeed() >= 0)
-					text = text + "rotate " + Math.abs(move.getAngleTurned())
+					text = text + "rotate " + Math.round(Math.abs(move.getAngleTurned() * 10) / 10)
 							+ "deg counter-clockwise at " + rotateSpeed
 							+ "deg/s";
 				else if (move.getRotateSpeed() < 0)
-					text = text + "rotate " + Math.abs(move.getAngleTurned())
+					text = text + "rotate " + Math.round(Math.abs(move.getAngleTurned() * 10) / 10)
 							+ "deg clockwise at " + rotateSpeed + "deg/s";
 				break;
 			default:

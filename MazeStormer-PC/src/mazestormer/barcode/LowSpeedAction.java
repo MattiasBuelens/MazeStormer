@@ -4,7 +4,7 @@ import mazestormer.robot.Robot;
 
 public class LowSpeedAction implements IAction{
 	
-	private static final double SPEED = 5; 
+	private static final double SPEED = 2; 
 
 	@Override
 	public void performAction(Robot robot) throws IllegalStateException {
