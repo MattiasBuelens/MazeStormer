@@ -49,6 +49,15 @@ public class PathFindingController extends SubController implements
 				false);
 		this.runner.start();
 	}
+	
+	@Override
+	public void startAction(long goalX, long goalY, boolean singleStep, boolean reposition) {
+		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
+				singleStep);
+		this.runner.setReposition(reposition);
+		this.runner.start();
+	}
 
 	@Override
 	public void stopAction() {
