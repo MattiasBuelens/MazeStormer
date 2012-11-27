@@ -1,5 +1,6 @@
 package mazestormer.barcode;
 
+import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
 public interface IAction{
@@ -12,5 +13,5 @@ public interface IAction{
 	 * 			The given robot must be a valid robot.
 	 * 			| robot != null
 	 */
-	public abstract void performAction(Robot robot) throws IllegalStateException;
+	public abstract void performAction(Robot robot, Maze maze);
 }

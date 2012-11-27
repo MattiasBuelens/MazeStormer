@@ -13,6 +13,7 @@ import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
+import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Robot;
 import mazestormer.robot.Runner;
@@ -38,6 +39,10 @@ public class BarcodeController extends SubController implements
 
 	private Robot getRobot() {
 		return getMainController().getRobot();
+	}
+	
+	private Maze getMaze() {
+		return getMainController().getMaze();
 	}
 
 	private void log(String logText) {
@@ -96,7 +101,7 @@ public class BarcodeController extends SubController implements
 
 		@Override
 		public void run() {
-			this.action.performAction(this.robot);
+			this.action.performAction(this.robot, getMaze());
 			stop();
 		}
 
@@ -269,7 +274,7 @@ public class BarcodeController extends SubController implements
 
 		private void decodeBarcode() {
 			// TODO
-			// BarcodeDecoder.getAction(this.barcode).performAction(getRobot());
+			// BarcodeDecoder.getAction(this.barcode).performAction(getRobot(), getMaze());
 		}
 	}
 

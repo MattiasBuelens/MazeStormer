@@ -45,7 +45,17 @@ public class PathFindingController extends SubController implements
 	@Override
 	public void startAction(long goalX, long goalY) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile);
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
+				false);
+		this.runner.start();
+	}
+	
+	@Override
+	public void startAction(long goalX, long goalY, boolean singleStep, boolean reposition) {
+		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
+				singleStep);
+		this.runner.setReposition(reposition);
 		this.runner.start();
 	}
 
@@ -115,6 +125,9 @@ public class PathFindingController extends SubController implements
 		private Navigator navigator;
 		private boolean isRunning = false;
 
+		private boolean singleStep;
+		private boolean reposition;
+
 		/**
 		 * Create a new tile sequence runner with given robot, maze and goal
 		 * tile.
@@ -126,12 +139,14 @@ public class PathFindingController extends SubController implements
 		 * @param tiles
 		 *            The tile sequence the robot must follow.
 		 */
-		public TileSequenceRunner(Robot robot, Maze maze, Tile goal) {
+		public TileSequenceRunner(Robot robot, Maze maze, Tile goal,
+				boolean singleStep) {
 			this.robot = robot;
 			this.maze = maze;
 			this.goal = goal;
-			this.tiles = this.maze.getMesh(true).findTilePath(getStartTile(),
+			this.tiles = this.maze.getMesh().findTilePath(getStartTile(),
 					this.goal);
+			this.singleStep = singleStep;
 			initializeNavigator();
 		}
 
@@ -151,12 +166,22 @@ public class PathFindingController extends SubController implements
 		 * @param tiles
 		 *            The tile sequence the robot must follow.
 		 */
-		public TileSequenceRunner(Robot robot, Maze maze, Tile[] tiles) {
+		public TileSequenceRunner(Robot robot, Maze maze, Tile[] tiles,
+				boolean singleStep) {
 			this.robot = robot;
 			this.maze = maze;
 			this.tiles = tiles;
 			this.goal = this.tiles[this.tiles.length - 1];
+			this.singleStep = singleStep;
 			initializeNavigator();
+		}
+		
+		public void setSinglestep(boolean request) {
+			this.singleStep = request;
+		}
+		
+		public void setReposition(boolean request) {
+			this.reposition = request;
 		}
 
 		private void initializeNavigator() {
@@ -194,9 +219,19 @@ public class PathFindingController extends SubController implements
 
 		@Override
 		public void run() {
+			if (this.singleStep && this.reposition) {
+				new LineFinderController(getMainController()).startSearching();
+			}
+			
+			this.navigator.singleStep(this.singleStep);
 			this.navigator.followPath();
-			while (!this.navigator.waitForStop())
-				Thread.yield();
+			if (this.singleStep) {
+				this.navigator.waitForStop();
+			} else {
+				while (!this.navigator.waitForStop())
+					Thread.yield();
+			}
+			
 			stop();
 		}
 

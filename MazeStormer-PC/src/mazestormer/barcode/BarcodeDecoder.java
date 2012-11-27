@@ -16,8 +16,7 @@ public class BarcodeDecoder {
 		actions[19] = new WaitAction();
 		actions[25] = new LowSpeedAction();
 		actions[37] = new HighSpeedAction();
-		// TODO
-		actions[55] = new NoAction();
+		actions[55] = new GoalAction();
 	}
 
 	public static IAction[] getActions() {

@@ -17,6 +17,7 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
+import mazestormer.maze.Tile;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.Robot;
 import mazestormer.simulator.VirtualRobot;
@@ -59,6 +60,7 @@ public class MainController implements IMainController {
 
 	private Maze maze;
 	private Maze sourceMaze;
+	private Tile goalTile;
 
 	/*
 	 * Controllers
@@ -382,7 +384,15 @@ public class MainController implements IMainController {
 		return sourceMaze;
 	}
 	
-	public void setMaze(Maze maze){
+	public void setMaze(Maze maze) {
 		this.maze = maze;
+	}
+	
+	public Tile getGoalTile() {
+		return this.goalTile;
+	}
+	
+	public void setGoalTile(Tile tile) {
+		this.goalTile = tile;
 	}
 }

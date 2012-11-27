@@ -32,6 +32,7 @@ public class Maze extends AbstractEventSource {
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
 	private Mesh mesh;
+	private Tile goalTile;
 
 	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
@@ -115,7 +116,10 @@ public class Maze extends AbstractEventSource {
 
 		// Fire tile added event
 		fireTileAdded(tile);
+		
 		updateMinMax(tile);
+		getMesh().addTileAsNode(tile);
+		
 		return tile;
 	}
 	
@@ -223,6 +227,8 @@ public class Maze extends AbstractEventSource {
 		for (LongPoint touchingPosition : edge.getTouching()) {
 			fireTileChanged(getTileAt(touchingPosition));
 		}
+		
+		getMesh().edgeUpdate(edge);
 	}
 
 	private void updateEdgeLine(Edge edge) {
@@ -427,23 +433,20 @@ public class Maze extends AbstractEventSource {
 	/**
 	 * Returns the mesh of this maze.
 	 * 
-	 * @param regenerate
-	 *            If regenerate is true, the nodes of the mesh of this maze will
-	 *            be regenerated. If regenerate is false, the collection of
-	 *            nodes of the current mesh stay unchanged and no regeneration
-	 *            calculation is executed.
-	 * @speed If regenerate is true, the calculation speed is ~O(t*d) with t the
-	 *        number of tiles of this maze and with d the average number of open
-	 *        directions of a tile. (No storage time is included)
 	 * @return The mesh of this maze.
 	 */
-	public Mesh getMesh(boolean regenerate) {
+	public Mesh getMesh() {
 		if (this.mesh == null) {
 			this.mesh = new Mesh(this);
 		}
-		if (regenerate == true) {
-			this.mesh.generateNodes();
-		}
 		return this.mesh;
+	}
+	
+	public Tile getGoalTile(){
+		return this.goalTile;
+	}
+	
+	public void setGoalTile(Tile tile) {
+		this.goalTile = tile;
 	}
 }
