@@ -117,6 +117,7 @@ public class PathFindingController extends SubController implements
 		private boolean isRunning = false;
 
 		private boolean singleStep;
+		private boolean reposition;
 
 		/**
 		 * Create a new tile sequence runner with given robot, maze and goal
@@ -165,6 +166,14 @@ public class PathFindingController extends SubController implements
 			this.singleStep = singleStep;
 			initializeNavigator();
 		}
+		
+		public void setSinglestep(boolean request) {
+			this.singleStep = request;
+		}
+		
+		public void setReposition(boolean request) {
+			this.reposition = request;
+		}
 
 		private void initializeNavigator() {
 			this.navigator = new Navigator(this.robot.getPilot());
@@ -209,6 +218,12 @@ public class PathFindingController extends SubController implements
 				while (!this.navigator.waitForStop())
 					Thread.yield();
 			}
+			
+			
+			if (this.singleStep && this.reposition) {
+				new LineFinderController(getMainController()).startSearching();
+			}
+			
 			stop();
 		}
 
