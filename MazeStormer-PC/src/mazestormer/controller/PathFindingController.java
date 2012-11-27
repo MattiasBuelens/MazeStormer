@@ -130,8 +130,7 @@ public class PathFindingController extends SubController implements
 			this.robot = robot;
 			this.maze = maze;
 			this.goal = goal;
-			this.tiles = this.maze.getMesh(true).findTilePath(getStartTile(),
-					this.goal);
+			this.tiles = this.maze.getMesh().findTilePath(getStartTile(), this.goal);
 			initializeNavigator();
 		}
 
