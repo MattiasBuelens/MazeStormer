@@ -32,6 +32,7 @@ public class Maze extends AbstractEventSource {
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
 	private Mesh mesh;
+	private Tile goalTile;
 
 	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
@@ -439,5 +440,13 @@ public class Maze extends AbstractEventSource {
 			this.mesh = new Mesh(this);
 		}
 		return this.mesh;
+	}
+	
+	public Tile getGoalTile(){
+		return this.goalTile;
+	}
+	
+	public void setGoalTile(Tile tile) {
+		this.goalTile = tile;
 	}
 }
