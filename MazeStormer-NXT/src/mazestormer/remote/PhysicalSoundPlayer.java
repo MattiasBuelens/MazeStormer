@@ -4,16 +4,15 @@ import java.io.File;
 
 import lejos.nxt.Sound;
 import mazestormer.command.Command;
-import mazestormer.command.SoundPlayCommand;
+import mazestormer.command.PlaySoundCommand;
 import mazestormer.robot.RobotSound;
 import mazestormer.robot.SoundPlayer;
 
-public class PhysicalSoundPlayer extends NXTComponent implements SoundPlayer,
+public class PhysicalSoundPlayer implements SoundPlayer,
 		MessageListener<Command> {
 
 	public PhysicalSoundPlayer(NXTCommunicator communicator) {
-		super(communicator);
-		addMessageListener(this);
+		communicator.addListener(this);
 	}
 
 	@Override
@@ -31,13 +30,16 @@ public class PhysicalSoundPlayer extends NXTComponent implements SoundPlayer,
 	/**
 	 * Handles sound play commands.
 	 */
-
 	@Override
 	public void messageReceived(Command command) {
-		if (!(command instanceof SoundPlayCommand))
-			return;
+		// TODO Sound commands not working for now
+		if (command instanceof PlaySoundCommand) {
+			onSoundPlayCommand((PlaySoundCommand) command);
+		}
+	}
 
-		RobotSound sound = ((SoundPlayCommand) command).getSound();
+	private void onSoundPlayCommand(PlaySoundCommand command) {
+		RobotSound sound = command.getSound();
 		playSound(sound);
 	}
 

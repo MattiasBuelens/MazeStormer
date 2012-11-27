@@ -39,8 +39,10 @@ public class Program implements Runnable, ButtonListener {
 		println("ESC to quit");
 
 		connect();
-		communicator.waitComplete();
-		disconnect();
+		if (isConnected) {
+			communicator.waitComplete();
+			disconnect();
+		}
 	}
 
 	private void connect() {
@@ -49,6 +51,7 @@ public class Program implements Runnable, ButtonListener {
 		NXTConnection connection = Bluetooth.waitForConnection();
 
 		if (connection == null) {
+			println("Connection failed");
 			stop();
 		}
 

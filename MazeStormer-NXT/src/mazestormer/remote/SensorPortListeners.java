@@ -36,28 +36,15 @@ public class SensorPortListeners implements SensorPortListener {
 		}
 	}
 
-	public static SensorPortListeners S1 = new SensorPortListeners(
-			SensorPort.S1);
-	public static SensorPortListeners S2 = new SensorPortListeners(
-			SensorPort.S2);
-	public static SensorPortListeners S3 = new SensorPortListeners(
-			SensorPort.S3);
-	public static SensorPortListeners S4 = new SensorPortListeners(
-			SensorPort.S4);
+	private static SensorPortListeners[] portListeners = new SensorPortListeners[SensorPort.NUMBER_OF_PORTS];
 
 	public static SensorPortListeners get(SensorPort port) {
-		switch (port.getId()) {
-		case 0:
-			return S1;
-		case 1:
-			return S2;
-		case 2:
-			return S3;
-		case 3:
-			return S4;
-		default:
-			return null;
+		SensorPortListeners listeners = portListeners[port.getId()];
+		if (listeners == null) {
+			listeners = new SensorPortListeners(port);
+			portListeners[port.getId()] = listeners;
 		}
+		return listeners;
 	}
 
 }

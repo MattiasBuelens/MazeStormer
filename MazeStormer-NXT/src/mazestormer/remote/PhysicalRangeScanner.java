@@ -3,8 +3,6 @@ package mazestormer.remote;
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
-import lejos.robotics.RegulatedMotor;
-import lejos.robotics.RotatingRangeScanner;
 import mazestormer.command.Command;
 import mazestormer.command.CommandReplier;
 import mazestormer.command.ScanCommand;
@@ -14,14 +12,14 @@ import mazestormer.report.ReportType;
 public class PhysicalRangeScanner extends CommandReplier<RangeReadings>
 		implements RangeScanner {
 
-	private final RotatingRangeScanner scanner;
+	private final RangeScanner scanner;
 
 	public PhysicalRangeScanner(NXTCommunicator communicator,
-			RegulatedMotor head, RangeFinder rangeFinder) {
+			RangeScanner scanner) {
 		super(communicator);
 		communicator.addListener(this);
 
-		scanner = new RotatingRangeScanner(head, rangeFinder);
+		this.scanner = scanner;
 	}
 
 	@Override
@@ -42,19 +40,20 @@ public class PhysicalRangeScanner extends CommandReplier<RangeReadings>
 	/**
 	 * Handles scan requests.
 	 */
-
 	@Override
 	public void messageReceived(Command command) {
-		if (!(command instanceof ScanCommand))
-			return;
+		if (command instanceof ScanCommand) {
+			onScanCommand((ScanCommand) command);
+		}
+	}
 
-		ScanCommand scanCommand = (ScanCommand) command;
+	private void onScanCommand(ScanCommand command) {
 		// Scan at given angles
-		float[] angles = scanCommand.getAngles();
+		float[] angles = command.getAngles();
 		setAngles(angles);
 		RangeReadings readings = getRangeValues();
 		// Reply with readings
-		reply(scanCommand, readings);
+		reply(command, readings);
 	}
 
 	@Override

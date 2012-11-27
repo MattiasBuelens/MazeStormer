@@ -6,9 +6,11 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.RegulatedMotor;
+import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.command.ShutdownCommandListener;
+import mazestormer.command.Command;
+import mazestormer.command.ShutdownCommand;
 import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
@@ -16,11 +18,13 @@ import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 import mazestormer.robot.SoundPlayer;
 
-public class PhysicalRobot extends NXTComponent implements Robot {
+public class PhysicalRobot extends NXTComponent implements Robot,
+		MessageListener<Command> {
 
 	private PhysicalPilot pilot;
 	private PhysicalLightSensor light;
 	private PhysicalRangeScanner scanner;
+	private PhysicalSoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
 
 	public PhysicalRobot(NXTCommunicator communicator) {
@@ -61,26 +65,30 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 
 	@Override
 	public SoundPlayer getSoundPlayer() {
-		return null;
+		return soundPlayer;
 	}
 
-	public void setup() {
+	private void setup() {
+		final NXTCommunicator comm = getCommunicator();
+
 		// Pilot
-		pilot = new PhysicalPilot(getCommunicator());
+		pilot = new PhysicalPilot(comm);
 
 		// Light sensor
-		light = new PhysicalLightSensor(getCommunicator(), SensorPort.S1);
+		light = new PhysicalLightSensor(comm, SensorPort.S1);
 
 		// Scanner
-		RangeFinder sensor = new UltrasonicSensor(SensorPort.S2);
+		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S2);
 		RegulatedMotor headMotor = Motor.C;
-		scanner = new PhysicalRangeScanner(getCommunicator(), headMotor, sensor);
+		RangeScanner headScanner = new RotatingRangeScanner(headMotor,
+				ultrasonicSensor);
+		scanner = new PhysicalRangeScanner(comm, headScanner);
 
 		// Sound player
-		// soundPlayer = new PhysicalSoundPlayer(getCommunicator());
+		soundPlayer = new PhysicalSoundPlayer(comm);
 
 		// Command listeners
-		addMessageListener(new ShutdownCommandListener(this));
+		addMessageListener(this);
 	}
 
 	@Override
@@ -90,8 +98,6 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 		// Release resources
 		pilot.terminate();
 		light.terminate();
-		// scanner.terminate();
-		// soundPlayer.terminate();
 		// Remove registered message listeners
 		super.terminate();
 	}
@@ -102,6 +108,14 @@ public class PhysicalRobot extends NXTComponent implements Robot {
 	@Override
 	public CommandBuilder when(Condition condition) {
 		return null;
+	}
+
+	@Override
+	public void messageReceived(Command command) {
+		if (command instanceof ShutdownCommand) {
+			// Shut down
+			terminate();
+		}
 	}
 
 }

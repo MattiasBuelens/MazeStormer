@@ -12,11 +12,10 @@ import mazestormer.report.MovementReporter;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 
-public class PhysicalPilot extends DifferentialPilot implements Pilot {
+public class PhysicalPilot extends DifferentialPilot implements Pilot,
+		MessageListener<Command> {
 
 	private final NXTCommunicator communicator;
-	// private List<MessageListener<Command>> messageListeners = new
-	// ArrayList<MessageListener<Command>>();
 
 	private MovementReporter movementReporter;
 
@@ -30,10 +29,7 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot {
 
 	private void setup() {
 		// Command listeners
-		addMessageListener(new TravelCommandListener());
-		addMessageListener(new RotateCommandListener());
-		addMessageListener(new StopCommandListener());
-		addMessageListener(new ParameterCommandListener());
+		addMessageListener(this);
 
 		// Move listener
 		addMoveListener(new MoveReporter(communicator));
@@ -44,8 +40,6 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot {
 	}
 
 	private void addMessageListener(MessageListener<Command> listener) {
-		// Add and store message listener
-		// messageListeners.add(listener);
 		communicator.addListener(listener);
 	}
 
@@ -56,75 +50,60 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot {
 
 		// Stop reporting movements
 		movementReporter.stop();
-
-		// Remove registered message listeners
-		// for (MessageListener<Command> listener : messageListeners) {
-		// communicator.removeListener(listener);
-		// }
 	}
 
-	private class TravelCommandListener implements MessageListener<Command> {
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof TravelCommand))
-				return;
-
-			double distance = ((TravelCommand) command).getDistance();
-			travel(distance, true);
+	@Override
+	public void messageReceived(Command command) {
+		if (command instanceof TravelCommand) {
+			onTravelCommand((TravelCommand) command);
+		}
+		if (command instanceof RotateCommand) {
+			onRotateCommand((RotateCommand) command);
+		}
+		if (command instanceof StopCommand) {
+			onStopCommand((StopCommand) command);
+		}
+		if (command instanceof PilotParameterCommand) {
+			onParameterCommand((PilotParameterCommand) command);
 		}
 	}
 
-	private class RotateCommandListener implements MessageListener<Command> {
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof RotateCommand))
-				return;
+	private void onTravelCommand(TravelCommand command) {
+		travel(command.getDistance(), true);
 
-			double angle = ((RotateCommand) command).getAngle();
+	}
 
-			if (Double.isInfinite(angle)) {
-				if (angle > 0) {
-					rotateLeft();
-				} else {
-					rotateRight();
-				}
+	private void onRotateCommand(RotateCommand command) {
+		double angle = command.getAngle();
+		if (Double.isInfinite(angle)) {
+			if (angle > 0) {
+				rotateLeft();
 			} else {
-				rotate(angle, true);
+				rotateRight();
 			}
+		} else {
+			rotate(angle, true);
 		}
 	}
 
-	private class StopCommandListener implements MessageListener<Command> {
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof StopCommand))
-				return;
-
-			stop();
-		}
+	private void onStopCommand(StopCommand command) {
+		stop();
 	}
 
-	private class ParameterCommandListener implements MessageListener<Command> {
-		@Override
-		public void messageReceived(Command command) {
-			if (!(command instanceof PilotParameterCommand))
-				return;
-
-			double value = ((PilotParameterCommand) command).getValue();
-
-			switch (command.getType()) {
-			case SET_TRAVEL_SPEED:
-				setTravelSpeed(value);
-				break;
-			case SET_ROTATE_SPEED:
-				setRotateSpeed(value);
-				break;
-			case SET_ACCELERATION:
-				setAcceleration((int) value);
-				break;
-			default:
-				break;
-			}
+	private void onParameterCommand(PilotParameterCommand command) {
+		double value = command.getValue();
+		switch (command.getType()) {
+		case SET_TRAVEL_SPEED:
+			setTravelSpeed(value);
+			break;
+		case SET_ROTATE_SPEED:
+			setRotateSpeed(value);
+			break;
+		case SET_ACCELERATION:
+			setAcceleration((int) value);
+			break;
+		default:
+			break;
 		}
 	}
 

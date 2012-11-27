@@ -6,15 +6,15 @@ import java.io.IOException;
 
 import mazestormer.robot.RobotSound;
 
-public class SoundPlayCommand extends Command {
+public class PlaySoundCommand extends Command {
 
 	private RobotSound sound;
 
-	public SoundPlayCommand(CommandType type) {
+	public PlaySoundCommand(CommandType type) {
 		super(type);
 	}
 
-	public SoundPlayCommand(CommandType type, RobotSound sound) {
+	public PlaySoundCommand(CommandType type, RobotSound sound) {
 		this(type);
 		setSound(sound);
 	}

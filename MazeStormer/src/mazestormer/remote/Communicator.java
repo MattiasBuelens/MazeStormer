@@ -19,13 +19,15 @@ public class Communicator<S extends Message, R extends Message> implements
 	private DataOutputStream dos;
 	private final MessageReader<? extends R> reader;
 
-	private List<MessageListener<? super R>> listeners = new ArrayList<MessageListener<? super R>>();
+	private final List<MessageListener<? super R>> listeners;
 
 	public Communicator(DataInputStream dis, DataOutputStream dos,
 			MessageReader<? extends R> reader) {
 		this.dis = dis;
 		this.dos = dos;
 		this.reader = reader;
+		
+		this.listeners = new ArrayList<MessageListener<? super R>>(32);
 	}
 
 	public Communicator(InputStream is, OutputStream os,
