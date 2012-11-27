@@ -4,12 +4,12 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.remote.RemoteMotor;
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeScanner;
-import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.detect.RotatingRangeScanner;
 
 public class PhysicalRobot implements Robot {
 
@@ -43,7 +43,8 @@ public class PhysicalRobot implements Robot {
 		if (scanner == null) {
 			RangeFinder sensor = new UltrasonicSensor(RemoteSensorPort.get(1));
 			RemoteMotor headMotor = CachedRemoteMotor.get(2);
-			scanner = new RotatingRangeScanner(headMotor, sensor);
+			float gearRatio = Robot.sensorGearRatio;
+			scanner = new RotatingRangeScanner(headMotor, sensor, gearRatio);
 		}
 		return scanner;
 	}

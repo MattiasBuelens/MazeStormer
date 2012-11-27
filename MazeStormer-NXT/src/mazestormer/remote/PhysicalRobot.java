@@ -6,13 +6,13 @@ import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.RegulatedMotor;
-import lejos.robotics.RotatingRangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.Command;
 import mazestormer.command.ShutdownCommand;
 import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
+import mazestormer.detect.RotatingRangeScanner;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
@@ -80,8 +80,9 @@ public class PhysicalRobot extends NXTComponent implements Robot,
 		// Scanner
 		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S2);
 		RegulatedMotor headMotor = Motor.C;
+		float gearRatio = Robot.sensorGearRatio;
 		RangeScanner headScanner = new RotatingRangeScanner(headMotor,
-				ultrasonicSensor);
+				ultrasonicSensor, gearRatio);
 		scanner = new PhysicalRangeScanner(comm, headScanner);
 
 		// Sound player

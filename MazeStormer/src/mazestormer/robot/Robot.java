@@ -1,5 +1,6 @@
 package mazestormer.robot;
 
+import lejos.geom.Point;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.ConditionalCommandBuilder;
@@ -31,6 +32,18 @@ public interface Robot extends ConditionalCommandBuilder {
 	 * Approximate radius of the light sensor beam.
 	 */
 	public final static float sensorRadius = 1.0f;
+
+	/**
+	 * Relative offset of the ultrasonic sensor from the center of the robot, in
+	 * centimeters.
+	 */
+	// public static final Point sensorPosition = new Point(-3.4f, -0.6f);
+	public static final Point sensorPosition = new Point(0f, -4.8f);
+
+	/**
+	 * Gear ratio of the ultrasonic sensor head motor.
+	 */
+	public static final float sensorGearRatio = -56f / 40f;
 
 	/**
 	 * Get the pilot controlling this robot's movement.

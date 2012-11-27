@@ -11,6 +11,7 @@ import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.robot.Robot;
 import mazestormer.simulator.VirtualRangeScanner;
 
 /**
@@ -22,19 +23,19 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 	private static final float defaultMaxDistance = 100f;
 
 	private final RangeScanner scanner;
+	private final Point offset;
 	private float maxDistance;
 	private PoseProvider pp = null;
 
-	/**
-	 * Relative position of ultrasonic sensor from rotation center of robot, in
-	 * centimeters.
-	 */
-	// TODO Move to Robot?
-	private static final Point sensorPosition = new Point(-3.4f, -0.6f);
-
-	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance) {
+	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance,
+			Point offset) {
 		this.scanner = checkNotNull(scanner);
 		this.maxDistance = maxDistance;
+		this.offset = offset;
+	}
+
+	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance) {
+		this(scanner, maxDistance, Robot.sensorPosition);
 	}
 
 	public RangeScannerFeatureDetector(RangeScanner scanner) {
@@ -59,6 +60,14 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 	}
 
 	/**
+	 * Get the relative offset of the range finder from the center of the robot,
+	 * in centimeters.
+	 */
+	public Point getOffset() {
+		return offset;
+	}
+
+	/**
 	 * Set the pose provider to register the current pose when registering new
 	 * readings.
 	 * 
@@ -73,6 +82,8 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 	public RangeFeature scan() {
 		// Get the range readings
 		RangeReadings rawReadings = scanner.getRangeValues();
+		if (rawReadings == null)
+			return null;
 
 		// Filter and sort the readings
 		Comparator<RangeReading> comparator = new ReadingRangeComparator();
@@ -82,18 +93,18 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 			// Only retain positive readings
 			if (rawReading.getRange() < 0)
 				continue;
-			
+
 			RangeReading reading;
-			//no need to change the coordinate system here.
-			//the point (0,0) is already the rotation center of the robot.
-			if(scanner instanceof VirtualRangeScanner)
+			// no need to change the coordinate system here.
+			// the point (0,0) is already the rotation center of the robot.
+			if (scanner instanceof VirtualRangeScanner)
 				reading = rawReading;
 			else {
 				// Change coordinate system from sensor (where O is the rotation
 				// center of the sensor-servo)
 				// to nxt (where 0 is the rotation center of the robot)
-				Point position = sensorPosition.pointAt(rawReading.getRange(),
-						rawReading.getAngle());
+				Point position = Robot.sensorPosition.pointAt(
+						rawReading.getRange(), rawReading.getAngle());
 				float angle = (float) Math.toDegrees(position.angle());
 				float range = position.length();
 				reading = new RangeReading(angle, range);
