@@ -1,14 +1,16 @@
 package mazestormer.barcode;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import lejos.util.Delay;
+import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
 public class WaitAction implements IAction {
 
 	@Override
-	public void performAction(Robot robot) throws IllegalStateException {
-		if (robot == null)
-			throw new IllegalStateException("The given robot must be a valid robot.");
+	public void performAction(Robot robot, Maze maze) {
+		checkNotNull(robot);
+		checkNotNull(maze);
 
 		/*
 		 * TODO This won't actually prevent the robot from doing anything. Other
