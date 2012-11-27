@@ -210,6 +210,10 @@ public class PathFindingController extends SubController implements
 
 		@Override
 		public void run() {
+			if (this.singleStep && this.reposition) {
+				new LineFinderController(getMainController()).startSearching();
+			}
+			
 			this.navigator.singleStep(this.singleStep);
 			this.navigator.followPath();
 			if (this.singleStep) {
@@ -217,11 +221,6 @@ public class PathFindingController extends SubController implements
 			} else {
 				while (!this.navigator.waitForStop())
 					Thread.yield();
-			}
-			
-			
-			if (this.singleStep && this.reposition) {
-				new LineFinderController(getMainController()).startSearching();
 			}
 			
 			stop();
