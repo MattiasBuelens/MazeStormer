@@ -17,7 +17,7 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	/**
 	 * Timeout for synchronous requests.
 	 */
-	public static final int requestTimeout = 1000;
+	public static final int requestTimeout = 10000;
 
 	private RemotePilot pilot;
 	private PoseProvider poseProvider;

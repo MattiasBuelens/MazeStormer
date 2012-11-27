@@ -138,6 +138,7 @@ public class ExplorerController extends SubController implements
 							nextTile.getX(), nextTile.getY());
 					while (!shouldContinue) {
 						//do not continue
+						//Best code evah!
 					} 
 				}
 
@@ -151,7 +152,7 @@ public class ExplorerController extends SubController implements
 
 			RangeFeatureDetector detector = getMainController().getRobot()
 					.getRangeDetector();
-			detector.setMaxDistance(28);// TODO: juist?
+			detector.setMaxDistance(24);// TODO: juist?
 			RangeFeature feature = detector.scan();
 
 			if (feature != null) {
@@ -159,7 +160,7 @@ public class ExplorerController extends SubController implements
 				for (RangeReading reading : feature.getRangeReadings()) {
 					orientation = angleToOrientation(reading.getAngle()
 							+ getMaze().toRelative(getPose().getHeading()));
-					// System.out.println("Wall in " + orientation);
+					System.out.println("Wall at dist: " + reading.getRange() + "in direction: " + reading.getAngle());
 					getMaze().setEdge(givenTile.getPosition(), orientation,
 							EdgeType.WALL);
 				}
