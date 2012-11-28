@@ -237,7 +237,7 @@ public class PathFindingController extends SubController implements
 
 		private void addWayPoints() {
 			if (this.tiles != null)
-				for (int i = 0; i < this.tiles.length; i++) {
+				for (int i = 1; i < this.tiles.length; i++) {
 					Point tilePosition = this.tiles[i].getPosition().toPoint();
 					Point absolutePosition = this.maze.toAbsolute(tilePosition);
 					Waypoint w = new Waypoint((absolutePosition.x + 0.5)
