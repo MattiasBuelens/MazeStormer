@@ -87,12 +87,16 @@ public class LogPanel extends ViewPanel {
 		Level {
 			@Override
 			public Object getValue(LogRecord record) {
+				if (record == null)
+					return "";
 				return record.getLevel().getLocalizedName();
 			}
 		},
 		Message {
 			@Override
 			public Object getValue(LogRecord record) {
+				if (record == null)
+					return "";
 				return record.getMessage();
 			}
 		};

@@ -26,19 +26,20 @@ public interface Robot extends ConditionalCommandBuilder {
 	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.
 	 */
+	// public final static float sensorOffset = 7.2f;
 	public final static float sensorOffset = 7.2f;
 
 	/**
 	 * Approximate radius of the light sensor beam.
 	 */
-	public final static float sensorRadius = 1.0f;
+	public final static float sensorRadius = 1.5f;
 
 	/**
 	 * Relative offset of the ultrasonic sensor from the center of the robot, in
 	 * centimeters.
 	 */
 	// public static final Point sensorPosition = new Point(-3.4f, -0.6f);
-	public static final Point sensorPosition = new Point(0f, -4.8f);
+	public static final Point sensorPosition = new Point(-0.8f, 0f);
 
 	/**
 	 * Gear ratio of the ultrasonic sensor head motor.
