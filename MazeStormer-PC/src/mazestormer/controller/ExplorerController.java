@@ -117,6 +117,7 @@ public class ExplorerController extends SubController implements
 			Tile currentTile, nextTile;
 
 			while (!queue.isEmpty() && isRunning()) {
+				System.out.println("Before poll: " + queue.size());
 				currentTile = queue.pollLast(); // DO remove the first path from the
 											// QUEUE
 											// (This is the tile the robot
@@ -144,6 +145,8 @@ public class ExplorerController extends SubController implements
 
 				shouldContinue = false;
 			}
+			stopExploring();
+			System.out.println("DONE, motherfucker");
 		}
 
 		// Scans in the direction of UNKNOWN edges, and updates them accordingly
@@ -152,7 +155,7 @@ public class ExplorerController extends SubController implements
 
 			RangeFeatureDetector detector = getMainController().getRobot()
 					.getRangeDetector();
-			detector.setMaxDistance(24);// TODO: juist?
+			detector.setMaxDistance(28);// TODO: juist?
 			RangeFeature feature = detector.scan();
 
 			if (feature != null) {
