@@ -6,6 +6,7 @@ import lejos.nxt.Button;
 import lejos.nxt.ButtonListener;
 import lejos.nxt.LCD;
 import lejos.nxt.NXT;
+import lejos.nxt.Sound;
 import lejos.nxt.comm.Bluetooth;
 import lejos.nxt.comm.NXTConnection;
 import mazestormer.robot.Robot;
@@ -55,9 +56,11 @@ public class Program implements Runnable, ButtonListener {
 			stop();
 		}
 
-		// Connect
+		// Connected
 		isConnected = true;
 		println("Connected");
+		Sound.beepSequenceUp();
+
 		// Create communicator
 		communicator = new NXTCommunicator(connection);
 		// Create robot
@@ -67,20 +70,28 @@ public class Program implements Runnable, ButtonListener {
 	}
 
 	private void disconnect() {
-		if (isConnected) {
-			isConnected = false;
-			println("Disconnecting");
-			if (robot != null) {
-				robot.terminate();
-			}
-			if (communicator != null) {
-				try {
-					communicator.terminate();
-				} catch (IOException e) {
-				}
-			}
-			println("Disconnected");
+		if (!isConnected)
+			return;
+
+		isConnected = false;
+		println("Disconnecting");
+
+		// Terminate robot
+		if (robot != null) {
+			robot.terminate();
 		}
+
+		// Terminate communicator
+		if (communicator != null) {
+			try {
+				communicator.terminate();
+			} catch (IOException e) {
+			}
+		}
+
+		// Disconnected
+		println("Disconnected");
+		Sound.beepSequence();
 	}
 
 	public void stop() {
