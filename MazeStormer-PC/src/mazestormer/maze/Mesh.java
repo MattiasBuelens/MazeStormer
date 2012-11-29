@@ -1,8 +1,11 @@
 package mazestormer.maze;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.AstarSearchAlgorithm;
 import lejos.robotics.pathfinding.Node;
@@ -10,18 +13,13 @@ import lejos.robotics.pathfinding.Path;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+public class Mesh implements MazeListener {
 
-public class Mesh {
+	private final Maze maze;
 
 	public Mesh(Maze maze) {
-		setMaze(maze);
-	}
-
-	private Maze maze;
-
-	public void setMaze(Maze maze) {
 		this.maze = maze;
+		maze.addListener(this);
 	}
 
 	public Maze getMaze() {
@@ -29,14 +27,15 @@ public class Mesh {
 	}
 
 	private Map<Tile, Node> nodeMap = new HashMap<Tile, Node>();
-	
+
 	public Tile[] findTilePath(Tile startTile, Tile goalTile) {
 		Path path = findNodePath(startTile, goalTile);
-		if(path != null){
-			Tile[] tiles = new Tile[path.size()];
-			for(int i=0; i<path.size(); i++){
+		if (path != null) {
+			int nbWaypoints = path.size();
+			Tile[] tiles = new Tile[nbWaypoints];
+			for (int i = 0; i < nbWaypoints; i++) {
 				Waypoint wp = path.get(i);
-				tiles[i] = getMaze().getTileAt(new LongPoint((long) wp.x, (long) wp.y));
+				tiles[i] = getMaze().getTileAt(new LongPoint(wp));
 			}
 			return tiles;
 		}
@@ -50,31 +49,31 @@ public class Mesh {
 		AstarSearchAlgorithm astar = new AstarSearchAlgorithm();
 		return astar.findPath(startNode, goalNode);
 	}
-	
-	public void addTileAsNode(Tile tile){
+
+	public void addTileAsNode(Tile tile) {
 		checkNotNull(tile);
 		this.nodeMap.put(tile, new Node(tile.getX(), tile.getY()));
 	}
-	
-	public void edgeUpdate(Edge edge){
+
+	public void edgeUpdate(Edge edge) {
 		checkNotNull(edge);
-		
+
 		if (edge.getType() == EdgeType.OPEN || edge.getType() == EdgeType.WALL) {
-			Object[] touchingLPs = edge.getTouching().toArray();
-			Tile firstTile = getMaze().getTileAt((LongPoint) touchingLPs[0]);
-			Tile secondTile = getMaze().getTileAt((LongPoint) touchingLPs[1]);
-			
+			LongPoint[] touching = edge.getTouching().toArray(new LongPoint[0]);
+			Node first = this.nodeMap.get(getMaze().getTileAt(touching[0]));
+			Node second = this.nodeMap.get(getMaze().getTileAt(touching[1]));
+
 			if (edge.getType() == EdgeType.OPEN) {
-				this.nodeMap.get(firstTile).addNeighbor(this.nodeMap.get(secondTile));
-				this.nodeMap.get(secondTile).addNeighbor(this.nodeMap.get(firstTile));
-			}	
-			else if (edge.getType() == EdgeType.WALL) {
-				this.nodeMap.get(firstTile).removeNeighbor(this.nodeMap.get(secondTile));
-				this.nodeMap.get(secondTile).removeNeighbor(this.nodeMap.get(firstTile));
+				first.addNeighbor(second);
+				second.addNeighbor(first);
+			} else if (edge.getType() == EdgeType.WALL) {
+				first.removeNeighbor(second);
+				second.removeNeighbor(first);
 			}
 		}
 	}
 
+	@Deprecated
 	public void printNodeMap() {
 		for (Tile tile : this.nodeMap.keySet()) {
 			System.out.println("Tile X: " + tile.getX() + "\t" + " Y: "
@@ -87,4 +86,28 @@ public class Mesh {
 					+ " | Openings: " + node.getNeighbors().size());
 		}
 	}
+
+	@Override
+	public void tileAdded(Tile tile) {
+		addTileAsNode(tile);
+	}
+
+	@Override
+	public void tileChanged(Tile tile) {
+	}
+
+	@Override
+	public void edgeChanged(Edge edge) {
+		edgeUpdate(edge);
+	}
+
+	@Override
+	public void mazeOriginChanged(Pose origin) {
+	}
+
+	@Override
+	public void mazeCleared() {
+		this.nodeMap.clear();
+	}
+
 }

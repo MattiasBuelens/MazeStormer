@@ -31,12 +31,13 @@ public class Maze extends AbstractEventSource {
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
-	private Mesh mesh;
+	private final Mesh mesh;
 	private Tile goalTile;
 
 	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
+		this.mesh = new Mesh(this);
 	}
 
 	public Maze(float tileSize) {
@@ -104,6 +105,7 @@ public class Maze extends AbstractEventSource {
 		// Create and put tile
 		Tile tile = new Tile(tilePosition);
 		tiles.put(tilePosition, tile);
+		updateMinMax(tile);
 
 		// Share edges with neighbours
 		for (Orientation orientation : Orientation.values()) {
@@ -116,55 +118,35 @@ public class Maze extends AbstractEventSource {
 
 		// Fire tile added event
 		fireTileAdded(tile);
-		
-		updateMinMax(tile);
-		getMesh().addTileAsNode(tile);
-		
+
 		return tile;
 	}
-	
+
 	private long minX = 0;
 	private long maxX = 0;
 	private long minY = 0;
 	private long maxY = 0;
-	
-	public long getMinX(){
+
+	public long getMinX() {
 		return this.minX;
 	}
-	
-	public long getMaxX(){
+
+	public long getMaxX() {
 		return this.maxX;
 	}
-	
-	public long getMinY(){
+
+	public long getMinY() {
 		return this.minY;
 	}
-	
-	public long getMaxY(){
+
+	public long getMaxY() {
 		return this.maxY;
 	}
-	
-	private void updateMinMax(Tile newTile){
-		updateMinX(newTile);
-		updateMaxX(newTile);
-		updateMinY(newTile);
-		updateMaxY(newTile);
-	}
-	
-	
-	private void updateMinX(Tile newTile) {
+
+	private void updateMinMax(Tile newTile) {
 		this.minX = Math.min(getMinX(), newTile.getX());
-	}
-	
-	private void updateMaxX(Tile newTile) {
 		this.maxX = Math.max(getMaxX(), newTile.getX());
-	}
-	
-	private void updateMinY(Tile newTile) {
 		this.minY = Math.min(getMinY(), newTile.getY());
-	}
-	
-	private void updateMaxY(Tile newTile) {
 		this.maxY = Math.max(getMaxY(), newTile.getY());
 	}
 
@@ -227,8 +209,6 @@ public class Maze extends AbstractEventSource {
 		for (LongPoint touchingPosition : edge.getTouching()) {
 			fireTileChanged(getTileAt(touchingPosition));
 		}
-		
-		getMesh().edgeUpdate(edge);
 	}
 
 	private void updateEdgeLine(Edge edge) {
@@ -431,22 +411,18 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Returns the mesh of this maze.
-	 * 
-	 * @return The mesh of this maze.
+	 * Get the mesh of this maze.
 	 */
 	public Mesh getMesh() {
-		if (this.mesh == null) {
-			this.mesh = new Mesh(this);
-		}
-		return this.mesh;
+		return mesh;
 	}
-	
-	public Tile getGoalTile(){
+
+	public Tile getGoalTile() {
 		return this.goalTile;
 	}
-	
+
 	public void setGoalTile(Tile tile) {
 		this.goalTile = tile;
 	}
+
 }

@@ -20,7 +20,8 @@ public class CollisionObserver implements Runnable, MoveListener {
 
 	private static final long interval = 100;
 	private ScheduledFuture<?> future;
-	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+	private final ScheduledExecutorService executor = Executors
+			.newSingleThreadScheduledExecutor();
 
 	private List<CollisionListener> listeners = new ArrayList<CollisionListener>();
 
@@ -47,11 +48,13 @@ public class CollisionObserver implements Runnable, MoveListener {
 		 * checks. To do this properly, you'd need to stop the robot before it
 		 * makes colliding move.
 		 */
-		future = executor.scheduleWithFixedDelay(this, interval, interval, TimeUnit.MILLISECONDS);
+		future = executor.scheduleWithFixedDelay(this, interval, interval,
+				TimeUnit.MILLISECONDS);
 	}
 
 	public void stop() {
-		future.cancel(false);
+		if (future != null)
+			future.cancel(false);
 	}
 
 	public void terminate() {

@@ -30,10 +30,12 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private static final String tileColor = CSS_SANDYBROWN_VALUE;
 	private static final String wallColor = CSS_PERU_VALUE;
 	private static final String lineColor = CSS_WHITE_VALUE;
+	private static final String unknownColor = CSS_LIGHTGRAY_VALUE;
 
 	private static final double tileSize = 1d;
 
 	private final double edgeStrokeWidth;
+	private static final int edgeDashSize = 4;
 
 	private final Maze maze;
 	private int zIndex = 0;
@@ -250,6 +252,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		public EdgeElement(LongPoint position, Orientation orientation) {
 			this.position = position;
 			this.orientation = orientation;
+			this.type = Edge.EdgeType.UNKNOWN;
 
 			line = (SVGLineElement) createElement(SVG_LINE_TAG);
 			line.setAttribute(SVG_STROKE_WIDTH_ATTRIBUTE, edgeStrokeWidth + "");
@@ -287,10 +290,26 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		// TODO: UNKNOWN color?
 		private void update() {
-			// Set stroke color
-			boolean isWall = getType() == Edge.EdgeType.WALL;
-			line.setAttribute(SVG_STROKE_ATTRIBUTE, isWall ? wallColor
-					: lineColor);
+			String color = unknownColor;
+			boolean dashed = false;
+			switch (getType()) {
+			case WALL:
+				color = wallColor;
+				break;
+			case OPEN:
+				color = lineColor;
+				break;
+			case UNKNOWN:
+			default:
+				color = unknownColor;
+				dashed = true;
+			}
+			// Stroke color
+			line.setAttribute(SVG_STROKE_ATTRIBUTE, color);
+			// Dashes
+			line.setAttribute(SVG_STROKE_DASHARRAY_ATTRIBUTE,
+					dashed ? (edgeDashSize * edgeStrokeWidth) + ""
+							: SVG_NONE_VALUE);
 		}
 
 		private void setPoints() {
