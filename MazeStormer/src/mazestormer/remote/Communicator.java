@@ -5,11 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Communicator<S extends Message, R extends Message> implements
-		Runnable {
+public abstract class Communicator<S extends Message, R extends Message>
+		implements Runnable {
 
 	private boolean isListening = false;
 	private boolean isTerminated = false;
@@ -19,15 +17,11 @@ public class Communicator<S extends Message, R extends Message> implements
 	private DataOutputStream dos;
 	private final MessageReader<? extends R> reader;
 
-	private final List<MessageListener<? super R>> listeners;
-
 	public Communicator(DataInputStream dis, DataOutputStream dos,
 			MessageReader<? extends R> reader) {
 		this.dis = dis;
 		this.dos = dos;
 		this.reader = reader;
-		
-		this.listeners = new ArrayList<MessageListener<? super R>>(32);
 	}
 
 	public Communicator(InputStream is, OutputStream os,
@@ -134,24 +128,29 @@ public class Communicator<S extends Message, R extends Message> implements
 		}
 	}
 
-	public void addListener(MessageListener<? super R> listener) {
-		listeners.add(listener);
-	}
+	/**
+	 * Adds a listener which will receive incoming messages.
+	 * 
+	 * @param listener
+	 *            The new listener.
+	 */
+	public abstract void addListener(MessageListener<? super R> listener);
 
-	public void removeListener(MessageListener<? super R> listener) {
-		listeners.remove(listener);
-	}
+	/**
+	 * Removes a message listener.
+	 * 
+	 * @param listener
+	 *            The listener to remove.
+	 */
+	public abstract void removeListener(MessageListener<? super R> listener);
 
-	public void trigger(final R message) {
-		// TODO Do we need this?
-		// Clone listeners to prevent concurrent modifications
-		final List<MessageListener<? super R>> listeners = new ArrayList<>(
-				this.listeners);
-		// Call listeners
-		for (MessageListener<? super R> listener : listeners) {
-			listener.messageReceived(message);
-		}
-	}
+	/**
+	 * Triggers all registered message listeners.
+	 * 
+	 * @param message
+	 *            The received message.
+	 */
+	public abstract void trigger(final R message);
 
 	public boolean isTerminated() {
 		return isTerminated;

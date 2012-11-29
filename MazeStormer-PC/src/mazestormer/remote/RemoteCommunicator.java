@@ -1,6 +1,8 @@
 package mazestormer.remote;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import lejos.pc.comm.NXTConnector;
 import mazestormer.command.Command;
@@ -10,12 +12,15 @@ import mazestormer.report.ReportReader;
 public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 
 	private NXTConnector connector;
+	private final List<MessageListener<? super Report<?>>> listeners;
 
 	private int nextRequestId = 0;
 
 	public RemoteCommunicator(NXTConnector connector) {
-		super(connector.getInputStream(), connector.getOutputStream(), new ReportReader());
+		super(connector.getInputStream(), connector.getOutputStream(),
+				new ReportReader());
 		this.connector = connector;
+		this.listeners = new CopyOnWriteArrayList<MessageListener<? super Report<?>>>();
 	}
 
 	public int nextRequestId() {
@@ -31,4 +36,45 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Listeners will only start receiving messages after the current message is
+	 * processed by all currently registered listeners.
+	 * </p>
+	 */
+	@Override
+	public void addListener(MessageListener<? super Report<?>> listener) {
+		listeners.add(listener);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Listeners will only stop receiving messages after the current message is
+	 * processed by all currently registered listeners.
+	 * </p>
+	 */
+	@Override
+	public void removeListener(MessageListener<? super Report<?>> listener) {
+		listeners.remove(listener);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * <p>
+	 * Changes to the list of registered listeners are only applied after the
+	 * current message is processed by all currently registered listeners.
+	 * </p>
+	 */
+	@Override
+	public void trigger(final Report<?> report) {
+		// Call listeners
+		for (MessageListener<? super Report<?>> listener : listeners) {
+			listener.messageReceived(report);
+		}
+	}
 }
