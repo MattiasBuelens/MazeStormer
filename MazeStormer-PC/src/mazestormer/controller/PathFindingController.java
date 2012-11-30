@@ -1,11 +1,11 @@
 package mazestormer.controller;
 
 import lejos.geom.Point;
-import lejos.robotics.navigation.Navigator;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
+import mazestormer.robot.Navigator;
 import mazestormer.robot.Robot;
 import mazestormer.util.LongPoint;
 
@@ -49,9 +49,10 @@ public class PathFindingController extends SubController implements
 				false);
 		this.runner.start();
 	}
-	
+
 	@Override
-	public void startAction(long goalX, long goalY, boolean singleStep, boolean reposition) {
+	public void startAction(long goalX, long goalY, boolean singleStep,
+			boolean reposition) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
 		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
 				singleStep);
@@ -175,18 +176,18 @@ public class PathFindingController extends SubController implements
 			this.singleStep = singleStep;
 			initializeNavigator();
 		}
-		
+
 		public void setSinglestep(boolean request) {
 			this.singleStep = request;
 		}
-		
+
 		public void setReposition(boolean request) {
 			this.reposition = request;
 		}
 
 		private void initializeNavigator() {
-			this.navigator = new Navigator(this.robot.getPilot());
-			this.navigator.setPoseProvider(this.robot.getPoseProvider());
+			this.navigator = new Navigator(this.robot.getPilot(),
+					this.robot.getPoseProvider());
 			addWayPoints();
 		}
 
@@ -222,7 +223,7 @@ public class PathFindingController extends SubController implements
 			if (this.singleStep && this.reposition) {
 				new LineFinderController(getMainController()).startSearching();
 			}
-			
+
 			this.navigator.singleStep(this.singleStep);
 			this.navigator.followPath();
 			if (this.singleStep) {
@@ -231,21 +232,19 @@ public class PathFindingController extends SubController implements
 				while (!this.navigator.waitForStop())
 					Thread.yield();
 			}
-			
+
 			stop();
 		}
 
 		private void addWayPoints() {
-			if (this.tiles != null)
-				for (int i = 1; i < this.tiles.length; i++) {
-					Point tilePosition = this.tiles[i].getPosition().toPoint();
-					Point absolutePosition = this.maze.toAbsolute(tilePosition);
-					Waypoint w = new Waypoint((absolutePosition.x + 0.5)
-							* this.maze.getTileSize(),
-							(absolutePosition.y + 0.5)
-									* this.maze.getTileSize());
-					this.navigator.addWaypoint(w);
-				}
+			for (int i = 1; i < this.tiles.length; i++) {
+				Point tilePosition = this.tiles[i].getPosition().toPoint();
+				Point absolutePosition = this.maze.toAbsolute(tilePosition);
+				Waypoint w = new Waypoint((absolutePosition.x + 0.5)
+						* this.maze.getTileSize(), (absolutePosition.y + 0.5)
+						* this.maze.getTileSize());
+				this.navigator.addWaypoint(w);
+			}
 		}
 
 	}
