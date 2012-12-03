@@ -2,6 +2,7 @@ package mazestormer.controller;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 
 import com.google.common.eventbus.Subscribe;
@@ -200,7 +201,9 @@ public class ExplorerController extends SubController implements
 					break;
 				}
 			}
-
+			
+			Collections.sort(list);
+			System.out.println(list.toString());
 			return Floats.toArray(list);
 		}
 
