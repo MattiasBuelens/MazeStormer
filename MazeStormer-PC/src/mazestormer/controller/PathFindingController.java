@@ -1,11 +1,13 @@
 package mazestormer.controller;
 
+import java.util.List;
+
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
-import mazestormer.robot.Navigator;
+import mazestormer.robot.PathRunner;
 import mazestormer.robot.Robot;
 import mazestormer.util.LongPoint;
 
@@ -41,7 +43,7 @@ public class PathFindingController extends SubController implements
 	private void postState(EventType eventType) {
 		postEvent(new ActionEvent(eventType));
 	}
-	
+
 	@Override
 	public void startStepAction(long goalX, long goalY) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
@@ -71,7 +73,7 @@ public class PathFindingController extends SubController implements
 	@Override
 	public void stopAction() {
 		if (this.runner != null) {
-			this.runner.stop();
+			this.runner.cancel();
 			this.runner = null;
 		}
 	}
@@ -125,15 +127,9 @@ public class PathFindingController extends SubController implements
 		}
 	}
 
-	public class TileSequenceRunner implements Runnable {
+	public class TileSequenceRunner extends PathRunner {
 
-		private Robot robot;
-		private Maze maze;
 		private Tile goal;
-		private Tile[] tiles;
-		private Navigator navigator;
-		private boolean isRunning = false;
-
 		private boolean singleStep;
 		private boolean reposition;
 
@@ -150,37 +146,8 @@ public class PathFindingController extends SubController implements
 		 */
 		public TileSequenceRunner(Robot robot, Maze maze, Tile goal,
 				boolean singleStep) {
-			this.robot = robot;
-			this.maze = maze;
+			super(robot, maze);
 			this.goal = goal;
-			this.tiles = this.maze.getMesh().findTilePath(getStartTile(),
-					this.goal);
-			this.singleStep = singleStep;
-			initializeNavigator();
-		}
-
-		/**
-		 * Create a new tile sequence runner with given robot, maze and tile
-		 * sequence.
-		 * 
-		 * @pre If the tile sequence doesn't refer the null reference, the
-		 *      robot's current tile must be the first tile in the sequence.
-		 * @pre If the tile sequence doesn't refer the null reference, every two
-		 *      consecutive tiles must be located next to each other in a four
-		 *      way grid structure. (North, East, South, West)
-		 * @param robot
-		 *            The robot who must follow a tile sequence.
-		 * @param maze
-		 *            The maze the robot is positioned in.
-		 * @param tiles
-		 *            The tile sequence the robot must follow.
-		 */
-		public TileSequenceRunner(Robot robot, Maze maze, Tile[] tiles,
-				boolean singleStep) {
-			this.robot = robot;
-			this.maze = maze;
-			this.tiles = tiles;
-			this.goal = this.tiles[this.tiles.length - 1];
 			this.singleStep = singleStep;
 			initializeNavigator();
 		}
@@ -194,36 +161,22 @@ public class PathFindingController extends SubController implements
 		}
 
 		private void initializeNavigator() {
-			this.navigator = new Navigator(this.robot.getPilot(),
-					this.robot.getPoseProvider());
-			addWayPoints();
-		}
-
-		public void start() {
-			this.isRunning = true;
-			new Thread(this).start();
-			postState(EventType.STARTED);
-		}
-
-		public void stop() {
-			if (isRunning()) {
-				this.isRunning = false;
-				this.navigator.stop();
-				postState(EventType.STOPPED);
+			List<Waypoint> waypoints = findPath(goal);
+			for (Waypoint waypoint : waypoints) {
+				navigator.addWaypoint(waypoint);
 			}
 		}
 
-		public synchronized boolean isRunning() {
-			return this.isRunning;
+		@Override
+		public void onStarted() {
+			super.onStarted();
+			postState(EventType.STARTED);
 		}
 
-		private Tile getStartTile() {
-			// Get absolute robot pose
-			Pose pose = this.robot.getPoseProvider().getPose();
-			// Get tile underneath robot
-			Point relativePosition = this.maze.toRelative(pose.getLocation());
-			Point tilePosition = this.maze.toTile(relativePosition);
-			return this.maze.getTileAt(tilePosition);
+		@Override
+		public void onCancelled() {
+			super.onCancelled();
+			postState(EventType.STOPPED);
 		}
 
 		@Override
@@ -237,22 +190,13 @@ public class PathFindingController extends SubController implements
 			if (this.singleStep) {
 				this.navigator.waitForStop();
 			} else {
-				while (!this.navigator.waitForStop())
+				while (!this.navigator.waitForStop()) {
 					Thread.yield();
+				}
 			}
 
-			stop();
-		}
-
-		private void addWayPoints() {
-			for (int i = 1; i < this.tiles.length; i++) {
-				Point tilePosition = this.tiles[i].getPosition().toPoint();
-				Point absolutePosition = this.maze.toAbsolute(tilePosition);
-				Waypoint w = new Waypoint((absolutePosition.x + 0.5)
-						* this.maze.getTileSize(), (absolutePosition.y + 0.5)
-						* this.maze.getTileSize());
-				this.navigator.addWaypoint(w);
-			}
+			// Done
+			cancel();
 		}
 
 	}
