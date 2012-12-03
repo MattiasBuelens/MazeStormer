@@ -1,5 +1,6 @@
 package mazestormer.simulator;
 
+import lejos.geom.Point;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
@@ -32,7 +33,8 @@ public class VirtualRobot implements Robot {
 	public VirtualRobot(Maze maze) {
 		this.maze = maze;
 
-		this.collisionDetector = new VirtualCollisionDetector(maze, getPoseProvider());
+		this.collisionDetector = new VirtualCollisionDetector(maze,
+				getPoseProvider());
 		this.collisionObserver = new CollisionObserver(this);
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
@@ -65,7 +67,8 @@ public class VirtualRobot implements Robot {
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
-			detector = new RangeScannerFeatureDetector(getRangeScanner());
+			detector = new RangeScannerFeatureDetector(getRangeScanner(),
+					sensorMaxDistance, new Point(0f, 0f));
 			detector.setPoseProvider(getPoseProvider());
 		}
 		return detector;

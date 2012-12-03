@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 
 import com.google.common.eventbus.Subscribe;
+import com.google.common.primitives.Floats;
 
 import lejos.geom.Point;
 import lejos.robotics.RangeReading;
@@ -105,8 +106,7 @@ public class ExplorerController extends SubController implements
 
 			Pose startPose = getPose();
 			Pose relativeStartPose = getMaze().toRelative(startPose);
-			Point startPoint = new Point(relativeStartPose.getX(),
-					relativeStartPose.getY());
+			Point startPoint = relativeStartPose.getLocation();
 			Point startPointTC = getMaze().toTile(startPoint);
 			Tile startTile = getMaze().getTileAt(startPointTC);
 
@@ -152,7 +152,6 @@ public class ExplorerController extends SubController implements
 
 			RangeFeatureDetector detector = getMainController().getRobot()
 					.getRangeDetector();
-			detector.setMaxDistance(28);// TODO: juist?
 			RangeFeature feature = detector.scan();
 
 			if (feature != null) {
@@ -199,12 +198,7 @@ public class ExplorerController extends SubController implements
 				}
 			}
 
-			float[] floatList = new float[list.size()];
-			for (int i = 0; i < list.size(); i++) {
-				floatList[i] = list.get(i);
-			}
-
-			return floatList;
+			return Floats.toArray(list);
 		}
 
 		// Pre: We verwachten angle tussen -360 en 360 graden

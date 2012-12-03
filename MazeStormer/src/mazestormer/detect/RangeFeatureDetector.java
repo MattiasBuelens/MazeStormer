@@ -25,4 +25,15 @@ public interface RangeFeatureDetector extends FeatureDetector {
 	@Override
 	public RangeFeature scan();
 
+	/**
+	 * Performs a single scan for an object at the given angles and returns the
+	 * results. If an object is not detected, this method returns <b>null</b>.
+	 * 
+	 * @param angles
+	 *            The angles to scan at.
+	 * 
+	 * @see {@link #scan()}
+	 */
+	public RangeFeature scan(float[] angles);
+
 }

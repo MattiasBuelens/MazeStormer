@@ -60,7 +60,8 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
-			detector = new RangeScannerFeatureDetector(getRangeScanner());
+			detector = new RangeScannerFeatureDetector(getRangeScanner(),
+					sensorMaxDistance, sensorPosition);
 			detector.setPoseProvider(getPoseProvider());
 		}
 		return detector;
@@ -84,7 +85,8 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 
 	@Override
 	public CommandBuilder when(Condition condition) {
-		RemoteCommandBuilder builder = new RemoteCommandBuilder(getCommunicator(), CommandType.WHEN, condition);
+		RemoteCommandBuilder builder = new RemoteCommandBuilder(
+				getCommunicator(), CommandType.WHEN, condition);
 		addMessageListener(builder);
 		return builder;
 	}

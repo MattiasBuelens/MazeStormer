@@ -11,16 +11,12 @@ import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.objectdetection.RangeFeature;
-import mazestormer.robot.Robot;
-import mazestormer.simulator.VirtualRangeScanner;
 
 /**
  * A range feature detector which uses a range scanner to locate objects.
  */
 public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		implements RangeFeatureDetector {
-
-	private static final float defaultMaxDistance = 100f;
 
 	private final RangeScanner scanner;
 	private final Point offset;
@@ -32,14 +28,6 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		this.scanner = checkNotNull(scanner);
 		this.maxDistance = maxDistance;
 		this.offset = offset;
-	}
-
-	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance) {
-		this(scanner, maxDistance, Robot.sensorPosition);
-	}
-
-	public RangeScannerFeatureDetector(RangeScanner scanner) {
-		this(scanner, defaultMaxDistance);
 	}
 
 	/**
@@ -94,21 +82,14 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 			if (rawReading.getRange() < 0)
 				continue;
 
-			RangeReading reading;
-			// no need to change the coordinate system here.
-			// the point (0,0) is already the rotation center of the robot.
-			if (scanner instanceof VirtualRangeScanner)
-				reading = rawReading;
-			else {
-				// Change coordinate system from sensor (where O is the rotation
-				// center of the sensor-servo)
-				// to nxt (where 0 is the rotation center of the robot)
-				Point position = Robot.sensorPosition.pointAt(
-						rawReading.getRange(), rawReading.getAngle());
-				float angle = (float) Math.toDegrees(position.angle());
-				float range = position.length();
-				reading = new RangeReading(angle, range);
-			}
+			// Change coordinate system from sensor with the origin in the
+			// rotation center of the sensor-servo to NXT with the origin in the
+			// rotation center of the robot
+			Point position = getOffset().pointAt(rawReading.getRange(),
+					rawReading.getAngle());
+			float angle = (float) Math.toDegrees(position.angle());
+			float range = position.length();
+			RangeReading reading = new RangeReading(angle, range);
 
 			// Only retain readings smaller than the maximum distance
 			if (reading.getRange() <= getMaxDistance()) {
@@ -132,6 +113,12 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		} else {
 			return new RangeFeature(readings);
 		}
+	}
+
+	@Override
+	public RangeFeature scan(float[] angles) {
+		scanner.setAngles(angles);
+		return scan();
 	}
 
 }

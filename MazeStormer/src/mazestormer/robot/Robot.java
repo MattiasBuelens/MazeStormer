@@ -47,6 +47,11 @@ public interface Robot extends ConditionalCommandBuilder {
 	public static final float sensorGearRatio = -56f / 40f;
 
 	/**
+	 * Maximum distance for ultasonic sensor range readings.
+	 */
+	public static final float sensorMaxDistance = 28;
+
+	/**
 	 * Get the pilot controlling this robot's movement.
 	 */
 	public Pilot getPilot();
