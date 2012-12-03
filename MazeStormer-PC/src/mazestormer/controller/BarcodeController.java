@@ -110,6 +110,7 @@ public class BarcodeController extends SubController implements
 	@Override
 	public void startScan() {
 		this.runner = new BarcodeRunner();
+		getRobot().getPilot().forward();
 		this.runner.start();
 	}
 
@@ -183,7 +184,6 @@ public class BarcodeController extends SubController implements
 		public void run() {
 			this.originalTravelSpeed = getTravelSpeed();
 			this.light.setFloodlight(true);
-			forward();
 			log("Start looking for black line.");
 			onBlack(new RunnerTask() {
 				@Override
