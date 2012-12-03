@@ -33,6 +33,7 @@ public class Maze extends AbstractEventSource {
 
 	private final Mesh mesh;
 	private Tile goalTile;
+	private Tile checkPointTile;
 
 	public Maze(float tileSize, float edgeSize) {
 		this.tileSize = tileSize;
@@ -423,6 +424,14 @@ public class Maze extends AbstractEventSource {
 
 	public void setGoalTile(Tile tile) {
 		this.goalTile = tile;
+	}
+	
+	public Tile getCheckPointTile() {
+		return this.checkPointTile;
+	}
+
+	public void setCheckPointTile(Tile tile) {
+		this.checkPointTile = tile;
 	}
 
 }
