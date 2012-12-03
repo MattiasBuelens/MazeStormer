@@ -184,16 +184,16 @@ public class ExplorerController extends SubController implements
 				if (givenTile.getEdgeAt(direction).getType() == EdgeType.UNKNOWN) {
 					switch (direction) {
 					case WEST:
-						list.add(new Float(180f - heading));
+						list.add(normalize(180f - heading));
 						break;
 					case NORTH:
-						list.add(new Float(90f - heading));
+						list.add(normalize(90f - heading));
 						break;
 					case EAST:
-						list.add(new Float(0f - heading));
+						list.add(normalize(0f - heading));
 						break;
 					case SOUTH:
-						list.add(new Float(-90f - heading));
+						list.add(normalize(-90f - heading));
 						break;
 					}
 				}
@@ -202,11 +202,16 @@ public class ExplorerController extends SubController implements
 			return Floats.toArray(list);
 		}
 
-		private Orientation angleToOrientation(float angle) {
+		private float normalize(float angle) {
 			while (angle > 180)
 				angle -= 360f;
 			while (angle < -180)
 				angle += 360f;
+			return angle;
+		}
+
+		private Orientation angleToOrientation(float angle) {
+			angle = normalize(angle);
 
 			if (angle > -45 && angle <= 45)
 				return Orientation.EAST;
