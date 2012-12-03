@@ -4,14 +4,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
-
-import com.google.common.eventbus.Subscribe;
-import com.google.common.primitives.Floats;
+import java.util.List;
 
 import lejos.geom.Point;
 import lejos.robotics.RangeReading;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.navigation.Pose;
+import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.controller.ExplorerEvent.EventType;
 import mazestormer.detect.RangeFeatureDetector;
@@ -20,28 +19,26 @@ import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
-import mazestormer.robot.Pilot;
+import mazestormer.robot.PathRunner;
+import mazestormer.robot.Robot;
+
+import com.google.common.primitives.Floats;
 
 public class ExplorerController extends SubController implements
 		IExplorerController {
 
 	private ExplorerRunner runner;
-	private Deque<Tile> queue = new ArrayDeque<Tile>();
 
 	public ExplorerController(MainController mainController) {
 		super(mainController);
 	}
 
-	private Pilot getPilot() {
-		return getMainController().getRobot().getPilot();
+	private Robot getRobot() {
+		return getMainController().getRobot();
 	}
 
 	private Maze getMaze() {
 		return getMainController().getMaze();
-	}
-
-	private Pose getPose() {
-		return getMainController().getRobot().getPoseProvider().getPose();
 	}
 
 	private RangeScanner getRangeScanner() {
@@ -54,52 +51,43 @@ public class ExplorerController extends SubController implements
 
 	@Override
 	public void startExploring() {
-		runner = new ExplorerRunner();
+		runner = new ExplorerRunner(getRobot(), getMaze());
 		runner.start();
 	}
 
 	@Override
 	public void stopExploring() {
 		if (runner != null) {
-			runner.stop();
+			runner.cancel();
 			runner = null;
 		}
 	}
 
-	boolean shouldContinue = false;
+	private class ExplorerRunner extends PathRunner {
 
-	@Subscribe
-	public void onActionEvent(mazestormer.controller.ActionEvent e) {
-		if (e.getEventType() == mazestormer.controller.EventType.STOPPED) {
-			shouldContinue = true;
+		private Deque<Tile> queue = new ArrayDeque<Tile>();
+
+		public ExplorerRunner(Robot robot, Maze maze) {
+			super(robot, maze);
 		}
-	}
 
-	private class ExplorerRunner implements Runnable {
-		private boolean isRunning = false;
-		private final Pilot pilot;
-
-		public void start() {
-			isRunning = true;
-			new Thread(this).start();
+		@Override
+		public void onStarted() {
+			super.onStarted();
 			postState(EventType.STARTED);
 		}
 
-		public void stop() {
-			if (isRunning()) {
-				isRunning = false;
-				pilot.stop();
-				getMainController().pathFindingControl().stopAction();
-				postState(EventType.STOPPED);
-			}
+		@Override
+		public void onCancelled() {
+			super.onCancelled();
+			postState(EventType.STOPPED);
 		}
 
-		public ExplorerRunner() {
-			this.pilot = getPilot();
-		}
+		// TODO Refactor run() into cycle()
+		private void cycle() {
+			if (queue.isEmpty() || !isRunning())
+				return;
 
-		public synchronized boolean isRunning() {
-			return isRunning;
 		}
 
 		@Override
@@ -135,17 +123,24 @@ public class ExplorerController extends SubController implements
 				// Rijd naar volgende tile (peek)
 				if (!queue.isEmpty()) {
 					nextTile = queue.peekLast();
-					getMainController().pathFindingControl().startAction(
-							nextTile.getX(), nextTile.getY());
-					while (!shouldContinue) {
-						// do not continue
-						// Best code evah!
-					}
+					goTo(nextTile);
 				}
-
-				shouldContinue = false;
 			}
 			stopExploring();
+		}
+
+		private void goTo(Tile goal) {
+			// Create path
+			navigator.clearPath();
+			List<Waypoint> waypoints = findPath(goal);
+			for (Waypoint waypoint : waypoints) {
+				navigator.addWaypoint(waypoint);
+			}
+			// Follow path
+			navigator.followPath();
+			// Wait until at end
+			while (!navigator.waitForStop())
+				Thread.yield();
 		}
 
 		// Scans in the direction of UNKNOWN edges, and updates them accordingly
@@ -201,7 +196,7 @@ public class ExplorerController extends SubController implements
 					break;
 				}
 			}
-			
+
 			Collections.sort(list);
 			System.out.println(list.toString());
 			return Floats.toArray(list);
