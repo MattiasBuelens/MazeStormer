@@ -202,11 +202,10 @@ public class ExplorerController extends SubController implements
 			return Floats.toArray(list);
 		}
 
-		// Pre: We verwachten angle tussen -360 en 360 graden
 		private Orientation angleToOrientation(float angle) {
-			if (angle > 180)
+			while (angle > 180)
 				angle -= 360f;
-			if (angle < -180)
+			while (angle < -180)
 				angle += 360f;
 
 			if (angle > -45 && angle <= 45)

@@ -19,6 +19,7 @@ import mazestormer.connect.RobotType;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.detect.ReadingAngleComparator;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.Robot;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
@@ -58,7 +59,7 @@ public class ScanTest implements FeatureListener {
 		float maxDistance = 255f;
 		int delay = 10 * 1000;
 		RangeScannerFeatureDetector detector = new RangeScannerFeatureDetector(
-				scanner, maxDistance);
+				scanner, maxDistance, Robot.sensorPosition);
 		detector.setDelay(delay);
 		detector.setPoseProvider(pp);
 		detector.addListener(this);

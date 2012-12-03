@@ -1,10 +1,10 @@
-package mazestormer.maze.parser;
+package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.EnumSet;
-
-import mazestormer.maze.Orientation;
+import java.util.Iterator;
+import java.util.Set;
 
 public enum TileType {
 
@@ -25,6 +25,32 @@ public enum TileType {
 		public boolean supportsBarcode() {
 			return true;
 		}
+
+		@Override
+		public TileShape matches(Set<Orientation> walls) {
+			// Check count
+			if (walls.size() != 2)
+				return null;
+			// Check placement
+			Iterator<Orientation> it = walls.iterator();
+			Orientation first = it.next(), second = it.next();
+			if (first.rotateClockwise(2) != second)
+				return null;
+			// Get direction
+			Orientation direction = null;
+			switch (first) {
+			case WEST:
+			case EAST:
+				direction = Orientation.NORTH;
+				break;
+			case NORTH:
+			case SOUTH:
+			default:
+				direction = Orientation.EAST;
+				break;
+			}
+			return new TileShape(this, direction);
+		}
 	},
 
 	/**
@@ -39,6 +65,22 @@ public enum TileType {
 			return EnumSet
 					.of(orientation, orientation.rotateCounterClockwise());
 		}
+
+		@Override
+		public TileShape matches(Set<Orientation> walls) {
+			// Check count
+			if (walls.size() != 2)
+				return null;
+			// Get direction
+			Iterator<Orientation> it = walls.iterator();
+			Orientation first = it.next(), second = it.next();
+			if (first.rotateCounterClockwise() == second) {
+				return new TileShape(this, first);
+			} else if (first.rotateClockwise() == second) {
+				return new TileShape(this, second);
+			}
+			return null;
+		}
 	},
 
 	/**
@@ -51,6 +93,17 @@ public enum TileType {
 		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
 			return EnumSet.of(orientation);
+		}
+
+		@Override
+		public TileShape matches(Set<Orientation> walls) {
+			// Check count
+			if (walls.size() != 1)
+				return null;
+			// Get side of wall
+			Iterator<Orientation> it = walls.iterator();
+			Orientation direction = it.next();
+			return new TileShape(this, direction);
 		}
 	},
 
@@ -65,6 +118,20 @@ public enum TileType {
 			checkNotNull(orientation);
 			return EnumSet.of(orientation, orientation.rotateClockwise(),
 					orientation.rotateCounterClockwise());
+		}
+
+		@Override
+		public TileShape matches(Set<Orientation> walls) {
+			// Check count
+			if (walls.size() != 3)
+				return null;
+			// Get openings
+			EnumSet<Orientation> openings = EnumSet.complementOf(EnumSet
+					.copyOf(walls));
+			Iterator<Orientation> it = openings.iterator();
+			// Get opposite side of opening
+			Orientation direction = it.next().rotateClockwise(2);
+			return new TileShape(this, direction);
 		}
 	},
 
@@ -82,6 +149,11 @@ public enum TileType {
 		@Override
 		public boolean hasOrientation() {
 			return false;
+		}
+
+		@Override
+		public TileShape matches(Set<Orientation> walls) {
+			return walls.isEmpty() ? new TileShape(this, null) : null;
 		}
 	};
 
@@ -121,6 +193,17 @@ public enum TileType {
 	 * @return A set of edge orientations.
 	 */
 	public abstract EnumSet<Orientation> getWalls(Orientation orientation);
+
+	/**
+	 * Check if this tile type matches the given set of wall orientations. If
+	 * this type matches the set of walls, the tile shape is returned.
+	 * 
+	 * @param walls
+	 *            The orientations of the walls.
+	 * 
+	 * @return The tile shape, or null if no match.
+	 */
+	public abstract TileShape matches(Set<Orientation> walls);
 
 	/**
 	 * Get the orientations where open edges should be placed.
