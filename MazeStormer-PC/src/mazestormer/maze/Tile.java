@@ -20,6 +20,7 @@ public class Tile {
 	private final EnumMap<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
 			Orientation.class);
 	private boolean isExplored = false;
+	private Barcode barcode;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -117,5 +118,19 @@ public class Tile {
 		// Return bounding box
 		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX()
 				- p1.getX(), p2.getY() - p1.getY());
+	}
+	
+	public void setBarcode(byte value) throws IllegalStateException {
+		if(getTileShape().getType() != TileType.STRAIGHT)
+			throw new IllegalStateException("Tile doesn't have the right type.");
+		barcode = new Barcode(value);
+	}
+	
+	public byte getBarcodeValue() {
+		return barcode.getValue();
+	}
+	
+	private TileShape getTileShape() {
+		return TileShape.get(getClosedSides());
 	}
 }
