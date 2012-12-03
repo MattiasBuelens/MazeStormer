@@ -57,7 +57,7 @@ public class VirtualRangeScanner implements RangeScanner {
 		float bestDistance = Float.POSITIVE_INFINITY;
 
 		for (Line line : getMaze().getLines()) {
-			Point p = line.intersectsAt(ray);
+			Point p = intersectionOf(ray, line);//line.intersectsAt(ray); deze methode suckt monkeyballs
 			if (p != null) {
 				// If intersecting, get distance
 				float distance = (float) p.distance(p1);
@@ -80,5 +80,31 @@ public class VirtualRangeScanner implements RangeScanner {
 	@Override
 	public RangeFinder getRangeFinder() {
 		return null;
+	}
+	
+	// check http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+	private Point intersectionOf(Line l1, Line l2) {
+		
+		Point p = l1.getP1();
+		Point r = l1.getP2().subtract(p);
+		Point q = l2.getP1();
+		Point s = l2.getP2().subtract(q);
+		
+		float divisor = crossProduct(r, s);
+		if(divisor==0)
+			return null;
+		Point qminp = q.subtract(p);
+		
+		float t = crossProduct(qminp, s) / divisor;
+		float u = crossProduct(qminp, r) / divisor;
+		
+		if(t >= 0 && t <= 1 && u >= 0 && u <= 1)
+			return (p.add(r.multiply(t)));
+		else return null;
+		
+	}
+	
+	private float crossProduct(Point p1, Point p2) {
+		return (float) (p1.getX()*p2.getY() - p1.getY()*p2.getX());
 	}
 }
