@@ -110,43 +110,40 @@ public class ExplorerController extends SubController implements
 			Point startPointTC = getMaze().toTile(startPoint);
 			Tile startTile = getMaze().getTileAt(startPointTC);
 
-			System.out.println(startTile);
-			
+			// System.out.println(startTile);
+
 			queue.addLast(startTile);
 			// 2. WHILE QUEUE is not empty
 			Tile currentTile, nextTile;
 
 			while (!queue.isEmpty() && isRunning()) {
-				System.out.println("Before poll: " + queue.size());
-				currentTile = queue.pollLast(); // DO remove the first path from the
-											// QUEUE
-											// (This is the tile the robot
-											// is currently on, because of peek
-											// and drive)
-				
+				currentTile = queue.pollLast(); // DO remove the first path from
+												// the
+				// QUEUE
+				// (This is the tile the robot
+				// is currently on, because of peek
+				// and drive)
+
 				// scannen en updaten
 				scanAndUpdate(queue, currentTile);
 				currentTile.setExplored();
 				// create new paths (to all children);
 				selectTiles(queue, currentTile);
 
-				
-				
 				// Rijd naar volgende tile (peek)
 				if (!queue.isEmpty()) {
 					nextTile = queue.peekLast();
 					getMainController().pathFindingControl().startAction(
 							nextTile.getX(), nextTile.getY());
 					while (!shouldContinue) {
-						//do not continue
-						//Best code evah!
-					} 
+						// do not continue
+						// Best code evah!
+					}
 				}
 
 				shouldContinue = false;
 			}
 			stopExploring();
-			System.out.println("DONE, motherfucker");
 		}
 
 		// Scans in the direction of UNKNOWN edges, and updates them accordingly
@@ -163,7 +160,6 @@ public class ExplorerController extends SubController implements
 				for (RangeReading reading : feature.getRangeReadings()) {
 					orientation = angleToOrientation(reading.getAngle()
 							+ getMaze().toRelative(getPose().getHeading()));
-					System.out.println("Wall at dist: " + reading.getRange() + "in direction: " + reading.getAngle());
 					getMaze().setEdge(givenTile.getPosition(), orientation,
 							EdgeType.WALL);
 				}
@@ -171,9 +167,6 @@ public class ExplorerController extends SubController implements
 
 			for (Edge currentEdge : givenTile.getEdges()) {
 				if (currentEdge.getType() == EdgeType.UNKNOWN) {
-					// System.out.println("Open in "
-					// +
-					// currentEdge.getOrientationFrom(givenTile.getPosition()));
 					getMaze().setEdge(
 							givenTile.getPosition(),
 							currentEdge.getOrientationFrom(givenTile
@@ -240,7 +233,8 @@ public class ExplorerController extends SubController implements
 					neighborTile = getMaze().getOrCreateNeighbor(givenTile,
 							direction);
 					// reject the new paths with loops;
-					if (!neighborTile.isExplored() && !queue.contains(neighborTile)) {
+					if (!neighborTile.isExplored()
+							&& !queue.contains(neighborTile)) {
 						// add the new paths to front of QUEUE;
 						queue.addLast(neighborTile);
 					}
