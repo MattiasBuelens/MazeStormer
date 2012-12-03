@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.text.ParseException;
 
 import mazestormer.maze.Orientation;
+import mazestormer.maze.TileType;
 
 public class TileToken implements Token {
 

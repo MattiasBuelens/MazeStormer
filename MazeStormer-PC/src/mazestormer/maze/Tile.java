@@ -63,23 +63,6 @@ public class Tile {
 		getEdgeAt(direction).setType(type);
 	}
 
-	// public void addEdges(Iterable<String> edges) {
-	// for (Edge edge : edges) {
-	// addWall(edge);
-	// }
-	// }
-
-	// //TODO: nodig?
-	// public boolean hasUnknownEdges(){
-	// for(Edge currentEdge : getEdges()){
-	// if(currentEdge.getType() == EdgeType.UNKNOWN){
-	// return true;
-	// }
-	// }
-	//
-	// return false;
-	// }
-
 	public boolean isExplored() {
 		return isExplored;
 	}
@@ -88,28 +71,28 @@ public class Tile {
 		isExplored = true;
 	}
 
-	public EnumSet<Orientation> getClosedSides() {
+	public TileShape getShape() {
+		return TileShape.get(getClosedSides());
+	}
+
+	private EnumSet<Orientation> getSidesByType(EdgeType type) {
 		EnumSet<Orientation> result = EnumSet.noneOf(Orientation.class);
 		for (Map.Entry<Orientation, Edge> entry : edges.entrySet()) {
 			Orientation orientation = entry.getKey();
 			Edge edge = entry.getValue();
-			if (edge.getType() == EdgeType.WALL) {
+			if (edge.getType() == type) {
 				result.add(orientation);
 			}
 		}
 		return result;
 	}
 
+	public EnumSet<Orientation> getClosedSides() {
+		return getSidesByType(EdgeType.WALL);
+	}
+
 	public EnumSet<Orientation> getOpenSides() {
-		EnumSet<Orientation> result = EnumSet.noneOf(Orientation.class);
-		for (Map.Entry<Orientation, Edge> entry : edges.entrySet()) {
-			Orientation orientation = entry.getKey();
-			Edge edge = entry.getValue();
-			if (edge.getType() == EdgeType.OPEN) {
-				result.add(orientation);
-			}
-		}
-		return result;
+		return getSidesByType(EdgeType.OPEN);
 	}
 
 	/**

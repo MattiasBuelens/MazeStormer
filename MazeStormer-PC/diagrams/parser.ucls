@@ -56,8 +56,8 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <enumeration id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.maze.parser.TileType" 
-    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/maze/parser/TileType.java" binary="false">    
+  <enumeration id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.maze.TileType" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/maze/TileType.java" binary="false">    
     <position height="-1" width="-1" x="79" y="284"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
