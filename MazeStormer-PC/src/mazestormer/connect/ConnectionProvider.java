@@ -27,9 +27,8 @@ public class ConnectionProvider {
 	}
 
 	protected void addConnectors() {
-		setConnector(RobotType.Physical, new PhysicalConnector());
-		setConnector(RobotType.Virtual, new VirtualConnector());
 		setConnector(RobotType.Remote, new RemoteConnector());
+		setConnector(RobotType.Virtual, new VirtualConnector());
 	}
 
 }

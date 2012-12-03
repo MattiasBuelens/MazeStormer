@@ -39,7 +39,7 @@ public class InitialTest implements FeatureListener {
 
 	private void start() {
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.Physical);
+				.getConnector(RobotType.Remote);
 
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");

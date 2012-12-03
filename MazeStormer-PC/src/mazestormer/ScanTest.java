@@ -34,7 +34,7 @@ public class ScanTest implements FeatureListener {
 
 	private void start() {
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.Physical);
+				.getConnector(RobotType.Remote);
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");
 		connector.connect(context);

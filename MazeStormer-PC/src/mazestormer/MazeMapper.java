@@ -26,7 +26,7 @@ public class MazeMapper {
 		heading = 0; //North
 		
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.Physical);
+				.getConnector(RobotType.Remote);
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");
 		connector.connect(context);
