@@ -19,7 +19,7 @@ public class Program {
 			InterruptedException {
 		// Set up connection
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.Physical);
+				.getConnector(RobotType.Remote);
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");
 		connector.connect(context);

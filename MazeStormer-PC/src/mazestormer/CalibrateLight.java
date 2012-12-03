@@ -14,7 +14,7 @@ public class CalibrateLight {
 	public static void main(String[] aArgs) throws Exception {
 
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.Physical);
+				.getConnector(RobotType.Remote);
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");
 		connector.connect(context);
