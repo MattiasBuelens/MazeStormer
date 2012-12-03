@@ -88,6 +88,7 @@ public class ExplorerController extends SubController implements
 			if (isRunning()) {
 				isRunning = false;
 				pilot.stop();
+				getMainController().pathFindingControl().stopAction();
 				postState(EventType.STOPPED);
 			}
 		}

@@ -12,6 +12,7 @@ public class BarcodeDecoder {
 	private static void setActions() {
 		actions[5] = new RotateCounterClockwiseAction();
 		actions[9] = new RotateClockwiseAction();
+		actions[13] = new CheckPointAction();
 		actions[15] = new SoundAction();
 		actions[19] = new WaitAction();
 		actions[25] = new LowSpeedAction();

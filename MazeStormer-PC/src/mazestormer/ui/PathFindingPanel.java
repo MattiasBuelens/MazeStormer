@@ -17,6 +17,7 @@ import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.EditFindReplaceIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
+import com.javarichclient.icon.tango.actions.MediaSkipForwardIcon;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -32,10 +33,12 @@ public class PathFindingPanel extends ViewPanel {
 
 	private JPanel container;
 
+	private JButton btnStartStepAction;
 	private JButton btnStartAction;
 	private JButton btnStopAction;
 	private JButton btnAddSourceMaze;
 	
+	private final Action startStepAction = new StartStepAction();
 	private final Action startAction = new StartAction();
 	private final Action stopAction = new StopAction();
 	private final Action addSourceMazeAction = new AddSourceMazeAction();
@@ -71,10 +74,16 @@ public class PathFindingPanel extends ViewPanel {
 		this.container.add(buttons, "cell 0 0 3 1,grow");
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
+		this.btnStartStepAction = new JButton();
+		this.btnStartStepAction.setAction(this.startStepAction);
+		this.btnStartStepAction.setText("");
+		this.btnStartStepAction.setIcon(new MediaPlaybackStartIcon(32, 32));
+		buttons.add(this.btnStartStepAction);
+		
 		this.btnStartAction = new JButton();
 		this.btnStartAction.setAction(this.startAction);
 		this.btnStartAction.setText("");
-		this.btnStartAction.setIcon(new MediaPlaybackStartIcon(32, 32));
+		this.btnStartAction.setIcon(new MediaSkipForwardIcon(32, 32));
 		buttons.add(this.btnStartAction);
 
 		this.btnStopAction = new JButton();
@@ -139,12 +148,17 @@ public class PathFindingPanel extends ViewPanel {
 	public void startAction() {
 		this.controller.startAction((int) this.xModel.getValue(), (int) this.yModel.getValue());
 	}
+	
+	public void startStepAction() {
+		this.controller.startStepAction((int) this.xModel.getValue(), (int) this.yModel.getValue());
+	}
 
 	public void stopAction() {
 		this.controller.stopAction();
 	}
 
 	private void setActionButtonState(boolean isRunning) {
+		this.btnStartStepAction.setEnabled(!isRunning);
 		this.btnStartAction.setEnabled(!isRunning);
 		this.btnStopAction.setEnabled(isRunning);
 	}
@@ -173,6 +187,19 @@ public class PathFindingPanel extends ViewPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			startAction();
+		}
+	}
+	
+	private class StartStepAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public StartStepAction() {
+			putValue(NAME, "Start");
+			putValue(SHORT_DESCRIPTION, "Start the robot driver");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			startStepAction();
 		}
 	}
 
