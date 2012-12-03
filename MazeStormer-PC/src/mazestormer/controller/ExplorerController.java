@@ -181,22 +181,24 @@ public class ExplorerController extends SubController implements
 			// TODO: pas heading vastzetten als we linefinder gedaan hebben.
 			float heading = getPose().getHeading();
 
-			for (Orientation direction : Orientation.values()) {
-				if (givenTile.getEdgeAt(direction).getType() == EdgeType.UNKNOWN) {
-					switch (direction) {
-					case WEST:
-						list.add(normalize(180f - heading));
-						break;
-					case NORTH:
-						list.add(normalize(90f - heading));
-						break;
-					case EAST:
-						list.add(normalize(0f - heading));
-						break;
-					case SOUTH:
-						list.add(normalize(-90f - heading));
-						break;
-					}
+			for (Orientation direction : givenTile.getUnknownSides()) {
+				// TODO Check if this replacement is equivalent
+				// float angle = Orientation.EAST.angleTo(direction);
+				// angle = normalize(angle - heading);
+
+				switch (direction) {
+				case WEST:
+					list.add(normalize(180f - heading));
+					break;
+				case NORTH:
+					list.add(normalize(90f - heading));
+					break;
+				case EAST:
+					list.add(normalize(0f - heading));
+					break;
+				case SOUTH:
+					list.add(normalize(-90f - heading));
+					break;
 				}
 			}
 			
@@ -230,16 +232,13 @@ public class ExplorerController extends SubController implements
 		private void selectTiles(Deque<Tile> queue, Tile givenTile) {
 			Tile neighborTile;
 
-			for (Orientation direction : Orientation.values()) {
-				if (givenTile.getEdgeAt(direction).getType() == Edge.EdgeType.OPEN) {
-					neighborTile = getMaze().getOrCreateNeighbor(givenTile,
-							direction);
-					// reject the new paths with loops;
-					if (!neighborTile.isExplored()
-							&& !queue.contains(neighborTile)) {
-						// add the new paths to front of QUEUE;
-						queue.addLast(neighborTile);
-					}
+			for (Orientation direction : givenTile.getOpenSides()) {
+				neighborTile = getMaze().getOrCreateNeighbor(givenTile,
+						direction);
+				// reject the new paths with loops;
+				if (!neighborTile.isExplored() && !queue.contains(neighborTile)) {
+					// add the new paths to front of QUEUE;
+					queue.addLast(neighborTile);
 				}
 			}
 		}

@@ -131,10 +131,14 @@ public class Navigator implements WaypointListener {
 	 *            to be followed.
 	 */
 	public void followPath(Path path) {
+		followPathUntil(path, null);
+	}
+
+	public void followPathUntil(Path path, State untilState) {
 		if (path == null)
 			return;
 		this.path = path;
-		followPath();
+		followPathUntil(untilState);
 	}
 
 	/**
@@ -142,10 +146,28 @@ public class Navigator implements WaypointListener {
 	 * non-blocking.
 	 */
 	public void followPath() {
+		followPathUntil(null);
+	}
+
+	public void followPathUntil(State untilState) {
 		if (path.isEmpty())
 			return;
 		interrupted = false;
+		nav.setCancelState(untilState);
 		nav.start();
+	}
+
+	/**
+	 * Resume the navigator from the given state.
+	 * 
+	 * @param state
+	 *            The next state.
+	 */
+	public void resumeFrom(State state) {
+		if (nav.isRunning())
+			return;
+		nav.setNextState(state);
+		followPath();
 	}
 
 	/**
@@ -322,10 +344,17 @@ public class Navigator implements WaypointListener {
 		}
 	}
 
+	public enum State {
+		ROTATE, TRAVEL, END_STEP, NEXT_STEP
+	}
+
 	/**
 	 * Runs the thread that processes the way point queue.
 	 */
 	private class Nav extends Runner {
+
+		private State nextState = State.NEXT_STEP;
+		private State cancelState = null;
 
 		public Nav() {
 			super(Navigator.this.getPilot());
@@ -341,29 +370,80 @@ public class Navigator implements WaypointListener {
 			cancel();
 		}
 
-		private void step() throws CancellationException {
-			destination = path.get(0);
-			pose = poseProvider.getPose();
+		public void setNextState(State nextState) {
+			this.nextState = nextState;
+		}
 
+		public void setCancelState(State cancelState) {
+			this.cancelState = cancelState;
+		}
+
+		private void step() throws CancellationException {
+			switch (nextState) {
+			case NEXT_STEP:
+			default:
+				nextStep();
+				break;
+			case ROTATE:
+				rotateStart();
+				break;
+			case TRAVEL:
+				travel();
+				break;
+			case END_STEP:
+				rotateDestination();
+				endStep();
+				break;
+			}
+
+			// Cancel when going to cancel state
+			if (nextState == cancelState)
+				cancel();
+
+			if (nextState != State.NEXT_STEP) {
+				// Step again
+				step();
+			}
+
+			// End of step
+			return;
+		}
+
+		private void nextStep() {
+			destination = path.get(0);
+			nextState = State.ROTATE;
+		}
+
+		private void rotateStart() {
 			// Rotate towards destination
+			pose = poseProvider.getPose();
 			float destinationBearing = pose.relativeBearing(destination);
 			rotate(destinationBearing, true);
 			waitComplete();
-			pose = poseProvider.getPose();
+			nextState = State.TRAVEL;
+		}
 
+		private void travel() {
 			// Travel towards destination
+			pose = poseProvider.getPose();
 			float distance = pose.distanceTo(destination);
 			travel(distance, true);
 			waitComplete();
-			pose = poseProvider.getPose();
+			nextState = State.END_STEP;
+		}
 
+		private void rotateDestination() {
 			// Apply destination heading
 			if (destination.isHeadingRequired()) {
+				pose = poseProvider.getPose();
 				rotate(destination.getHeading() - pose.getHeading(), true);
 				waitComplete();
 				pose = poseProvider.getPose();
 			}
+		}
 
+		private void endStep() {
+			pose = poseProvider.getPose();
 			if (isRunning() && !pathCompleted()) {
 				if (!interrupted) {
 					// Presumably at way point
@@ -376,6 +456,7 @@ public class Navigator implements WaypointListener {
 				// Call listeners
 				callListeners();
 			}
+			nextState = State.NEXT_STEP;
 		}
 
 		private void waitComplete() {

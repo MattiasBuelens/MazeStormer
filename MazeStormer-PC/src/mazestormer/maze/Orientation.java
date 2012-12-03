@@ -58,6 +58,16 @@ public enum Orientation {
 	}
 
 	/**
+	 * Get the angle from this orientation to the given other orientation.
+	 * 
+	 * @param other
+	 *            The other orientation.
+	 */
+	public float angleTo(Orientation other) {
+		return getDelta().angleTo(other.getDelta());
+	}
+
+	/**
 	 * Get the unit line of the side in this orientation.
 	 * 
 	 * <p>

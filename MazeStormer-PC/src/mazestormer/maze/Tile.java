@@ -96,6 +96,10 @@ public class Tile {
 		return getSidesByType(EdgeType.OPEN);
 	}
 
+	public EnumSet<Orientation> getUnknownSides() {
+		return getSidesByType(EdgeType.UNKNOWN);
+	}
+
 	/**
 	 * Returns the rectangle in relative coordinates to the maze.
 	 */
