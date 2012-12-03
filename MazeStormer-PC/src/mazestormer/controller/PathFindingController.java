@@ -41,6 +41,14 @@ public class PathFindingController extends SubController implements
 	private void postState(EventType eventType) {
 		postEvent(new ActionEvent(eventType));
 	}
+	
+	@Override
+	public void startStepAction(long goalX, long goalY) {
+		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
+				true);
+		this.runner.start();
+	}
 
 	@Override
 	public void startAction(long goalX, long goalY) {
