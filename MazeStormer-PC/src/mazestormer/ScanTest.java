@@ -57,8 +57,7 @@ public class ScanTest implements FeatureListener {
 
 		float maxDistance = 255f;
 		int delay = 10 * 1000;
-		RangeScannerFeatureDetector detector = new RangeScannerFeatureDetector(
-				scanner, maxDistance);
+		RangeScannerFeatureDetector detector = new RangeScannerFeatureDetector(scanner, maxDistance);
 		detector.setDelay(delay);
 		detector.setPoseProvider(pp);
 		detector.addListener(this);
