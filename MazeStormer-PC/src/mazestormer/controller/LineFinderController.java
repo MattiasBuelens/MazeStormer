@@ -5,7 +5,6 @@ import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.connect.ConnectEvent;
-import mazestormer.controller.LineFinderEvent.EventType;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Robot;
 import mazestormer.robot.Runner;
@@ -14,7 +13,8 @@ import mazestormer.util.CancellationException;
 
 import com.google.common.eventbus.Subscribe;
 
-public class LineFinderController extends SubController implements ILineFinderController {
+public class LineFinderController extends SubController implements
+		ILineFinderController {
 
 	private final static double slowRotateSpeed = 30;
 	private final static double fastRotateSpeed = 50;
@@ -66,7 +66,7 @@ public class LineFinderController extends SubController implements ILineFinderCo
 		}
 	}
 
-	private void postState(EventType eventType) {
+	private void postState(LineFinderEvent.EventType eventType) {
 		postEvent(new LineFinderEvent(eventType));
 	}
 
@@ -89,7 +89,7 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			super.onStarted();
 
 			// Post state
-			postState(EventType.STARTED);
+			postState(LineFinderEvent.EventType.STARTED);
 		}
 
 		@Override
@@ -105,16 +105,18 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			getPilot().setRotateSpeed(originalRotateSpeed);
 
 			// Post state
-			postState(EventType.STOPPED);
+			postState(LineFinderEvent.EventType.STOPPED);
 		}
 
 		private void onLine(final RunnerTask task) {
-			Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
+			Condition condition = new LightCompareCondition(
+					ConditionType.LIGHT_GREATER_THAN, threshold);
 			handle = getRobot().when(condition).stop().run(wrap(task)).build();
 		}
 
 		private void offLine(final RunnerTask task) {
-			Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, threshold);
+			Condition condition = new LightCompareCondition(
+					ConditionType.LIGHT_SMALLER_THAN, threshold);
 			handle = getRobot().when(condition).stop().run(wrap(task)).build();
 		}
 
@@ -196,7 +198,8 @@ public class LineFinderController extends SubController implements ILineFinderCo
 			 * 
 			 * Therefore: alpha = 2*asin(sr/(2*so))
 			 */
-			double sensorAngle = 2 * Math.asin(light.getSensorRadius() / (2 * Robot.sensorOffset));
+			double sensorAngle = 2 * Math.asin(light.getSensorRadius()
+					/ (2 * Robot.sensorOffset));
 			log("Angle adjusting for sensor radius: " + sensorAngle);
 
 			// Position perpendicular to line

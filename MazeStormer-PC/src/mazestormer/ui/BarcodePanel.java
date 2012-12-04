@@ -20,7 +20,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mazestormer.barcode.ActionType;
-import mazestormer.controller.EventType;
+import mazestormer.controller.BarcodeActionEvent;
+import mazestormer.controller.BarcodeScanEvent;
 import mazestormer.controller.IBarcodeController;
 import net.miginfocom.swing.MigLayout;
 
@@ -197,9 +198,13 @@ public class BarcodePanel extends ViewPanel {
 	}
 
 	@Subscribe
-	public void onActionEvent(mazestormer.controller.ActionEvent e) {
-		setActionButtonState(e.getEventType() == EventType.STARTED);
-		setScanButtonState(e.getEventType() == EventType.SCAN_STARTED);
+	public void onActionEvent(BarcodeActionEvent e) {
+		setActionButtonState(e.getEventType() == BarcodeActionEvent.EventType.STARTED);
+	}
+
+	@Subscribe
+	public void onScanEvent(BarcodeScanEvent e) {
+		setScanButtonState(e.getEventType() == BarcodeScanEvent.EventType.STARTED);
 	}
 
 	private class StartAction extends AbstractAction {
@@ -274,4 +279,5 @@ public class BarcodePanel extends ViewPanel {
 			controller.setScanSpeed((int) scanSpeedModel.getValue());
 		}
 	}
+
 }

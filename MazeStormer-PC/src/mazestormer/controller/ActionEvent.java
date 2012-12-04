@@ -1,6 +1,10 @@
 package mazestormer.controller;
 
-public class ActionEvent{
+public abstract class ActionEvent {
+
+	public enum EventType {
+		STARTED, STOPPED;
+	}
 
 	private final EventType eventType;
 
@@ -11,4 +15,5 @@ public class ActionEvent{
 	public EventType getEventType() {
 		return eventType;
 	}
+
 }

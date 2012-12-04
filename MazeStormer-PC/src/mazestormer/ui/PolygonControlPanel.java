@@ -17,7 +17,6 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
-import mazestormer.controller.EventType;
 import mazestormer.controller.IPolygonControlController;
 import mazestormer.controller.IPolygonControlController.Direction;
 import mazestormer.controller.PolygonEvent;
@@ -153,7 +152,7 @@ public class PolygonControlPanel extends ViewPanel {
 
 	@Subscribe
 	public void onPolygonEvent(PolygonEvent e) {
-		setButtonState(e.getEventType() == EventType.STARTED);
+		setButtonState(e.getEventType() == PolygonEvent.EventType.STARTED);
 	}
 
 	@Subscribe
@@ -186,4 +185,5 @@ public class PolygonControlPanel extends ViewPanel {
 			stopPolygon();
 		}
 	}
+
 }

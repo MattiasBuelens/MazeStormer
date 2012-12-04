@@ -40,8 +40,8 @@ public class PathFindingController extends SubController implements
 		getMainController().getLogger().info(logText);
 	}
 
-	private void postState(EventType eventType) {
-		postEvent(new ActionEvent(eventType));
+	private void postState(PathFinderEvent.EventType eventType) {
+		postEvent(new PathFinderEvent(eventType));
 	}
 
 	@Override
@@ -170,13 +170,15 @@ public class PathFindingController extends SubController implements
 		@Override
 		public void onStarted() {
 			super.onStarted();
-			postState(EventType.STARTED);
+			// Post state
+			postState(PathFinderEvent.EventType.STARTED);
 		}
 
 		@Override
 		public void onCancelled() {
 			super.onCancelled();
-			postState(EventType.STOPPED);
+			// Post state
+			postState(PathFinderEvent.EventType.STOPPED);
 		}
 
 		@Override

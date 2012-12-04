@@ -410,7 +410,7 @@ public class Navigator implements WaypointListener {
 		}
 
 		private void nextStep() {
-			destination = path.get(0);
+			destination = getWaypoint();
 			nextState = State.ROTATE;
 		}
 
@@ -444,6 +444,7 @@ public class Navigator implements WaypointListener {
 
 		private void endStep() {
 			pose = poseProvider.getPose();
+			nextState = State.NEXT_STEP;
 			if (isRunning() && !pathCompleted()) {
 				if (!interrupted) {
 					// Presumably at way point
@@ -456,7 +457,6 @@ public class Navigator implements WaypointListener {
 				// Call listeners
 				callListeners();
 			}
-			nextState = State.NEXT_STEP;
 		}
 
 		private void waitComplete() {
