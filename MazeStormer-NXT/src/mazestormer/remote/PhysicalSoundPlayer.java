@@ -23,7 +23,7 @@ public class PhysicalSoundPlayer implements SoundPlayer,
 	@Override
 	public void playSound(RobotSound sound) {
 		if (sound != null && RobotSound.isEnabled()) {
-			Sound.playSample(new File(sound.getFileName()), Sound.getVolume());
+			Sound.playSample(new File(sound.getFileName()));
 		}
 	}
 
