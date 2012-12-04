@@ -1,8 +1,8 @@
 package mazestormer.simulator;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -14,8 +14,9 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 	private boolean isRunning = false;
 	private boolean isTerminated = false;
 
-	private final Set<Future> futures = new HashSet<Future>();
-	private final ExecutorService executor = Executors.newSingleThreadExecutor();
+	private final Set<Future> futures = new CopyOnWriteArraySet<Future>();
+	private final ExecutorService executor = Executors
+			.newSingleThreadExecutor();
 
 	public ConditionFuture add(C condition) {
 		if (isTerminated())
@@ -29,10 +30,13 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 		if (!isRunning())
 			start();
 
+		System.out.println("+ " + future + "\tRemaining: " + futures);
+
 		return future;
 	}
 
 	protected void removeFuture(Future future) {
+		System.out.println("- " + future + "\tRemaining: " + futures);
 		if (!isTerminated())
 			futures.remove(future);
 	}
@@ -46,7 +50,7 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 	protected void stop() {
 		isRunning = false;
 		// Cancel any remaining futures
-		for(Future future : futures) {
+		for (Future future : futures) {
 			future.cancel(true);
 		}
 	}
@@ -83,9 +87,6 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 				while (it.hasNext()) {
 					Future future = it.next();
 					future.check(value);
-					// Remove if done
-					if (future.isDone())
-						it.remove();
 				}
 
 				// Stop if no more futures to check
@@ -110,7 +111,15 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 		}
 
 		@Override
+		protected void resolve() {
+			// Remove when resolved
+			removeFuture(this);
+			super.resolve();
+		}
+
+		@Override
 		public boolean cancel(boolean mayInterruptIfRunning) {
+			// Remove when cancelled
 			removeFuture(this);
 			return super.cancel(mayInterruptIfRunning);
 		}

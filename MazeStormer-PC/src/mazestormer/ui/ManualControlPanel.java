@@ -207,10 +207,12 @@ public class ManualControlPanel extends ViewPanel {
 	}
 
 	public void travel(float distance) {
+		setCurrentButton(null);
 		controller.travel(distance);
 	}
 
 	public void rotate(float angle) {
+		setCurrentButton(null);
 		controller.rotate(angle);
 	}
 

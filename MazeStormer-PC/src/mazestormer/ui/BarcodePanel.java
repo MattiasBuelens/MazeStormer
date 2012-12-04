@@ -4,8 +4,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.beans.Beans;
 
-import javax.swing.Action;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -13,21 +13,20 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.google.common.eventbus.Subscribe;
-import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
-import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
-
 import mazestormer.barcode.ActionType;
-import mazestormer.barcode.Threshold;
 import mazestormer.controller.EventType;
 import mazestormer.controller.IBarcodeController;
 import net.miginfocom.swing.MigLayout;
-import javax.swing.JSpinner;
+
+import com.google.common.eventbus.Subscribe;
+import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
+import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 
 public class BarcodePanel extends ViewPanel {
 
@@ -52,11 +51,13 @@ public class BarcodePanel extends ViewPanel {
 	public BarcodePanel(IBarcodeController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Barcode actions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "Barcode actions",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.container = new JPanel();
-		this.container.setLayout(new MigLayout("", "[grow 75][grow][fill]", "[][][][][][][]"));
+		this.container.setLayout(new MigLayout("", "[grow 75][grow][fill]",
+				"[][][][][][][]"));
 		add(this.container);
 
 		createActionChoicePanel();
@@ -72,12 +73,17 @@ public class BarcodePanel extends ViewPanel {
 	private void registerController() {
 		registerEventBus(this.controller.getEventBus());
 
+		scanSpeedModel.setValue((int) controller.getScanSpeed());
+		wbModel.setValue((int) controller.getWBThreshold());
+		bwModel.setValue((int) controller.getBWThreshold());
+
 		setActionButtonState(false);
 		setScanButtonState(false);
 	}
 
 	private void createActionChoicePanel() {
-		this.actionModel = new DefaultComboBoxModel<ActionType>(ActionType.values());
+		this.actionModel = new DefaultComboBoxModel<ActionType>(
+				ActionType.values());
 
 		JLabel lblAction = new JLabel("Action");
 		this.container.add(lblAction, "cell 0 0,grow");
@@ -148,7 +154,6 @@ public class BarcodePanel extends ViewPanel {
 	}
 
 	private void createScanSpeedSpinner() {
-
 		JLabel lblWBUnit = new JLabel("%");
 		container.add(lblWBUnit, "cell 2 5");
 		JLabel lblSpeed = new JLabel("Travel speed");
@@ -184,10 +189,6 @@ public class BarcodePanel extends ViewPanel {
 
 	public void stopScan() {
 		this.controller.stopScan();
-	}
-
-	public void setScanSpeed(double speed) {
-		this.controller.setScanSpeed(speed);
 	}
 
 	private void setScanButtonState(boolean isRunning) {
@@ -254,26 +255,23 @@ public class BarcodePanel extends ViewPanel {
 	}
 
 	private class WBChangeListener implements ChangeListener {
-
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			Threshold.WHITE_BLACK.setThresholdValue((int) wbModel.getValue());
+			controller.setWBThreshold((int) wbModel.getValue());
 		}
 	}
 
 	private class BWChangeListener implements ChangeListener {
-
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			Threshold.BLACK_WHITE.setThresholdValue((int) bwModel.getValue());
+			controller.setBWThreshold((int) bwModel.getValue());
 		}
 	}
 
 	private class scanSpeedChangeListener implements ChangeListener {
-
 		@Override
 		public void stateChanged(ChangeEvent e) {
-			setScanSpeed((int) scanSpeedModel.getValue());
+			controller.setScanSpeed((int) scanSpeedModel.getValue());
 		}
 	}
 }

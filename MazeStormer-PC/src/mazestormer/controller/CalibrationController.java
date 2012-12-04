@@ -69,8 +69,8 @@ public class CalibrationController extends SubController implements
 	@Subscribe
 	public void onConnected(ConnectEvent e) {
 		if(e.isConnected()) {
-			setHighValue(582);
-			setLowValue(512);
+			setHighValue(580);
+			setLowValue(360);
 		}
 	}
 

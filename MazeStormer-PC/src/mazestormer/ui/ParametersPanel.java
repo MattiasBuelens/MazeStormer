@@ -21,7 +21,6 @@ public class ParametersPanel extends ViewPanel {
 
 	private final IParametersController controller;
 
-
 	private SpinnerNumberModel travelSpeedModel;
 	private SpinnerNumberModel rotateSpeedModel;
 
@@ -29,7 +28,8 @@ public class ParametersPanel extends ViewPanel {
 		this.controller = controller;
 
 		setBorder(null);
-		setLayout(new MigLayout("", "[grow 75][grow 25][]", "[grow,fill][grow,fill]"));
+		setLayout(new MigLayout("", "[grow 75][grow 25][]",
+				"[grow,fill][grow,fill]"));
 
 		createModels();
 
@@ -42,11 +42,10 @@ public class ParametersPanel extends ViewPanel {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
+		updateState();
 	}
 
-	private void updateState(boolean isConnected) {
-		setVisible(isConnected);
-
+	private void updateState() {
 		travelSpeedModel.setValue(controller.getTravelSpeed());
 		travelSpeedModel.setMaximum(controller.getMaxTravelSpeed());
 
@@ -56,7 +55,7 @@ public class ParametersPanel extends ViewPanel {
 
 	@Subscribe
 	public void onConnected(ConnectEvent e) {
-		updateState(e.isConnected());
+		updateState();
 	}
 
 	private void createModels() {

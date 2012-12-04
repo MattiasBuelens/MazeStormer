@@ -7,7 +7,6 @@ import java.text.ParseException;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
-import mazestormer.maze.Tile;
 import mazestormer.util.LongPoint;
 
 public class Parser {
@@ -58,22 +57,22 @@ public class Parser {
 				// Get position
 				LongPoint position = new LongPoint(x, y);
 				// Set edges
-				Tile tile = maze.getTileAt(position);
 				for (Orientation orientation : token.getType().getWalls(
 						token.getOrientation())) {
-					maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
+					maze.setEdge(position, orientation, EdgeType.WALL);
 				}
 				for (Orientation orientation : token.getType().getOpenings(
 						token.getOrientation())) {
-					maze.setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
+					maze.setEdge(position, orientation, EdgeType.OPEN);
 				}
-				// TODO Add barcode
-				// maze.getTileAt(position).setBarcode(token.getBarcode())
+				// Set barcode
+				if (token.getType().supportsBarcode()) {
+					maze.setBarcode(position, token.getBarcode());
+				}
 			}
 		}
 
 		// Ensure end of file
 		tokenizer.getEOFToken();
 	}
-
 }

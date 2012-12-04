@@ -1,8 +1,11 @@
 package mazestormer.controller;
 
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+
+import com.google.common.math.DoubleMath;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.ActionType;
@@ -40,7 +43,7 @@ public class BarcodeController extends SubController implements
 	private Robot getRobot() {
 		return getMainController().getRobot();
 	}
-	
+
 	private Maze getMaze() {
 		return getMainController().getMaze();
 	}
@@ -130,6 +133,26 @@ public class BarcodeController extends SubController implements
 	@Override
 	public void setScanSpeed(double speed) {
 		this.scanTravelSpeed = speed;
+	}
+
+	@Override
+	public int getWBThreshold() {
+		return Threshold.WHITE_BLACK.getThresholdValue();
+	}
+
+	@Override
+	public void setWBThreshold(int threshold) {
+		Threshold.WHITE_BLACK.setThresholdValue(threshold);
+	}
+
+	@Override
+	public int getBWThreshold() {
+		return Threshold.BLACK_WHITE.getThresholdValue();
+	}
+
+	@Override
+	public void setBWThreshold(int threshold) {
+		Threshold.BLACK_WHITE.setThresholdValue(threshold);
 	}
 
 	private class BarcodeRunner extends Runner {
@@ -274,7 +297,8 @@ public class BarcodeController extends SubController implements
 
 		private void decodeBarcode() {
 			// TODO
-			// BarcodeDecoder.getAction(this.barcode).performAction(getRobot(), getMaze());
+			// BarcodeDecoder.getAction(this.barcode).performAction(getRobot(),
+			// getMaze());
 		}
 	}
 
@@ -300,22 +324,23 @@ public class BarcodeController extends SubController implements
 		while (it.hasNext() && index >= 0) {
 			int i = it.nextIndex();
 			float distance = it.next();
-			int at;
+			double at;
 			if (i == 0) {
 				// First bar
-				at = (int) Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH,
-						0);
+				at = Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH, 0);
 			} else {
-				at = (int) Math.max(distance / BAR_LENGTH, 1);
+				at = Math.max(distance / BAR_LENGTH, 1);
 			}
+			int limit = DoubleMath.roundToInt(at, RoundingMode.FLOOR);
 			// Odd indices are white, even indices are black
 			int barBit = i & 1; // == i % 2
 			// Set bit from index to index-a
-			for (int j = 0; j < at && index >= 0; j++) {
+			for (int j = 0; j < limit && index >= 0; j++) {
 				result |= barBit << index;
 				index--;
 			}
 		}
 		return result;
 	}
+
 }

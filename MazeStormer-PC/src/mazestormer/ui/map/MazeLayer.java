@@ -2,6 +2,7 @@ package mazestormer.ui.map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.awt.geom.Rectangle2D;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -113,8 +114,13 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	}
 
 	@Override
-	public void tileChanged(Tile tile) {
-		// TODO Update tile when barcode is detected
+	public void tileChanged(final Tile tile) {
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				tiles.get(tile.getPosition()).update();
+			}
+		});
 	}
 
 	@Override
@@ -185,6 +191,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		private final SVGGElement tileGroup;
 		private final SVGRectElement rect;
+		private final BarcodeElement barcode;
 
 		public TileElement(final Tile tile) {
 			this.tile = tile;
@@ -198,6 +205,9 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			rect.setAttribute(SVG_FILL_ATTRIBUTE, tileColor);
 			tileGroup.appendChild(rect);
 
+			barcode = new BarcodeElement(tile);
+			tileGroup.appendChild(barcode.get());
+
 			for (Orientation orientation : Orientation.values()) {
 				setEdge(orientation, tile.getEdgeAt(orientation).getType());
 			}
@@ -209,6 +219,11 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		public LongPoint getPosition() {
 			return tile.getPosition();
+		}
+
+		public void update() {
+			// Update barcode
+			barcode.update();
 		}
 
 		private void setEdge(Orientation orientation, Edge.EdgeType type) {
@@ -236,6 +251,42 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			} else {
 				edgesGroup.insertBefore(edgeElement.get(),
 						edgesGroup.getFirstChild());
+			}
+		}
+
+	}
+
+	private class BarcodeElement {
+
+		private final Tile tile;
+		private final SVGGElement barGroup;
+
+		public BarcodeElement(final Tile tile) {
+			this.tile = tile;
+			barGroup = (SVGGElement) createElement(SVG_G_TAG);
+			update();
+		}
+
+		public Element get() {
+			return barGroup;
+		}
+
+		public void update() {
+			// Remove previous bars
+			SVGUtils.removeChildNodes(barGroup);
+			// Start with black bar
+			boolean isBlack = true;
+			for (Rectangle2D bar : getMaze().getBarcodeBars(tile)) {
+				// Create and add bar
+				Element barRect = createElement(SVG_RECT_TAG);
+				barRect.setAttribute(SVG_X_ATTRIBUTE, bar.getX() + "");
+				barRect.setAttribute(SVG_Y_ATTRIBUTE, (1d - bar.getY() - bar.getHeight()) + "");
+				barRect.setAttribute(SVG_WIDTH_ATTRIBUTE, bar.getWidth() + "");
+				barRect.setAttribute(SVG_HEIGHT_ATTRIBUTE, bar.getHeight() + "");
+				barRect.setAttribute(SVG_FILL_ATTRIBUTE,
+						isBlack ? CSS_BLACK_VALUE : CSS_WHITE_VALUE);
+				barGroup.appendChild(barRect);
+				isBlack = !isBlack;
 			}
 		}
 

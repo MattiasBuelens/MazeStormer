@@ -1,5 +1,7 @@
 package mazestormer.simulator;
 
+import java.awt.geom.Rectangle2D;
+
 import lejos.geom.Point;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
@@ -11,8 +13,10 @@ import mazestormer.robot.Robot;
 
 public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 
-	public static final int BROWN_VALUE = 512;
-	public static final int WHITE_VALUE = 582;
+	// TODO Tweak virtual light sensor values
+	public static final int WHITE_VALUE = 580; // 100%
+	public static final int BROWN_VALUE = 510; // 68%
+	public static final int BLACK_VALUE = 360; // 0%
 
 	private Maze maze;
 	private PoseProvider poseProvider;
@@ -49,11 +53,28 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 
 		// Check if robot is on open side of tile
 		for (Orientation orientation : tile.getOpenSides()) {
-			if (tile.getSide(orientation, getMaze()).contains(relativePosition)) {
+			if (getMaze().getEdgeBounds(tile.getEdgeAt(orientation)).contains(
+					relativePosition)) {
+				// On line
 				return WHITE_VALUE;
 			}
 		}
 
+		// Check if robot is on bar of barcode
+		if (tile.hasBarcode()) {
+			boolean isBlack = true;
+			// Get the position of the robot relative to the corner of the tile
+			Point relativeTilePosition = tilePosition.subtract(tile.getPosition().toPoint());
+			for (Rectangle2D bar : getMaze().getBarcodeBars(tile)) {
+				if (bar.contains(relativeTilePosition)) {
+					// On bar
+					return isBlack ? BLACK_VALUE : WHITE_VALUE;
+				}
+				isBlack = !isBlack;
+			}
+		}
+
+		// On tile
 		return BROWN_VALUE;
 	}
 

@@ -56,8 +56,8 @@ public abstract class PathRunner extends Runner implements NavigationListener {
 
 	public Waypoint toWaypoint(Tile tile) {
 		// Get center of tile
-		Point tilePosition = tile.getPosition().toPoint();
-		tilePosition.addWith(new Point(0.5f, 0.5f));
+		Point tilePosition = tile.getPosition().toPoint()
+				.add(new Point(0.5f, 0.5f));
 		// Get absolute position
 		Point absolutePosition = maze.toAbsolute(maze.fromTile(tilePosition));
 		// Create way point

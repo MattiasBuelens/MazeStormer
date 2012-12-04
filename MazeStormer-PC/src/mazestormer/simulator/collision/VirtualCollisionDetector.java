@@ -47,7 +47,8 @@ public class VirtualCollisionDetector {
 		float heading = pose.getHeading();
 
 		// The distance from the center of the robot to a corner.
-		float distanceToCorners = (float) Math.sqrt(Math.pow(ROBOT_WIDTH / 2, 2) + Math.pow(ROBOT_HEIGHT / 2, 2));
+		float distanceToCorners = (float) Math.sqrt(Math
+				.pow(ROBOT_WIDTH / 2, 2) + Math.pow(ROBOT_HEIGHT / 2, 2));
 		// The angle between the axle over the width, and the line to the front
 		// right corner.
 		float angle = (float) Math.atan2(ROBOT_HEIGHT / 2, ROBOT_WIDTH / 2);
@@ -70,7 +71,8 @@ public class VirtualCollisionDetector {
 
 	private boolean onWall(Point relativePosition, Tile tile) {
 		for (Orientation orientation : tile.getClosedSides()) {
-			if (tile.getSide(orientation, getMaze()).contains(relativePosition)) {
+			if (getMaze().getEdgeBounds(tile.getEdgeAt(orientation)).contains(
+					relativePosition)) {
 				return true;
 			}
 		}

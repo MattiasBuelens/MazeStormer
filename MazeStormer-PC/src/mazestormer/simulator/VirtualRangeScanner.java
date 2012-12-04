@@ -56,7 +56,7 @@ public class VirtualRangeScanner implements RangeScanner {
 		// Initialize with infinite best distance
 		float bestDistance = Float.POSITIVE_INFINITY;
 
-		for (Line line : getMaze().getLines()) {
+		for (Line line : getMaze().getEdgeLines()) {
 			Point p = line.intersectsAt(ray);
 			if (p != null) {
 				// If intersecting, get distance
