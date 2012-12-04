@@ -198,7 +198,6 @@ public class ExplorerController extends SubController implements
 			}
 
 			Collections.sort(list);
-			System.out.println(list.toString());
 			return Floats.toArray(list);
 		}
 
