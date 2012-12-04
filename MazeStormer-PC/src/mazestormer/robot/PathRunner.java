@@ -13,8 +13,8 @@ import mazestormer.robot.Robot;
 
 public abstract class PathRunner extends Runner implements NavigationListener {
 
-	private final Robot robot;
-	private final Maze maze;
+	protected final Robot robot;
+	protected final Maze maze;
 	protected final Navigator navigator;
 
 	public PathRunner(Robot robot, Maze maze) {
@@ -27,10 +27,6 @@ public abstract class PathRunner extends Runner implements NavigationListener {
 
 	protected Pose getPose() {
 		return robot.getPoseProvider().getPose();
-	}
-
-	protected Maze getMaze() {
-		return maze;
 	}
 
 	public Tile getCurrentTile() {

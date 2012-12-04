@@ -1,18 +1,23 @@
 package mazestormer.robot;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import mazestormer.util.CancellationException;
 
-public abstract class Runner implements RunnerTask {
+public abstract class Runner implements RunnerTask, RunnerListener {
 
 	private final Pilot pilot;
 	private boolean isRunning = false;
-	private final ExecutorService executor = Executors.newSingleThreadExecutor();
+	private final ExecutorService executor = Executors
+			.newSingleThreadExecutor();
+	private final List<RunnerListener> listeners = new CopyOnWriteArrayList<RunnerListener>();
 
 	public Runner(Pilot pilot) {
 		this.pilot = pilot;
+		addListener(this);
 	}
 
 	protected Pilot getPilot() {
@@ -34,7 +39,9 @@ public abstract class Runner implements RunnerTask {
 
 		isRunning = true;
 		executor.execute(wrap(this));
-		onStarted();
+		for (RunnerListener listener : listeners) {
+			listener.onStarted();
+		}
 		return true;
 	}
 
@@ -48,19 +55,32 @@ public abstract class Runner implements RunnerTask {
 			return false;
 
 		isRunning = false;
-		onCancelled();
+		for (RunnerListener listener : listeners) {
+			listener.onCancelled();
+		}
 		return true;
 	}
 
+	public void addListener(RunnerListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeListener(RunnerListener listener) {
+		listeners.remove(listener);
+	}
+
 	/**
-	 * Subclasses should override this method to perform additional initializations.
+	 * Subclasses should override this method to perform additional
+	 * initializations.
 	 */
+	@Override
 	public void onStarted() {
 	}
 
 	/**
 	 * Subclasses should override this method to perform additional cleanup.
 	 */
+	@Override
 	public void onCancelled() {
 		getPilot().stop();
 	}
@@ -69,7 +89,7 @@ public abstract class Runner implements RunnerTask {
 	 * Wrap a task to catch cancellations.
 	 * 
 	 * @param task
-	 * 			The task to wrap.
+	 *            The task to wrap.
 	 */
 	protected Runnable wrap(final RunnerTask task) {
 		return new Runnable() {
@@ -82,6 +102,34 @@ public abstract class Runner implements RunnerTask {
 				}
 			}
 		};
+	}
+
+	protected void fork(final Runner runner) {
+		addListener(new RunnerListener() {
+			@Override
+			public void onStarted() {
+			}
+
+			@Override
+			public void onCancelled() {
+				// Cancel forked runner when this runner is cancelled
+				runner.cancel();
+			}
+		});
+	}
+
+	protected void join(final Runner runner, final Runnable after) {
+		runner.addListener(new RunnerListener() {
+			@Override
+			public void onStarted() {
+			}
+
+			@Override
+			public void onCancelled() {
+				// Continue with given task when other runner is cancelled
+				executor.execute(after);
+			}
+		});
 	}
 
 	protected void throwWhenCancelled() throws CancellationException {
@@ -104,7 +152,8 @@ public abstract class Runner implements RunnerTask {
 		travel(distance, false);
 	}
 
-	protected void travel(double distance, boolean immediateReturn) throws CancellationException {
+	protected void travel(double distance, boolean immediateReturn)
+			throws CancellationException {
 		throwWhenCancelled();
 		getPilot().travel(distance, immediateReturn);
 		throwWhenCancelled();
@@ -134,7 +183,8 @@ public abstract class Runner implements RunnerTask {
 		rotate(angle, false);
 	}
 
-	protected void rotate(double angle, boolean immediateReturn) throws CancellationException {
+	protected void rotate(double angle, boolean immediateReturn)
+			throws CancellationException {
 		throwWhenCancelled();
 		getPilot().rotate(angle, immediateReturn);
 		throwWhenCancelled();

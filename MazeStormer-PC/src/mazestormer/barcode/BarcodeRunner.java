@@ -1,4 +1,4 @@
-package mazestormer.controller;
+package mazestormer.barcode;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.barcode.Threshold;
 import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
@@ -77,18 +76,28 @@ public class BarcodeRunner extends Runner {
 		System.out.println(message);
 	}
 
-	private static float getPoseDiff(Pose one, Pose two) {
-		float diffX = Math.abs(one.getX() - two.getX());
-		float diffY = Math.abs(one.getY() - two.getY());
-		return Math.max(diffX, diffY);
+	/**
+	 * Triggered when the start of a barcode was found.
+	 */
+	protected void onStartBarcode() {
 	}
 
-	private static float getTotalSum(Iterable<Float> values) {
-		float sum = 0;
-		for (float value : values) {
-			sum += value;
-		}
-		return sum;
+	/**
+	 * Triggered when the barcode was successfully read.
+	 * 
+	 * <p>
+	 * The default implementation logs the read barcode and performs the
+	 * associated action.
+	 * </p>
+	 */
+	protected void onEndBarcode(byte barcode) {
+		// Log
+		String paddedBarcode = Strings.padStart(
+				Integer.toBinaryString(barcode), NUMBER_OF_BARS, '0');
+		log("Scanned barcode: " + paddedBarcode);
+
+		// Action
+		performAction(barcode);
 	}
 
 	@Override
@@ -123,6 +132,9 @@ public class BarcodeRunner extends Runner {
 	}
 
 	private void onBlackBackward() {
+		// Notify
+		onStartBarcode();
+
 		log("Go to the begin of the barcode zone.");
 		setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
@@ -195,17 +207,15 @@ public class BarcodeRunner extends Runner {
 	}
 
 	private void completed() {
-		// Done
-		cancel();
 		// Read barcode
 		byte barcode = (byte) readBarcode(distances);
-		performAction(barcode);
+		// Notify
+		onEndBarcode(barcode);
+		// Done
+		cancel();
 	}
 
 	protected void performAction(byte barcode) {
-		String paddedBarcode = Strings.padStart(
-				Integer.toBinaryString(barcode), NUMBER_OF_BARS, '0');
-		log("Scanned barcode: " + paddedBarcode);
 		// TODO
 		// BarcodeDecoder.getAction(this.barcode).performAction(getRobot(),
 		// getMaze());
@@ -243,6 +253,20 @@ public class BarcodeRunner extends Runner {
 			}
 		}
 		return result;
+	}
+
+	private static float getPoseDiff(Pose one, Pose two) {
+		float diffX = Math.abs(one.getX() - two.getX());
+		float diffY = Math.abs(one.getY() - two.getY());
+		return Math.max(diffX, diffY);
+	}
+
+	private static float getTotalSum(Iterable<Float> values) {
+		float sum = 0;
+		for (float value : values) {
+			sum += value;
+		}
+		return sum;
 	}
 
 }

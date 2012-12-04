@@ -135,7 +135,12 @@ public class BarcodeController extends SubController implements
 
 	}
 
-	private class BarcodeRunner extends mazestormer.controller.BarcodeRunner {
+	private class BarcodeRunner extends mazestormer.barcode.BarcodeRunner {
+
+		public BarcodeRunner() {
+			super(BarcodeController.this.getRobot(), BarcodeController.this
+					.getMaze());
+		}
 
 		@Override
 		public void onStarted() {
@@ -153,11 +158,6 @@ public class BarcodeController extends SubController implements
 
 		private void postState(BarcodeScanEvent.EventType eventType) {
 			postEvent(new BarcodeScanEvent(eventType));
-		}
-
-		public BarcodeRunner() {
-			super(BarcodeController.this.getRobot(), BarcodeController.this
-					.getMaze());
 		}
 
 		@Override
