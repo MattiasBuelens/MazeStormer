@@ -1,15 +1,19 @@
 package mazestormer.maze;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Barcode {
 
 	private final byte value;
+	private final List<Integer> barWidths;
+
 	private static final int nbBars = 6;
 
 	public Barcode(byte value) {
 		this.value = value;
+		this.barWidths = Collections.unmodifiableList(getWidths(value));
 	}
 
 	public byte getValue() {
@@ -25,6 +29,38 @@ public class Barcode {
 	 * black bars.
 	 */
 	public List<Integer> getWidths() {
+		return barWidths;
+	}
+
+	/**
+	 * Get the number of bars in a barcode, with leading and terminating black
+	 * bars.
+	 */
+	public static int getNbValueBars() {
+		return nbBars;
+	}
+
+	/**
+	 * Get the number of bars in a barcode, without leading and terminating
+	 * black bars.
+	 */
+	public static int getNbBars() {
+		return getNbValueBars() + 2;
+	}
+
+	/**
+	 * Reverse the given barcode.
+	 * 
+	 * @param barcode
+	 *            The barcode value to reverse.
+	 * 
+	 * @return The barcode value in reversed bit order.
+	 */
+	public static byte reverse(byte barcode) {
+		return (byte) (Integer.reverse(barcode) >>> (Integer.SIZE - getNbValueBars()));
+	}
+
+	private static List<Integer> getWidths(byte value) {
 		List<Integer> widths = new ArrayList<Integer>();
 
 		// Add leading black bar
@@ -56,25 +92,6 @@ public class Barcode {
 		}
 
 		return widths;
-	}
-
-	/**
-	 * Get the number of bars in a barcode.
-	 */
-	public static int getNbBars() {
-		return nbBars;
-	}
-
-	/**
-	 * Reverse the given barcode.
-	 * 
-	 * @param barcode
-	 *            The barcode value to reverse.
-	 * 
-	 * @return The barcode value in reversed bit order.
-	 */
-	public static byte reverse(byte barcode) {
-		return (byte) (Integer.reverse(barcode) >>> (Integer.SIZE - getNbBars()));
 	}
 
 }

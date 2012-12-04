@@ -26,7 +26,7 @@ import mazestormer.robot.RunnerTask;
 public class BarcodeController extends SubController implements
 		IBarcodeController {
 	// private static final double START_BAR_LENGTH = 1.8; // [cm]
-	private static final double BAR_LENGTH = 1.85; // [cm]
+	// private static final double BAR_LENGTH = 1.85; // [cm]
 	private static final int NUMBER_OF_BARS = 6; // without black start bars
 	private static final int BLACK_THRESHOLD = 50;
 
@@ -154,6 +154,10 @@ public class BarcodeController extends SubController implements
 	@Override
 	public void setBWThreshold(int threshold) {
 		Threshold.BLACK_WHITE.setThresholdValue(threshold);
+	}
+
+	private double getBarLength() {
+		return getMaze().getBarLength();
 	}
 
 	private class BarcodeRunner extends Runner {
@@ -284,7 +288,7 @@ public class BarcodeController extends SubController implements
 			}
 
 			if (getTotalSum(this.distances) <= (NUMBER_OF_BARS + 1)
-					* BAR_LENGTH) {
+					* getBarLength()) {
 				// Iterate
 				loop();
 			} else {
@@ -310,8 +314,10 @@ public class BarcodeController extends SubController implements
 		}
 
 		private int readBarcode(List<Float> distances) {
+			final double barLength = getBarLength();
 			int result = 0;
 			int index = NUMBER_OF_BARS - 1;
+
 			// Iterate over distances until barcode complete
 			ListIterator<Float> it = distances.listIterator();
 			while (it.hasNext() && index >= 0) {
@@ -323,10 +329,10 @@ public class BarcodeController extends SubController implements
 					// TODO Check with start offset
 					// at = Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH,
 					// 0);
-					at = Math.max((distance - startOffset - BAR_LENGTH)
-							/ BAR_LENGTH, 0);
+					at = Math.max((distance - startOffset - barLength)
+							/ barLength, 0);
 				} else {
-					at = Math.max(distance / BAR_LENGTH, 1);
+					at = Math.max(distance / barLength, 1);
 				}
 				// TODO Check rounding
 				int limit = DoubleMath.roundToInt(at, RoundingMode.HALF_DOWN);

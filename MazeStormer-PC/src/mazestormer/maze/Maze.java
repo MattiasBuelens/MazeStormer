@@ -24,11 +24,11 @@ public class Maze extends AbstractEventSource {
 	private static final float defaultTileSize = 40f;
 	private static final float defaultEdgeSize = 2f;
 	// TODO Duplicate constant from BarcodeController, merge?
-	private static final float defaultBarSize = 1.85f;
+	private static final float defaultBarLength = 1.85f;
 
 	private final float tileSize;
 	private final float edgeSize;
-	private final float barSize;
+	private final float barLength;
 	private Pose origin = new Pose();
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
@@ -39,15 +39,15 @@ public class Maze extends AbstractEventSource {
 	private final Mesh mesh;
 	private Map<Target, Tile> targets = new EnumMap<Target, Tile>(Target.class);
 
-	public Maze(float tileSize, float edgeSize, float barSize) {
+	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
-		this.barSize = barSize;
+		this.barLength = barLength;
 		this.mesh = new Mesh(this);
 	}
 
 	public Maze(float tileSize, float edgeSize) {
-		this(tileSize, edgeSize, defaultBarSize);
+		this(tileSize, edgeSize, defaultBarLength);
 	}
 
 	public Maze(float tileSize) {
@@ -73,10 +73,10 @@ public class Maze extends AbstractEventSource {
 	}
 
 	/**
-	 * Get the size of a bar in this maze.
+	 * Get the length of a bar in this maze.
 	 */
-	public float getBarSize() {
-		return barSize;
+	public float getBarLength() {
+		return barLength;
 	}
 
 	/**
@@ -511,9 +511,9 @@ public class Maze extends AbstractEventSource {
 
 		// Center point in tile coordinates
 		Point center = isVertical ? new Point(0f, 0.5f) : new Point(0.5f, 0f);
-		// Barcode offset in relative coordinates
-		float barSize = getBarSize() / getTileSize();
-		float offsetAmount = (Barcode.getNbBars() + 2) / 2 * barSize;
+		// Barcode offset in tile coordinates
+		float barLength = getBarLength() / getTileSize();
+		float offsetAmount = Barcode.getNbBars() / 2 * barLength;
 		Point offset = direction.shift(center, -offsetAmount);
 
 		// Create bar rectangles
@@ -521,7 +521,7 @@ public class Maze extends AbstractEventSource {
 		Point barPoint = offset;
 		for (int width : tile.getBarcode().getWidths()) {
 			// Add bar
-			float barWidth = width * barSize;
+			float barWidth = width * barLength;
 			if (isVertical) {
 				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint
 						.getY(), 1, barWidth));
