@@ -13,17 +13,12 @@ import mazestormer.robot.Robot;
 
 public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 
-	// TODO Tweak virtual light sensor values
 	public static final int WHITE_VALUE = 580; // 100%
 	public static final int BROWN_VALUE = 510; // 68%
 	public static final int BLACK_VALUE = 360; // 0%
 
 	private Maze maze;
 	private PoseProvider poseProvider;
-
-	// private int delay = 50; // ms
-	// private long nextTime = 0;
-	// private int nextValue = 0;
 
 	public VirtualLightSensor(Maze maze, PoseProvider poseProvider) {
 		this.maze = maze;
@@ -64,7 +59,8 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 		if (tile.hasBarcode()) {
 			boolean isBlack = true;
 			// Get the position of the robot relative to the corner of the tile
-			Point relativeTilePosition = tilePosition.subtract(tile.getPosition().toPoint());
+			Point relativeTilePosition = tilePosition.subtract(tile
+					.getPosition().toPoint());
 			for (Rectangle2D bar : getMaze().getBarcodeBars(tile)) {
 				if (bar.contains(relativeTilePosition)) {
 					// On bar

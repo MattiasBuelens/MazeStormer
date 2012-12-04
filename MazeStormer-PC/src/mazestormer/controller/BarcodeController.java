@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 
 import lejos.robotics.navigation.Pose;
@@ -24,7 +25,7 @@ import mazestormer.robot.RunnerTask;
 
 public class BarcodeController extends SubController implements
 		IBarcodeController {
-	private static final double START_BAR_LENGTH = 1.8; // [cm]
+	// private static final double START_BAR_LENGTH = 1.8; // [cm]
 	private static final double BAR_LENGTH = 1.85; // [cm]
 	private static final int NUMBER_OF_BARS = 6; // without black start bars
 	private static final int BLACK_THRESHOLD = 50;
@@ -160,6 +161,7 @@ public class BarcodeController extends SubController implements
 		private final CalibratedLightSensor light;
 		private CommandHandle handle;
 
+		private double startOffset;
 		private double originalTravelSpeed;
 
 		private Pose oldPose;
@@ -171,6 +173,8 @@ public class BarcodeController extends SubController implements
 		public BarcodeRunner() {
 			super(getRobot().getPilot());
 			this.light = getRobot().getLightSensor();
+
+			this.startOffset = light.getSensorRadius();
 		}
 
 		@Override
@@ -219,7 +223,9 @@ public class BarcodeController extends SubController implements
 		private void onBlackBackward() {
 			log("Go to the begin of the barcode zone.");
 			setTravelSpeed(getScanSpeed());
-			travel(-START_BAR_LENGTH / 2);
+			// TODO Check with start offset
+			// travel(- START_BAR_LENGTH / 2);
+			travel(-startOffset);
 
 			this.oldPose = getRobot().getPoseProvider().getPose();
 			this.blackToWhite = true;
@@ -292,7 +298,9 @@ public class BarcodeController extends SubController implements
 
 		private void encodeBarcode() {
 			this.barcode = (byte) readBarcode(this.distances);
-			log("Scanned barcode: " + Integer.toBinaryString(this.barcode));
+			String paddedBarcode = Strings.padStart(
+					Integer.toBinaryString(this.barcode), NUMBER_OF_BARS, '0');
+			log("Scanned barcode: " + paddedBarcode);
 		}
 
 		private void decodeBarcode() {
@@ -300,6 +308,39 @@ public class BarcodeController extends SubController implements
 			// BarcodeDecoder.getAction(this.barcode).performAction(getRobot(),
 			// getMaze());
 		}
+
+		private int readBarcode(List<Float> distances) {
+			int result = 0;
+			int index = NUMBER_OF_BARS - 1;
+			// Iterate over distances until barcode complete
+			ListIterator<Float> it = distances.listIterator();
+			while (it.hasNext() && index >= 0) {
+				int i = it.nextIndex();
+				float distance = it.next();
+				double at;
+				if (i == 0) {
+					// First bar
+					// TODO Check with start offset
+					// at = Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH,
+					// 0);
+					at = Math.max((distance - startOffset - BAR_LENGTH)
+							/ BAR_LENGTH, 0);
+				} else {
+					at = Math.max(distance / BAR_LENGTH, 1);
+				}
+				// TODO Check rounding
+				int limit = DoubleMath.roundToInt(at, RoundingMode.HALF_DOWN);
+				// Odd indices are white, even indices are black
+				int barBit = i & 1; // == i % 2
+				// Set bit from index to index-a
+				for (int j = 0; j < limit && index >= 0; j++) {
+					result |= barBit << index;
+					index--;
+				}
+			}
+			return result;
+		}
+
 	}
 
 	private static float getPoseDiff(Pose one, Pose two) {
@@ -314,33 +355,6 @@ public class BarcodeController extends SubController implements
 			sum += value;
 		}
 		return sum;
-	}
-
-	private static int readBarcode(List<Float> distances) {
-		int result = 0;
-		int index = NUMBER_OF_BARS - 1;
-		// Iterate over distances until barcode complete
-		ListIterator<Float> it = distances.listIterator();
-		while (it.hasNext() && index >= 0) {
-			int i = it.nextIndex();
-			float distance = it.next();
-			double at;
-			if (i == 0) {
-				// First bar
-				at = Math.max((distance - START_BAR_LENGTH) / BAR_LENGTH, 0);
-			} else {
-				at = Math.max(distance / BAR_LENGTH, 1);
-			}
-			int limit = DoubleMath.roundToInt(at, RoundingMode.FLOOR);
-			// Odd indices are white, even indices are black
-			int barBit = i & 1; // == i % 2
-			// Set bit from index to index-a
-			for (int j = 0; j < limit && index >= 0; j++) {
-				result |= barBit << index;
-				index--;
-			}
-		}
-		return result;
 	}
 
 }

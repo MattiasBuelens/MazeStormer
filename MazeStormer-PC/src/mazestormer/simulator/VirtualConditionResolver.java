@@ -30,13 +30,10 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 		if (!isRunning())
 			start();
 
-		System.out.println("+ " + future + "\tRemaining: " + futures);
-
 		return future;
 	}
 
 	protected void removeFuture(Future future) {
-		System.out.println("- " + future + "\tRemaining: " + futures);
 		if (!isTerminated())
 			futures.remove(future);
 	}

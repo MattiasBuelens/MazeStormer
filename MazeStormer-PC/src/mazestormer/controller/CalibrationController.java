@@ -65,10 +65,10 @@ public class CalibrationController extends SubController implements
 		getLightSensor().calibrateHigh();
 		postEvent(new CalibrationChangeEvent("high", getHighValue()));
 	}
-	
+
 	@Subscribe
 	public void onConnected(ConnectEvent e) {
-		if(e.isConnected()) {
+		if (e.isConnected()) {
 			setHighValue(580);
 			setLowValue(360);
 		}
