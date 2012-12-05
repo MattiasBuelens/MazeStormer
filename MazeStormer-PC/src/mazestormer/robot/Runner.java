@@ -37,10 +37,13 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	public boolean start() {
 		if (isRunning())
 			return false;
-
 		start(this);
-
 		return true;
+	}
+
+	public void restart() {
+		cancel();
+		start();
 	}
 
 	protected void start(Runnable task) {
@@ -120,7 +123,7 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	 */
 	@Override
 	public void onCompleted() {
-		getPilot().stop();
+		// getPilot().stop();
 	}
 
 	/**
@@ -128,7 +131,7 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	 */
 	@Override
 	public void onCancelled() {
-		getPilot().stop();
+		// getPilot().stop();
 	}
 
 	/**
@@ -166,24 +169,6 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 				} catch (CancellationException e) {
 					onCancelled();
 				}
-			}
-		});
-	}
-
-	protected void join(final Runner runner, final Runnable after) {
-		runner.addListener(new RunnerListener() {
-			@Override
-			public void onStarted() {
-			}
-
-			@Override
-			public void onCompleted() {
-				// Continue with given task when other runner is completed
-				start(after);
-			}
-
-			@Override
-			public void onCancelled() {
 			}
 		});
 	}

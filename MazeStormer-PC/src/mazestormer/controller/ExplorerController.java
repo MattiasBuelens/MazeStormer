@@ -34,7 +34,6 @@ public class ExplorerController extends SubController implements
 		runner = new ExplorerRunner(getRobot(), getMaze()) {
 			@Override
 			protected void log(String message) {
-				super.log(message);
 				ExplorerController.this.log(message);
 			}
 		};

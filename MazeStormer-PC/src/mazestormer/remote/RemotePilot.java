@@ -53,8 +53,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public double getMaxTravelSpeed() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.POSITIVE_INFINITY;
 	}
 
 	@Override
@@ -70,8 +69,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	@Override
 	public double getRotateMaxSpeed() {
-		// TODO Auto-generated method stub
-		return 0;
+		return Double.POSITIVE_INFINITY;
 	}
 
 	@Override
