@@ -21,7 +21,7 @@ public class Navigator implements WaypointListener {
 	private Waypoint destination;
 	private int sequenceNr;
 
-	private ArrayList<NavigationListener> listeners = new ArrayList<NavigationListener>();
+	private ArrayList<NavigationListener> navigationListeners = new ArrayList<NavigationListener>();
 
 	/**
 	 * If true, causes Nav.run() to break whenever way point is reached.
@@ -57,7 +57,11 @@ public class Navigator implements WaypointListener {
 	 *            The new navigation listener.
 	 */
 	public void addNavigationListener(NavigationListener listener) {
-		listeners.add(listener);
+		navigationListeners.add(listener);
+	}
+
+	public void removeNavigationListener(NavigationListener listener) {
+		navigationListeners.remove(listener);
 	}
 
 	/**
@@ -130,11 +134,11 @@ public class Navigator implements WaypointListener {
 	 * @param path
 	 *            to be followed.
 	 */
-	public void followPath(Path path) {
+	public synchronized void followPath(Path path) {
 		followPathUntil(path, null);
 	}
 
-	public void followPathUntil(Path path, State untilState) {
+	public synchronized void followPathUntil(Path path, State untilState) {
 		if (path == null)
 			return;
 		this.path = path;
@@ -145,11 +149,11 @@ public class Navigator implements WaypointListener {
 	 * Starts the robot traversing the current path. This method is
 	 * non-blocking.
 	 */
-	public void followPath() {
+	public synchronized void followPath() {
 		followPathUntil(null);
 	}
 
-	public void followPathUntil(State untilState) {
+	public synchronized void followPathUntil(State untilState) {
 		if (path.isEmpty())
 			return;
 		interrupted = false;
@@ -164,8 +168,12 @@ public class Navigator implements WaypointListener {
 	 *            The next state.
 	 */
 	public void resumeFrom(State state) {
-		nav.setNextState(state);
-		followPath();
+		resumeFromUntil(state, null);
+	}
+
+	public void resumeFromUntil(State fromState, State untilState) {
+		nav.setNextState(fromState);
+		followPathUntil(untilState);
 	}
 
 	/**
@@ -275,7 +283,7 @@ public class Navigator implements WaypointListener {
 	 * Stops the robot. The robot will resume its path traversal if you call
 	 * {@link #followPath()}.
 	 */
-	public void stop() {
+	public synchronized void stop() {
 		if (nav.cancel()) {
 			interrupted = true;
 			callListeners();
@@ -330,7 +338,7 @@ public class Navigator implements WaypointListener {
 
 	private void callListeners() {
 		pose = poseProvider.getPose();
-		for (NavigationListener l : listeners) {
+		for (NavigationListener l : navigationListeners) {
 			if (interrupted) {
 				l.pathInterrupted(destination, pose, sequenceNr);
 			} else {
@@ -360,12 +368,7 @@ public class Navigator implements WaypointListener {
 
 		@Override
 		public void run() throws CancellationException {
-			// Keep stepping
-			while (!pathCompleted()) {
-				step();
-			}
-			// Done
-			resolve();
+			step();
 		}
 
 		public void setNextState(State nextState) {
@@ -378,6 +381,7 @@ public class Navigator implements WaypointListener {
 
 		private void step() throws CancellationException {
 			throwWhenCancelled();
+
 			switch (nextState) {
 			case NEXT_STEP:
 			default:
@@ -403,7 +407,7 @@ public class Navigator implements WaypointListener {
 			}
 
 			// Step again
-			if (nextState != State.NEXT_STEP) {
+			if (!pathCompleted()) {
 				step();
 			}
 		}
@@ -418,7 +422,7 @@ public class Navigator implements WaypointListener {
 			pose = poseProvider.getPose();
 			float destinationBearing = pose.relativeBearing(destination);
 			rotate(destinationBearing, true);
-			waitComplete();
+			waitForMove();
 			nextState = State.TRAVEL;
 		}
 
@@ -427,7 +431,7 @@ public class Navigator implements WaypointListener {
 			pose = poseProvider.getPose();
 			float distance = pose.distanceTo(destination);
 			travel(distance, true);
-			waitComplete();
+			waitForMove();
 			nextState = State.END_STEP;
 		}
 
@@ -436,7 +440,7 @@ public class Navigator implements WaypointListener {
 			if (destination.isHeadingRequired()) {
 				pose = poseProvider.getPose();
 				rotate(destination.getHeading() - pose.getHeading(), true);
-				waitComplete();
+				waitForMove();
 				pose = poseProvider.getPose();
 			}
 		}
@@ -457,7 +461,7 @@ public class Navigator implements WaypointListener {
 			callListeners();
 		}
 
-		private void waitComplete() {
+		private void waitForMove() {
 			Pilot pilot = getPilot();
 			while (pilot.isMoving() && isRunning()) {
 				Thread.yield();

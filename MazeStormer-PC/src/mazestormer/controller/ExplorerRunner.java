@@ -21,6 +21,7 @@ import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.robot.Navigator;
+import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.Robot;
 import mazestormer.robot.RunnerListener;
@@ -32,19 +33,13 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private Deque<Tile> queue = new ArrayDeque<Tile>();
 	private Tile currentTile;
 	private Tile nextTile;
-	private Barcode nextBarcode = null;
 
 	private final LineFinderRunner lineFinder;
 	private final BarcodeRunner barcodeRunner;
 
 	private static final int findLineInterval = 10;
-	private int nextFindLine = 1;
-
-	private State state = null;
-
-	public enum State {
-		SCAN, ROTATE, TRAVEL, LINE, BARCODE;
-	}
+	private int nextFindLine;
+	private Barcode nextBarcode;
 
 	public ExplorerRunner(Robot robot, Maze maze) {
 		super(robot, maze);
@@ -82,18 +77,19 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	@Override
 	public boolean cancel() {
-		if (super.cancel()) {
-			// Cancel runners
-			lineFinder.cancel();
-			barcodeRunner.cancel();
-			return true;
-		}
-		return false;
+		// Stop
+		getPilot().stop();
+		boolean isCancelled = super.cancel();
+		// Cancel runners
+		lineFinder.cancel();
+		barcodeRunner.cancel();
+		return isCancelled;
 	}
 
 	private void init() {
+		nextFindLine = 1;
+		nextBarcode = null;
 		// 1. QUEUE <-- path only containing the root
-
 		Pose startPose = getPose();
 		Pose relativeStartPose = maze.toRelative(startPose);
 		Point startPoint = relativeStartPose.getLocation();
@@ -108,21 +104,21 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			resolve();
 			return;
 		}
-		// Set and consume barcode
-		if (nextBarcode != null) {
-			maze.setBarcode(currentTile.getPosition(), nextBarcode);
-			nextBarcode = null;
-		}
 
 		// Remove the first path from the queue
 		// This is the current tile of the robot
 		currentTile = queue.pollLast();
 
-		// Scan and update current tile
-		state = State.SCAN;
+		log("Scanning " + currentTile.getPosition());
 		scanAndUpdate(currentTile);
 		currentTile.setExplored();
 		throwWhenCancelled();
+
+		// Set and consume barcode
+		if (nextBarcode != null) {
+			maze.setBarcode(currentTile.getPosition(), nextBarcode);
+			nextBarcode = null;
+		}
 
 		// Create new paths to all neighbors
 		selectTiles(currentTile);
@@ -146,12 +142,10 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			navigator.addWaypoint(waypoint);
 		}
 
-		// Follow path until before traveling
-		state = State.ROTATE;
 		navigator.followPathUntil(Navigator.State.TRAVEL);
 	}
 
-	private void beforeTravel() {
+	private synchronized void beforeTravel() {
 		if (shouldFindLine()) {
 			// Start line finder
 			lineFinder.start();
@@ -160,47 +154,50 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		}
 	}
 
-	private void travel() {
-		state = State.TRAVEL;
+	private synchronized void travel() {
 		// Follow path until way point is reached
-		navigator.resumeFrom(Navigator.State.TRAVEL);
+		navigator.stop();
+		navigator.resumeFromUntil(Navigator.State.TRAVEL,
+				Navigator.State.NEXT_STEP);
 	}
 
-	private void afterTravel() {
+	private synchronized void nextStep() {
+		// Increment counter for line finder
+		nextFindLine = (nextFindLine + 1) % findLineInterval;
+		log("After travel: " + nextFindLine);
 		// Next step
 		cycle();
 	}
 
-	private void beforeLineFinder() {
-		state = State.LINE;
+	private synchronized void beforeLineFinder() {
 	}
 
-	private void afterLineFinder() {
+	private synchronized void afterLineFinder() {
 		// Cancel line finder if still running
 		lineFinder.cancel();
-		// Start barcode runner
-		barcodeRunner.start();
 		// Travel to way point
 		travel();
+		// Start barcode runner
+		if (!currentTile.hasBarcode()) {
+			barcodeRunner.start();
+		}
 	}
 
-	private void beforeBarcode() {
-		System.out.println("Before barcode");
-		System.out.println("Pose:" + getPose());
-		state = State.BARCODE;
+	private synchronized void beforeBarcode() {
+		log("Before barcode, pose:" + getPose());
 		// Stop navigator
 		navigator.stop();
 		// Cancel line finder if still running
 		lineFinder.cancel();
 	}
 
-	private void afterBarcode(byte barcode) {
-		System.out.println("After barcode");
+	private synchronized void afterBarcode(byte barcode) {
+		log("After barcode, pose:" + getPose());
 		// Store barcode
 		nextBarcode = new Barcode(barcode);
-		// Cancel barcode runner if still running
-		barcodeRunner.cancel();
 		// Travel to way point
+		navigator.stop();
+		travel(-barcodeRunner.getBarcodeLength() / 2);
 		travel();
 	}
 
@@ -272,30 +269,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		return nextFindLine == 0;
 	}
 
-	@Override
-	public void atWaypoint(Waypoint waypoint, Pose pose, int sequence) {
-	}
-
-	@Override
-	public void pathComplete(Waypoint waypoint, Pose pose, int sequence) {
-		log("Completed: " + waypoint);
-		// Increment counter for line finder
-		nextFindLine = (nextFindLine + 1) % findLineInterval;
-
-		afterTravel();
-	}
-
-	@Override
-	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
-		log("At stop point: " + state);
-		switch (state) {
-		case ROTATE:
-			beforeTravel();
-			break;
-		default:
-		}
-	}
-
 	private float normalize(float angle) {
 		while (angle > 180)
 			angle -= 360f;
@@ -345,6 +318,24 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		public void onEndBarcode(byte barcode) {
 			afterBarcode(barcode);
 		}
+
+	}
+
+	@Override
+	public void atWaypoint(Waypoint waypoint, Pose pose, int sequence) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void pathComplete(Waypoint waypoint, Pose pose, int sequence) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
+		// TODO Auto-generated method stub
 
 	}
 
