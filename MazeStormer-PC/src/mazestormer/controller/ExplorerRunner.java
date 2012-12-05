@@ -23,8 +23,7 @@ import mazestormer.maze.Tile;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.Robot;
-import mazestormer.robot.RunnerTask;
-import mazestormer.util.CancellationException;
+import mazestormer.robot.RunnerListener;
 
 import com.google.common.primitives.Floats;
 
@@ -41,11 +40,18 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private static final int findLineInterval = 10;
 	private int nextFindLine = 1;
 
+	private State state = null;
+
+	public enum State {
+		SCAN, ROTATE, TRAVEL, LINE, BARCODE;
+	}
+
 	public ExplorerRunner(Robot robot, Maze maze) {
 		super(robot, maze);
 
 		// Navigator
 		navigator.singleStep(true);
+		navigator.addNavigationListener(this);
 
 		// Runners
 		lineFinder = new LineFinderRunner(robot) {
@@ -54,6 +60,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 				ExplorerRunner.this.log(message);
 			}
 		};
+		lineFinder.addListener(new LineFinderListener());
 		barcodeRunner = new BarcodeRunner(robot, maze) {
 			@Override
 			protected void log(String message) {
@@ -61,20 +68,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			}
 		};
 		barcodeRunner.addBarcodeListener(new BarcodeListener());
-
-		// Resume navigation after completion of runners
-		join(lineFinder, prepare(new RunnerTask() {
-			@Override
-			public void run() throws CancellationException {
-				afterLineFinder();
-			}
-		}));
-		join(barcodeRunner, prepare(new RunnerTask() {
-			@Override
-			public void run() throws CancellationException {
-				afterBarcode();
-			}
-		}));
 	}
 
 	protected void log(String message) {
@@ -115,19 +108,20 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			resolve();
 			return;
 		}
+		// Set and consume barcode
+		if (nextBarcode != null) {
+			maze.setBarcode(currentTile.getPosition(), nextBarcode);
+			nextBarcode = null;
+		}
 
 		// Remove the first path from the queue
 		// This is the current tile of the robot
 		currentTile = queue.pollLast();
 
 		// Scan and update current tile
+		state = State.SCAN;
 		scanAndUpdate(currentTile);
 		currentTile.setExplored();
-		// Set and consume barcode
-		if (nextBarcode != null) {
-			maze.setBarcode(currentTile.getPosition(), nextBarcode);
-			nextBarcode = null;
-		}
 		throwWhenCancelled();
 
 		// Create new paths to all neighbors
@@ -153,64 +147,61 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		}
 
 		// Follow path until before traveling
+		state = State.ROTATE;
 		navigator.followPathUntil(Navigator.State.TRAVEL);
-		navigator.waitForStop();
-		throwWhenCancelled();
+	}
 
+	private void beforeTravel() {
 		if (shouldFindLine()) {
 			// Start line finder
 			lineFinder.start();
-			pause();
 		} else {
 			afterLineFinder();
 		}
 	}
 
-	/**
-	 * Resume navigation.
-	 */
-	private void resume() {
+	private void travel() {
+		state = State.TRAVEL;
 		// Follow path until way point is reached
 		navigator.resumeFrom(Navigator.State.TRAVEL);
-		navigator.waitForStop();
-		throwWhenCancelled();
+	}
 
-		// Cancel barcode runner if still running
-		barcodeRunner.cancel();
-
+	private void afterTravel() {
 		// Next step
 		cycle();
 	}
 
-	/**
-	 * Pause the navigation.
-	 */
-	private void pause() {
-		// navigator.stop();
-		super.cancel();
+	private void beforeLineFinder() {
+		state = State.LINE;
 	}
 
-	/**
-	 * Triggered after rotating the robot towards the next way point and the
-	 * line finder has positioned the robot when necessary.
-	 */
 	private void afterLineFinder() {
 		// Cancel line finder if still running
 		lineFinder.cancel();
 		// Start barcode runner
 		barcodeRunner.start();
-		// Resume
-		resume();
+		// Travel to way point
+		travel();
 	}
 
-	/**
-	 * Triggered after a barcode has been scanned and processed.
-	 */
-	private void afterBarcode() {
+	private void beforeBarcode() {
+		System.out.println("Before barcode");
+		System.out.println("Pose:" + getPose());
+		state = State.BARCODE;
+		// Stop navigator
+		navigator.stop();
+		// Cancel line finder if still running
+		lineFinder.cancel();
+	}
+
+	private void afterBarcode(byte barcode) {
+		System.out.println("After barcode");
+		// Store barcode
+		nextBarcode = new Barcode(barcode);
 		// Cancel barcode runner if still running
 		barcodeRunner.cancel();
-		// Resume
-		resume();
+		// Travel to way point
+		travel();
 	}
 
 	/**
@@ -283,16 +274,26 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	@Override
 	public void atWaypoint(Waypoint waypoint, Pose pose, int sequence) {
-		// Increment counter for line finder
-		nextFindLine = (nextFindLine + 1) % findLineInterval;
 	}
 
 	@Override
 	public void pathComplete(Waypoint waypoint, Pose pose, int sequence) {
+		log("Completed: " + waypoint);
+		// Increment counter for line finder
+		nextFindLine = (nextFindLine + 1) % findLineInterval;
+
+		afterTravel();
 	}
 
 	@Override
 	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
+		log("At stop point: " + state);
+		switch (state) {
+		case ROTATE:
+			beforeTravel();
+			break;
+		default:
+		}
 	}
 
 	private float normalize(float angle) {
@@ -317,18 +318,32 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		}
 	}
 
+	private class LineFinderListener implements RunnerListener {
+		@Override
+		public void onStarted() {
+			beforeLineFinder();
+		}
+
+		@Override
+		public void onCompleted() {
+			afterLineFinder();
+		}
+
+		@Override
+		public void onCancelled() {
+		}
+	}
+
 	private class BarcodeListener implements BarcodeRunnerListener {
 
 		@Override
 		public void onStartBarcode() {
-			// Interrupt navigation
-			pause();
+			beforeBarcode();
 		}
 
 		@Override
 		public void onEndBarcode(byte barcode) {
-			// Store barcode
-			nextBarcode = new Barcode(barcode);
+			afterBarcode(barcode);
 		}
 
 	}

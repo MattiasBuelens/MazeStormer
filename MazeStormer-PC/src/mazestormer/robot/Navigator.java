@@ -111,7 +111,7 @@ public class Navigator implements WaypointListener {
 	 * called, it stops.
 	 */
 	public void clearPath() {
-		nav.cancel();
+		stop();
 		path.clear();
 	}
 
@@ -153,8 +153,8 @@ public class Navigator implements WaypointListener {
 		if (path.isEmpty())
 			return;
 		interrupted = false;
-		nav.setCancelState(untilState);
-		nav.start();
+		nav.setStopState(untilState);
+		nav.restart();
 	}
 
 	/**
@@ -164,8 +164,6 @@ public class Navigator implements WaypointListener {
 	 *            The next state.
 	 */
 	public void resumeFrom(State state) {
-		if (nav.isRunning())
-			return;
 		nav.setNextState(state);
 		followPath();
 	}
@@ -354,7 +352,7 @@ public class Navigator implements WaypointListener {
 	private class Nav extends Runner {
 
 		private State nextState = State.NEXT_STEP;
-		private State cancelState = null;
+		private State stopState = null;
 
 		public Nav() {
 			super(Navigator.this.getPilot());
@@ -363,24 +361,23 @@ public class Navigator implements WaypointListener {
 		@Override
 		public void run() throws CancellationException {
 			// Keep stepping
-			while (isRunning() && !pathCompleted()) {
+			while (!pathCompleted()) {
 				step();
 			}
 			// Done
-			cancel();
+			resolve();
 		}
 
 		public void setNextState(State nextState) {
 			this.nextState = nextState;
 		}
 
-		public void setCancelState(State cancelState) {
-			this.cancelState = cancelState;
+		public void setStopState(State stopState) {
+			this.stopState = stopState;
 		}
 
 		private void step() throws CancellationException {
 			throwWhenCancelled();
-			System.out.println("Step:" + nextState);
 			switch (nextState) {
 			case NEXT_STEP:
 			default:
@@ -398,17 +395,17 @@ public class Navigator implements WaypointListener {
 				break;
 			}
 
-			// Cancel when going to cancel state
-			if (nextState == cancelState)
-				cancel();
-
-			if (nextState != State.NEXT_STEP) {
-				// Step again
-				step();
+			// Stop when going to cancel state
+			if (nextState == stopState) {
+				interrupted = true;
+				callListeners();
+				return;
 			}
 
-			// End of step
-			return;
+			// Step again
+			if (nextState != State.NEXT_STEP) {
+				step();
+			}
 		}
 
 		private void nextStep() {
@@ -447,18 +444,17 @@ public class Navigator implements WaypointListener {
 		private void endStep() {
 			pose = poseProvider.getPose();
 			nextState = State.NEXT_STEP;
-			if (isRunning() && !pathCompleted()) {
-				if (!interrupted) {
-					// Presumably at way point
-					path.remove(0);
-					sequenceNr++;
-				}
-				// Stop when path completed or single step
-				if (pathCompleted() || singleStep)
-					resolve();
-				// Call listeners
-				callListeners();
+			if (!interrupted) {
+				// Presumably at way point
+				path.remove(0);
+				sequenceNr++;
 			}
+			// Stop when path completed or single step
+			if (pathCompleted() || singleStep) {
+				resolve();
+			}
+			// Call listeners
+			callListeners();
 		}
 
 		private void waitComplete() {

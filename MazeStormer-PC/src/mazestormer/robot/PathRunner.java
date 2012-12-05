@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lejos.geom.Point;
-import lejos.robotics.navigation.NavigationListener;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
-import mazestormer.robot.Robot;
 
-public abstract class PathRunner extends Runner implements NavigationListener {
+public abstract class PathRunner extends Runner {
 
 	protected final Robot robot;
 	protected final Maze maze;
@@ -23,7 +21,6 @@ public abstract class PathRunner extends Runner implements NavigationListener {
 		this.maze = maze;
 		this.navigator = new Navigator(robot.getPilot(),
 				robot.getPoseProvider());
-		this.navigator.addNavigationListener(this);
 	}
 
 	protected Pose getPose() {
@@ -65,20 +62,6 @@ public abstract class PathRunner extends Runner implements NavigationListener {
 	public void onCancelled() {
 		super.onCancelled();
 		navigator.stop();
-	}
-
-	@Override
-	public void atWaypoint(Waypoint waypoint, Pose pose, int sequence) {
-	}
-
-	@Override
-	public void pathComplete(Waypoint waypoint, Pose pose, int sequence) {
-	}
-
-	@Override
-	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
-		// Navigation interrupted, cancel runner
-		cancel();
 	}
 
 }

@@ -198,7 +198,7 @@ public class PathFindingController extends SubController implements
 			}
 
 			// Done
-			cancel();
+			resolve();
 		}
 
 	}
