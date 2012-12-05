@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.Move.MoveType;
@@ -31,13 +34,16 @@ public class VirtualPilot implements Pilot {
 
 	public VirtualPilot(double trackWidth, double maxTravelSpeed,
 			double maxRotateSpeed) {
-		executor = Executors.newSingleThreadScheduledExecutor();
-
 		this.maxTravelSpeed = maxTravelSpeed;
 		this.maxRotateSpeed = maxRotateSpeed;
-
 		this.trackWidth = (float) trackWidth;
 
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newSingleThreadScheduledExecutor(factory);
+
+		// Initial speeds
 		setTravelSpeed(.8f * getMaxTravelSpeed());
 		setRotateSpeed(.8f * getRotateMaxSpeed());
 	}

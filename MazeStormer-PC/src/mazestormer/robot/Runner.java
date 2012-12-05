@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import mazestormer.util.AbstractFuture;
 import mazestormer.util.CancellationException;
@@ -14,8 +17,7 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		FutureListener<Void> {
 
 	private final Pilot pilot;
-	private final ExecutorService executor = Executors
-			.newSingleThreadExecutor();
+	private final ExecutorService executor;
 	private final List<RunnerListener> listeners = new ArrayList<RunnerListener>();
 
 	private RunnerFuture future;
@@ -23,6 +25,11 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	public Runner(Pilot pilot) {
 		this.pilot = pilot;
 		addListener(this);
+
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newSingleThreadExecutor(factory);
 	}
 
 	protected Pilot getPilot() {

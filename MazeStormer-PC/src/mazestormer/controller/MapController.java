@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import lejos.robotics.navigation.Pose;
@@ -27,6 +28,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class MapController extends SubController implements IMapController {
 
@@ -45,9 +47,12 @@ public class MapController extends SubController implements IMapController {
 
 	public MapController(MainController mainController) {
 		super(mainController);
-
-		executor = Executors.newSingleThreadScheduledExecutor();
 		setUpdateInterval(defaultUpdateInterval);
+
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newSingleThreadScheduledExecutor(factory);
 
 		createMap();
 		createLayers();

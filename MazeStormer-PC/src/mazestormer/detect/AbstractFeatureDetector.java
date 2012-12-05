@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import lejos.robotics.objectdetection.Feature;
 import lejos.robotics.objectdetection.FeatureDetector;
@@ -43,8 +46,11 @@ public abstract class AbstractFeatureDetector implements FeatureDetector {
 	 *            The delay, in milliseconds.
 	 */
 	public AbstractFeatureDetector(int delay) {
-		executor = Executors.newSingleThreadScheduledExecutor();
 		setDelay(delay);
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newSingleThreadScheduledExecutor(factory);
 	}
 
 	/**

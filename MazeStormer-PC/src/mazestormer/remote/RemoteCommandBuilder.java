@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import mazestormer.command.CommandType;
 import mazestormer.command.ConditionalCommand;
@@ -23,7 +26,7 @@ public class RemoteCommandBuilder extends ReportRequester<Void> implements
 	private final ConditionalCommand command;
 	private final List<Runnable> actions = new ArrayList<>();
 
-	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private final ExecutorService executor;
 	private final ActionRunner actionRunner = new ActionRunner();
 
 	public RemoteCommandBuilder(RemoteCommunicator communicator,
@@ -31,6 +34,11 @@ public class RemoteCommandBuilder extends ReportRequester<Void> implements
 		super(communicator);
 		command = new ConditionalCommand(type, condition);
 		command.setRequestId(communicator.nextRequestId());
+
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newCachedThreadPool(factory);
 	}
 
 	@Override

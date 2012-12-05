@@ -223,12 +223,12 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	private void completed() {
 		// Read barcode
 		byte barcode = (byte) readBarcode(distances);
+		// Done
+		resolve();
 		// Notify listeners
 		for (BarcodeRunnerListener listener : listeners) {
 			listener.onEndBarcode(barcode);
 		}
-		// Done
-		resolve();
 	}
 
 	protected void performAction(byte barcode) {

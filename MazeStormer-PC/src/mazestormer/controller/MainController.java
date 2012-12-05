@@ -3,7 +3,9 @@ package mazestormer.controller;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.awt.EventQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +30,7 @@ import mazestormer.util.EventSource;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class MainController implements IMainController {
 
@@ -49,7 +52,7 @@ public class MainController implements IMainController {
 	/*
 	 * Events
 	 */
-	private EventBus eventBus = new AsyncEventBus(getClass().getSimpleName(), Executors.newSingleThreadExecutor());
+	private EventBus eventBus;
 
 	/*
 	 * Models
@@ -92,16 +95,26 @@ public class MainController implements IMainController {
 	private EventSource view;
 
 	public MainController() {
+		// Create event bus on named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		ExecutorService executor = Executors.newSingleThreadExecutor(factory);
+		eventBus = new AsyncEventBus(getClass().getSimpleName(), executor);
+
+		// Register on event bus
 		getEventBus().register(this);
 
+		// Connection
 		connectionProvider = new ConnectionProvider();
 		// TODO Configure device name in GUI?
 		connectionContext.setDeviceName("brons");
 		connectionContext.setSourceMaze(getSourceMaze());
 
+		// View
 		view = createView();
 		view.registerEventBus(getEventBus());
 
+		// Post initialized
 		postEvent(new InitializeEvent());
 	}
 
@@ -170,7 +183,7 @@ public class MainController implements IMainController {
 		}
 		return barcodeControl;
 	}
-	
+
 	@Override
 	public IPathFindingController pathFindingControl() {
 		if (pathFindingControl == null) {
@@ -333,12 +346,14 @@ public class MainController implements IMainController {
 		 */
 		if (e.isConnected() && getRobot() instanceof VirtualRobot) {
 			VirtualRobot vRobot = (VirtualRobot) getRobot();
-			vRobot.getCollisionObserver().addCollisionListener(new CollisionListener() {
-				@Override
-				public void brutalCrashOccured() {
-					getLogger().severe("A collision occured, please retreat.");
-				}
-			});
+			vRobot.getCollisionObserver().addCollisionListener(
+					new CollisionListener() {
+						@Override
+						public void brutalCrashOccured() {
+							getLogger().severe(
+									"A collision occured, please retreat.");
+						}
+					});
 		}
 	}
 
@@ -383,15 +398,15 @@ public class MainController implements IMainController {
 		}
 		return sourceMaze;
 	}
-	
+
 	public void setMaze(Maze maze) {
 		this.maze = maze;
 	}
-	
+
 	public Tile getGoalTile() {
 		return this.goalTile;
 	}
-	
+
 	public void setGoalTile(Tile tile) {
 		this.goalTile = tile;
 	}

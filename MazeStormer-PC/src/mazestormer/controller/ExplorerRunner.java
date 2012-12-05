@@ -14,12 +14,12 @@ import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.BarcodeRunnerListener;
-import mazestormer.maze.Barcode;
 import mazestormer.maze.Edge;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.maze.TileType;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.Robot;
@@ -32,7 +32,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private Deque<Tile> queue = new ArrayDeque<Tile>();
 	private Tile currentTile;
 	private Tile nextTile;
-	private Barcode nextBarcode = null;
 
 	private final LineFinderRunner lineFinder;
 	private final BarcodeRunner barcodeRunner;
@@ -109,16 +108,17 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			return;
 		}
 		// Set and consume barcode
-		if (nextBarcode != null) {
-			maze.setBarcode(currentTile.getPosition(), nextBarcode);
-			nextBarcode = null;
-		}
+		// if (nextBarcode != null) {
+		// maze.setBarcode(currentTile.getPosition(), nextBarcode);
+		// nextBarcode = null;
+		// }
 
 		// Remove the first path from the queue
 		// This is the current tile of the robot
 		currentTile = queue.pollLast();
 
 		// Scan and update current tile
+		log("Scan");
 		state = State.SCAN;
 		scanAndUpdate(currentTile);
 		currentTile.setExplored();
@@ -167,6 +167,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void afterTravel() {
+		// Increment counter for line finder
+		nextFindLine = (nextFindLine + 1) % findLineInterval;
 		// Next step
 		cycle();
 	}
@@ -196,12 +198,26 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	private void afterBarcode(byte barcode) {
 		System.out.println("After barcode");
-		// Store barcode
-		nextBarcode = new Barcode(barcode);
 		// Cancel barcode runner if still running
 		barcodeRunner.cancel();
-		// Travel to way point
-		travel();
+		// Set barcode on tile
+		setBarcodeTile(currentTile, barcode);
+		// Next tile
+		afterTravel();
+	}
+
+	private void setBarcodeTile(Tile tile, byte barcode) {
+		float relativeHeading = maze.toRelative(getPose().getHeading());
+		Orientation heading = angleToOrientation(relativeHeading);
+
+		// Make straight tile
+		for (Orientation wall : TileType.STRAIGHT.getWalls(heading)) {
+			maze.setEdge(tile.getPosition(), wall, EdgeType.WALL);
+		}
+		// Mark as explored
+		tile.setExplored();
+		// Set barcode
+		maze.setBarcode(tile.getPosition(), barcode);
 	}
 
 	/**
@@ -279,9 +295,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	@Override
 	public void pathComplete(Waypoint waypoint, Pose pose, int sequence) {
 		log("Completed: " + waypoint);
-		// Increment counter for line finder
-		nextFindLine = (nextFindLine + 1) % findLineInterval;
-
 		afterTravel();
 	}
 
@@ -335,7 +348,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private class BarcodeListener implements BarcodeRunnerListener {
-
 		@Override
 		public void onStartBarcode() {
 			beforeBarcode();
@@ -345,7 +357,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		public void onEndBarcode(byte barcode) {
 			afterBarcode(barcode);
 		}
-
 	}
 
 }

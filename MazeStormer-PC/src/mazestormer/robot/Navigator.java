@@ -10,12 +10,10 @@ import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.navigation.WaypointListener;
 import lejos.robotics.pathfinding.Path;
 
-public class Navigator implements WaypointListener {
+public class Navigator extends Runner implements WaypointListener {
 
-	private Pilot pilot;
 	private PoseProvider poseProvider;
 
-	private Nav nav;
 	private Path path = new Path();
 	private Pose pose = new Pose();
 	private Waypoint destination;
@@ -28,11 +26,12 @@ public class Navigator implements WaypointListener {
 	 */
 	private boolean singleStep = false;
 
-	/**
-	 * Set by stop(), reset by followPath(), goTo() used by Nav.run(),
-	 * callListeners().
-	 */
-	private boolean interrupted = false;
+	public enum State {
+		NEXT_STEP, ROTATE, TRAVEL, END_STEP
+	}
+
+	private State nextState = State.NEXT_STEP;
+	private State stopState = null;
 
 	/**
 	 * Creates a navigator controlling the given pilot and using the given pose
@@ -44,9 +43,8 @@ public class Navigator implements WaypointListener {
 	 *            The pose provider.
 	 */
 	public Navigator(Pilot pilot, PoseProvider poseProvider) {
-		this.pilot = pilot;
+		super(pilot);
 		this.poseProvider = poseProvider;
-		nav = new Nav();
 	}
 
 	/**
@@ -80,15 +78,6 @@ public class Navigator implements WaypointListener {
 	}
 
 	/**
-	 * Gets the pilot being controlled.
-	 * 
-	 * @return The pilot.
-	 */
-	public Pilot getPilot() {
-		return pilot;
-	}
-
-	/**
 	 * Sets the path that the navigator will traverse. By default, the robot
 	 * will not stop along the way. If the robot is moving when this method is
 	 * called, it stops and the current path is replaced by the new one.
@@ -99,7 +88,7 @@ public class Navigator implements WaypointListener {
 	public void setPath(Path path) {
 		if (path == null)
 			return;
-		if (nav.isRunning())
+		if (isRunning())
 			stop();
 		this.path = path;
 		singleStep = false;
@@ -152,9 +141,8 @@ public class Navigator implements WaypointListener {
 	public void followPathUntil(State untilState) {
 		if (path.isEmpty())
 			return;
-		interrupted = false;
-		nav.setStopState(untilState);
-		nav.restart();
+		stopState = untilState;
+		restart();
 	}
 
 	/**
@@ -164,7 +152,7 @@ public class Navigator implements WaypointListener {
 	 *            The next state.
 	 */
 	public void resumeFrom(State state) {
-		nav.setNextState(state);
+		nextState = state;
 		followPath();
 	}
 
@@ -276,8 +264,7 @@ public class Navigator implements WaypointListener {
 	 * {@link #followPath()}.
 	 */
 	public void stop() {
-		if (nav.cancel()) {
-			interrupted = true;
+		if (cancel()) {
 			callListeners();
 		}
 	}
@@ -321,7 +308,7 @@ public class Navigator implements WaypointListener {
 	 * @return True if and only if the robot is moving.
 	 */
 	public boolean isMoving() {
-		return nav.isRunning();
+		return isRunning();
 	}
 
 	public void pathGenerated() {
@@ -331,7 +318,7 @@ public class Navigator implements WaypointListener {
 	private void callListeners() {
 		pose = poseProvider.getPose();
 		for (NavigationListener l : listeners) {
-			if (interrupted) {
+			if (!isRunning()) {
 				l.pathInterrupted(destination, pose, sequenceNr);
 			} else {
 				l.atWaypoint(destination, pose, sequenceNr);
@@ -342,129 +329,101 @@ public class Navigator implements WaypointListener {
 		}
 	}
 
-	public enum State {
-		ROTATE, TRAVEL, END_STEP, NEXT_STEP
+	@Override
+	public void run() throws CancellationException {
+		// Keep stepping
+		while (!pathCompleted()) {
+			step();
+		}
+		// Done
+		resolve();
 	}
 
-	/**
-	 * Runs the thread that processes the way point queue.
-	 */
-	private class Nav extends Runner {
-
-		private State nextState = State.NEXT_STEP;
-		private State stopState = null;
-
-		public Nav() {
-			super(Navigator.this.getPilot());
+	private void step() throws CancellationException {
+		throwWhenCancelled();
+		switch (nextState) {
+		case NEXT_STEP:
+		default:
+			nextStep();
+			break;
+		case ROTATE:
+			rotateStart();
+			break;
+		case TRAVEL:
+			travel();
+			break;
+		case END_STEP:
+			rotateDestination();
+			endStep();
+			break;
 		}
 
-		@Override
-		public void run() throws CancellationException {
-			// Keep stepping
-			while (!pathCompleted()) {
-				step();
-			}
-			// Done
+		// Stop when going to cancel state
+		if (nextState == stopState) {
+			stop();
+			return;
+		}
+
+		// Step again
+		if (nextState != State.NEXT_STEP) {
+			step();
+		}
+	}
+
+	private void nextStep() {
+		destination = getWaypoint();
+		nextState = State.ROTATE;
+	}
+
+	private void rotateStart() {
+		// Rotate towards destination
+		pose = poseProvider.getPose();
+		float destinationBearing = pose.relativeBearing(destination);
+		rotate(destinationBearing, true);
+		waitComplete();
+		nextState = State.TRAVEL;
+	}
+
+	private void travel() {
+		// Travel towards destination
+		pose = poseProvider.getPose();
+		float distance = pose.distanceTo(destination);
+		travel(distance, true);
+		waitComplete();
+		nextState = State.END_STEP;
+	}
+
+	private void rotateDestination() {
+		// Apply destination heading
+		if (destination.isHeadingRequired()) {
+			pose = poseProvider.getPose();
+			rotate(destination.getHeading() - pose.getHeading(), true);
+			waitComplete();
+		}
+	}
+
+	private void endStep() {
+		pose = poseProvider.getPose();
+		nextState = State.NEXT_STEP;
+		if (isRunning()) {
+			// Presumably at way point
+			path.remove(0);
+			sequenceNr++;
+		}
+		// Call listeners
+		callListeners();
+		// Stop when path completed or single step
+		if (pathCompleted() || singleStep) {
 			resolve();
 		}
+	}
 
-		public void setNextState(State nextState) {
-			this.nextState = nextState;
+	private void waitComplete() {
+		Pilot pilot = getPilot();
+		while (pilot.isMoving() && isRunning()) {
+			Thread.yield();
 		}
-
-		public void setStopState(State stopState) {
-			this.stopState = stopState;
-		}
-
-		private void step() throws CancellationException {
-			throwWhenCancelled();
-			switch (nextState) {
-			case NEXT_STEP:
-			default:
-				nextStep();
-				break;
-			case ROTATE:
-				rotateStart();
-				break;
-			case TRAVEL:
-				travel();
-				break;
-			case END_STEP:
-				rotateDestination();
-				endStep();
-				break;
-			}
-
-			// Stop when going to cancel state
-			if (nextState == stopState) {
-				interrupted = true;
-				callListeners();
-				return;
-			}
-
-			// Step again
-			if (nextState != State.NEXT_STEP) {
-				step();
-			}
-		}
-
-		private void nextStep() {
-			destination = getWaypoint();
-			nextState = State.ROTATE;
-		}
-
-		private void rotateStart() {
-			// Rotate towards destination
-			pose = poseProvider.getPose();
-			float destinationBearing = pose.relativeBearing(destination);
-			rotate(destinationBearing, true);
-			waitComplete();
-			nextState = State.TRAVEL;
-		}
-
-		private void travel() {
-			// Travel towards destination
-			pose = poseProvider.getPose();
-			float distance = pose.distanceTo(destination);
-			travel(distance, true);
-			waitComplete();
-			nextState = State.END_STEP;
-		}
-
-		private void rotateDestination() {
-			// Apply destination heading
-			if (destination.isHeadingRequired()) {
-				pose = poseProvider.getPose();
-				rotate(destination.getHeading() - pose.getHeading(), true);
-				waitComplete();
-				pose = poseProvider.getPose();
-			}
-		}
-
-		private void endStep() {
-			pose = poseProvider.getPose();
-			nextState = State.NEXT_STEP;
-			if (!interrupted) {
-				// Presumably at way point
-				path.remove(0);
-				sequenceNr++;
-			}
-			// Stop when path completed or single step
-			if (pathCompleted() || singleStep) {
-				resolve();
-			}
-			// Call listeners
-			callListeners();
-		}
-
-		private void waitComplete() {
-			Pilot pilot = getPilot();
-			while (pilot.isMoving() && isRunning()) {
-				Thread.yield();
-			}
-			throwWhenCancelled();
-		}
-
+		throwWhenCancelled();
 	}
 
 }

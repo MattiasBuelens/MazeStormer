@@ -5,6 +5,9 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
@@ -15,8 +18,14 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 	private boolean isTerminated = false;
 
 	private final Set<Future> futures = new CopyOnWriteArraySet<Future>();
-	private final ExecutorService executor = Executors
-			.newSingleThreadExecutor();
+	private final ExecutorService executor;
+
+	public VirtualConditionResolver() {
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newSingleThreadExecutor(factory);
+	}
 
 	public ConditionFuture add(C condition) {
 		if (isTerminated())

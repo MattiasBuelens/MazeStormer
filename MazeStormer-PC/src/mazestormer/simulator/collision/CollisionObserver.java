@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
@@ -20,8 +23,7 @@ public class CollisionObserver implements Runnable, MoveListener {
 
 	private static final long interval = 100;
 	private ScheduledFuture<?> future;
-	private final ScheduledExecutorService executor = Executors
-			.newSingleThreadScheduledExecutor();
+	private final ScheduledExecutorService executor;
 
 	private List<CollisionListener> listeners = new ArrayList<CollisionListener>();
 
@@ -29,6 +31,11 @@ public class CollisionObserver implements Runnable, MoveListener {
 		this.pilot = robot.getPilot();
 		this.detector = robot.getCollisionDetector();
 		pilot.addMoveListener(this);
+
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newSingleThreadScheduledExecutor(factory);
 	}
 
 	public boolean isRunning() {

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import mazestormer.command.ConditionalCommandBuilder;
 import mazestormer.command.ConditionalCommandBuilder.CommandBuilder;
@@ -13,19 +16,25 @@ import mazestormer.robot.Robot;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-public class VirtualCommandBuilder implements ConditionalCommandBuilder.CommandBuilder {
+public class VirtualCommandBuilder implements
+		ConditionalCommandBuilder.CommandBuilder {
 
 	private final Robot robot;
 	private final ConditionFuture future;
 	private final List<Runnable> commands = new ArrayList<Runnable>();
 	private final List<Runnable> actions = new ArrayList<Runnable>();
 
-	private final ExecutorService executor = Executors.newCachedThreadPool();
+	private final ExecutorService executor;
 	private final Runner actionRunner = new Runner();
 
 	public VirtualCommandBuilder(Robot robot, ConditionFuture future) {
 		this.robot = robot;
 		this.future = future;
+
+		// Named executor
+		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
+				getClass().getSimpleName() + "-%d").build();
+		executor = Executors.newCachedThreadPool(factory);
 	}
 
 	@Override
@@ -36,6 +45,7 @@ public class VirtualCommandBuilder implements ConditionalCommandBuilder.CommandB
 
 	protected void trigger() {
 		executor.execute(actionRunner);
+		executor.shutdown();
 	}
 
 	@Override
