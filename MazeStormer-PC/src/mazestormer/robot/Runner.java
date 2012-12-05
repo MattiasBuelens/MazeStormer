@@ -74,9 +74,7 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		if (!isRunning())
 			return false;
 
-		boolean isCancelled = future.cancel(true);
-		future.removeFutureListener(this);
-		return isCancelled;
+		return future.cancel(true);
 	}
 
 	public synchronized boolean isRunning() {
@@ -87,10 +85,6 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		if (future != null) {
 			future.resolve();
 		}
-	}
-
-	public void waitComplete() {
-		future.get();
 	}
 
 	public void addListener(RunnerListener listener) {

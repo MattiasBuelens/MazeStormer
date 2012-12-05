@@ -33,7 +33,7 @@ public class Barcode {
 	}
 
 	/**
-	 * Get the number of bars in a barcode, without leading and terminating black
+	 * Get the number of bars in a barcode, with leading and terminating black
 	 * bars.
 	 */
 	public static int getNbValueBars() {
@@ -41,7 +41,7 @@ public class Barcode {
 	}
 
 	/**
-	 * Get the number of bars in a barcode, with leading and terminating
+	 * Get the number of bars in a barcode, without leading and terminating
 	 * black bars.
 	 */
 	public static int getNbBars() {
