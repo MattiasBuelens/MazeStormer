@@ -21,7 +21,7 @@ class LineFinderRunner extends Runner {
 	private final static double safetyAngle = 10.0;
 	private final static double fastRotateAngle = -(90 - maxAttackAngle - safetyAngle);
 
-	private final static int threshold = 70;
+	private final static int threshold = 85;
 
 	private final Robot robot;
 	private double lineWidth;

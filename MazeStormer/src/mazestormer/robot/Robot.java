@@ -15,18 +15,18 @@ public interface Robot extends ConditionalCommandBuilder {
 	/**
 	 * Right wheel diameter, in centimeters.
 	 */
-	public final static float rightWheelDiameter = 3.0f;
+	public final static float rightWheelDiameter = 2.999f;
 
 	/**
 	 * Distance between center of wheels, in centimeters.
 	 */
-	public final static float trackWidth = 14.3f;// 13.97f;
+	public final static float trackWidth = 14.45f;// 14.3f;
 
 	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.
 	 */
 	// public final static float sensorOffset = 7.2f;
-	public final static float sensorOffset = 7.2f;
+	public final static float sensorOffset = 7.1f;
 
 	/**
 	 * Approximate radius of the light sensor beam.
