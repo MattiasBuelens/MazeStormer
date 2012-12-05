@@ -15,7 +15,7 @@ public interface Robot extends ConditionalCommandBuilder {
 	/**
 	 * Right wheel diameter, in centimeters.
 	 */
-	public final static float rightWheelDiameter = 3.01f;
+	public final static float rightWheelDiameter = 3.0f;
 
 	/**
 	 * Distance between center of wheels, in centimeters.
