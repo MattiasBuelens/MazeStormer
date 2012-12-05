@@ -1,20 +1,9 @@
 package mazestormer.controller;
 
-
-public class ExplorerEvent {
-
-	public enum EventType {
-		STARTED, STOPPED
-	};
-
-	private final EventType eventType;
+public class ExplorerEvent extends ActionEvent {
 
 	public ExplorerEvent(EventType type) {
-		this.eventType = type;
+		super(type);
 	}
 
-	public EventType getEventType() {
-		return eventType;
-	}
-	
 }

@@ -23,6 +23,7 @@ public abstract class PathRunner extends Runner implements NavigationListener {
 		this.maze = maze;
 		this.navigator = new Navigator(robot.getPilot(),
 				robot.getPoseProvider());
+		this.navigator.addNavigationListener(this);
 	}
 
 	protected Pose getPose() {
@@ -76,6 +77,7 @@ public abstract class PathRunner extends Runner implements NavigationListener {
 
 	@Override
 	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
+		// Navigation interrupted, cancel runner
 		cancel();
 	}
 

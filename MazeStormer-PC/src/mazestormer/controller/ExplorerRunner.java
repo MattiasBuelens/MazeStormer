@@ -8,42 +8,94 @@ import java.util.List;
 
 import lejos.geom.Point;
 import lejos.robotics.RangeReading;
+import lejos.robotics.navigation.NavigationListener;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.objectdetection.RangeFeature;
-import mazestormer.detect.RangeFeatureDetector;
+import mazestormer.barcode.BarcodeRunner;
+import mazestormer.barcode.BarcodeRunnerListener;
+import mazestormer.maze.Barcode;
 import mazestormer.maze.Edge;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.robot.Navigator;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.Robot;
+import mazestormer.robot.RunnerTask;
+import mazestormer.util.CancellationException;
 
 import com.google.common.primitives.Floats;
 
-class ExplorerRunner extends PathRunner {
+public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	private Deque<Tile> queue = new ArrayDeque<Tile>();
 	private Tile currentTile;
 	private Tile nextTile;
+	private Barcode nextBarcode = null;
+
+	private final LineFinderRunner lineFinder;
+	private final BarcodeRunner barcodeRunner;
+
+	private static final int findLineInterval = 10;
+	private int nextFindLine = 1;
 
 	public ExplorerRunner(Robot robot, Maze maze) {
 		super(robot, maze);
+
+		// Navigator
+		navigator.singleStep(true);
+
+		// Runners
+		lineFinder = new LineFinderRunner(robot) {
+			@Override
+			protected void log(String message) {
+				ExplorerRunner.this.log(message);
+			}
+		};
+		barcodeRunner = new BarcodeRunner(robot, maze) {
+			@Override
+			protected void log(String message) {
+				ExplorerRunner.this.log(message);
+			}
+		};
+		barcodeRunner.addBarcodeListener(new BarcodeListener());
+
+		// Resume navigation after completion of runners
+		join(lineFinder, prepare(new RunnerTask() {
+			@Override
+			public void run() throws CancellationException {
+				afterLineFinder();
+			}
+		}));
+		join(barcodeRunner, prepare(new RunnerTask() {
+			@Override
+			public void run() throws CancellationException {
+				afterBarcode();
+			}
+		}));
+	}
+
+	protected void log(String message) {
+		System.out.println(message);
 	}
 
 	@Override
 	public void run() {
-		// Initialize
 		init();
+		cycle();
+	}
 
-		// Loop
-		while (!queue.isEmpty() && isRunning()) {
-			cycle();
+	@Override
+	public boolean cancel() {
+		if (super.cancel()) {
+			// Cancel runners
+			lineFinder.cancel();
+			barcodeRunner.cancel();
+			return true;
 		}
-
-		// Done
-		cancel();
+		return false;
 	}
 
 	private void init() {
@@ -59,28 +111,37 @@ class ExplorerRunner extends PathRunner {
 	}
 
 	private void cycle() {
-		if (queue.isEmpty() || !isRunning())
+		if (queue.isEmpty() || !isRunning()) {
+			resolve();
 			return;
+		}
 
-		/*
-		 * DO remove the first path from the QUEUE.
-		 * 
-		 * (This is the tile the robot is currently on, because of peek and
-		 * drive.)
-		 */
+		// Remove the first path from the queue
+		// This is the current tile of the robot
 		currentTile = queue.pollLast();
 
-		// scannen en updaten
-		scanAndUpdate(queue, currentTile);
+		// Scan and update current tile
+		scanAndUpdate(currentTile);
 		currentTile.setExplored();
-		// create new paths (to all children);
-		selectTiles(queue, currentTile);
-
-		// Rijd naar volgende tile (peek)
-		if (!queue.isEmpty()) {
-			nextTile = queue.peekLast();
-			goTo(nextTile);
+		// Set and consume barcode
+		if (nextBarcode != null) {
+			maze.setBarcode(currentTile.getPosition(), nextBarcode);
+			nextBarcode = null;
 		}
+		throwWhenCancelled();
+
+		// Create new paths to all neighbors
+		selectTiles(currentTile);
+
+		// Destination reached
+		if (queue.isEmpty()) {
+			resolve();
+			return;
+		}
+
+		// Go to next tile
+		nextTile = queue.peekLast();
+		goTo(nextTile);
 	}
 
 	private void goTo(Tile goal) {
@@ -90,37 +151,90 @@ class ExplorerRunner extends PathRunner {
 		for (Waypoint waypoint : waypoints) {
 			navigator.addWaypoint(waypoint);
 		}
-		// Follow path
-		navigator.followPath();
-		// Wait until at end
-		while (!navigator.waitForStop())
-			Thread.yield();
+
+		// Follow path until before traveling
+		navigator.followPathUntil(Navigator.State.TRAVEL);
+		navigator.waitForStop();
+		throwWhenCancelled();
+
+		if (shouldFindLine()) {
+			// Start line finder
+			lineFinder.start();
+			pause();
+		} else {
+			afterLineFinder();
+		}
+	}
+
+	/**
+	 * Resume navigation.
+	 */
+	private void resume() {
+		// Follow path until way point is reached
+		navigator.resumeFrom(Navigator.State.TRAVEL);
+		navigator.waitForStop();
+		throwWhenCancelled();
+
+		// Cancel barcode runner if still running
+		barcodeRunner.cancel();
+
+		// Next step
+		cycle();
+	}
+
+	/**
+	 * Pause the navigation.
+	 */
+	private void pause() {
+		// navigator.stop();
+		super.cancel();
+	}
+
+	/**
+	 * Triggered after rotating the robot towards the next way point and the
+	 * line finder has positioned the robot when necessary.
+	 */
+	private void afterLineFinder() {
+		// Cancel line finder if still running
+		lineFinder.cancel();
+		// Start barcode runner
+		barcodeRunner.start();
+		// Resume
+		resume();
+	}
+
+	/**
+	 * Triggered after a barcode has been scanned and processed.
+	 */
+	private void afterBarcode() {
+		// Cancel barcode runner if still running
+		barcodeRunner.cancel();
+		// Resume
+		resume();
 	}
 
 	/**
 	 * Scans in the direction of *unknown* edges, and updates them accordingly.
 	 */
-	private void scanAndUpdate(Deque<Tile> queue, Tile givenTile) {
-		robot.getRangeScanner().setAngles(getScanAngles(givenTile));
+	private void scanAndUpdate(Tile tile) {
+		RangeFeature feature = robot.getRangeDetector().scan(
+				getScanAngles(tile));
 
-		RangeFeatureDetector detector = robot.getRangeDetector();
-		RangeFeature feature = detector.scan();
-
+		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
 				orientation = angleToOrientation(reading.getAngle()
 						+ maze.toRelative(getPose().getHeading()));
-				maze.setEdge(givenTile.getPosition(), orientation,
-						EdgeType.WALL);
+				maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
 
-		for (Edge currentEdge : givenTile.getEdges()) {
-			if (currentEdge.getType() == EdgeType.UNKNOWN) {
-				maze.setEdge(
-						givenTile.getPosition(),
-						currentEdge.getOrientationFrom(givenTile.getPosition()),
+		// Replace unknown edges with openings
+		for (Edge edge : tile.getEdges()) {
+			if (edge.getType() == EdgeType.UNKNOWN) {
+				maze.setEdge(tile.getPosition(),
+						edge.getOrientationFrom(tile.getPosition()),
 						EdgeType.OPEN);
 			}
 		}
@@ -130,11 +244,9 @@ class ExplorerRunner extends PathRunner {
 	 * Adds tiles to the queue if the edge in its direction is open and it is
 	 * not explored yet.
 	 */
-	private void selectTiles(Deque<Tile> queue, Tile givenTile) {
-		Tile neighborTile;
-
-		for (Orientation direction : givenTile.getOpenSides()) {
-			neighborTile = maze.getOrCreateNeighbor(givenTile, direction);
+	private void selectTiles(Tile tile) {
+		for (Orientation direction : tile.getOpenSides()) {
+			Tile neighborTile = maze.getOrCreateNeighbor(tile, direction);
 			// Reject the new paths with loops
 			if (!neighborTile.isExplored() && !queue.contains(neighborTile)) {
 				// Add the new paths to front of queue
@@ -152,29 +264,35 @@ class ExplorerRunner extends PathRunner {
 		float heading = getPose().getHeading();
 
 		for (Orientation direction : tile.getUnknownSides()) {
-			// TODO Check if this replacement is equivalent
-			// float angle = Orientation.EAST.angleTo(direction);
-			// angle = normalize(angle - heading);
-
-			switch (direction) {
-			case WEST:
-				list.add(normalize(180f - heading));
-				break;
-			case NORTH:
-				list.add(normalize(90f - heading));
-				break;
-			case EAST:
-				list.add(normalize(0f - heading));
-				break;
-			case SOUTH:
-				list.add(normalize(-90f - heading));
-				break;
-			}
+			// Get angle relative to positive X (east) direction
+			float angle = Orientation.EAST.angleTo(direction);
+			list.add(normalize(angle - heading));
 		}
 
 		// Sort angles
 		Collections.sort(list);
 		return Floats.toArray(list);
+	}
+
+	/**
+	 * Check whether the robot should find a line to adjust its position.
+	 */
+	protected boolean shouldFindLine() {
+		return nextFindLine == 0;
+	}
+
+	@Override
+	public void atWaypoint(Waypoint waypoint, Pose pose, int sequence) {
+		// Increment counter for line finder
+		nextFindLine = (nextFindLine + 1) % findLineInterval;
+	}
+
+	@Override
+	public void pathComplete(Waypoint waypoint, Pose pose, int sequence) {
+	}
+
+	@Override
+	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
 	}
 
 	private float normalize(float angle) {
@@ -197,6 +315,22 @@ class ExplorerRunner extends PathRunner {
 		} else {
 			return Orientation.SOUTH;
 		}
+	}
+
+	private class BarcodeListener implements BarcodeRunnerListener {
+
+		@Override
+		public void onStartBarcode() {
+			// Interrupt navigation
+			pause();
+		}
+
+		@Override
+		public void onEndBarcode(byte barcode) {
+			// Store barcode
+			nextBarcode = new Barcode(barcode);
+		}
+
 	}
 
 }

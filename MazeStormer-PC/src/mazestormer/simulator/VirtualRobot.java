@@ -56,8 +56,8 @@ public class VirtualRobot implements Robot {
 		return light;
 	}
 
-	@Override
-	public RangeScanner getRangeScanner() {
+	// @Override
+	protected RangeScanner getRangeScanner() {
 		if (scanner == null) {
 			scanner = new VirtualRangeScanner(maze, getPoseProvider());
 		}

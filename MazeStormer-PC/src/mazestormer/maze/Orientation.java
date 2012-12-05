@@ -64,7 +64,8 @@ public enum Orientation {
 	 *            The other orientation.
 	 */
 	public float angleTo(Orientation other) {
-		return getDelta().angleTo(other.getDelta());
+		float radians = other.getDelta().angle() - getDelta().angle();
+		return (float) Math.toDegrees(radians);
 	}
 
 	/**

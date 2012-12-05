@@ -49,8 +49,8 @@ public class RemoteRobot extends RemoteComponent implements Robot {
 		return light;
 	}
 
-	@Override
-	public RangeScanner getRangeScanner() {
+	// @Override
+	protected RangeScanner getRangeScanner() {
 		if (scanner == null) {
 			scanner = new RemoteRangeScanner(getCommunicator());
 		}

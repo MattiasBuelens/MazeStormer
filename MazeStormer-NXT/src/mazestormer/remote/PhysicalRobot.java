@@ -42,8 +42,8 @@ public class PhysicalRobot extends NXTComponent implements Robot,
 		return light;
 	}
 
-	@Override
-	public RangeScanner getRangeScanner() {
+	// @Override
+	protected RangeScanner getRangeScanner() {
 		return scanner;
 	}
 

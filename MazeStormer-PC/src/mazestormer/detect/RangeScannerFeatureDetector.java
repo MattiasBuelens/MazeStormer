@@ -115,9 +115,13 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 		}
 	}
 
+	/**
+	 * @effect The scan angles of the range scanner are set to the given angles.
+	 *         | getScanner().setAngles(angles)
+	 */
 	@Override
 	public RangeFeature scan(float[] angles) {
-		scanner.setAngles(angles);
+		getScanner().setAngles(angles);
 		return scan();
 	}
 

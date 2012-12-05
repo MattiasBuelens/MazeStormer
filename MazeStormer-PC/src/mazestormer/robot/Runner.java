@@ -1,19 +1,24 @@
 package mazestormer.robot;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import mazestormer.util.AbstractFuture;
 import mazestormer.util.CancellationException;
+import mazestormer.util.Future;
+import mazestormer.util.FutureListener;
 
-public abstract class Runner implements RunnerTask, RunnerListener {
+public abstract class Runner implements RunnerTask, RunnerListener,
+		FutureListener<Void> {
 
 	private final Pilot pilot;
-	private boolean isRunning = false;
 	private final ExecutorService executor = Executors
 			.newSingleThreadExecutor();
-	private final List<RunnerListener> listeners = new CopyOnWriteArrayList<RunnerListener>();
+	private final List<RunnerListener> listeners = new ArrayList<RunnerListener>();
+
+	private RunnerFuture future;
 
 	public Runner(Pilot pilot) {
 		this.pilot = pilot;
@@ -22,10 +27,6 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 
 	protected Pilot getPilot() {
 		return pilot;
-	}
-
-	public synchronized boolean isRunning() {
-		return isRunning;
 	}
 
 	/**
@@ -37,12 +38,28 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 		if (isRunning())
 			return false;
 
-		isRunning = true;
-		executor.execute(wrap(this));
+		start(this);
+
+		return true;
+	}
+
+	protected void start(Runnable task) {
+		startTask(prepare(task));
+	}
+
+	protected void start(RunnerTask task) {
+		startTask(prepare(task));
+	}
+
+	private void startTask(Runnable task) {
+		future = new RunnerFuture();
+		future.addFutureListener(this);
+
+		executor.execute(task);
+
 		for (RunnerListener listener : listeners) {
 			listener.onStarted();
 		}
-		return true;
 	}
 
 	/**
@@ -54,11 +71,17 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 		if (!isRunning())
 			return false;
 
-		isRunning = false;
-		for (RunnerListener listener : listeners) {
-			listener.onCancelled();
+		return future.cancel(true);
+	}
+
+	public synchronized boolean isRunning() {
+		return future != null && !future.isDone();
+	}
+
+	protected void resolve() {
+		if (future != null) {
+			future.resolve();
 		}
-		return true;
 	}
 
 	public void addListener(RunnerListener listener) {
@@ -67,6 +90,20 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 
 	public void removeListener(RunnerListener listener) {
 		listeners.remove(listener);
+	}
+
+	@Override
+	public void futureResolved(Future<Void> future) {
+		for (RunnerListener listener : listeners) {
+			listener.onCompleted();
+		}
+	}
+
+	@Override
+	public void futureCancelled(Future<Void> future) {
+		for (RunnerListener listener : listeners) {
+			listener.onCancelled();
+		}
 	}
 
 	/**
@@ -78,6 +115,15 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 	}
 
 	/**
+	 * Subclasses should override this method to perform additional actions on
+	 * completion.
+	 */
+	@Override
+	public void onCompleted() {
+		getPilot().stop();
+	}
+
+	/**
 	 * Subclasses should override this method to perform additional cleanup.
 	 */
 	@Override
@@ -86,13 +132,33 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 	}
 
 	/**
-	 * Wrap a task to catch cancellations.
+	 * Prepare a task to execute in this runner.
 	 * 
 	 * @param task
 	 *            The task to wrap.
 	 */
-	protected Runnable wrap(final RunnerTask task) {
+	protected Runnable prepare(final Runnable task) {
 		return new Runnable() {
+			@Override
+			public void run() {
+				executor.execute(new Runnable() {
+					@Override
+					public void run() {
+						task.run();
+					}
+				});
+			}
+		};
+	}
+
+	/**
+	 * Prepare a task to execute in this runner and catch cancellations.
+	 * 
+	 * @param task
+	 *            The task to wrap.
+	 */
+	protected Runnable prepare(final RunnerTask task) {
+		return prepare(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -100,20 +166,6 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 				} catch (CancellationException e) {
 					onCancelled();
 				}
-			}
-		};
-	}
-
-	protected void fork(final Runner runner) {
-		addListener(new RunnerListener() {
-			@Override
-			public void onStarted() {
-			}
-
-			@Override
-			public void onCancelled() {
-				// Cancel forked runner when this runner is cancelled
-				runner.cancel();
 			}
 		});
 	}
@@ -125,11 +177,23 @@ public abstract class Runner implements RunnerTask, RunnerListener {
 			}
 
 			@Override
+			public void onCompleted() {
+				// Continue with given task when other runner is completed
+				start(after);
+			}
+
+			@Override
 			public void onCancelled() {
-				// Continue with given task when other runner is cancelled
-				executor.execute(after);
 			}
 		});
+	}
+
+	private class RunnerFuture extends AbstractFuture<Void> {
+
+		protected boolean resolve() {
+			return resolve(null);
+		}
+
 	}
 
 	protected void throwWhenCancelled() throws CancellationException {

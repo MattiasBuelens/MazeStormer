@@ -1,7 +1,5 @@
 package mazestormer.controller;
 
-import lejos.robotics.RangeScanner;
-import mazestormer.controller.ExplorerEvent.EventType;
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 import mazestormer.robot.RunnerListener;
@@ -23,17 +21,23 @@ public class ExplorerController extends SubController implements
 		return getMainController().getMaze();
 	}
 
-	RangeScanner getRangeScanner() {
-		return getMainController().getRobot().getRangeScanner();
+	private void log(String logText) {
+		getMainController().getLogger().info(logText);
 	}
 
-	void postState(EventType eventType) {
+	private void postState(ExplorerEvent.EventType eventType) {
 		postEvent(new ExplorerEvent(eventType));
 	}
 
 	@Override
 	public void startExploring() {
-		runner = new ExplorerRunner(getRobot(), getMaze());
+		runner = new ExplorerRunner(getRobot(), getMaze()) {
+			@Override
+			protected void log(String message) {
+				super.log(message);
+				ExplorerController.this.log(message);
+			}
+		};
 		runner.addListener(new ExplorerListener());
 		runner.start();
 	}
@@ -47,15 +51,22 @@ public class ExplorerController extends SubController implements
 	}
 
 	private class ExplorerListener implements RunnerListener {
+
 		@Override
 		public void onStarted() {
-			postState(EventType.STARTED);
+			postState(ExplorerEvent.EventType.STARTED);
+		}
+
+		@Override
+		public void onCompleted() {
+			onCancelled();
 		}
 
 		@Override
 		public void onCancelled() {
-			postState(EventType.STOPPED);
+			postState(ExplorerEvent.EventType.STOPPED);
 		}
+
 	}
 
 }

@@ -1,12 +1,14 @@
 package mazestormer.controller;
 
 import mazestormer.barcode.ActionType;
+import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 import mazestormer.robot.Runner;
+import mazestormer.robot.RunnerListener;
 
 public class BarcodeController extends SubController implements
 		IBarcodeController {
@@ -82,17 +84,26 @@ public class BarcodeController extends SubController implements
 
 	@Override
 	public void startScan() {
-		this.barcodeRunner = new BarcodeRunner();
+		// Prepare
+		barcodeRunner = new BarcodeRunner(getRobot(), getMaze()) {
+			@Override
+			protected void log(String message) {
+				BarcodeController.this.log(message);
+			}
+		};
+		barcodeRunner.addListener(new BarcodeListener());
+
+		// Start
 		barcodeRunner.setScanSpeed(getScanSpeed());
 		getRobot().getPilot().forward();
-		this.barcodeRunner.start();
+		barcodeRunner.start();
 	}
 
 	@Override
 	public void stopScan() {
-		if (this.barcodeRunner != null) {
-			this.barcodeRunner.cancel();
-			this.barcodeRunner = null;
+		if (barcodeRunner != null) {
+			barcodeRunner.cancel();
+			barcodeRunner = null;
 		}
 	}
 
@@ -135,34 +146,28 @@ public class BarcodeController extends SubController implements
 
 	}
 
-	private class BarcodeRunner extends mazestormer.barcode.BarcodeRunner {
-
-		public BarcodeRunner() {
-			super(BarcodeController.this.getRobot(), BarcodeController.this
-					.getMaze());
-		}
+	private class BarcodeListener implements RunnerListener {
 
 		@Override
 		public void onStarted() {
-			super.onStarted();
 			// Post state
 			postState(BarcodeScanEvent.EventType.STARTED);
 		}
 
 		@Override
+		public void onCompleted() {
+			// Post state
+			postState(BarcodeScanEvent.EventType.STOPPED);
+		}
+
+		@Override
 		public void onCancelled() {
-			super.onCancelled();
 			// Post state
 			postState(BarcodeScanEvent.EventType.STOPPED);
 		}
 
 		private void postState(BarcodeScanEvent.EventType eventType) {
 			postEvent(new BarcodeScanEvent(eventType));
-		}
-
-		@Override
-		protected void log(String message) {
-			BarcodeController.this.log(message);
 		}
 
 	}

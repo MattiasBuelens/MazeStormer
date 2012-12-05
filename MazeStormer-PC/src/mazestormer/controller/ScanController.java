@@ -1,6 +1,5 @@
 package mazestormer.controller;
 
-import lejos.robotics.RangeScanner;
 import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.detect.RangeFeatureDetector;
@@ -13,10 +12,6 @@ public class ScanController extends SubController implements IScanController {
 
 	private boolean isConnected() {
 		return getMainController().isConnected();
-	}
-
-	private RangeScanner getRangeScanner() {
-		return getMainController().getRobot().getRangeScanner();
 	}
 
 	private RangeFeatureDetector getRangeDetector() {
@@ -35,13 +30,10 @@ public class ScanController extends SubController implements IScanController {
 		for (int i = 0; i < count; i++) {
 			angles[i] = start + i * increment;
 		}
-		// Configure scanner
-		RangeScanner scanner = getRangeScanner();
-		scanner.setAngles(angles);
 
 		// Scan for readings
 		RangeFeatureDetector detector = getRangeDetector();
-		RangeFeature feature = detector.scan();
+		RangeFeature feature = detector.scan(angles);
 
 		// Publish
 		if (feature != null) {

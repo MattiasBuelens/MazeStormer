@@ -18,7 +18,7 @@ import mazestormer.robot.RunnerTask;
 import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 
-public class BarcodeRunner extends Runner {
+public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 
 	// private static final double START_BAR_LENGTH = 1.8; // [cm]
 	// private static final double BAR_LENGTH = 1.85; // [cm]
@@ -40,12 +40,16 @@ public class BarcodeRunner extends Runner {
 	private boolean blackToWhite;
 	private List<Float> distances = new ArrayList<Float>();
 
+	private final List<BarcodeRunnerListener> listeners = new ArrayList<BarcodeRunnerListener>();
+
 	public BarcodeRunner(Robot robot, Maze maze) {
 		super(robot.getPilot());
 		this.robot = robot;
 		this.maze = maze;
 
 		this.startOffset = robot.getLightSensor().getSensorRadius();
+
+		addBarcodeListener(this);
 	}
 
 	protected Robot getRobot() {
@@ -76,21 +80,20 @@ public class BarcodeRunner extends Runner {
 		System.out.println(message);
 	}
 
-	/**
-	 * Triggered when the start of a barcode was found.
-	 */
-	protected void onStartBarcode() {
+	public void addBarcodeListener(BarcodeRunnerListener listener) {
+		listeners.add(listener);
 	}
 
-	/**
-	 * Triggered when the barcode was successfully read.
-	 * 
-	 * <p>
-	 * The default implementation logs the read barcode and performs the
-	 * associated action.
-	 * </p>
-	 */
-	protected void onEndBarcode(byte barcode) {
+	public void removeBarcodeListener(BarcodeRunnerListener listener) {
+		listeners.remove(listener);
+	}
+
+	@Override
+	public void onStartBarcode() {
+	}
+
+	@Override
+	public void onEndBarcode(byte barcode) {
 		// Log
 		String paddedBarcode = Strings.padStart(
 				Integer.toBinaryString(barcode), NUMBER_OF_BARS, '0');
@@ -100,10 +103,7 @@ public class BarcodeRunner extends Runner {
 		performAction(barcode);
 	}
 
-	@Override
-	public void onCancelled() {
-		super.onCancelled();
-
+	private void terminate() {
 		// Cancel condition handle
 		if (handle != null)
 			handle.cancel();
@@ -112,10 +112,22 @@ public class BarcodeRunner extends Runner {
 		getPilot().setTravelSpeed(originalTravelSpeed);
 	}
 
+	@Override
+	public void onCompleted() {
+		super.onCompleted();
+		terminate();
+	}
+
+	@Override
+	public void onCancelled() {
+		super.onCancelled();
+		terminate();
+	}
+
 	private void onBlack(final RunnerTask task) {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
-		handle = getRobot().when(condition).stop().run(wrap(task)).build();
+		handle = getRobot().when(condition).stop().run(prepare(task)).build();
 	}
 
 	@Override
@@ -132,8 +144,10 @@ public class BarcodeRunner extends Runner {
 	}
 
 	private void onBlackBackward() {
-		// Notify
-		onStartBarcode();
+		// Notify listeners
+		for (BarcodeRunnerListener listener : listeners) {
+			listener.onStartBarcode();
+		}
 
 		log("Go to the begin of the barcode zone.");
 		setTravelSpeed(getScanSpeed());
@@ -178,14 +192,14 @@ public class BarcodeRunner extends Runner {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_SMALLER_THAN,
 				Threshold.WHITE_BLACK.getThresholdValue());
-		handle = getRobot().when(condition).run(wrap(task)).build();
+		handle = getRobot().when(condition).run(prepare(task)).build();
 	}
 
 	private void onTrespassNewWhite(final RunnerTask task) {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_GREATER_THAN,
 				Threshold.BLACK_WHITE.getThresholdValue());
-		handle = getRobot().when(condition).run(wrap(task)).build();
+		handle = getRobot().when(condition).run(prepare(task)).build();
 	}
 
 	private void onChange() {
@@ -209,10 +223,12 @@ public class BarcodeRunner extends Runner {
 	private void completed() {
 		// Read barcode
 		byte barcode = (byte) readBarcode(distances);
-		// Notify
-		onEndBarcode(barcode);
+		// Notify listeners
+		for (BarcodeRunnerListener listener : listeners) {
+			listener.onEndBarcode(barcode);
+		}
 		// Done
-		cancel();
+		resolve();
 	}
 
 	protected void performAction(byte barcode) {

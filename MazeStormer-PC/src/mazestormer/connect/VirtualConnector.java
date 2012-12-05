@@ -11,8 +11,8 @@ public class VirtualConnector implements Connector {
 	/*
 	 * Default virtual speeds
 	 */
-	private static final double travelSpeed = 20d; // cm/sec
-	private static final double rotateSpeed = 90d; // degrees/sec
+	private static final double travelSpeed = 40d; // cm/sec
+	private static final double rotateSpeed = 180d; // degrees/sec
 
 	private Robot robot;
 

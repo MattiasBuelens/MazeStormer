@@ -379,6 +379,8 @@ public class Navigator implements WaypointListener {
 		}
 
 		private void step() throws CancellationException {
+			throwWhenCancelled();
+			System.out.println("Step:" + nextState);
 			switch (nextState) {
 			case NEXT_STEP:
 			default:
@@ -453,7 +455,7 @@ public class Navigator implements WaypointListener {
 				}
 				// Stop when path completed or single step
 				if (pathCompleted() || singleStep)
-					cancel();
+					resolve();
 				// Call listeners
 				callListeners();
 			}

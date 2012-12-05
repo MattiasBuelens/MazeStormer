@@ -1,7 +1,6 @@
 package mazestormer.robot;
 
 import lejos.geom.Point;
-import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.ConditionalCommandBuilder;
 import mazestormer.detect.RangeFeatureDetector;
@@ -64,7 +63,7 @@ public interface Robot extends ConditionalCommandBuilder {
 	/**
 	 * Get the range scanner of this robot.
 	 */
-	public RangeScanner getRangeScanner();
+	//public RangeScanner getRangeScanner();
 
 	/**
 	 * Get the range feature detector of this robot.
