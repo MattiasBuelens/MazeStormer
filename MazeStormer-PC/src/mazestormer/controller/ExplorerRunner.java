@@ -198,7 +198,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		// Cancel line finder if still running
 		lineFinder.cancel();
 		// Start barcode runner
-		barcodeRunner.start();
+		//barcodeRunner.start();
 		// Resume
 		resume();
 	}
