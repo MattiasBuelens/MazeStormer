@@ -22,14 +22,12 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 
 	// private static final double START_BAR_LENGTH = 1.8; // [cm]
 	// private static final double BAR_LENGTH = 1.85; // [cm]
-	static final int NUMBER_OF_BARS = 6; // without black start bars
-	static final int BLACK_THRESHOLD = 50;
-
-	static final float NOISE_LENGTH = 0.65f;
+	private static final int BLACK_THRESHOLD = 50;
+	private static final float NOISE_LENGTH = 0.65f;
 
 	private final Robot robot;
 	private final Maze maze;
-
+	private boolean performAction;
 	private double scanSpeed = 2; // cm/sec
 	private double originalTravelSpeed;
 
@@ -68,6 +66,14 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		this.scanSpeed = scanSpeed;
 	}
 
+	public boolean performsAction() {
+		return performAction;
+	}
+
+	public void setPerformAction(boolean performAction) {
+		this.performAction = performAction;
+	}
+
 	protected Pose getPose() {
 		return getRobot().getPoseProvider().getPose();
 	}
@@ -96,11 +102,21 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	public void onEndBarcode(byte barcode) {
 		// Log
 		String paddedBarcode = Strings.padStart(
-				Integer.toBinaryString(barcode), NUMBER_OF_BARS, '0');
+				Integer.toBinaryString(barcode), Barcode.getNbValueBars(), '0');
 		log("Scanned barcode: " + paddedBarcode);
 
 		// Action
-		performAction(barcode);
+		if (performsAction()) {
+			performAction(barcode);
+		}
+	}
+
+	public void performAction(byte barcode) {
+		BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
+	}
+
+	public void performAction(Barcode barcode) {
+		BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
 	}
 
 	private void reset() {
@@ -215,7 +231,8 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 			blackToWhite = !this.blackToWhite;
 		}
 
-		if (getTotalSum(distances) <= (NUMBER_OF_BARS + 1) * getBarLength()) {
+		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1)
+				* getBarLength()) {
 			// Iterate
 			loop();
 		} else {
@@ -235,16 +252,10 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		}
 	}
 
-	protected void performAction(byte barcode) {
-		// TODO
-		// BarcodeDecoder.getAction(this.barcode).performAction(getRobot(),
-		// getMaze());
-	}
-
 	private int readBarcode(List<Float> distances) {
 		final double barLength = getBarLength();
 		int result = 0;
-		int index = NUMBER_OF_BARS - 1;
+		int index = Barcode.getNbValueBars() - 1;
 
 		// Iterate over distances until barcode complete
 		ListIterator<Float> it = distances.listIterator();

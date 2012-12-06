@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
 
+import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 

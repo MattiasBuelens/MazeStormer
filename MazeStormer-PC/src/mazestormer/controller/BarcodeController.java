@@ -92,9 +92,10 @@ public class BarcodeController extends SubController implements
 			}
 		};
 		barcodeRunner.addListener(new BarcodeListener());
+		barcodeRunner.setPerformAction(false);
+		barcodeRunner.setScanSpeed(getScanSpeed());
 
 		// Start
-		barcodeRunner.setScanSpeed(getScanSpeed());
 		getRobot().getPilot().forward();
 		barcodeRunner.start();
 	}

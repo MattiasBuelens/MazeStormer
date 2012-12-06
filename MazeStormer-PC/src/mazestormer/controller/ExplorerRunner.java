@@ -18,6 +18,7 @@ import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.BarcodeRunnerListener;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
+import mazestormer.maze.Maze.Target;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
@@ -39,16 +40,36 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private final LineFinderRunner lineFinder;
 	private final BarcodeRunner barcodeRunner;
 
-	private static final int findLineInterval = 10;
-	private int nextFindLine = 1;
-	private boolean shouldFindLine = false;
-
-	private State state = State.NEXT;
-	private AtomicBoolean enableNavigator = new AtomicBoolean(true);
-
 	public enum State {
 		SCAN, ROTATE, TRAVEL, LINE, BARCODE, NEXT;
 	}
+
+	/**
+	 * Flag indicating if the maze is fully explored.
+	 */
+	private boolean isExplored = false;
+	/**
+	 * Current state of the explorer.
+	 */
+	private State state = State.NEXT;
+	/**
+	 * Flag indicating if the explorer should respond to incoming navigator
+	 * events. The barcode runner needs to disable events while it is running.
+	 */
+	private AtomicBoolean enableNavigator = new AtomicBoolean(true);
+
+	/**
+	 * The amount of tiles between two line finder adjustment runs.
+	 */
+	private static final int findLineInterval = 10;
+	/**
+	 * Tile counter for line finder adjustment.
+	 */
+	private int findLineCounter = 1;
+	/**
+	 * Flag indicating if the line finder should be run.
+	 */
+	private boolean shouldFindLine = false;
 
 	public ExplorerRunner(Robot robot, Maze maze) {
 		super(robot, maze);
@@ -70,9 +91,22 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 				ExplorerRunner.this.log(message);
 			}
 		};
+		barcodeRunner.addBarcodeListener(new BarcodeListener());
 		// TODO Make configurable
 		barcodeRunner.setScanSpeed(10);
-		barcodeRunner.addBarcodeListener(new BarcodeListener());
+		barcodeRunner.setPerformAction(true);
+	}
+
+	protected void log(String message) {
+		System.out.println(message);
+	}
+
+	public boolean isExplored() {
+		return isExplored;
+	}
+
+	public void setExplored(boolean isExplored) {
+		this.isExplored = isExplored;
 	}
 
 	private State getState() {
@@ -97,10 +131,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			Thread.yield();
 	}
 
-	protected void log(String message) {
-		System.out.println(message);
-	}
-
 	@Override
 	public void run() {
 		init();
@@ -114,12 +144,14 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	@Override
 	public void onCompleted() {
+		log("Explorer completed.");
 		super.onCompleted();
 		reset();
 	}
 
 	@Override
 	public void onCancelled() {
+		log("Explorer cancelled.");
 		super.onCancelled();
 		reset();
 	}
@@ -127,13 +159,19 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	@Override
 	public void shutdown() {
 		// Shutdown everything
-		getPilot().stop();
 		super.shutdown();
 		lineFinder.shutdown();
 		barcodeRunner.shutdown();
+		getPilot().stop();
 	}
 
 	private void init() {
+		// Reset state
+		setExplored(false);
+		setState(State.NEXT);
+		if (!isNavigatorEnabled())
+			enableNavigator();
+
 		// Queue starts with path only containing the root
 		Tile startTile = getCurrentTile();
 		queue.clear();
@@ -142,7 +180,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	private void cycle() {
 		if (queue.isEmpty() || !isRunning()) {
-			resolve();
+			onEmptyQueue();
 			return;
 		}
 
@@ -159,23 +197,49 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		}
 		throwWhenCancelled();
 
-		// Explore
-		explore();
-	}
-
-	private void explore() {
 		// Create new paths to all neighbors
 		selectTiles(currentTile);
 
 		// Destination reached
 		if (queue.isEmpty()) {
-			resolve();
+			onEmptyQueue();
 			return;
 		}
 
 		// Go to next tile
 		nextTile = queue.peekLast();
 		goTo(nextTile);
+	}
+
+	private void onEmptyQueue() {
+		log("End of queue reached");
+		if (isExplored()) {
+			// Done
+			resolve();
+		} else {
+			// Finish
+			finish();
+		}
+	}
+
+	private void finish() {
+		log("Traveling to checkpoint and goal");
+		// Set as explored
+		setExplored(true);
+		// Add goal
+		Tile goal = maze.getTarget(Target.GOAL);
+		if (goal != null) {
+			queue.addLast(goal);
+		}
+		// Add checkpoint before goal
+		Tile checkPoint = maze.getTarget(Target.CHECKPOINT);
+		if (checkPoint != null) {
+			queue.addLast(checkPoint);
+		}
+		// Add current tile
+		queue.addLast(getCurrentTile());
+		// Start traveling
+		cycle();
 	}
 
 	private void goTo(Tile goal) {
@@ -275,7 +339,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	/**
-	 * Scans in the direction of *unknown* edges, and updates them accordingly.
+	 * Scan in the direction of *unknown* edges, and updates them accordingly.
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
@@ -297,7 +361,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	/**
-	 * Adds tiles to the queue if the edge in its direction is open and it is
+	 * Add tiles to the queue if the edge in its direction is open and it is
 	 * not explored yet.
 	 */
 	private void selectTiles(Tile tile) {
@@ -336,24 +400,41 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 */
 	private void incrementFindLineCounter() {
 		// Increment counter for line finder
-		nextFindLine++;
-		if (nextFindLine == findLineInterval) {
+		findLineCounter++;
+		if (findLineCounter == findLineInterval) {
 			shouldFindLine = true;
-			nextFindLine = 0;
+			findLineCounter = 0;
 		}
 	}
 
 	/**
-	 * Enables the barcode runner when the next way point is not yet explored.
+	 * Enable the barcode runner when the next way point is not yet explored.
 	 * Triggered when a way point is reached.
 	 */
 	private void toggleBarcodeRunner() {
-		Path path = navigator.getPath();
-		// Only scan if next way point is not yet explored
-		if (!path.isEmpty() && getTileAt(path.get(0)).isExplored()) {
+		if (isExplored()) {
+			// Everything is already explored
 			barcodeRunner.cancel();
 		} else {
-			barcodeRunner.start();
+			// Only scan if next way point is not yet explored
+			Path path = navigator.getPath();
+			if (path.isEmpty() || !getTileAt(path.get(0)).isExplored()) {
+				barcodeRunner.start();
+			} else {
+				barcodeRunner.cancel();
+			}
+		}
+	}
+
+	/**
+	 * Execute the barcode action of the current tile.
+	 */
+	private void executeBarcodeAction() {
+		Tile currentTile = getCurrentTile();
+		// Skip barcodes when traveling to checkpoint or goal
+		if (!isExplored() && currentTile.hasBarcode()) {
+			log("Performing barcode action for " + currentTile.getPosition());
+			barcodeRunner.performAction(currentTile.getBarcode());
 		}
 	}
 
@@ -395,6 +476,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	public void atWaypoint(Waypoint waypoint, Pose pose, int sequence) {
 		incrementFindLineCounter();
 		toggleBarcodeRunner();
+		executeBarcodeAction();
 	}
 
 	private void pathComplete() {
@@ -411,7 +493,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private void pathInterrupted() {
 		if (!isNavigatorEnabled())
 			return;
-		// Paused after rotating and before traveling
+
+		// Navigator is paused after rotating and before traveling
 		if (getState() == State.ROTATE) {
 			beforeTravel();
 		}

@@ -15,6 +15,7 @@ import java.util.Map;
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
+import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.AbstractEventSource;
 import mazestormer.util.LongPoint;

@@ -2,7 +2,7 @@ package mazestormer.barcode;
 
 public class BarcodeDecoder {
 
-	private static final int RANGE = 64;
+	private static final int RANGE = (1 << Barcode.getNbValueBars());
 	private static IAction[] actions = new IAction[RANGE];
 
 	static {
@@ -24,15 +24,28 @@ public class BarcodeDecoder {
 		return actions.clone();
 	}
 
-	private static IAction getActionAt(int index) throws IndexOutOfBoundsException {
+	private static IAction getActionAt(int index) {
 		if (index < 0 || index >= RANGE)
-			return new NoAction();
-		if (actions[index] == null)
 			return new NoAction();
 		return actions[index];
 	}
 
 	public static IAction getAction(byte barcode) {
-		return getActionAt((int) barcode);
+		// Find action for forward barcode
+		IAction action = getActionAt((int) barcode);
+		if (action != null)
+			return action;
+		// Find action for reversed barcode
+		byte reverseBarcode = Barcode.reverse(barcode);
+		IAction reverseAction = getActionAt((int) reverseBarcode);
+		if (reverseAction != null)
+			return reverseAction;
+		// No action found
+		return new NoAction();
 	}
+
+	public static IAction getAction(Barcode barcode) {
+		return getAction(barcode.getValue());
+	}
+
 }
