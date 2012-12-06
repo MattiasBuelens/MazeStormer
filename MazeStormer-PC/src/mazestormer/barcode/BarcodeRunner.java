@@ -103,7 +103,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		performAction(barcode);
 	}
 
-	private void terminate() {
+	private void reset() {
 		// Cancel condition handle
 		if (handle != null)
 			handle.cancel();
@@ -115,13 +115,13 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	@Override
 	public void onCompleted() {
 		super.onCompleted();
-		terminate();
+		reset();
 	}
 
 	@Override
 	public void onCancelled() {
 		super.onCancelled();
-		terminate();
+		reset();
 	}
 
 	private void onBlack(final RunnerTask task) {
@@ -132,8 +132,11 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 
 	@Override
 	public void run() {
+		// Reset
 		originalTravelSpeed = getTravelSpeed();
+		distances.clear();
 		robot.getLightSensor().setFloodlight(true);
+
 		log("Start looking for black line.");
 		onBlack(new RunnerTask() {
 			@Override
@@ -148,6 +151,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		for (BarcodeRunnerListener listener : listeners) {
 			listener.onStartBarcode();
 		}
+		throwWhenCancelled();
 
 		log("Go to the begin of the barcode zone.");
 		setTravelSpeed(getScanSpeed());

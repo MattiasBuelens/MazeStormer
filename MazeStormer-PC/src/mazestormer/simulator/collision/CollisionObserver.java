@@ -44,7 +44,7 @@ public class CollisionObserver implements Runnable, MoveListener {
 	}
 
 	public void start() {
-		if (isRunning())
+		if (isTerminated() || isRunning())
 			return;
 
 		/*
@@ -63,6 +63,10 @@ public class CollisionObserver implements Runnable, MoveListener {
 	public void stop() {
 		if (future != null)
 			future.cancel(false);
+	}
+
+	public boolean isTerminated() {
+		return executor.isShutdown();
 	}
 
 	public void terminate() {

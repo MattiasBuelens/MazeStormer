@@ -14,6 +14,9 @@ public class Navigator extends Runner implements WaypointListener {
 
 	private PoseProvider poseProvider;
 
+	private State nextState = State.NEXT_STEP;
+	private State stopState = null;
+
 	private Path path = new Path();
 	private Pose pose = new Pose();
 	private Waypoint destination;
@@ -29,9 +32,6 @@ public class Navigator extends Runner implements WaypointListener {
 	public enum State {
 		NEXT_STEP, ROTATE, TRAVEL, END_STEP
 	}
-
-	private State nextState = State.NEXT_STEP;
-	private State stopState = null;
 
 	/**
 	 * Creates a navigator controlling the given pilot and using the given pose
@@ -55,7 +55,12 @@ public class Navigator extends Runner implements WaypointListener {
 	 *            The new navigation listener.
 	 */
 	public void addNavigationListener(NavigationListener listener) {
-		listeners.add(listener);
+		if (!listeners.contains(listener))
+			listeners.add(listener);
+	}
+
+	public void removeNavigationListener(NavigationListener listener) {
+		listeners.remove(listener);
 	}
 
 	/**
@@ -331,12 +336,7 @@ public class Navigator extends Runner implements WaypointListener {
 
 	@Override
 	public void run() throws CancellationException {
-		// Keep stepping
-		while (!pathCompleted()) {
-			step();
-		}
-		// Done
-		resolve();
+		step();
 	}
 
 	private void step() throws CancellationException {
@@ -357,6 +357,7 @@ public class Navigator extends Runner implements WaypointListener {
 			endStep();
 			break;
 		}
+		throwWhenCancelled();
 
 		// Stop when going to cancel state
 		if (nextState == stopState) {
@@ -365,9 +366,7 @@ public class Navigator extends Runner implements WaypointListener {
 		}
 
 		// Step again
-		if (nextState != State.NEXT_STEP) {
-			step();
-		}
+		step();
 	}
 
 	private void nextStep() {
@@ -405,7 +404,8 @@ public class Navigator extends Runner implements WaypointListener {
 	private void endStep() {
 		pose = poseProvider.getPose();
 		nextState = State.NEXT_STEP;
-		if (isRunning()) {
+
+		if (isRunning() && !pathCompleted()) {
 			// Presumably at way point
 			path.remove(0);
 			sequenceNr++;

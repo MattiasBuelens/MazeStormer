@@ -107,6 +107,21 @@ public class BarcodeController extends SubController implements
 		}
 	}
 
+	private void onScanStarted() {
+		// Post state
+		postState(BarcodeScanEvent.EventType.STARTED);
+	}
+
+	private void onScanStopped() {
+		getRobot().getPilot().stop();
+		// Post state
+		postState(BarcodeScanEvent.EventType.STOPPED);
+	}
+
+	private void postState(BarcodeScanEvent.EventType eventType) {
+		postEvent(new BarcodeScanEvent(eventType));
+	}
+
 	private class ActionRunner extends Runner {
 
 		private final Robot robot;
@@ -150,24 +165,17 @@ public class BarcodeController extends SubController implements
 
 		@Override
 		public void onStarted() {
-			// Post state
-			postState(BarcodeScanEvent.EventType.STARTED);
+			onScanStarted();
 		}
 
 		@Override
 		public void onCompleted() {
-			// Post state
-			postState(BarcodeScanEvent.EventType.STOPPED);
+			onScanStopped();
 		}
 
 		@Override
 		public void onCancelled() {
-			// Post state
-			postState(BarcodeScanEvent.EventType.STOPPED);
-		}
-
-		private void postState(BarcodeScanEvent.EventType eventType) {
-			postEvent(new BarcodeScanEvent(eventType));
+			onScanStopped();
 		}
 
 	}

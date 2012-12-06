@@ -47,7 +47,7 @@ class LineFinderRunner extends Runner {
 		System.out.println(message);
 	}
 
-	private void terminate() {
+	private void reset() {
 		// Cancel condition handle
 		if (handle != null)
 			handle.cancel();
@@ -60,13 +60,13 @@ class LineFinderRunner extends Runner {
 	@Override
 	public void onCompleted() {
 		super.onCompleted();
-		terminate();
+		reset();
 	}
 
 	@Override
 	public void onCancelled() {
 		super.onCancelled();
-		terminate();
+		reset();
 	}
 
 	private void onLine(final RunnerTask task) {

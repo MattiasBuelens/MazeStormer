@@ -6,23 +6,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import mazestormer.util.AbstractFuture;
 import mazestormer.util.CancellationException;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 public abstract class Runner implements RunnerTask, RunnerListener,
 		FutureListener<Void> {
+
+	private static ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("Runner-%d").build();
 
 	private final Pilot pilot;
 	private final ExecutorService executor = Executors
 			.newCachedThreadPool(factory);
 	private final List<RunnerListener> listeners = new ArrayList<RunnerListener>();
-
-	private static ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("Runner-%d").build();
 
 	private RunnerFuture future;
 
@@ -60,11 +60,11 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	}
 
 	protected synchronized void start(Runnable task) {
-		executor.execute(prepare(task));
+		prepare(task).run();
 	}
 
 	protected synchronized void start(RunnerTask task) {
-		executor.execute(prepare(task));
+		prepare(task).run();
 	}
 
 	/**
@@ -151,6 +151,9 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		return new Runnable() {
 			@Override
 			public void run() {
+				if (executor.isShutdown())
+					return;
+
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {

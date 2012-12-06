@@ -44,7 +44,6 @@ public class VirtualCommandBuilder implements
 
 	protected void trigger() {
 		executor.execute(actionRunner);
-		executor.shutdown();
 	}
 
 	@Override

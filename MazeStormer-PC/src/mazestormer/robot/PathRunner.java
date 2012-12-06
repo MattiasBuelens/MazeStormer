@@ -27,11 +27,16 @@ public abstract class PathRunner extends Runner {
 		return robot.getPoseProvider().getPose();
 	}
 
-	public Tile getCurrentTile() {
+	protected Tile getCurrentTile() {
 		// Get absolute robot pose
 		Pose pose = robot.getPoseProvider().getPose();
 		// Get tile underneath robot
-		Point relativePosition = maze.toRelative(pose.getLocation());
+		return getTileAt(pose.getLocation());
+	}
+
+	protected Tile getTileAt(Point position) {
+		// Get tile underneath robot
+		Point relativePosition = maze.toRelative(position);
 		Point tilePosition = maze.toTile(relativePosition);
 		return maze.getTileAt(tilePosition);
 	}
