@@ -28,7 +28,7 @@ public class PolygonControlController extends SubController implements
 	@Override
 	public void stopPolygon() {
 		if (runner != null) {
-			runner.cancel();
+			runner.shutdown();
 			runner = null;
 		}
 	}

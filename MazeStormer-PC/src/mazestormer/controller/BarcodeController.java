@@ -43,7 +43,7 @@ public class BarcodeController extends SubController implements
 	@Override
 	public void stopAction() {
 		if (this.actionRunner != null) {
-			this.actionRunner.cancel();
+			this.actionRunner.shutdown();
 			this.actionRunner = null;
 		}
 	}

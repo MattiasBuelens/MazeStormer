@@ -73,7 +73,7 @@ public class PathFindingController extends SubController implements
 	@Override
 	public void stopAction() {
 		if (this.runner != null) {
-			this.runner.cancel();
+			this.runner.shutdown();
 			this.runner = null;
 		}
 	}

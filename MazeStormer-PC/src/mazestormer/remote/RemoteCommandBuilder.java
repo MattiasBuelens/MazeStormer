@@ -26,19 +26,17 @@ public class RemoteCommandBuilder extends ReportRequester<Void> implements
 	private final ConditionalCommand command;
 	private final List<Runnable> actions = new ArrayList<>();
 
-	private final ExecutorService executor;
+	private final ExecutorService executor = Executors
+			.newCachedThreadPool(factory);
 	private final ActionRunner actionRunner = new ActionRunner();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("RemoteCommandBuilder-%d").build();
 
 	public RemoteCommandBuilder(RemoteCommunicator communicator,
 			CommandType type, Condition condition) {
 		super(communicator);
 		command = new ConditionalCommand(type, condition);
 		command.setRequestId(communicator.nextRequestId());
-
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
-		executor = Executors.newCachedThreadPool(factory);
 	}
 
 	@Override

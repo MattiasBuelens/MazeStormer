@@ -31,11 +31,15 @@ public abstract class AbstractFeatureDetector implements FeatureDetector {
 	private boolean enabled = false;
 	private int delay = 0;
 
-	private ScheduledExecutorService executor;
+	private ScheduledExecutorService executor = Executors
+			.newSingleThreadScheduledExecutor(factory);
 	private Runnable scanTask = new ScanTask();
 	private ScheduledFuture<?> scanTaskHandle;
 
 	private List<FeatureListener> listeners = new ArrayList<FeatureListener>();
+
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("AbstractFeatureDetector-%d").build();
 
 	/**
 	 * Create a new feature detector with the given execution delay. The
@@ -47,10 +51,6 @@ public abstract class AbstractFeatureDetector implements FeatureDetector {
 	 */
 	public AbstractFeatureDetector(int delay) {
 		setDelay(delay);
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
-		executor = Executors.newSingleThreadScheduledExecutor(factory);
 	}
 
 	/**

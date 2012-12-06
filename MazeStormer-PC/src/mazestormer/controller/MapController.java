@@ -38,21 +38,20 @@ public class MapController extends SubController implements IMapController {
 	private MazeLayer sourceMazeLayer;
 	private RangesLayer rangesLayer;
 
-	private ScheduledExecutorService executor;
+	private ScheduledExecutorService executor = Executors
+			.newSingleThreadScheduledExecutor(factory);
 	private Runnable updateTask = new UpdateTask();
 	private ScheduledFuture<?> updateHandle;
 	private long updateInterval;
+
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("MapController-%d").build();
 
 	private static final long defaultUpdateInterval = 1000 / 25;
 
 	public MapController(MainController mainController) {
 		super(mainController);
 		setUpdateInterval(defaultUpdateInterval);
-
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
-		executor = Executors.newSingleThreadScheduledExecutor(factory);
 
 		createMap();
 		createLayers();

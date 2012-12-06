@@ -27,15 +27,16 @@ public class CollisionObserver implements Runnable, MoveListener {
 
 	private List<CollisionListener> listeners = new ArrayList<CollisionListener>();
 
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("CollisionObserver-%d").build();
+
 	public CollisionObserver(VirtualRobot robot) {
 		this.pilot = robot.getPilot();
 		this.detector = robot.getCollisionDetector();
-		pilot.addMoveListener(this);
 
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
 		executor = Executors.newSingleThreadScheduledExecutor(factory);
+
+		pilot.addMoveListener(this);
 	}
 
 	public boolean isRunning() {

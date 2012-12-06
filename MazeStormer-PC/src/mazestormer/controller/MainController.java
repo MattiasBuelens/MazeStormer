@@ -49,6 +49,8 @@ public class MainController implements IMainController {
 		});
 	}
 
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("MainController-%d").build();
 	/*
 	 * Events
 	 */
@@ -96,8 +98,6 @@ public class MainController implements IMainController {
 
 	public MainController() {
 		// Create event bus on named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
 		ExecutorService executor = Executors.newSingleThreadExecutor(factory);
 		eventBus = new AsyncEventBus(getClass().getSimpleName(), executor);
 

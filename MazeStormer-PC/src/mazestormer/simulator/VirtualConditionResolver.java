@@ -20,10 +20,10 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 	private final Set<Future> futures = new CopyOnWriteArraySet<Future>();
 	private final ExecutorService executor;
 
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("VirtualConditionResolver-%d").build();
+
 	public VirtualConditionResolver() {
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
 		executor = Executors.newSingleThreadExecutor(factory);
 	}
 

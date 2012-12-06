@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import lejos.geom.Point;
 import lejos.robotics.RangeReading;
@@ -24,6 +25,8 @@ import mazestormer.robot.Navigator;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.Robot;
 import mazestormer.robot.RunnerListener;
+import mazestormer.robot.RunnerTask;
+import mazestormer.util.CancellationException;
 
 import com.google.common.primitives.Floats;
 
@@ -39,10 +42,11 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private static final int findLineInterval = 10;
 	private int nextFindLine = 1;
 
-	private State state = null;
+	private AtomicReference<State> state = new AtomicReference<State>(
+			State.NEXT);
 
 	public enum State {
-		SCAN, ROTATE, TRAVEL, LINE, BARCODE;
+		SCAN, ROTATE, TRAVEL, LINE, BARCODE, NEXT;
 	}
 
 	public ExplorerRunner(Robot robot, Maze maze) {
@@ -69,6 +73,21 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		barcodeRunner.addBarcodeListener(new BarcodeListener());
 	}
 
+	private State getState() {
+		return state.get();
+	}
+
+	private void setState(State newState, State... expectedStates) {
+		while (isRunning()) {
+			for (State expected : expectedStates) {
+				if (state.compareAndSet(expected, newState)) {
+					return;
+				}
+			}
+		}
+		throwWhenCancelled();
+	}
+
 	protected void log(String message) {
 		System.out.println(message);
 	}
@@ -80,14 +99,11 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	@Override
-	public boolean cancel() {
-		if (super.cancel()) {
-			// Cancel runners
-			lineFinder.cancel();
-			barcodeRunner.cancel();
-			return true;
-		}
-		return false;
+	public void shutdown() {
+		// Shutdown everything
+		super.shutdown();
+		lineFinder.shutdown();
+		barcodeRunner.shutdown();
 	}
 
 	private void init() {
@@ -117,9 +133,10 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		// This is the current tile of the robot
 		currentTile = queue.pollLast();
 
+		// Update state
+		setState(State.SCAN, State.NEXT);
 		// Scan and update current tile
-		log("Scan");
-		state = State.SCAN;
+		log("Scan: " + currentTile.getPosition());
 		scanAndUpdate(currentTile);
 		currentTile.setExplored();
 		throwWhenCancelled();
@@ -147,7 +164,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		}
 
 		// Follow path until before traveling
-		state = State.ROTATE;
+		setState(State.ROTATE, State.SCAN);
 		navigator.followPathUntil(Navigator.State.TRAVEL);
 	}
 
@@ -161,20 +178,29 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void travel() {
-		state = State.TRAVEL;
+		// Update state
+		setState(State.TRAVEL, State.ROTATE, State.LINE);
 		// Follow path until way point is reached
 		navigator.resumeFrom(Navigator.State.TRAVEL);
 	}
 
 	private void afterTravel() {
+		// Update state
+		setState(State.NEXT, State.TRAVEL);
+		// Next step
+		next();
+	}
+
+	private void next() {
 		// Increment counter for line finder
 		nextFindLine = (nextFindLine + 1) % findLineInterval;
-		// Next step
+		// Cycle again
 		cycle();
 	}
 
 	private void beforeLineFinder() {
-		state = State.LINE;
+		// Update state
+		setState(State.LINE, State.ROTATE);
 	}
 
 	private void afterLineFinder() {
@@ -187,9 +213,9 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void beforeBarcode() {
-		System.out.println("Before barcode");
-		System.out.println("Pose:" + getPose());
-		state = State.BARCODE;
+		// Update state
+		setState(State.BARCODE, State.TRAVEL);
+		log("Before barcode");
 		// Stop navigator
 		navigator.stop();
 		// Cancel line finder if still running
@@ -197,13 +223,15 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void afterBarcode(byte barcode) {
-		System.out.println("After barcode");
+		// Update state
+		setState(State.NEXT, State.BARCODE);
+		log("After barcode: " + currentTile.getPosition());
 		// Cancel barcode runner if still running
 		barcodeRunner.cancel();
 		// Set barcode on tile
 		setBarcodeTile(currentTile, barcode);
-		// Next tile
-		afterTravel();
+		// Next step
+		next();
 	}
 
 	private void setBarcodeTile(Tile tile, byte barcode) {
@@ -294,18 +322,29 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	@Override
 	public void pathComplete(Waypoint waypoint, Pose pose, int sequence) {
+		if (getState() == State.BARCODE)
+			return;
+
 		log("Completed: " + waypoint);
-		afterTravel();
+		start(new RunnerTask() {
+			@Override
+			public void run() throws CancellationException {
+				afterTravel();
+			}
+		});
 	}
 
 	@Override
 	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
 		log("At stop point: " + state);
-		switch (state) {
-		case ROTATE:
-			beforeTravel();
-			break;
-		default:
+
+		if (getState() == State.ROTATE) {
+			start(new RunnerTask() {
+				@Override
+				public void run() throws CancellationException {
+					beforeTravel();
+				}
+			});
 		}
 	}
 
@@ -334,12 +373,22 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private class LineFinderListener implements RunnerListener {
 		@Override
 		public void onStarted() {
-			beforeLineFinder();
+			start(new RunnerTask() {
+				@Override
+				public void run() throws CancellationException {
+					beforeLineFinder();
+				}
+			});
 		}
 
 		@Override
 		public void onCompleted() {
-			afterLineFinder();
+			start(new RunnerTask() {
+				@Override
+				public void run() throws CancellationException {
+					afterLineFinder();
+				}
+			});
 		}
 
 		@Override
@@ -350,12 +399,22 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private class BarcodeListener implements BarcodeRunnerListener {
 		@Override
 		public void onStartBarcode() {
-			beforeBarcode();
+			start(new RunnerTask() {
+				@Override
+				public void run() throws CancellationException {
+					beforeBarcode();
+				}
+			});
 		}
 
 		@Override
-		public void onEndBarcode(byte barcode) {
-			afterBarcode(barcode);
+		public void onEndBarcode(final byte barcode) {
+			start(new RunnerTask() {
+				@Override
+				public void run() throws CancellationException {
+					afterBarcode(barcode);
+				}
+			});
 		}
 	}
 

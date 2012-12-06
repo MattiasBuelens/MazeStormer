@@ -17,19 +17,18 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		FutureListener<Void> {
 
 	private final Pilot pilot;
-	private final ExecutorService executor;
+	private final ExecutorService executor = Executors
+			.newCachedThreadPool(factory);
 	private final List<RunnerListener> listeners = new ArrayList<RunnerListener>();
+
+	private static ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("Runner-%d").build();
 
 	private RunnerFuture future;
 
 	public Runner(Pilot pilot) {
 		this.pilot = pilot;
 		addListener(this);
-
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
-		executor = Executors.newSingleThreadExecutor(factory);
 	}
 
 	protected Pilot getPilot() {
@@ -41,35 +40,31 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	 * 
 	 * @return True if the runner is started, false if it was already running.
 	 */
-	public boolean start() {
+	public synchronized boolean start() {
 		if (isRunning())
 			return false;
-		start(this);
-		return true;
-	}
-
-	public void restart() {
-		cancel();
-		start();
-	}
-
-	protected void start(Runnable task) {
-		startTask(prepare(task));
-	}
-
-	protected void start(RunnerTask task) {
-		startTask(prepare(task));
-	}
-
-	private void startTask(Runnable task) {
 		future = new RunnerFuture();
 		future.addFutureListener(this);
 
-		executor.execute(task);
+		start(this);
 
 		for (RunnerListener listener : listeners) {
 			listener.onStarted();
 		}
+		return true;
+	}
+
+	public synchronized void restart() {
+		cancel();
+		start();
+	}
+
+	protected synchronized void start(Runnable task) {
+		executor.execute(prepare(task));
+	}
+
+	protected synchronized void start(RunnerTask task) {
+		executor.execute(prepare(task));
 	}
 
 	/**
@@ -77,11 +72,16 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	 * 
 	 * @return True if the runner is cancelled, false if it was not running.
 	 */
-	public boolean cancel() {
+	public synchronized boolean cancel() {
 		if (!isRunning())
 			return false;
 
 		return future.cancel(true);
+	}
+
+	public synchronized void shutdown() {
+		cancel();
+		executor.shutdownNow();
 	}
 
 	public synchronized boolean isRunning() {

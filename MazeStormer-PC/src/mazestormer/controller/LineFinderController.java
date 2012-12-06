@@ -50,7 +50,7 @@ public class LineFinderController extends SubController implements
 	@Override
 	public void stopSearching() {
 		if (runner != null) {
-			runner.cancel();
+			runner.shutdown();
 			runner = null;
 		}
 	}

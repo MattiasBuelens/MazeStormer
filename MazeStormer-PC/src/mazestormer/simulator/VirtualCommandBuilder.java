@@ -24,17 +24,16 @@ public class VirtualCommandBuilder implements
 	private final List<Runnable> commands = new ArrayList<Runnable>();
 	private final List<Runnable> actions = new ArrayList<Runnable>();
 
-	private final ExecutorService executor;
+	private final ExecutorService executor = Executors
+			.newCachedThreadPool(factory);;
 	private final Runner actionRunner = new Runner();
+
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("VirtualCommandBuilder-%d").build();
 
 	public VirtualCommandBuilder(Robot robot, ConditionFuture future) {
 		this.robot = robot;
 		this.future = future;
-
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
-		executor = Executors.newCachedThreadPool(factory);
 	}
 
 	@Override

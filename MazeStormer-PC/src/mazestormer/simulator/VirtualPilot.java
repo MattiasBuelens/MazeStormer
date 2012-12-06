@@ -32,15 +32,15 @@ public class VirtualPilot implements Pilot {
 
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("VirtualPilot-%d").build();
+
 	public VirtualPilot(double trackWidth, double maxTravelSpeed,
 			double maxRotateSpeed) {
 		this.maxTravelSpeed = maxTravelSpeed;
 		this.maxRotateSpeed = maxRotateSpeed;
 		this.trackWidth = (float) trackWidth;
 
-		// Named executor
-		ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat(
-				getClass().getSimpleName() + "-%d").build();
 		executor = Executors.newSingleThreadScheduledExecutor(factory);
 
 		// Initial speeds

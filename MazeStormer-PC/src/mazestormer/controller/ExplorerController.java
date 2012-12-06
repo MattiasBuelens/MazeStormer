@@ -44,7 +44,7 @@ public class ExplorerController extends SubController implements
 	@Override
 	public void stopExploring() {
 		if (runner != null) {
-			runner.cancel();
+			runner.shutdown();
 			runner = null;
 		}
 	}
