@@ -79,6 +79,7 @@ public class MainController implements IMainController {
 	private IPathFindingController pathFindingControl;
 	private ILineFinderController lineFinderControl;
 	private IExplorerController explorerControl;
+	private ICheatController cheatControl;
 
 	private IMapController map;
 	private ILogController log;
@@ -206,6 +207,14 @@ public class MainController implements IMainController {
 			explorerControl = new ExplorerController(this);
 		}
 		return explorerControl;
+	}
+	
+	@Override
+	public ICheatController cheatControl() {
+		if (cheatControl == null) {
+			cheatControl = new CheatController(this);
+		}
+		return cheatControl;
 	}
 
 	@Override

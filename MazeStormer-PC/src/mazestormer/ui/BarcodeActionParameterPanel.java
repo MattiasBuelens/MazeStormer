@@ -84,7 +84,6 @@ public class BarcodeActionParameterPanel extends ViewPanel {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			controller.setLowSpeed((int) lowSpeedModel.getValue());
-			updateCurrentSpinValue();
 		}
 	}
 	
@@ -92,7 +91,6 @@ public class BarcodeActionParameterPanel extends ViewPanel {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			controller.setHighSpeed((int) highSpeedModel.getValue());
-			updateCurrentSpinValue();
 		}
 	}
 }

@@ -24,6 +24,7 @@ public class ExplorerControlPanel extends ViewPanel {
 	private final ParametersPanel parametersPanel;
 	private final BarcodeScanParameterPanel barcodeScanParameterPanel;
 	private final BarcodeActionParameterPanel barcodeActionParameterPanel;
+	private final TeleportParameterPanel teleportParameterPanel;
 	
 	private JPanel container;
 
@@ -40,6 +41,7 @@ public class ExplorerControlPanel extends ViewPanel {
 		this.parametersPanel = new ParametersPanel(this.controller.getParametersController());
 		this.barcodeScanParameterPanel = new BarcodeScanParameterPanel(this.controller.getBarcodeController());
 		this.barcodeActionParameterPanel = new BarcodeActionParameterPanel(this.controller.getBarcodeController());
+		this.teleportParameterPanel = new TeleportParameterPanel(this.controller.getCheatController());
 
 		setBorder(new TitledBorder(null, "Maze Explorer", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -52,6 +54,7 @@ public class ExplorerControlPanel extends ViewPanel {
 		createParametersPanel();
 		createBarcodeScanParameterPanel();
 		createBarcodeActionParameterPanel();
+		createTeleportParameterPanel();
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -89,6 +92,10 @@ public class ExplorerControlPanel extends ViewPanel {
 	
 	private void createBarcodeActionParameterPanel() {
 		this.container.add(this.barcodeActionParameterPanel, "cell 0 3 3 1,growx");
+	}
+	
+	private void createTeleportParameterPanel() {
+		this.container.add(this.teleportParameterPanel, "cell 0 4 3 1,growx");
 	}
 
 	public void startExploring() {

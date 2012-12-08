@@ -12,4 +12,6 @@ public interface IExplorerController  extends EventSource{
 	
 	public IParametersController getParametersController();
 	
+	public ICheatController getCheatController();
+	
 }

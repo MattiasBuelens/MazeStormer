@@ -22,6 +22,11 @@ public class ExplorerController extends SubController implements
 	public IParametersController getParametersController() {
 		return getMainController().parameters();
 	}
+	
+	@Override
+	public ICheatController getCheatController() {
+		return getMainController().cheatControl();
+	}
 
 	private Robot getRobot() {
 		return getMainController().getRobot();
