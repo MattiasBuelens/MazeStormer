@@ -7,17 +7,17 @@ import java.util.TimerTask;
 
 public class AbstractFuture<V> implements Future<V> {
 
-	private boolean isCancelled = false;
-	private boolean isResolved = false;
+	private volatile boolean isCancelled = false;
+	private volatile boolean isResolved = false;
 	private V result;
 
 	private List<FutureListener<V>> listeners = new ArrayList<FutureListener<V>>();
 
-	private boolean isResolved() {
+	private synchronized boolean isResolved() {
 		return isResolved;
 	}
 
-	protected boolean resolve(V result) {
+	protected synchronized boolean resolve(V result) {
 		if (!isDone()) {
 			this.result = result;
 			isResolved = true;
@@ -27,12 +27,12 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	@Override
-	public boolean isCancelled() {
+	public synchronized boolean isCancelled() {
 		return isCancelled;
 	}
 
 	@Override
-	public boolean cancel(boolean mayInterruptIfRunning) {
+	public synchronized boolean cancel(boolean mayInterruptIfRunning) {
 		if (!isCancelled()) {
 			isCancelled = true;
 			fireCancelled();
@@ -42,7 +42,7 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	@Override
-	public boolean isDone() {
+	public synchronized boolean isDone() {
 		return isCancelled() || isResolved();
 	}
 
