@@ -8,4 +8,8 @@ public interface IExplorerController  extends EventSource{
 
 	public void stopExploring();
 	
+	public IBarcodeController getBarcodeController();
+	
+	public IParametersController getParametersController();
+	
 }

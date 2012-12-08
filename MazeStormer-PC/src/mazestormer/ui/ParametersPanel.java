@@ -5,6 +5,7 @@ import java.beans.Beans;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -27,7 +28,8 @@ public class ParametersPanel extends ViewPanel {
 	public ParametersPanel(IParametersController controller) {
 		this.controller = controller;
 
-		setBorder(null);
+		setBorder(new TitledBorder(null, "General parameters",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new MigLayout("", "[grow 75][grow 25][]",
 				"[grow,fill][grow,fill]"));
 
