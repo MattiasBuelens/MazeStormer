@@ -38,7 +38,7 @@ public class TeleportParameterPanel extends ViewPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.container = new JPanel();
-		this.container.setLayout(new MigLayout("", "[grow 75][grow][grow]", "[][]"));
+		this.container.setLayout(new MigLayout("", "[grow 75][grow][grow][]", "[]"));
 		add(this.container);
 
 		createTeleportSpinners();
@@ -53,32 +53,28 @@ public class TeleportParameterPanel extends ViewPanel {
 	}
 	
 	private void createTeleportButton() {
-		JPanel buttons = new JPanel();
-		this.container.add(buttons, "cell 0 0 3 1,grow");
-		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
 		this.btnTeleportAction = new JButton();
+		container.add(btnTeleportAction, "cell 3 0");
 		this.btnTeleportAction.setAction(this.teleportAction);
 		this.btnTeleportAction.setText("");
-		this.btnTeleportAction.setIcon(new SystemLogOutIcon(32, 32));
-		buttons.add(this.btnTeleportAction);
+		this.btnTeleportAction.setIcon(new SystemLogOutIcon(25, 25));
 	}
 	
 	private void createTeleportSpinners() {
 		JLabel lblGoal = new JLabel("Teleport to tile coordinates (X,Y)");
-		this.container.add(lblGoal, "cell 0 1,alignx left,aligny baseline");
+		this.container.add(lblGoal, "cell 0 0,alignx left,aligny baseline");
 
 		JSpinner xSpinner = new JSpinner();
 		this.xModel = new SpinnerNumberModel(0, (int) this.controller.getTileMinX(),
 				(int) this.controller.getTileMaxX(), 1);
 		xSpinner.setModel(this.xModel);
-		this.container.add(xSpinner, "cell 1 1,growx");
+		this.container.add(xSpinner, "cell 1 0,growx");
 
 		JSpinner ySpinner = new JSpinner();
 		this.yModel = new SpinnerNumberModel(0, (int) this.controller.getTileMinY(),
 				(int) this.controller.getTileMaxY(), 1);
 		ySpinner.setModel(this.yModel);
-		this.container.add(ySpinner, "cell 2 1,growx");
+		this.container.add(ySpinner, "cell 2 0,growx");
 	}
 	
 	public void update() {
