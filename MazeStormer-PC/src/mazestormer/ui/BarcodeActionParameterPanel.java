@@ -77,7 +77,7 @@ public class BarcodeActionParameterPanel extends ViewPanel {
 		this.highSpeedModel.addChangeListener(new HighSpeedChangeListener());
 	}
 	
-	private void updateSpinners() {
+	private void updateCurrentSpinValue() {
 		this.lowSpeedModel.setValue((int) this.controller.getLowSpeed());
 		this.highSpeedModel.setValue((int) this.controller.getHighSpeed());
 	}
@@ -86,7 +86,7 @@ public class BarcodeActionParameterPanel extends ViewPanel {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			controller.setLowSpeed((int) lowSpeedModel.getValue());
-			updateSpinners();
+			updateCurrentSpinValue();
 		}
 	}
 	
@@ -94,7 +94,7 @@ public class BarcodeActionParameterPanel extends ViewPanel {
 		@Override
 		public void stateChanged(ChangeEvent e) {
 			controller.setHighSpeed((int) highSpeedModel.getValue());
-			updateSpinners();
+			updateCurrentSpinValue();
 		}
 	}
 }
