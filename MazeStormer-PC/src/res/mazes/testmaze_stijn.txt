@@ -1,0 +1,7 @@
+7 6
+DeadEnd.N		DeadEnd.W		T.N				Straight.E.00	T.N			Straight.E.09	Corner.E
+Corner.W		Straight.E.55	T.E				DeadEnd.W		Corner.S	DeadEnd.W		Corner.S
+Corner.N		Straight.E.00	Cross			T.N				T.N			Straight.E.00	Corner.E
+Straight.N.19	DeadEnd.N		Straight.N.00	Straight.N.00	T.W			Straight.E.00	Corner.S
+Corner.W		Corner.S		Straight.N.00	Straight.N.00	Corner.W	Straight.E.13	Corner.E
+DeadEnd.W		Straight.E.00	Corner.S		DeadEnd.S		DeadEnd.W	Straight.E.00	Corner.S

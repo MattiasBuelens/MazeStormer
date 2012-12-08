@@ -1,0 +1,13 @@
+10 10
+
+#testdoolhof1
+DeadEnd.N	Corner.N	Corner.E	Corner.N	Straight.E.00	T.N		Straight.E.00	T.N		Straight.E.55	DeadEnd.E
+Straight.N.00	Straight.S.37	Straight.S.00	T.W		Straight.W.00	T.S		T.N		T.S		T.N		DeadEnd.E
+Straight.S.00	DeadEnd.S	Straight.N.25	Corner.W	Straight.E.00	T.N		T.S		Straight.E.00	T.S		DeadEnd.E
+Corner.W	Straight.W.00	Cross		Straight.W.00	Straight.E.00	Cross		T.N		Straight.E.00	Straight.E.00	Corner.E
+DeadEnd.N	DeadEnd.N	T.W		T.N		T.N		T.E		Straight.N.00	DeadEnd.N	Corner.N	T.E
+Straight.N.00	DeadEnd.S	Straight.N.00	Straight.N.00	Corner.W	T.E		Straight.S.13	DeadEnd.S	DeadEnd.S	Straight.N.00
+T.W		Straight.W.00	Corner.S	Corner.W	Straight.E.00	T.S		Cross		Straight.E.00	Straight.E.00	Corner.S
+Straight.N.00	Corner.N	Corner.E	Corner.N	T.N		Corner.E	Straight.N.00	Corner.N	Straight.W.00	Corner.E
+Straight.N.00	DeadEnd.S	Straight.N.00	DeadEnd.S	Straight.N.5	DeadEnd.S	T.W		Cross		Straight.W.15	T.E
+Corner.W	Straight.E.00	T.S		Straight.E.00	T.S		Straight.E.00	Corner.S	Corner.W	Straight.E.00	Corner.S

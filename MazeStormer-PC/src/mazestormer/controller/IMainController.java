@@ -19,6 +19,8 @@ public interface IMainController {
 	public IPathFindingController pathFindingControl();
 
 	public ILineFinderController lineFinderControl();
+	
+	public ICheatController cheatControl();
 
 	public IMapController map();
 

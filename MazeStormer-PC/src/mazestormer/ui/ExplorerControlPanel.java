@@ -21,6 +21,11 @@ public class ExplorerControlPanel extends ViewPanel {
 
 	private static final long serialVersionUID = 1L;
 	private final IExplorerController controller;
+	private final ParametersPanel parametersPanel;
+	private final BarcodeScanParameterPanel barcodeScanParameterPanel;
+	private final BarcodeActionParameterPanel barcodeActionParameterPanel;
+	private final TeleportParameterPanel teleportParameterPanel;
+	
 	private JPanel container;
 
 	// Actions
@@ -33,15 +38,23 @@ public class ExplorerControlPanel extends ViewPanel {
 
 	public ExplorerControlPanel(IExplorerController controller) {
 		this.controller = controller;
+		this.parametersPanel = new ParametersPanel(this.controller.getParametersController());
+		this.barcodeScanParameterPanel = new BarcodeScanParameterPanel(this.controller.getBarcodeController());
+		this.barcodeActionParameterPanel = new BarcodeActionParameterPanel(this.controller.getBarcodeController());
+		this.teleportParameterPanel = new TeleportParameterPanel(this.controller.getCheatController());
 
 		setBorder(new TitledBorder(null, "Maze Explorer", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		container = new JPanel();
-		container.setLayout(new MigLayout("", "[grow]", "[]"));
+		container.setLayout(new MigLayout("", "[grow]", "[][][]"));
 		add(container);
 
 		createStartStopButtons();
+		createParametersPanel();
+		createBarcodeScanParameterPanel();
+		createBarcodeActionParameterPanel();
+		createTeleportParameterPanel();
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -67,6 +80,22 @@ public class ExplorerControlPanel extends ViewPanel {
 		btnStop.setText("");
 		btnStop.setIcon(new MediaPlaybackStopIcon(32, 32));
 		buttons.add(btnStop);
+	}
+	
+	private void createParametersPanel() {
+		this.container.add(this.parametersPanel, "cell 0 1 3 1,growx");
+	}
+	
+	private void createBarcodeScanParameterPanel() {
+		this.container.add(this.barcodeScanParameterPanel, "cell 0 2 3 1,growx");
+	}
+	
+	private void createBarcodeActionParameterPanel() {
+		this.container.add(this.barcodeActionParameterPanel, "cell 0 3 3 1,growx");
+	}
+	
+	private void createTeleportParameterPanel() {
+		this.container.add(this.teleportParameterPanel, "cell 0 4 3 1,growx");
 	}
 
 	public void startExploring() {

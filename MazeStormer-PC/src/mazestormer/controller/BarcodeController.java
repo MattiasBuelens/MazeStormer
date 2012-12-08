@@ -2,6 +2,7 @@ package mazestormer.controller;
 
 import mazestormer.barcode.ActionType;
 import mazestormer.barcode.BarcodeRunner;
+import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
@@ -181,4 +182,33 @@ public class BarcodeController extends SubController implements
 
 	}
 
+	@Override
+	public double getLowSpeed() {
+		return BarcodeSpeed.LOW.getBarcodeSpeedValue();
+	}
+
+	@Override
+	public void setLowSpeed(double speed) {
+		BarcodeSpeed.LOW.setBarcodeSpeedValue(speed);
+	}
+
+	@Override
+	public double getHighSpeed() {
+		return BarcodeSpeed.HIGH.getBarcodeSpeedValue();
+	}
+
+	@Override
+	public void setHighSpeed(double speed) {
+		BarcodeSpeed.HIGH.setBarcodeSpeedValue(speed);
+	}
+
+	@Override
+	public double getLowerSpeedBound() {
+		return BarcodeSpeed.LOWERBOUND.getBarcodeSpeedValue();
+	}
+
+	@Override
+	public double getUpperSpeedBound() {
+		return BarcodeSpeed.UPPERBOUND.getBarcodeSpeedValue();
+	}
 }
