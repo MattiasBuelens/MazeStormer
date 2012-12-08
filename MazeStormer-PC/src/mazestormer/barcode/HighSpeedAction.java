@@ -6,7 +6,7 @@ import mazestormer.robot.Robot;
 
 public class HighSpeedAction implements IAction{
 	
-	private static final double SPEED = 10; 
+	private static final double SPEED = BarcodeSpeed.HIGH.getBarcodeSpeedValue(); 
 
 	@Override
 	public void performAction(Robot robot, Maze maze) {

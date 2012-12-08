@@ -24,4 +24,16 @@ public interface IBarcodeController extends EventSource {
 	public int getBWThreshold();
 	
 	public void setBWThreshold(int threshold);
+	
+	public double getLowSpeed();
+	
+	public void setLowSpeed(double speed);
+	
+	public double getHighSpeed();
+	
+	public void setHighSpeed(double speed);
+	
+	public double getLowerSpeedBound();
+	
+	public double getUpperSpeedBound();
 }

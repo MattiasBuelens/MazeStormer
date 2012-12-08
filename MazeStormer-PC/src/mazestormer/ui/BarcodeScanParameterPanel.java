@@ -70,11 +70,12 @@ public class BarcodeScanParameterPanel extends ViewPanel {
 		spinWB.setModel(this.wbModel);
 		this.container.add(spinWB, "cell 1 1,growx");
 		this.wbModel.addChangeListener(new WBChangeListener());
+		
+		JLabel lblWBUnit = new JLabel("%");
+		container.add(lblWBUnit, "cell 2 1");
 	}
 
 	private void createScanSpeedSpinner() {
-		JLabel lblWBUnit = new JLabel("%");
-		container.add(lblWBUnit, "cell 2 1");
 		JLabel lblSpeed = new JLabel("Scan travel speed");
 		this.container.add(lblSpeed, "cell 0 2");
 
