@@ -44,9 +44,7 @@ public class BarcodeActionParameterPanel extends ViewPanel {
 	private void registerController() {
 		registerEventBus(this.controller.getEventBus());
 
-		this.lowSpeedModel.setValue((int) controller.getLowSpeed());
-		this.highSpeedModel.setValue((int) controller.getHighSpeed());
-		
+		updateCurrentSpinValue();
 	}
 	
 	private void createSpeedSpinners() {

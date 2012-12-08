@@ -1,10 +1,10 @@
 package mazestormer.barcode;
 
 public enum BarcodeSpeed {
-	LOW(2), HIGH(9), UPPERBOUND(20), LOWERBOUND(0);
+	LOW(2d), HIGH(9d), UPPERBOUND(20d), LOWERBOUND(0d);
 	
 	private BarcodeSpeed(double barcodeSpeedValue) {
-		setBarcodeSpeedValue(barcodeSpeedValue);
+		this.barcodeSpeedValue = barcodeSpeedValue;
 	}
 
 	private double barcodeSpeedValue;

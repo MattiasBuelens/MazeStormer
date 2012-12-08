@@ -29,7 +29,8 @@ public class BarcodePanel extends ViewPanel {
 	private static final long serialVersionUID = 12L;
 
 	private final IBarcodeController controller;
-	private final BarcodeScanParameterPanel barcodeParameterPanel;
+	private final BarcodeScanParameterPanel barcodeScanParameterPanel;
+	private final BarcodeActionParameterPanel barcodeActionParameterPanel;
 
 	private JPanel container;
 	private JButton btnStartAction;
@@ -43,20 +44,22 @@ public class BarcodePanel extends ViewPanel {
 
 	public BarcodePanel(IBarcodeController controller) {
 		this.controller = controller;
-		this.barcodeParameterPanel = new BarcodeScanParameterPanel(this.controller);
+		this.barcodeScanParameterPanel = new BarcodeScanParameterPanel(this.controller);
+		this.barcodeActionParameterPanel = new BarcodeActionParameterPanel(this.controller);
 
 		setBorder(new TitledBorder(null, "Barcode actions",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.container = new JPanel();
-		this.container.setLayout(new MigLayout("", "[grow 75][grow][fill]", "[][][][][][][]"));
+		this.container.setLayout(new MigLayout("", "[grow 75][grow][fill]", "[][][][][][]"));
 		add(this.container);
 
 		createActionChoicePanel();
 		createActionButtons();
 		createScanButtons();
-		createBarcodeParameterPanel();
+		createBarcodeScanParameterPanel();
+		createBarcodeActionParameterPanel();
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -120,8 +123,12 @@ public class BarcodePanel extends ViewPanel {
 		buttons.add(this.btnStopScan);
 	}
 	
-	private void createBarcodeParameterPanel() {
-		this.container.add(this.barcodeParameterPanel, "cell 0 4 3 1,growx");
+	private void createBarcodeScanParameterPanel() {
+		this.container.add(this.barcodeScanParameterPanel, "cell 0 4 3 1,growx");
+	}
+	
+	private void createBarcodeActionParameterPanel() {
+		this.container.add(this.barcodeActionParameterPanel, "cell 0 5 3 1,growx");
 	}
 
 	public void startAction() {
