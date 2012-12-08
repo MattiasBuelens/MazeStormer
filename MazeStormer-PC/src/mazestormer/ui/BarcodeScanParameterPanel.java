@@ -14,7 +14,7 @@ import javax.swing.event.ChangeListener;
 import mazestormer.controller.IBarcodeController;
 import net.miginfocom.swing.MigLayout;
 
-public class BarcodeParameterPanel extends ViewPanel {
+public class BarcodeScanParameterPanel extends ViewPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private final IBarcodeController controller;
@@ -25,7 +25,7 @@ public class BarcodeParameterPanel extends ViewPanel {
 
 	private JPanel container;
 	
-	public BarcodeParameterPanel(IBarcodeController controller) {
+	public BarcodeScanParameterPanel(IBarcodeController controller) {
 		this.controller = controller;
 
 		setBorder(new TitledBorder(null, "Barcode scan parameters",

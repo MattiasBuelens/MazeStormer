@@ -29,7 +29,7 @@ public class BarcodePanel extends ViewPanel {
 	private static final long serialVersionUID = 12L;
 
 	private final IBarcodeController controller;
-	private final BarcodeParameterPanel barcodeParameterPanel;
+	private final BarcodeScanParameterPanel barcodeParameterPanel;
 
 	private JPanel container;
 	private JButton btnStartAction;
@@ -43,7 +43,7 @@ public class BarcodePanel extends ViewPanel {
 
 	public BarcodePanel(IBarcodeController controller) {
 		this.controller = controller;
-		this.barcodeParameterPanel = new BarcodeParameterPanel(this.controller);
+		this.barcodeParameterPanel = new BarcodeScanParameterPanel(this.controller);
 
 		setBorder(new TitledBorder(null, "Barcode actions",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));

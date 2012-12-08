@@ -22,7 +22,7 @@ public class ExplorerControlPanel extends ViewPanel {
 	private static final long serialVersionUID = 1L;
 	private final IExplorerController controller;
 	private final ParametersPanel parametersPanel;
-	private final BarcodeParameterPanel barcodeParameterPanel;
+	private final BarcodeScanParameterPanel barcodeParameterPanel;
 	
 	private JPanel container;
 
@@ -37,7 +37,7 @@ public class ExplorerControlPanel extends ViewPanel {
 	public ExplorerControlPanel(IExplorerController controller) {
 		this.controller = controller;
 		this.parametersPanel = new ParametersPanel(this.controller.getParametersController());
-		this.barcodeParameterPanel = new BarcodeParameterPanel(this.controller.getBarcodeController());
+		this.barcodeParameterPanel = new BarcodeScanParameterPanel(this.controller.getBarcodeController());
 
 		setBorder(new TitledBorder(null, "Maze Explorer", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
