@@ -12,6 +12,16 @@ public class ExplorerController extends SubController implements
 	public ExplorerController(MainController mainController) {
 		super(mainController);
 	}
+	
+	@Override
+	public IBarcodeController getBarcodeController() {
+		return getMainController().barcodeControl();
+	}
+	
+	@Override
+	public IParametersController getParametersController() {
+		return getMainController().parameters();
+	}
 
 	private Robot getRobot() {
 		return getMainController().getRobot();
