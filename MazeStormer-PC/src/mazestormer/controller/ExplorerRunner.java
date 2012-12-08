@@ -92,8 +92,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			}
 		};
 		barcodeRunner.addBarcodeListener(new BarcodeListener());
-		// TODO Make configurable
-		barcodeRunner.setScanSpeed(10);
 		barcodeRunner.setPerformAction(true);
 	}
 
@@ -129,6 +127,10 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private void disableNavigator() {
 		while (!enableNavigator.compareAndSet(true, false))
 			Thread.yield();
+	}
+	
+	public void setScanSpeed(double scanSpeed) {
+		barcodeRunner.setScanSpeed(scanSpeed);
 	}
 
 	@Override

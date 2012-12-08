@@ -4,14 +4,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
-public class HighSpeedAction implements IAction{
-	
-	private static final double SPEED = BarcodeSpeed.HIGH.getBarcodeSpeedValue(); 
+public class HighSpeedAction implements IAction {
 
 	@Override
 	public void performAction(Robot robot, Maze maze) {
 		checkNotNull(robot);
 		checkNotNull(maze);
-		robot.getPilot().setTravelSpeed(SPEED);
+		robot.getPilot().setTravelSpeed(BarcodeSpeed.HIGH.getBarcodeSpeedValue());
 	}
+
 }

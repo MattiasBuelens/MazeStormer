@@ -4,25 +4,24 @@ import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 import mazestormer.robot.RunnerListener;
 
-public class ExplorerController extends SubController implements
-		IExplorerController {
+public class ExplorerController extends SubController implements IExplorerController {
 
 	private ExplorerRunner runner;
 
 	public ExplorerController(MainController mainController) {
 		super(mainController);
 	}
-	
+
 	@Override
 	public IBarcodeController getBarcodeController() {
 		return getMainController().barcodeControl();
 	}
-	
+
 	@Override
 	public IParametersController getParametersController() {
 		return getMainController().parameters();
 	}
-	
+
 	@Override
 	public ICheatController getCheatController() {
 		return getMainController().cheatControl();
@@ -53,6 +52,7 @@ public class ExplorerController extends SubController implements
 			}
 		};
 		runner.addListener(new ExplorerListener());
+		runner.setScanSpeed(getBarcodeController().getScanSpeed());
 		runner.start();
 	}
 
