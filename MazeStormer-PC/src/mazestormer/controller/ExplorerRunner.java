@@ -1,9 +1,10 @@
 package mazestormer.controller;
 
-import java.util.ArrayDeque;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,7 +34,7 @@ import com.google.common.primitives.Floats;
 
 public class ExplorerRunner extends PathRunner implements NavigationListener {
 
-	private Deque<Tile> queue = new ArrayDeque<Tile>();
+	private LinkedList<Tile> queue = new LinkedList<Tile>();
 	private Tile currentTile;
 	private Tile nextTile;
 
@@ -128,7 +129,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		while (!enableNavigator.compareAndSet(true, false))
 			Thread.yield();
 	}
-	
+
 	public void setScanSpeed(double scanSpeed) {
 		barcodeRunner.setScanSpeed(scanSpeed);
 	}
@@ -178,7 +179,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		// Queue starts with path only containing the root
 		Tile startTile = getCurrentTile();
 		queue.clear();
-		queue.addLast(startTile);
+		queue.addFirst(startTile);
 	}
 
 	private void cycle() {
@@ -189,7 +190,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 		// Remove the first path from the queue
 		// This is the current tile of the robot
-		currentTile = queue.pollLast();
+		currentTile = queue.pollFirst();
 
 		// Scan and update current tile
 		setState(State.SCAN);
@@ -209,8 +210,13 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			return;
 		}
 
+		// Sort queue if exploring
+		if (!isExplored()) {
+			Collections.sort(queue, new ClosestTileComparator(currentTile));
+		}
+
 		// Go to next tile
-		nextTile = queue.peekLast();
+		nextTile = queue.peekFirst();
 		goTo(nextTile);
 	}
 
@@ -232,15 +238,15 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		// Add goal
 		Tile goal = maze.getTarget(Target.GOAL);
 		if (goal != null) {
-			queue.addLast(goal);
+			queue.addFirst(goal);
 		}
 		// Add checkpoint before goal
 		Tile checkPoint = maze.getTarget(Target.CHECKPOINT);
 		if (checkPoint != null) {
-			queue.addLast(checkPoint);
+			queue.addFirst(checkPoint);
 		}
 		// Add current tile
-		queue.addLast(getCurrentTile());
+		queue.addFirst(getCurrentTile());
 		// Start traveling
 		cycle();
 	}
@@ -346,14 +352,12 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
-		RangeFeature feature = robot.getRangeDetector().scan(
-				getScanAngles(tile));
+		RangeFeature feature = robot.getRangeDetector().scan(getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
-				orientation = angleToOrientation(reading.getAngle()
-						+ maze.toRelative(getPose().getHeading()));
+				orientation = angleToOrientation(reading.getAngle() + maze.toRelative(getPose().getHeading()));
 				maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
@@ -373,7 +377,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			// Reject the new paths with loops
 			if (!neighborTile.isExplored() && !queue.contains(neighborTile)) {
 				// Add the new paths to front of queue
-				queue.addLast(neighborTile);
+				queue.addFirst(neighborTile);
 			}
 		}
 	}
@@ -564,6 +568,30 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 				}
 			});
 		}
+	}
+
+	/**
+	 * Compares tiles based on their Manhattan distance to a given reference tile.
+	 */
+	public static class ClosestTileComparator implements Comparator<Tile> {
+
+		private final Point2D referencePosition;
+
+		public ClosestTileComparator(Tile referenceTile) {
+			this.referencePosition = referenceTile.getPosition();
+		}
+
+		@Override
+		public int compare(Tile left, Tile right) {
+			double leftDistance = manhattanDistance(referencePosition, left.getPosition());
+			double rightDistance = manhattanDistance(referencePosition, right.getPosition());
+			return Double.compare(leftDistance, rightDistance);
+		}
+
+		public static double manhattanDistance(Point2D left, Point2D right) {
+			return Math.abs(left.getX() - right.getX()) + Math.abs(left.getY() - right.getY());
+		}
+
 	}
 
 }
