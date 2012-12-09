@@ -49,8 +49,7 @@ public class MainController implements IMainController {
 		});
 	}
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("MainController-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MainController-%d").build();
 	/*
 	 * Events
 	 */
@@ -208,7 +207,7 @@ public class MainController implements IMainController {
 		}
 		return explorerControl;
 	}
-	
+
 	@Override
 	public ICheatController cheatControl() {
 		if (cheatControl == null) {
@@ -334,13 +333,13 @@ public class MainController implements IMainController {
 
 		@Override
 		public void moveStarted(Move event, MoveProvider mp) {
-			getLogger().info("Move started: " + event.toString());
+			getLogger().fine("Move started: " + event.toString());
 			postEvent(new MoveEvent(MoveEvent.EventType.STARTED, event));
 		}
 
 		@Override
 		public void moveStopped(Move event, MoveProvider mp) {
-			getLogger().info("Move stopped: " + event.toString());
+			getLogger().fine("Move stopped: " + event.toString());
 			postEvent(new MoveEvent(MoveEvent.EventType.STOPPED, event));
 		}
 
@@ -355,14 +354,12 @@ public class MainController implements IMainController {
 		 */
 		if (e.isConnected() && getRobot() instanceof VirtualRobot) {
 			VirtualRobot vRobot = (VirtualRobot) getRobot();
-			vRobot.getCollisionObserver().addCollisionListener(
-					new CollisionListener() {
-						@Override
-						public void brutalCrashOccured() {
-							getLogger().severe(
-									"A collision occured, please retreat.");
-						}
-					});
+			vRobot.getCollisionObserver().addCollisionListener(new CollisionListener() {
+				@Override
+				public void brutalCrashOccured() {
+					getLogger().severe("A collision occured, please retreat.");
+				}
+			});
 		}
 	}
 
