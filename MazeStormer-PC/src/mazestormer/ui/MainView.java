@@ -1,6 +1,7 @@
 package mazestormer.ui;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.beans.Beans;
 
 import javax.swing.JFrame;
@@ -36,6 +37,7 @@ public class MainView extends JFrame implements EventSource {
 
 	public MainView(IMainController controller) {
 		setTitle("MazeStormer");
+		setIconImage(Toolkit.getDefaultToolkit().getImage(MainView.class.getResource("/res/images/MazeIcon.jpg")));
 
 		this.controller = controller;
 
