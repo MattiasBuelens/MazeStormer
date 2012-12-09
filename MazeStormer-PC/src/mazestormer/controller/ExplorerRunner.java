@@ -57,20 +57,24 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 * Flag indicating if the explorer should respond to incoming navigator
 	 * events. The barcode runner needs to disable events while it is running.
 	 */
-	private AtomicBoolean enableNavigator = new AtomicBoolean(true);
-
+	private AtomicBoolean navigatorEnabled = new AtomicBoolean(true);
+	/**
+	 * Flag indicating if the explorer should periodically adjust
+	 * the robot's position by running the line finder.
+	 */
+	private AtomicBoolean lineAdjustEnabled = new AtomicBoolean(true);
 	/**
 	 * The amount of tiles between two line finder adjustment runs.
 	 */
-	private static final int findLineInterval = 10;
+	private int lineAdjustInterval = 10;
 	/**
 	 * Tile counter for line finder adjustment.
 	 */
-	private int findLineCounter = 1;
+	private int lineAdjustCounter = 1;
 	/**
 	 * Flag indicating if the line finder should be run.
 	 */
-	private boolean shouldFindLine = false;
+	private boolean shouldLineAdjust = false;
 
 	public ExplorerRunner(Robot robot, Maze maze) {
 		super(robot, maze);
@@ -117,17 +121,33 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private boolean isNavigatorEnabled() {
-		return enableNavigator.get();
+		return navigatorEnabled.get();
 	}
 
 	private void enableNavigator() {
-		while (!enableNavigator.compareAndSet(false, true))
+		while (!navigatorEnabled.compareAndSet(false, true))
 			Thread.yield();
 	}
 
 	private void disableNavigator() {
-		while (!enableNavigator.compareAndSet(true, false))
+		while (!navigatorEnabled.compareAndSet(true, false))
 			Thread.yield();
+	}
+
+	public boolean isLineAdjustEnabled() {
+		return lineAdjustEnabled.get();
+	}
+
+	public void setLineAdjustEnabled(boolean isEnabled) {
+		lineAdjustEnabled.set(isEnabled);
+	}
+
+	public int getLineAdjustInterval() {
+		return lineAdjustInterval;
+	}
+
+	public void setLineAdjustInterval(int interval) {
+		this.lineAdjustInterval = interval;
 	}
 
 	public void setScanSpeed(double scanSpeed) {
@@ -268,8 +288,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	private void beforeTravel() {
 		// Start line finder if needed
-		if (shouldFindLine) {
-			shouldFindLine = false;
+		if (shouldLineAdjust && isLineAdjustEnabled()) {
+			shouldLineAdjust = false;
 			lineFinder.start();
 		} else {
 			afterLineFinder();
@@ -407,10 +427,10 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 */
 	private void incrementFindLineCounter() {
 		// Increment counter for line finder
-		findLineCounter++;
-		if (findLineCounter == findLineInterval) {
-			shouldFindLine = true;
-			findLineCounter = 0;
+		lineAdjustCounter++;
+		if (lineAdjustCounter >= getLineAdjustInterval()) {
+			shouldLineAdjust = true;
+			lineAdjustCounter = 0;
 		}
 	}
 

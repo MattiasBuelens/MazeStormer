@@ -10,6 +10,14 @@ public class ExplorerController extends SubController implements IExplorerContro
 
 	public ExplorerController(MainController mainController) {
 		super(mainController);
+
+		runner = new ExplorerRunner(getRobot(), getMaze()) {
+			@Override
+			protected void log(String message) {
+				ExplorerController.this.log(message);
+			}
+		};
+		runner.addListener(new ExplorerListener());
 	}
 
 	@Override
@@ -45,23 +53,33 @@ public class ExplorerController extends SubController implements IExplorerContro
 
 	@Override
 	public void startExploring() {
-		runner = new ExplorerRunner(getRobot(), getMaze()) {
-			@Override
-			protected void log(String message) {
-				ExplorerController.this.log(message);
-			}
-		};
-		runner.addListener(new ExplorerListener());
 		runner.setScanSpeed(getBarcodeController().getScanSpeed());
 		runner.start();
 	}
 
 	@Override
 	public void stopExploring() {
-		if (runner != null) {
-			runner.shutdown();
-			runner = null;
-		}
+		runner.shutdown();
+	}
+
+	@Override
+	public boolean isLineAdjustEnabled() {
+		return runner.isLineAdjustEnabled();
+	}
+
+	@Override
+	public void setLineAdjustEnabled(boolean isEnabled) {
+		runner.setLineAdjustEnabled(isEnabled);
+	}
+
+	@Override
+	public int getLineAdjustInterval() {
+		return runner.getLineAdjustInterval();
+	}
+
+	@Override
+	public void setLineAdjustInterval(int interval) {
+		runner.setLineAdjustInterval(interval);
 	}
 
 	private class ExplorerListener implements RunnerListener {
