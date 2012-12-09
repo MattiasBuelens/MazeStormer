@@ -17,6 +17,7 @@ import lejos.robotics.pathfinding.Path;
 import lejos.util.Delay;
 import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.BarcodeRunnerListener;
+import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Maze.Target;
@@ -267,7 +268,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		}
 		// Add current tile
 		queue.addFirst(getCurrentTile());
-		// Start traveling
+		// Start traveling at high speed
+		setTravelSpeed(BarcodeSpeed.HIGH.getBarcodeSpeedValue());
 		cycle();
 	}
 
