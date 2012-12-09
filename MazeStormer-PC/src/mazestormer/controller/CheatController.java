@@ -17,6 +17,7 @@ public class CheatController extends SubController implements ICheatController {
 		Point tilePosition = (new LongPoint(goalX, goalY)).toPoint().add(new Point(0.5f, 0.5f));
 		Point absolutePosition = getMaze().toAbsolute(getMaze().fromTile(tilePosition));
 		getRobot().getPoseProvider().setPose(new Pose(absolutePosition.x, absolutePosition.y, 90f));
+		getRobot().getPilot().travel(0d);
 	}
 	
 	private Robot getRobot() {
