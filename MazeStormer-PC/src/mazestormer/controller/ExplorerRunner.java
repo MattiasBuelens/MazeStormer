@@ -169,6 +169,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	private void init() {
 		// Reset state
+		maze.clear();
 		setExplored(false);
 		setState(State.NEXT);
 		if (!isNavigatorEnabled())
