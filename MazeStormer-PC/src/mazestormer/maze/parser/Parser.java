@@ -66,7 +66,7 @@ public class Parser {
 					maze.setEdge(position, orientation, EdgeType.OPEN);
 				}
 				// Set barcode
-				if (token.getType().supportsBarcode()) {
+				if (token.getType().supportsBarcode() && token.getBarcode() != 0) {
 					maze.setBarcode(position, token.getBarcode());
 				}
 			}
