@@ -1,6 +1,5 @@
 package mazestormer.ui;
 
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.beans.Beans;
 
@@ -14,8 +13,10 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
+import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.SystemLogOutIcon;
 
+import mazestormer.controller.ConfigurationEvent;
 import mazestormer.controller.ICheatController;
 import net.miginfocom.swing.MigLayout;
 
@@ -50,6 +51,13 @@ public class TeleportParameterPanel extends ViewPanel {
 	
 	private void registerController() {
 		registerEventBus(this.controller.getEventBus());
+	}
+	
+	@Subscribe
+	public void onNewMazeLoadEvent(ConfigurationEvent e) {
+		if (e.getEventType() == ConfigurationEvent.EventType.NEW_MAZE_LOADED) {
+			update();
+		}
 	}
 	
 	private void createTeleportButton() {
@@ -102,7 +110,6 @@ public class TeleportParameterPanel extends ViewPanel {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			update();
 			teleportAction();
 		}
 	}

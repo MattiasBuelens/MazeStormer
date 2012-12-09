@@ -94,6 +94,10 @@ public class ConfigurationController extends SubController implements
 			postEvent(new StopEvent());
 		}
 	}
+	
+	private void postState(ConfigurationEvent.EventType eventType) {
+		postEvent(new ConfigurationEvent(eventType));
+	}
 
 	@Override
 	public void loadMaze(String mazeFilePath) {
@@ -104,6 +108,7 @@ public class ConfigurationController extends SubController implements
 			maze.clear();
 			new Parser(maze).parse(contents);
 			log("Source maze successfully loaded.");
+			postState(ConfigurationEvent.EventType.NEW_MAZE_LOADED);
 		} catch (IOException e) {
 			warning("Failed to load source maze: " + e.getMessage());
 		} catch (ParseException e) {
