@@ -274,6 +274,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void goTo(Tile goal) {
+		throwWhenCancelled();
 		log("Go to " + goal.getPosition());
 
 		// Create path
@@ -289,6 +290,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void beforeTravel() {
+		throwWhenCancelled();
 		// Start line finder if needed
 		if (shouldLineAdjust && isLineAdjustEnabled()) {
 			shouldLineAdjust = false;
@@ -299,6 +301,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void travel() {
+		throwWhenCancelled();
 		// Update state
 		setState(State.TRAVEL);
 		// Follow path until way point is reached
@@ -306,11 +309,13 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void afterTravel() {
+		throwWhenCancelled();
 		// Next step
 		next();
 	}
 
 	private void next() {
+		throwWhenCancelled();
 		// Update state
 		setState(State.NEXT);
 		// Cycle again
@@ -318,11 +323,13 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void beforeLineFinder() {
+		throwWhenCancelled();
 		// Update state
 		setState(State.LINE);
 	}
 
 	private void afterLineFinder() {
+		throwWhenCancelled();
 		// Cancel line finder if still running
 		lineFinder.cancel();
 		// Start barcode runner
@@ -342,6 +349,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void afterBarcode(byte barcode) {
+		throwWhenCancelled();
 		log("Barcode read, placing on: " + nextTile.getPosition());
 		// Set barcode on tile
 		setBarcodeTile(nextTile, barcode);
