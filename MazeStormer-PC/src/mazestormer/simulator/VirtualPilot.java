@@ -447,7 +447,7 @@ public class VirtualPilot implements Pilot {
 		if (moveEndHandle != null) {
 			moveEndHandle.cancel(true);
 		}
-		executor.shutdownNow();
+		// executor.shutdownNow();
 	}
 
 	private class MoveEndRunner implements Runnable {
