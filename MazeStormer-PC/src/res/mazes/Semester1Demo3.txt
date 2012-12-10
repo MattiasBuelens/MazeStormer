@@ -1,0 +1,11 @@
+8 8
+
+# 2012-13 - Semester 1 - Demo 3 - Doolhof voor Simulator
+DeadEnd.W	T.N		Straight.E.55	T.N		Straight.W.23	T.N		Straight.E.00	Corner.E
+Corner.N	T.E		DeadEnd.W	Cross		Straight.E.05	Corner.S	Corner.N	T.E
+Straight.N.09	T.W		Corner.E	DeadEnd.S	DeadEnd.N	DeadEnd.W	T.E		Straight.S.11
+T.W		Corner.S	Corner.W	Corner.E	T.W		Corner.E	T.W		T.E
+Straight.S.37	Corner.N	Corner.E	Corner.W	T.E		Corner.W	Corner.S	Straight.N.47
+Straight.S.15	T.W		Cross		Corner.E	Corner.W	T.N		Straight.W.13	T.E
+Straight.N.25	Straight.N.37	T.W		Cross		DeadEnd.E	Straight.N.09	DeadEnd.W	T.E
+Corner.W	Corner.S	DeadEnd.S	Corner.W	Straight.W.22	T.S		Straight.E.19	Corner.S
