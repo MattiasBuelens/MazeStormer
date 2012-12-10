@@ -4,20 +4,15 @@ import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 import mazestormer.robot.RunnerListener;
 
-public class ExplorerController extends SubController implements IExplorerController {
+public class ExplorerController extends SubController implements
+		IExplorerController {
 
 	private ExplorerRunner runner;
+	private boolean isLineAdjustEnabled = true;
+	private int lineAdjustInterval = 10;
 
 	public ExplorerController(MainController mainController) {
 		super(mainController);
-
-		runner = new ExplorerRunner(getRobot(), getMaze()) {
-			@Override
-			protected void log(String message) {
-				ExplorerController.this.log(message);
-			}
-		};
-		runner.addListener(new ExplorerListener());
 	}
 
 	@Override
@@ -53,33 +48,53 @@ public class ExplorerController extends SubController implements IExplorerContro
 
 	@Override
 	public void startExploring() {
+		runner = new ExplorerRunner(getRobot(), getMaze()) {
+			@Override
+			protected void log(String message) {
+				ExplorerController.this.log(message);
+			}
+		};
+		// Set parameters
+		runner.setLineAdjustEnabled(isLineAdjustEnabled());
+		runner.setLineAdjustInterval(getLineAdjustInterval());
 		runner.setScanSpeed(getBarcodeController().getScanSpeed());
+		// Start
+		runner.addListener(new ExplorerListener());
 		runner.start();
 	}
 
 	@Override
 	public void stopExploring() {
-		runner.shutdown();
+		if (runner != null) {
+			runner.shutdown();
+			runner = null;
+		}
 	}
 
 	@Override
 	public boolean isLineAdjustEnabled() {
-		return runner.isLineAdjustEnabled();
+		return isLineAdjustEnabled;
 	}
 
 	@Override
 	public void setLineAdjustEnabled(boolean isEnabled) {
-		runner.setLineAdjustEnabled(isEnabled);
+		isLineAdjustEnabled = isEnabled;
+		if (runner != null) {
+			runner.setLineAdjustEnabled(isEnabled);
+		}
 	}
 
 	@Override
 	public int getLineAdjustInterval() {
-		return runner.getLineAdjustInterval();
+		return lineAdjustInterval;
 	}
 
 	@Override
 	public void setLineAdjustInterval(int interval) {
-		runner.setLineAdjustInterval(interval);
+		lineAdjustInterval = interval;
+		if (runner != null) {
+			runner.setLineAdjustInterval(interval);
+		}
 	}
 
 	private class ExplorerListener implements RunnerListener {

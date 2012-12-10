@@ -58,7 +58,7 @@ public class ExplorerControlPanel extends ViewPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		container = new JPanel();
-		container.setLayout(new MigLayout("", "[grow 75][grow][fill]", "[][][][][][]"));
+		container.setLayout(new MigLayout("", "[grow 75][grow]", "[][][][][][]"));
 		add(container);
 
 		createStartStopButtons();
@@ -98,23 +98,26 @@ public class ExplorerControlPanel extends ViewPanel {
 	}
 
 	private void createLineAdjust() {
+		JPanel lineAdjust = new JPanel();
+		lineAdjust.setLayout(new MigLayout("", "[][grow 60][grow]", "[]"));
+		
 		final JSpinner spinLineAdjust = new JSpinner();
-		lineAdjustIntervalModel = new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1));
+		this.lineAdjustIntervalModel = new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1));
 		spinLineAdjust.setModel(lineAdjustIntervalModel);
-		container.add(spinLineAdjust, "cell 1 1,growx");
+		lineAdjust.add(spinLineAdjust, "cell 1 0,growx");
 
 		final JLabel lblLineAdjustUnit = new JLabel("tiles");
-		container.add(lblLineAdjustUnit, "cell 2 1");
-		lineAdjustIntervalModel.addChangeListener(new ChangeListener() {
+		lineAdjust.add(lblLineAdjustUnit, "cell 2 0,alignx left");
+		this.lineAdjustIntervalModel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				controller.setLineAdjustInterval((int) lineAdjustIntervalModel.getValue());
 			}
 		});
 
-		checkLineAdjust = new JCheckBox("Adjust robot position every");
-		container.add(checkLineAdjust, "cell 0 1");
-		checkLineAdjust.addItemListener(new ItemListener() {
+		this.checkLineAdjust = new JCheckBox("Adjust robot position every");
+		lineAdjust.add(checkLineAdjust, "cell 0 0");
+		this.checkLineAdjust.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				boolean isEnabled = (e.getStateChange() == ItemEvent.SELECTED);
@@ -122,22 +125,24 @@ public class ExplorerControlPanel extends ViewPanel {
 				spinLineAdjust.setEnabled(isEnabled);
 			}
 		});
+		
+		this.container.add(lineAdjust, "cell 0 1 2 1,growx");
 	}
 
 	private void createParametersPanel() {
-		this.container.add(this.parametersPanel, "cell 0 2 3 1,growx");
+		this.container.add(this.parametersPanel, "cell 0 2 1 1,growx");
 	}
 
 	private void createBarcodeScanParameterPanel() {
-		this.container.add(this.barcodeScanParameterPanel, "cell 0 3 3 1,growx");
+		this.container.add(this.barcodeScanParameterPanel, "cell 1 2 1 1,growx");
 	}
 
 	private void createBarcodeActionParameterPanel() {
-		this.container.add(this.barcodeActionParameterPanel, "cell 0 4 3 1,growx");
+		this.container.add(this.barcodeActionParameterPanel, "cell 1 3 1 1,growx");
 	}
 
 	private void createTeleportParameterPanel() {
-		this.container.add(this.teleportParameterPanel, "cell 0 5 3 1,growx");
+		this.container.add(this.teleportParameterPanel, "cell 0 3 1 1,growx");
 	}
 
 	public void startExploring() {

@@ -69,7 +69,7 @@ public class TeleportParameterPanel extends ViewPanel {
 	}
 	
 	private void createTeleportSpinners() {
-		JLabel lblGoal = new JLabel("Teleport to tile coordinates (X,Y)");
+		JLabel lblGoal = new JLabel("Teleport to tile (X,Y)");
 		this.container.add(lblGoal, "cell 0 0,alignx left,aligny baseline");
 
 		JSpinner xSpinner = new JSpinner();

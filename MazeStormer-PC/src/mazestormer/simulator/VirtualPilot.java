@@ -444,8 +444,9 @@ public class VirtualPilot implements Pilot {
 	@Override
 	public void terminate() {
 		stop();
-		if (moveEndHandle != null)
-			moveEndHandle.cancel(false);
+		if (moveEndHandle != null) {
+			moveEndHandle.cancel(true);
+		}
 		executor.shutdownNow();
 	}
 
