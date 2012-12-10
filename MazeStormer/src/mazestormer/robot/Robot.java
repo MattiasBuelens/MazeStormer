@@ -20,7 +20,7 @@ public interface Robot extends ConditionalCommandBuilder {
 	/**
 	 * Distance between center of wheels, in centimeters.
 	 */
-	public final static float trackWidth = 14.45f;// 14.3f;
+	public final static float trackWidth = 14.25f;// 14.3f;
 
 	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.
