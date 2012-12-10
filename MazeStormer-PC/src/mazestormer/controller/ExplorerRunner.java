@@ -60,8 +60,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 */
 	private AtomicBoolean navigatorEnabled = new AtomicBoolean(true);
 	/**
-	 * Flag indicating if the explorer should periodically adjust
-	 * the robot's position by running the line finder.
+	 * Flag indicating if the explorer should periodically adjust the robot's
+	 * position by running the line finder.
 	 */
 	private AtomicBoolean lineAdjustEnabled = new AtomicBoolean(true);
 	/**
@@ -98,7 +98,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			}
 		};
 		barcodeRunner.addBarcodeListener(new BarcodeListener());
-		barcodeRunner.setPerformAction(true);
+		// Barcode actions are manually executed
+		barcodeRunner.setPerformAction(false);
 	}
 
 	protected void log(String message) {
@@ -353,6 +354,10 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		log("Barcode read, placing on: " + nextTile.getPosition());
 		// Set barcode on tile
 		setBarcodeTile(nextTile, barcode);
+		// Execute barcode action
+		executeBarcodeAction();
+		// Travel off barcode
+		travel(maze.getTileSize() / 4);
 		// Resume listening to navigator
 		enableNavigator();
 		// Next step
@@ -382,12 +387,14 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
-		RangeFeature feature = robot.getRangeDetector().scan(getScanAngles(tile));
+		RangeFeature feature = robot.getRangeDetector().scan(
+				getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
-				orientation = angleToOrientation(reading.getAngle() + maze.toRelative(getPose().getHeading()));
+				orientation = angleToOrientation(reading.getAngle()
+						+ maze.toRelative(getPose().getHeading()));
 				maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
@@ -398,8 +405,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	/**
-	 * Add tiles to the queue if the edge in its direction is open and it is
-	 * not explored yet.
+	 * Add tiles to the queue if the edge in its direction is open and it is not
+	 * explored yet.
 	 */
 	private void selectTiles(Tile tile) {
 		for (Orientation direction : tile.getOpenSides()) {
@@ -601,7 +608,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	/**
-	 * Compares tiles based on their Manhattan distance to a given reference tile.
+	 * Compares tiles based on their Manhattan distance to a given reference
+	 * tile.
 	 */
 	public static class ClosestTileComparator implements Comparator<Tile> {
 
@@ -613,13 +621,16 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 		@Override
 		public int compare(Tile left, Tile right) {
-			double leftDistance = manhattanDistance(referencePosition, left.getPosition());
-			double rightDistance = manhattanDistance(referencePosition, right.getPosition());
+			double leftDistance = manhattanDistance(referencePosition,
+					left.getPosition());
+			double rightDistance = manhattanDistance(referencePosition,
+					right.getPosition());
 			return Double.compare(leftDistance, rightDistance);
 		}
 
 		public static double manhattanDistance(Point2D left, Point2D right) {
-			return Math.abs(left.getX() - right.getX()) + Math.abs(left.getY() - right.getY());
+			return Math.abs(left.getX() - right.getX())
+					+ Math.abs(left.getY() - right.getY());
 		}
 
 	}
