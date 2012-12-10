@@ -510,7 +510,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	private void pathComplete() {
 		// Dirty fix for synchronization with barcode
-		Delay.msDelay(50);
+		Delay.msDelay(200);
 
 		if (!isNavigatorEnabled())
 			return;
