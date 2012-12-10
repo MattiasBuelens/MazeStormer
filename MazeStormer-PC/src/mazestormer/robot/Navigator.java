@@ -22,6 +22,10 @@ public class Navigator extends Runner implements WaypointListener {
 	private Waypoint destination;
 	private int sequenceNr;
 
+	private boolean checkPose = false;
+	private static final double maxDistanceError = 1;
+	private static final double maxHeadingError = 5;
+
 	private ArrayList<NavigationListener> listeners = new ArrayList<NavigationListener>();
 
 	/**
@@ -171,6 +175,14 @@ public class Navigator extends Runner implements WaypointListener {
 	 */
 	public void singleStep(boolean singleStep) {
 		this.singleStep = singleStep;
+	}
+
+	public boolean checksPose() {
+		return checkPose;
+	}
+
+	public void setCheckPose(boolean checkPose) {
+		this.checkPose = checkPose;
 	}
 
 	/**
@@ -340,7 +352,6 @@ public class Navigator extends Runner implements WaypointListener {
 	}
 
 	private void step() throws CancellationException {
-		throwWhenCancelled();
 		switch (nextState) {
 		case NEXT_STEP:
 		default:
@@ -370,11 +381,13 @@ public class Navigator extends Runner implements WaypointListener {
 	}
 
 	private void nextStep() {
+		throwWhenCancelled();
 		destination = getWaypoint();
 		nextState = State.ROTATE;
 	}
 
 	private void rotateStart() {
+		throwWhenCancelled();
 		// Rotate towards destination
 		pose = poseProvider.getPose();
 		float destinationBearing = pose.relativeBearing(destination);
@@ -384,6 +397,7 @@ public class Navigator extends Runner implements WaypointListener {
 	}
 
 	private void travel() {
+		throwWhenCancelled();
 		// Travel towards destination
 		pose = poseProvider.getPose();
 		float distance = pose.distanceTo(destination);
@@ -393,6 +407,7 @@ public class Navigator extends Runner implements WaypointListener {
 	}
 
 	private void rotateDestination() {
+		throwWhenCancelled();
 		// Apply destination heading
 		if (destination.isHeadingRequired()) {
 			pose = poseProvider.getPose();
@@ -402,8 +417,15 @@ public class Navigator extends Runner implements WaypointListener {
 	}
 
 	private void endStep() {
+		throwWhenCancelled();
 		pose = poseProvider.getPose();
 		nextState = State.NEXT_STEP;
+
+		// Confirm final pose
+		if (checksPose() && !validPose()) {
+			cancel();
+			return;
+		}
 
 		if (isRunning() && !pathCompleted()) {
 			// Presumably at way point
@@ -416,6 +438,21 @@ public class Navigator extends Runner implements WaypointListener {
 		if (pathCompleted() || singleStep) {
 			resolve();
 		}
+	}
+
+	private boolean validPose() {
+		double distanceError = destination.distance(pose.getLocation());
+		if (distanceError > maxDistanceError) {
+			return false;
+		}
+		if (destination.isHeadingRequired()) {
+			double headingError = Math.abs(destination.getHeading()
+					- pose.getHeading());
+			if (headingError > maxHeadingError) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void waitComplete() {

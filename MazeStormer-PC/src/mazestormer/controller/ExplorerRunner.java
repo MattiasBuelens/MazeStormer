@@ -127,13 +127,11 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void enableNavigator() {
-		while (!navigatorEnabled.compareAndSet(false, true))
-			Thread.yield();
+		navigatorEnabled.set(true);
 	}
 
 	private void disableNavigator() {
-		while (!navigatorEnabled.compareAndSet(true, false))
-			Thread.yield();
+		navigatorEnabled.set(false);
 	}
 
 	public boolean isLineAdjustEnabled() {
@@ -342,6 +340,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	private void beforeBarcode() {
 		// Stop listening to navigator
 		disableNavigator();
+		// navigator.stop();
 		// Update state
 		setState(State.BARCODE);
 		log("Barcode found, pausing navigation");
