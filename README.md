@@ -1,7 +1,7 @@
 MazeStormer
 ===========
 
-A robot that storms through mazes, powered by LEGO NXT.
+A robot that storms through mazes and steals all the treasures, powered by LEGO NXT.
 
 This project is part of the course *Problem solving and Design: Computer Sciences* from the Computer Sciences department at KU Leuven.
 
