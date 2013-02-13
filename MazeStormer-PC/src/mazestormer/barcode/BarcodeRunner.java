@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
@@ -14,6 +13,7 @@ import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 import mazestormer.robot.Runner;
 import mazestormer.robot.RunnerTask;
+import mazestormer.util.Future;
 
 import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
@@ -31,7 +31,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	private double scanSpeed = 2; // cm/sec
 	private double originalTravelSpeed;
 
-	private CommandHandle handle;
+	private Future<Void> handle;
 	private double startOffset;
 	private Pose oldPose;
 	private Pose newPose;

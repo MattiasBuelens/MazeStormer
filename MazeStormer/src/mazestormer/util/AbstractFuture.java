@@ -35,6 +35,11 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	@Override
+	public synchronized boolean cancel() {
+		return cancel(true);
+	}
+
+	@Override
 	public synchronized boolean cancel(boolean mayInterruptIfRunning) {
 		if (!isCancelled()) {
 			isCancelled = true;
@@ -65,7 +70,8 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	@Override
-	public V get(long timeout, TimeUnit unit) throws CancellationException, TimeoutException {
+	public V get(long timeout, TimeUnit unit) throws CancellationException,
+			TimeoutException {
 		// Start timeout timer
 		TimeoutTask timeoutTask = new TimeoutTask();
 		Timer timer = new Timer();

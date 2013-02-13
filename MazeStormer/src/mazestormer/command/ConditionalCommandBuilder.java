@@ -1,20 +1,15 @@
 package mazestormer.command;
 
 import mazestormer.condition.Condition;
+import mazestormer.util.Future;
 
 public interface ConditionalCommandBuilder {
 
 	public CommandBuilder when(Condition condition);
 
-	public interface CommandHandle {
-
-		public void cancel();
-
-	}
-
 	public interface CommandBuilder {
 
-		public CommandHandle build();
+		public Future<Void> build();
 
 		public CommandBuilder run(Runnable action);
 

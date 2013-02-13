@@ -70,7 +70,6 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 
 	private void onTravelCommand(TravelCommand command) {
 		travel(command.getDistance(), true);
-
 	}
 
 	private void onRotateCommand(RotateCommand command) {

@@ -6,15 +6,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import mazestormer.command.ConditionalCommandBuilder;
 import mazestormer.command.ConditionalCommandBuilder.CommandBuilder;
-import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.ConditionFuture;
 import mazestormer.robot.Robot;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class VirtualCommandBuilder implements
 		ConditionalCommandBuilder.CommandBuilder {
@@ -25,7 +24,7 @@ public class VirtualCommandBuilder implements
 	private final List<Runnable> actions = new ArrayList<Runnable>();
 
 	private final ExecutorService executor = Executors
-			.newCachedThreadPool(factory);;
+			.newCachedThreadPool(factory);
 	private final Runner actionRunner = new Runner();
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder()
@@ -37,9 +36,9 @@ public class VirtualCommandBuilder implements
 	}
 
 	@Override
-	public CommandHandle build() {
+	public Future<Void> build() {
 		future.addFutureListener(new Listener(future));
-		return new Handle(future);
+		return future;
 	}
 
 	protected void trigger() {
@@ -139,21 +138,6 @@ public class VirtualCommandBuilder implements
 			for (Runnable action : actions) {
 				action.run();
 			}
-		}
-
-	}
-
-	private class Handle implements CommandHandle {
-
-		private final Future<?> future;
-
-		public Handle(Future<?> future) {
-			this.future = future;
-		}
-
-		@Override
-		public void cancel() {
-			future.cancel(true);
 		}
 
 	}

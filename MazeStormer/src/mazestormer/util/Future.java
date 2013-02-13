@@ -2,6 +2,8 @@ package mazestormer.util;
 
 public interface Future<V> extends java.util.concurrent.Future<V> {
 
+	boolean cancel();
+
 	/**
 	 * Adds a future listener.
 	 * 

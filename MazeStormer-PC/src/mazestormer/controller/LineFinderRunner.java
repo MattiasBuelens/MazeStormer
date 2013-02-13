@@ -2,7 +2,6 @@ package mazestormer.controller;
 
 import java.util.concurrent.CancellationException;
 
-import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
@@ -10,6 +9,7 @@ import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Robot;
 import mazestormer.robot.Runner;
 import mazestormer.robot.RunnerTask;
+import mazestormer.util.Future;
 
 class LineFinderRunner extends Runner {
 
@@ -27,7 +27,7 @@ class LineFinderRunner extends Runner {
 	private final Robot robot;
 	private double lineWidth;
 
-	private CommandHandle handle;
+	private Future<Void> handle;
 	private double originalTravelSpeed;
 	private double originalRotateSpeed;
 

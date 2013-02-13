@@ -6,19 +6,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import mazestormer.command.CommandType;
 import mazestormer.command.ConditionalCommand;
 import mazestormer.command.ConditionalCommandBuilder;
 import mazestormer.command.ConditionalCommandBuilder.CommandBuilder;
-import mazestormer.command.ConditionalCommandBuilder.CommandHandle;
 import mazestormer.command.RotateCommand;
 import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
 import mazestormer.condition.Condition;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class RemoteCommandBuilder extends ReportRequester<Void> implements
 		ConditionalCommandBuilder.CommandBuilder {
@@ -40,10 +39,10 @@ public class RemoteCommandBuilder extends ReportRequester<Void> implements
 	}
 
 	@Override
-	public CommandHandle build() {
+	public Future<Void> build() {
 		Future<Void> future = request(command);
 		future.addFutureListener(new Listener(future));
-		return new Handle(future);
+		return future;
 	}
 
 	protected void trigger() {
@@ -101,21 +100,6 @@ public class RemoteCommandBuilder extends ReportRequester<Void> implements
 			for (Runnable action : actions) {
 				action.run();
 			}
-		}
-
-	}
-
-	private class Handle implements CommandHandle {
-
-		private final Future<?> future;
-
-		public Handle(Future<?> future) {
-			this.future = future;
-		}
-
-		@Override
-		public void cancel() {
-			future.cancel(true);
 		}
 
 	}
