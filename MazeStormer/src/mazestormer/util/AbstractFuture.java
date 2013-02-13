@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class AbstractFuture<V> implements Future<V> {
 
 	private volatile boolean isCancelled = false;
 	private volatile boolean isResolved = false;
-	private V result;
+	private volatile V result;
 
 	private List<FutureListener<V>> listeners = new ArrayList<FutureListener<V>>();
 
@@ -62,11 +65,11 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	@Override
-	public V get(long timeout) throws CancellationException, TimeoutException {
+	public V get(long timeout, TimeUnit unit) throws CancellationException, TimeoutException {
 		// Start timeout timer
 		TimeoutTask timeoutTask = new TimeoutTask();
 		Timer timer = new Timer();
-		timer.schedule(timeoutTask, timeout);
+		timer.schedule(timeoutTask, unit.toMillis(timeout));
 
 		// Wait until done or time out
 		while (!isDone() && !timeoutTask.isTimeout()) {
@@ -111,7 +114,7 @@ public class AbstractFuture<V> implements Future<V> {
 
 	private class TimeoutTask extends TimerTask {
 
-		private boolean isTimeout = false;
+		private volatile boolean isTimeout = false;
 
 		public boolean isTimeout() {
 			return isTimeout;

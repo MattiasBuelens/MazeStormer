@@ -1,5 +1,8 @@
 package mazestormer.remote;
 
+
+import java.util.concurrent.TimeUnit;
+
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
@@ -34,7 +37,7 @@ public class RemoteRangeScanner extends RemoteComponent implements RangeScanner 
 	@Override
 	public RangeReadings getRangeValues() {
 		try {
-			return scanRequester.request(getAngles()).get(RemoteRobot.requestTimeout);
+			return scanRequester.request(getAngles()).get(RemoteRobot.requestTimeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

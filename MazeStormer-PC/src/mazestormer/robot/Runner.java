@@ -2,12 +2,12 @@ package mazestormer.robot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import mazestormer.util.AbstractFuture;
-import mazestormer.util.CancellationException;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 

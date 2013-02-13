@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lejos.robotics.RangeReading;
@@ -29,7 +30,6 @@ import mazestormer.robot.PathRunner;
 import mazestormer.robot.Robot;
 import mazestormer.robot.RunnerListener;
 import mazestormer.robot.RunnerTask;
-import mazestormer.util.CancellationException;
 
 import com.google.common.primitives.Floats;
 

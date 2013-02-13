@@ -1,6 +1,7 @@
 package mazestormer.remote;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import mazestormer.command.Command;
 import mazestormer.command.CommandType;
@@ -43,7 +44,7 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 	@Override
 	public int getNormalizedLightValue() {
 		try {
-			return lightValueRequester.request().get(RemoteRobot.requestTimeout);
+			return lightValueRequester.request().get(RemoteRobot.requestTimeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;

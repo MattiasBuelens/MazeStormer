@@ -1,6 +1,6 @@
 package mazestormer.robot;
 
-import mazestormer.util.CancellationException;
+import java.util.concurrent.CancellationException;
 
 public interface RunnerTask {
 	public void run() throws CancellationException;
