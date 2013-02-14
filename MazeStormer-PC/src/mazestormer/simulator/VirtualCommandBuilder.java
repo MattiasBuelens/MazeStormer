@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadFactory;
 import mazestormer.command.ConditionalCommandBuilder;
 import mazestormer.command.ConditionalCommandBuilder.CommandBuilder;
 import mazestormer.condition.ConditionFuture;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
@@ -18,7 +18,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class VirtualCommandBuilder implements
 		ConditionalCommandBuilder.CommandBuilder {
 
-	private final Robot robot;
+	private final ControllableRobot robot;
 	private final ConditionFuture future;
 	private final List<Runnable> commands = new ArrayList<Runnable>();
 	private final List<Runnable> actions = new ArrayList<Runnable>();
@@ -30,7 +30,7 @@ public class VirtualCommandBuilder implements
 	private static final ThreadFactory factory = new ThreadFactoryBuilder()
 			.setNameFormat("VirtualCommandBuilder-%d").build();
 
-	public VirtualCommandBuilder(Robot robot, ConditionFuture future) {
+	public VirtualCommandBuilder(ControllableRobot robot, ConditionFuture future) {
 		this.robot = robot;
 		this.future = future;
 	}

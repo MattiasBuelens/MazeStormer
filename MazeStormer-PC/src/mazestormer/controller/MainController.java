@@ -21,7 +21,7 @@ import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.robot.MoveEvent;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
@@ -317,7 +317,7 @@ public class MainController implements IMainController {
 	 * Robot
 	 */
 
-	public Robot getRobot() throws IllegalStateException {
+	public ControllableRobot getControllableRobot() throws IllegalStateException {
 		checkState(isConnected());
 		return connector.getRobot();
 	}
@@ -325,7 +325,7 @@ public class MainController implements IMainController {
 	@Subscribe
 	public void registerPilotMoveListener(ConnectEvent e) {
 		if (e.isConnected()) {
-			getRobot().getPilot().addMoveListener(new MovePublisher());
+			getControllableRobot().getPilot().addMoveListener(new MovePublisher());
 		}
 	}
 
@@ -352,8 +352,8 @@ public class MainController implements IMainController {
 		 * detector and observer on the Robot interface. PhysicalRobot should
 		 * provide a physical collision detector or a dummy implementation.
 		 */
-		if (e.isConnected() && getRobot() instanceof VirtualRobot) {
-			VirtualRobot vRobot = (VirtualRobot) getRobot();
+		if (e.isConnected() && getControllableRobot() instanceof VirtualRobot) {
+			VirtualRobot vRobot = (VirtualRobot) getControllableRobot();
 			vRobot.getCollisionObserver().addCollisionListener(new CollisionListener() {
 				@Override
 				public void brutalCrashOccured() {
@@ -374,7 +374,7 @@ public class MainController implements IMainController {
 
 	public Pose getPose() {
 		if (isConnected()) {
-			return getRobot().getPoseProvider().getPose();
+			return getControllableRobot().getPoseProvider().getPose();
 		} else {
 			return getStartPose();
 		}
@@ -383,7 +383,7 @@ public class MainController implements IMainController {
 	@Subscribe
 	public void setupStartPose(ConnectEvent e) {
 		if (e.isConnected()) {
-			getRobot().getPoseProvider().setPose(getStartPose());
+			getControllableRobot().getPoseProvider().setPose(getStartPose());
 		}
 	}
 

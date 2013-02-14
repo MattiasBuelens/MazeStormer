@@ -6,7 +6,7 @@ import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class LineFollower {
 
@@ -17,7 +17,7 @@ public class LineFollower {
 		context.setDeviceName("brons");
 		connector.connect(context);
 
-		Robot robot = connector.getRobot();
+		ControllableRobot robot = connector.getRobot();
 		CalibratedLightSensor light = robot.getLightSensor();
 		Pilot pilot = robot.getPilot();
 		light.setFloodlight(true);

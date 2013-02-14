@@ -16,7 +16,7 @@ public class PolygonControlController extends SubController implements
 	private PolygonRunner runner;
 
 	private Pilot getPilot() {
-		return getMainController().getRobot().getPilot();
+		return getMainController().getControllableRobot().getPilot();
 	}
 
 	@Override

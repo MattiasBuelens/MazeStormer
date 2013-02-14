@@ -8,13 +8,13 @@ import java.util.Map;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
 import mazestormer.condition.ConditionType;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class VirtualConditionResolvers {
 
 	private Map<ConditionType, VirtualConditionResolver<?, ?>> resolvers = new EnumMap<>(ConditionType.class);
 
-	public VirtualConditionResolvers(Robot robot) {
+	public VirtualConditionResolvers(ControllableRobot robot) {
 		// Light value comparing
 		LightCompareConditionResolver lightResolver = new LightCompareConditionResolver(robot);
 		resolvers.put(ConditionType.LIGHT_GREATER_THAN, lightResolver);

@@ -27,7 +27,7 @@ import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.PathRunner;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.RunnerListener;
 import mazestormer.robot.RunnerTask;
 
@@ -77,7 +77,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 */
 	private boolean shouldLineAdjust = false;
 
-	public ExplorerRunner(Robot robot, Maze maze) {
+	public ExplorerRunner(ControllableRobot robot, Maze maze) {
 		super(robot, maze);
 
 		// Navigator

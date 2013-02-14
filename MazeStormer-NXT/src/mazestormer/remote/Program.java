@@ -9,11 +9,11 @@ import lejos.nxt.NXT;
 import lejos.nxt.Sound;
 import lejos.nxt.comm.Bluetooth;
 import lejos.nxt.comm.NXTConnection;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class Program implements Runnable, ButtonListener {
 
-	private Robot robot;
+	private ControllableRobot robot;
 	private NXTCommunicator communicator;
 
 	private boolean isRunning = false;

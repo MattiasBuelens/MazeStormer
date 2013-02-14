@@ -6,7 +6,7 @@ import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Runner;
 import mazestormer.robot.RunnerTask;
 import mazestormer.util.Future;
@@ -24,19 +24,19 @@ class LineFinderRunner extends Runner {
 
 	private final static int threshold = 85;
 
-	private final Robot robot;
+	private final ControllableRobot robot;
 	private double lineWidth;
 
 	private Future<Void> handle;
 	private double originalTravelSpeed;
 	private double originalRotateSpeed;
 
-	public LineFinderRunner(Robot robot) {
+	public LineFinderRunner(ControllableRobot robot) {
 		super(robot.getPilot());
 		this.robot = robot;
 	}
 
-	protected Robot getRobot() {
+	protected ControllableRobot getRobot() {
 		return robot;
 	}
 
@@ -118,7 +118,7 @@ class LineFinderRunner extends Runner {
 		log("Off line, positioning robot on line edge.");
 
 		lineWidth = getPilot().getMovement().getDistanceTraveled();
-		double centerOffset = Robot.sensorOffset
+		double centerOffset = ControllableRobot.sensorOffset
 				- getLightSensor().getSensorRadius();
 		log("Line width: " + lineWidth);
 		log("Offset from center: " + centerOffset);
@@ -161,7 +161,7 @@ class LineFinderRunner extends Runner {
 		 * Therefore: alpha = 2*asin(sr/(2*so))
 		 */
 		double sensorAngle = 2 * Math.asin(getLightSensor().getSensorRadius()
-				/ (2 * Robot.sensorOffset));
+				/ (2 * ControllableRobot.sensorOffset));
 		log("Angle adjusting for sensor radius: " + sensorAngle);
 
 		// Position perpendicular to line

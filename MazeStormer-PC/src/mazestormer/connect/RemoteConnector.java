@@ -12,16 +12,16 @@ import mazestormer.command.CommandType;
 import mazestormer.command.ShutdownCommand;
 import mazestormer.remote.RemoteCommunicator;
 import mazestormer.remote.RemoteRobot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class RemoteConnector implements Connector {
 
 	private NXTConnector connector;
 	private RemoteCommunicator communicator;
-	private Robot robot;
+	private ControllableRobot robot;
 
 	@Override
-	public Robot getRobot() throws IllegalStateException {
+	public ControllableRobot getRobot() throws IllegalStateException {
 		checkState(isConnected());
 		return robot;
 	}

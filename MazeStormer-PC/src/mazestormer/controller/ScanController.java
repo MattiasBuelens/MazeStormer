@@ -15,7 +15,7 @@ public class ScanController extends SubController implements IScanController {
 	}
 
 	private RangeFeatureDetector getRangeDetector() {
-		return getMainController().getRobot().getRangeDetector();
+		return getMainController().getControllableRobot().getRangeDetector();
 	}
 
 	@Override
