@@ -8,7 +8,7 @@ import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class NXTLineFinder {
 
@@ -22,7 +22,7 @@ public class NXTLineFinder {
 		context.setDeviceName("brons");
 		connector.connect(context);
 
-		Robot robot = connector.getRobot();
+		ControllableRobot robot = connector.getRobot();
 		CalibratedLightSensor light = robot.getLightSensor();
 		Pilot pilot = robot.getPilot();
 		light.setFloodlight(true);
@@ -73,7 +73,7 @@ public class NXTLineFinder {
 				// Over white line
 				pilot.stop();
 				pilot.setTravelSpeed(fastSpeed);
-				pilot.travel(Robot.sensorOffset - 1.4,false);
+				pilot.travel(ControllableRobot.sensorOffset - 1.4,false);
 				
 				pilot.setRotateSpeed(fastRotateSpeed);
 				pilot.rotate(fastRotateAngle, false);

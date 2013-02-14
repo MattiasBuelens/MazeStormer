@@ -11,11 +11,11 @@ import mazestormer.maze.Tile;
 
 public abstract class PathRunner extends Runner {
 
-	protected final Robot robot;
+	protected final ControllableRobot robot;
 	protected final Maze maze;
 	protected final Navigator navigator;
 
-	public PathRunner(Robot robot, Maze maze) {
+	public PathRunner(ControllableRobot robot, Maze maze) {
 		super(robot.getPilot());
 		this.robot = robot;
 		this.maze = maze;

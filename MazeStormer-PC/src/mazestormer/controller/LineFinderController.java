@@ -2,7 +2,7 @@ package mazestormer.controller;
 
 import mazestormer.connect.ConnectEvent;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.RunnerListener;
 
 import com.google.common.eventbus.Subscribe;
@@ -16,12 +16,12 @@ public class LineFinderController extends SubController implements
 		super(mainController);
 	}
 
-	private Robot getRobot() {
-		return getMainController().getRobot();
+	private ControllableRobot getRobot() {
+		return getMainController().getControllableRobot();
 	}
 
 	private CalibratedLightSensor getLightSensor() {
-		return getMainController().getRobot().getLightSensor();
+		return getMainController().getControllableRobot().getLightSensor();
 	}
 
 	private void log(String logText) {

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import lejos.geom.Point;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +25,8 @@ public class VirtualPilotTest {
 
 	@Before
 	public void setUp() throws Exception {
-		pilot = new VirtualPilot(Robot.leftWheelDiameter,
-				Robot.rightWheelDiameter, Robot.trackWidth);
+		pilot = new VirtualPilot(ControllableRobot.leftWheelDiameter,
+				ControllableRobot.rightWheelDiameter, ControllableRobot.trackWidth);
 		pilot.setTravelSpeed(travelSpeed);
 		pilot.setRotateSpeed(rotateSpeed);
 		tracker = new OdometryPoseProvider(pilot);

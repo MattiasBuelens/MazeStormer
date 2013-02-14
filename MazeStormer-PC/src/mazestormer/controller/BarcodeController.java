@@ -7,7 +7,7 @@ import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
 import mazestormer.maze.Maze;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Runner;
 import mazestormer.robot.RunnerListener;
 
@@ -23,8 +23,8 @@ public class BarcodeController extends SubController implements
 		super(mainController);
 	}
 
-	private Robot getRobot() {
-		return getMainController().getRobot();
+	private ControllableRobot getRobot() {
+		return getMainController().getControllableRobot();
 	}
 
 	private Maze getMaze() {
@@ -126,7 +126,7 @@ public class BarcodeController extends SubController implements
 
 	private class ActionRunner extends Runner {
 
-		private final Robot robot;
+		private final ControllableRobot robot;
 		private IAction action;
 
 		public ActionRunner(IAction action) {

@@ -5,12 +5,12 @@ import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Maze.Target;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class GoalAction implements IAction {
 
 	@Override
-	public void performAction(Robot robot, Maze maze) {
+	public void performAction(ControllableRobot robot, Maze maze) {
 		checkNotNull(robot);
 		checkNotNull(maze);
 

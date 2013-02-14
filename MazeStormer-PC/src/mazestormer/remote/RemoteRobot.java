@@ -9,10 +9,10 @@ import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.SoundPlayer;
 
-public class RemoteRobot extends RemoteComponent implements Robot {
+public class RemoteRobot extends RemoteComponent implements ControllableRobot {
 
 	/**
 	 * Timeout for synchronous requests.

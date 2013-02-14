@@ -10,7 +10,7 @@ import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.maze.Maze;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Runner;
 import mazestormer.robot.RunnerTask;
 import mazestormer.util.Future;
@@ -25,7 +25,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	private static final int BLACK_THRESHOLD = 50;
 	private static final float NOISE_LENGTH = 0.65f;
 
-	private final Robot robot;
+	private final ControllableRobot robot;
 	private final Maze maze;
 	private boolean performAction;
 	private double scanSpeed = 2; // cm/sec
@@ -40,7 +40,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 
 	private final List<BarcodeRunnerListener> listeners = new ArrayList<BarcodeRunnerListener>();
 
-	public BarcodeRunner(Robot robot, Maze maze) {
+	public BarcodeRunner(ControllableRobot robot, Maze maze) {
 		super(robot.getPilot());
 		this.robot = robot;
 		this.maze = maze;
@@ -50,7 +50,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		addBarcodeListener(this);
 	}
 
-	protected Robot getRobot() {
+	protected ControllableRobot getRobot() {
 		return robot;
 	}
 
@@ -144,6 +144,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
 		handle = getRobot().when(condition).stop().run(prepare(task)).build();
+		// handle = getRobot().when(condition).run(prepare(task)).build();
 	}
 
 	@Override
@@ -170,6 +171,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		throwWhenCancelled();
 
 		log("Go to the begin of the barcode zone.");
+		// stop();
 		setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
 		// travel(- START_BAR_LENGTH / 2);

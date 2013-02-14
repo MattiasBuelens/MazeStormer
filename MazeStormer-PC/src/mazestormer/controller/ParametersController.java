@@ -14,7 +14,7 @@ public class ParametersController extends SubController implements
 	}
 
 	private Pilot getPilot() {
-		return getMainController().getRobot().getPilot();
+		return getMainController().getControllableRobot().getPilot();
 	}
 
 	@Override

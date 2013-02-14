@@ -8,7 +8,7 @@ import mazestormer.command.CommandType;
 import mazestormer.command.LightCalibrateCommand;
 import mazestormer.command.LightFloodlightCommand;
 import mazestormer.robot.AbstractCalibratedLightSensor;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 
 public class RemoteLightSensor extends AbstractCalibratedLightSensor {
@@ -91,7 +91,7 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 
 	@Override
 	public float getSensorRadius() {
-		return Robot.sensorRadius;
+		return ControllableRobot.sensorRadius;
 	}
 
 	public static class LightValueRequester extends ReportRequester<Integer> {

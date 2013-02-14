@@ -1,7 +1,7 @@
 package mazestormer.barcode;
 
 import mazestormer.maze.Maze;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public interface IAction{
 	
@@ -13,5 +13,5 @@ public interface IAction{
 	 * 			The given robot must be a valid robot.
 	 * 			| robot != null
 	 */
-	public abstract void performAction(Robot robot, Maze maze);
+	public abstract void performAction(ControllableRobot robot, Maze maze);
 }

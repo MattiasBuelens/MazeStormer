@@ -11,12 +11,12 @@ import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.collision.CollisionObserver;
 import mazestormer.simulator.collision.VirtualCollisionDetector;
 
-public class VirtualRobot implements Robot {
+public class VirtualRobot implements ControllableRobot {
 
 	private VirtualPilot pilot;
 	private CalibratedLightSensor light;
@@ -43,7 +43,7 @@ public class VirtualRobot implements Robot {
 	@Override
 	public Pilot getPilot() {
 		if (pilot == null) {
-			pilot = new VirtualPilot(Robot.trackWidth);
+			pilot = new VirtualPilot(ControllableRobot.trackWidth);
 		}
 		return pilot;
 	}

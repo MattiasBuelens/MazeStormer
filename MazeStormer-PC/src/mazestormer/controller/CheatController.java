@@ -3,7 +3,7 @@ package mazestormer.controller;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
 
 public class CheatController extends SubController implements ICheatController {
@@ -20,8 +20,8 @@ public class CheatController extends SubController implements ICheatController {
 		getRobot().getPilot().travel(0d);
 	}
 	
-	private Robot getRobot() {
-		return getMainController().getRobot();
+	private ControllableRobot getRobot() {
+		return getMainController().getControllableRobot();
 	}
 	
 	private Maze getMaze() {
