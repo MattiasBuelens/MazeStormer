@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import mazestormer.condition.Condition;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 
 import com.google.common.collect.HashMultimap;
@@ -19,7 +19,7 @@ import com.google.common.collect.SetMultimap;
 
 public class StateController {
 
-	private final Robot robot;
+	private final ControllableRobot robot;
 	private final State initialState;
 
 	private final AtomicReference<State> currentState = new AtomicReference<State>();
@@ -33,7 +33,7 @@ public class StateController {
 			.synchronizedSetMultimap(HashMultimap.<State, ConditionalLink> create());
 	private final Set<Transitioner> conditionalTransitions = new HashSet<Transitioner>();
 
-	public StateController(Robot robot, State initialState) {
+	public StateController(ControllableRobot robot, State initialState) {
 		this.robot = checkNotNull(robot);
 		this.initialState = checkNotNull(initialState);
 	}

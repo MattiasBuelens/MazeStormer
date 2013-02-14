@@ -59,7 +59,7 @@ public class ConfigurationController extends SubController implements
 
 	private Pilot getPilot() {
 		checkState(isConnected());
-		return getMainController().getRobot().getPilot();
+		return getMainController().getControllableRobot().getPilot();
 	}
 
 	@Override

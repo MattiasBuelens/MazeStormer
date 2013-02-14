@@ -1,7 +1,7 @@
 package mazestormer.controller;
 
 import mazestormer.maze.Maze;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.RunnerListener;
 
 public class ExplorerController extends SubController implements
@@ -30,8 +30,8 @@ public class ExplorerController extends SubController implements
 		return getMainController().cheatControl();
 	}
 
-	private Robot getRobot() {
-		return getMainController().getRobot();
+	private ControllableRobot getRobot() {
+		return getMainController().getControllableRobot();
 	}
 
 	private Maze getMaze() {

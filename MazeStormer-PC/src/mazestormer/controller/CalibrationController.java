@@ -17,7 +17,7 @@ public class CalibrationController extends SubController implements
 	}
 
 	private CalibratedLightSensor getLightSensor() {
-		return getMainController().getRobot().getLightSensor();
+		return getMainController().getControllableRobot().getLightSensor();
 	}
 
 	@Override

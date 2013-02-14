@@ -18,7 +18,7 @@ import mazestormer.condition.ConditionFuture;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.report.ReportType;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class PhysicalLightSensor extends LightSensor implements
 		CalibratedLightSensor, SensorPortListener, MessageListener<Command> {
@@ -64,7 +64,7 @@ public class PhysicalLightSensor extends LightSensor implements
 
 	@Override
 	public float getSensorRadius() {
-		return Robot.sensorRadius;
+		return ControllableRobot.sensorRadius;
 	}
 
 	private void addMessageListener(MessageListener<Command> listener) {

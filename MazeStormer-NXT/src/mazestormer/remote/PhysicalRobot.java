@@ -15,10 +15,10 @@ import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RotatingRangeScanner;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.SoundPlayer;
 
-public class PhysicalRobot extends NXTComponent implements Robot,
+public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		MessageListener<Command> {
 
 	private PhysicalPilot pilot;
@@ -80,7 +80,7 @@ public class PhysicalRobot extends NXTComponent implements Robot,
 		// Scanner
 		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S2);
 		RegulatedMotor headMotor = Motor.C;
-		float gearRatio = Robot.sensorGearRatio;
+		float gearRatio = ControllableRobot.sensorGearRatio;
 		RangeScanner headScanner = new RotatingRangeScanner(headMotor,
 				ultrasonicSensor, gearRatio);
 		scanner = new PhysicalRangeScanner(comm, headScanner);

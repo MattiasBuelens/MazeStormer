@@ -12,7 +12,7 @@ public class ManualControlController extends SubController implements
 	}
 
 	private Pilot getPilot() {
-		return getMainController().getRobot().getPilot();
+		return getMainController().getControllableRobot().getPilot();
 	}
 
 	@Override

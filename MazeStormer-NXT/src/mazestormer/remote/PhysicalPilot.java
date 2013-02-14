@@ -10,7 +10,7 @@ import mazestormer.command.TravelCommand;
 import mazestormer.report.MoveReporter;
 import mazestormer.report.MovementReporter;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class PhysicalPilot extends DifferentialPilot implements Pilot,
 		MessageListener<Command> {
@@ -20,8 +20,8 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 	private MovementReporter movementReporter;
 
 	public PhysicalPilot(NXTCommunicator communicator) {
-		super(Robot.leftWheelDiameter, Robot.rightWheelDiameter,
-				Robot.trackWidth, Motor.A, Motor.B, false);
+		super(ControllableRobot.leftWheelDiameter, ControllableRobot.rightWheelDiameter,
+				ControllableRobot.trackWidth, Motor.A, Motor.B, false);
 
 		this.communicator = communicator;
 		setup();

@@ -9,7 +9,7 @@ import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.robot.AbstractCalibratedLightSensor;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 
@@ -38,7 +38,7 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 		// Get absolute robot pose
 		Pose pose = getPoseProvider().getPose();
 		// Add sensor offset
-		Point position = pose.getLocation().pointAt(Robot.sensorOffset,
+		Point position = pose.getLocation().pointAt(ControllableRobot.sensorOffset,
 				pose.getHeading());
 
 		// Get tile underneath robot

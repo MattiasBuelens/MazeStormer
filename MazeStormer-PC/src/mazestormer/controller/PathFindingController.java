@@ -8,7 +8,7 @@ import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.robot.PathRunner;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
 
 public class PathFindingController extends SubController implements
@@ -20,8 +20,8 @@ public class PathFindingController extends SubController implements
 		super(mainController);
 	}
 
-	private Robot getRobot() {
-		return getMainController().getRobot();
+	private ControllableRobot getRobot() {
+		return getMainController().getControllableRobot();
 	}
 
 	private Maze getMaze() {
@@ -144,7 +144,7 @@ public class PathFindingController extends SubController implements
 		 * @param tiles
 		 *            The tile sequence the robot must follow.
 		 */
-		public TileSequenceRunner(Robot robot, Maze maze, Tile goal,
+		public TileSequenceRunner(ControllableRobot robot, Maze maze, Tile goal,
 				boolean singleStep) {
 			super(robot, maze);
 			this.goal = goal;

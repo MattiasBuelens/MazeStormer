@@ -3,12 +3,12 @@ package mazestormer.barcode;
 import static com.google.common.base.Preconditions.checkNotNull;
 import lejos.util.Delay;
 import mazestormer.maze.Maze;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class WaitAction implements IAction {
 
 	@Override
-	public void performAction(Robot robot, Maze maze) {
+	public void performAction(ControllableRobot robot, Maze maze) {
 		checkNotNull(robot);
 		checkNotNull(maze);
 

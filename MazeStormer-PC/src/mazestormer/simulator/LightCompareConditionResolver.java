@@ -2,14 +2,14 @@ package mazestormer.simulator;
 
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.Robot;
+import mazestormer.robot.ControllableRobot;
 
 public class LightCompareConditionResolver extends
 		VirtualConditionResolver<LightCompareCondition, Integer> {
 
 	private final CalibratedLightSensor light;
 
-	public LightCompareConditionResolver(Robot robot) {
+	public LightCompareConditionResolver(ControllableRobot robot) {
 		this.light = robot.getLightSensor();
 	}
 
