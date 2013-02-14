@@ -29,8 +29,8 @@ public class StateController {
 	private final AtomicBoolean isPaused = new AtomicBoolean();
 
 	private final Map<State, State> directLinks = new ConcurrentHashMap<State, State>();
-	private final SetMultimap<State, Link> conditionalLinks = Multimaps
-			.synchronizedSetMultimap(HashMultimap.<State, Link> create());
+	private final SetMultimap<State, ConditionalLink> conditionalLinks = Multimaps
+			.synchronizedSetMultimap(HashMultimap.<State, ConditionalLink> create());
 	private final Set<Transitioner> conditionalTransitions = new HashSet<Transitioner>();
 
 	public StateController(Robot robot, State initialState) {
@@ -180,7 +180,7 @@ public class StateController {
 	 */
 	public synchronized void link(State prevState, State nextState,
 			Condition condition) {
-		Link link = new Link(checkNotNull(prevState), checkNotNull(nextState),
+		ConditionalLink link = new ConditionalLink(checkNotNull(prevState), checkNotNull(nextState),
 				checkNotNull(condition));
 		conditionalLinks.put(prevState, link);
 	}
@@ -234,9 +234,9 @@ public class StateController {
 		// Create conditional transitions
 		synchronized (conditionalTransitions) {
 			conditionalTransitions.clear();
-			Set<Link> links = conditionalLinks.get(state);
+			Set<ConditionalLink> links = conditionalLinks.get(state);
 			synchronized (links) {
-				for (Link link : links) {
+				for (ConditionalLink link : links) {
 					conditionalTransitions.add(new Transitioner(link));
 				}
 			}
@@ -256,38 +256,12 @@ public class StateController {
 		}
 	}
 
-	private static class Link {
-
-		private final State prevState;
-		private final State nextState;
-		private final Condition condition;
-
-		public Link(State prevState, State nextState, Condition condition) {
-			this.prevState = prevState;
-			this.nextState = nextState;
-			this.condition = condition;
-		}
-
-		public State getPreviousState() {
-			return prevState;
-		}
-
-		public State getNextState() {
-			return nextState;
-		}
-
-		public Condition getCondition() {
-			return condition;
-		}
-
-	}
-
 	private class Transitioner implements Runnable {
 
-		private final Link link;
+		private final ConditionalLink link;
 		private final Future<Void> handle;
 
-		public Transitioner(Link link) {
+		public Transitioner(ConditionalLink link) {
 			this.link = link;
 			this.handle = robot.when(link.getCondition()).run(this).build();
 		}

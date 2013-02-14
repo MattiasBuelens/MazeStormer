@@ -144,6 +144,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
 		handle = getRobot().when(condition).stop().run(prepare(task)).build();
+		// handle = getRobot().when(condition).run(prepare(task)).build();
 	}
 
 	@Override
@@ -170,6 +171,7 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		throwWhenCancelled();
 
 		log("Go to the begin of the barcode zone.");
+		// stop();
 		setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
 		// travel(- START_BAR_LENGTH / 2);

@@ -85,6 +85,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 	@Override
 	public void stop() {
 		send(new StopCommand(CommandType.STOP));
+		waitComplete();
 	}
 
 	@Override
