@@ -3,6 +3,7 @@ package mazestormer.remote;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lejos.pc.comm.NXTConnector;
 import mazestormer.command.Command;
@@ -14,7 +15,7 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 	private NXTConnector connector;
 	private final List<MessageListener<? super Report<?>>> listeners;
 
-	private int nextRequestId = 0;
+	private volatile AtomicInteger nextRequestId = new AtomicInteger();
 
 	public RemoteCommunicator(NXTConnector connector) {
 		super(connector.getInputStream(), connector.getOutputStream(),
@@ -24,7 +25,7 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 	}
 
 	public int nextRequestId() {
-		return nextRequestId++;
+		return nextRequestId.incrementAndGet();
 	}
 
 	@Override

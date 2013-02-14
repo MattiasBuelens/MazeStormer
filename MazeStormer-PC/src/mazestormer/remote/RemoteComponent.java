@@ -1,38 +1,22 @@
 package mazestormer.remote;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import mazestormer.command.Command;
 import mazestormer.report.Report;
 
-public abstract class RemoteComponent {
+public abstract class RemoteComponent extends MessageSender<Command> {
 
-	private final RemoteCommunicator communicator;
 	private List<MessageListener<Report<?>>> messageListeners = new ArrayList<MessageListener<Report<?>>>();
 
 	public RemoteComponent(RemoteCommunicator communicator) {
-		this.communicator = communicator;
+		super(communicator);
 	}
 
-	protected RemoteCommunicator getCommunicator() {
-		return communicator;
-	}
-
-	/**
-	 * Send a command.
-	 * 
-	 * @param command
-	 *            The command.
-	 */
-	protected void send(Command command) {
-		try {
-			getCommunicator().send(command);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	@Override
+	public RemoteCommunicator getCommunicator() {
+		return (RemoteCommunicator) super.getCommunicator();
 	}
 
 	/**
@@ -44,7 +28,7 @@ public abstract class RemoteComponent {
 	protected void addMessageListener(MessageListener<Report<?>> listener) {
 		// Add and store message listener
 		messageListeners.add(listener);
-		communicator.addListener(listener);
+		getCommunicator().addListener(listener);
 	}
 
 	/**
@@ -53,7 +37,8 @@ public abstract class RemoteComponent {
 	public void terminate() {
 		// Remove registered message listeners
 		for (MessageListener<Report<?>> listener : messageListeners) {
-			communicator.removeListener(listener);
+			getCommunicator().removeListener(listener);
 		}
 	}
+
 }
