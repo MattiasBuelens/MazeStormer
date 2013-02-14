@@ -381,7 +381,8 @@ public enum TimeUnit {
 	 *         <tt>Long.MAX_VALUE</tt> if it would positively overflow.
 	 */
 	public long convert(long sourceDuration, TimeUnit sourceUnit) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
@@ -395,7 +396,8 @@ public enum TimeUnit {
 	 * @see #convert
 	 */
 	public long toNanos(long duration) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
@@ -409,7 +411,8 @@ public enum TimeUnit {
 	 * @see #convert
 	 */
 	public long toMicros(long duration) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
@@ -423,7 +426,8 @@ public enum TimeUnit {
 	 * @see #convert
 	 */
 	public long toMillis(long duration) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
@@ -437,7 +441,8 @@ public enum TimeUnit {
 	 * @see #convert
 	 */
 	public long toSeconds(long duration) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
@@ -452,7 +457,8 @@ public enum TimeUnit {
 	 * @since 1.6
 	 */
 	public long toMinutes(long duration) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
@@ -467,7 +473,8 @@ public enum TimeUnit {
 	 * @since 1.6
 	 */
 	public long toHours(long duration) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
@@ -480,7 +487,8 @@ public enum TimeUnit {
 	 * @since 1.6
 	 */
 	public long toDays(long duration) {
-		throw new AbstractMethodError();
+		// throw new AbstractMethodError();
+		throw new RuntimeException();
 	}
 
 	/**
