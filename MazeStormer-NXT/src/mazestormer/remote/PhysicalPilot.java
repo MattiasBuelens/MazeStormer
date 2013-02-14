@@ -2,6 +2,8 @@ package mazestormer.remote;
 
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.DifferentialPilot;
+import lejos.robotics.navigation.MoveListener;
+import lejos.robotics.navigation.Move.MoveType;
 import mazestormer.command.Command;
 import mazestormer.command.PilotParameterCommand;
 import mazestormer.command.RotateCommand;
@@ -9,8 +11,10 @@ import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
 import mazestormer.report.MoveReporter;
 import mazestormer.report.MovementReporter;
+import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
+import mazestormer.util.Future;
 
 public class PhysicalPilot extends DifferentialPilot implements Pilot,
 		MessageListener<Command> {
@@ -39,8 +43,27 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 		movementReporter.start();
 	}
 
+	@Override
+	public Future<Boolean> travelComplete(double distance) {
+		MoveFuture future = new MoveFuture(this, MoveType.TRAVEL);
+		travel(distance, true);
+		return future;
+	}
+
+	@Override
+	public Future<Boolean> rotateComplete(double angle) {
+		MoveFuture future = new MoveFuture(this, MoveType.ROTATE);
+		rotate(angle, true);
+		return future;
+	}
+
 	private void addMessageListener(MessageListener<Command> listener) {
 		communicator.addListener(listener);
+	}
+
+	@Override
+	public void removeMoveListener(MoveListener listener) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

@@ -218,6 +218,12 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		throwWhenCancelled();
 	}
 
+	protected Future<Boolean> travelComplete(double distance)
+			throws CancellationException {
+		throwWhenCancelled();
+		return getPilot().travelComplete(distance);
+	}
+
 	protected double getTravelSpeed() throws CancellationException {
 		throwWhenCancelled();
 		return getPilot().getTravelSpeed();
@@ -247,6 +253,12 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		throwWhenCancelled();
 		getPilot().rotate(angle, immediateReturn);
 		throwWhenCancelled();
+	}
+
+	protected Future<Boolean> rotateComplete(double angle)
+			throws CancellationException {
+		throwWhenCancelled();
+		return getPilot().rotateComplete(angle);
 	}
 
 	protected double getRotateSpeed() throws CancellationException {

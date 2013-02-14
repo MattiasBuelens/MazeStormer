@@ -13,7 +13,9 @@ import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
 import mazestormer.report.MoveReport;
 import mazestormer.report.Report;
+import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
+import mazestormer.util.Future;
 
 public class RemotePilot extends RemoteComponent implements Pilot {
 
@@ -125,6 +127,20 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 			waitComplete();
 	}
 
+	@Override
+	public Future<Boolean> travelComplete(double distance) {
+		MoveFuture future = new MoveFuture(this, MoveType.TRAVEL);
+		travel(distance, true);
+		return future;
+	}
+
+	@Override
+	public Future<Boolean> rotateComplete(double angle) {
+		MoveFuture future = new MoveFuture(this, MoveType.ROTATE);
+		rotate(angle, true);
+		return future;
+	}
+
 	protected synchronized void movementStart(Move move) {
 		isMoving = true;
 		setMovement(new Move(move.getMoveType(), 0, 0, isMoving()));
@@ -162,6 +178,11 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 	@Override
 	public void addMoveListener(MoveListener listener) {
 		moveListeners.add(listener);
+	}
+
+	@Override
+	public void removeMoveListener(MoveListener listener) {
+		moveListeners.remove(listener);
 	}
 
 	@Override

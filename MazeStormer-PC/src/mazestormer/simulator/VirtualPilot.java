@@ -13,7 +13,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.Move.MoveType;
 import lejos.robotics.navigation.MoveListener;
+import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
+import mazestormer.util.Future;
 
 public class VirtualPilot implements Pilot {
 
@@ -137,6 +139,20 @@ public class VirtualPilot implements Pilot {
 
 		if (!immediateReturn)
 			waitComplete();
+	}
+
+	@Override
+	public Future<Boolean> travelComplete(double distance) {
+		MoveFuture future = new MoveFuture(this, MoveType.TRAVEL);
+		travel(distance, true);
+		return future;
+	}
+
+	@Override
+	public Future<Boolean> rotateComplete(double angle) {
+		MoveFuture future = new MoveFuture(this, MoveType.ROTATE);
+		rotate(angle, true);
+		return future;
 	}
 
 	// @Override
@@ -433,6 +449,11 @@ public class VirtualPilot implements Pilot {
 	@Override
 	public void addMoveListener(MoveListener listener) {
 		moveListeners.add(listener);
+	}
+
+	@Override
+	public void removeMoveListener(MoveListener listener) {
+		moveListeners.remove(listener);
 	}
 
 	@Override
