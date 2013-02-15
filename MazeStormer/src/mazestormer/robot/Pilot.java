@@ -41,7 +41,7 @@ public interface Pilot extends RotateMoveController {
 	 * @return A future which produces whether the rotation was successfully
 	 *         completed.
 	 */
-	public Future<Boolean> rotateComplete(double distance);
+	public Future<Boolean> rotateComplete(double angle);
 
 	/**
 	 * Stop and terminate this pilot.
