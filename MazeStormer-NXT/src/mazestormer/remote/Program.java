@@ -16,8 +16,8 @@ public class Program implements Runnable, ButtonListener {
 	private ControllableRobot robot;
 	private NXTCommunicator communicator;
 
-	private boolean isRunning = false;
-	private boolean isConnected = false;
+	private volatile boolean isRunning = false;
+	private volatile boolean isConnected = false;
 
 	public static void main(String[] args) throws Exception {
 		new Program().run();
