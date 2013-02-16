@@ -1,6 +1,7 @@
 package mazestormer.simulator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -8,14 +9,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.Move.MoveType;
 import lejos.robotics.navigation.MoveListener;
 import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
 import mazestormer.util.Future;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class VirtualPilot implements Pilot {
 
@@ -32,13 +33,11 @@ public class VirtualPilot implements Pilot {
 	private ScheduledExecutorService executor;
 	private ScheduledFuture<?> moveEndHandle;
 
-	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
+	private List<MoveListener> moveListeners = Collections.synchronizedList(new ArrayList<MoveListener>());
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("VirtualPilot-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("VirtualPilot-%d").build();
 
-	public VirtualPilot(double trackWidth, double maxTravelSpeed,
-			double maxRotateSpeed) {
+	public VirtualPilot(double trackWidth, double maxTravelSpeed, double maxRotateSpeed) {
 		this.maxTravelSpeed = maxTravelSpeed;
 		this.maxRotateSpeed = maxRotateSpeed;
 		this.trackWidth = (float) trackWidth;
@@ -124,7 +123,7 @@ public class VirtualPilot implements Pilot {
 
 	@Override
 	public void stop() {
-		movementStop();
+		movementStop(isMoving());
 		waitComplete();
 	}
 
@@ -188,8 +187,7 @@ public class VirtualPilot implements Pilot {
 
 	// @Override
 	public void arc(double radius, double angle, boolean immediateReturn) {
-		if (radius == Double.POSITIVE_INFINITY
-				|| radius == Double.NEGATIVE_INFINITY) {
+		if (radius == Double.POSITIVE_INFINITY || radius == Double.NEGATIVE_INFINITY) {
 			forward();
 			return;
 		}
@@ -202,10 +200,8 @@ public class VirtualPilot implements Pilot {
 	}
 
 	// @Override
-	public void travelArc(double radius, double distance,
-			boolean immediateReturn) {
-		if (radius == Double.POSITIVE_INFINITY
-				|| radius == Double.NEGATIVE_INFINITY) {
+	public void travelArc(double radius, double distance, boolean immediateReturn) {
+		if (radius == Double.POSITIVE_INFINITY || radius == Double.NEGATIVE_INFINITY) {
 			travel(distance, immediateReturn);
 			return;
 		}
@@ -229,8 +225,7 @@ public class VirtualPilot implements Pilot {
 	private double turnRate(final double radius) {
 		int direction = (radius < 0) ? -1 : 1;
 		double radiusToUse = direction * radius;
-		double ratio = (2 * radiusToUse - trackWidth)
-				/ (2 * radiusToUse + trackWidth);
+		double ratio = (2 * radiusToUse - trackWidth) / (2 * radiusToUse + trackWidth);
 		return (direction * 100 * (1 - ratio));
 	}
 
@@ -251,8 +246,7 @@ public class VirtualPilot implements Pilot {
 		return radius;
 	}
 
-	public void steer(final double turnRate, final double angle,
-			final boolean immediateReturn) {
+	public void steer(final double turnRate, final double angle, final boolean immediateReturn) {
 		if (angle == 0)
 			return;
 		if (turnRate == 0) {
@@ -266,51 +260,47 @@ public class VirtualPilot implements Pilot {
 			waitComplete();
 	}
 
-	protected void movementStart(MoveType moveType, float distance,
-			float angle, float radius) {
-
+	protected synchronized void movementStart(MoveType moveType, float distance, float angle, float radius) {
 		boolean wasMoving = isMoving();
-
 		if (wasMoving)
-			movementStop();
+			movementStop(true);
 
 		// Set current move
-		move = new Move(moveType, distance, angle, (float) getTravelSpeed(),
-				(float) getRotateSpeed(), wasMoving);
+		move = new Move(moveType, distance, angle, (float) getTravelSpeed(), (float) getRotateSpeed(), wasMoving);
 		isMoving = true;
 
 		// Publish the *targeted* move distance and angle
-		for (MoveListener ml : moveListeners) {
+		List<MoveListener> listeners = new ArrayList<MoveListener>(moveListeners);
+		for (MoveListener ml : listeners) {
 			ml.moveStarted(move, this);
 		}
 
 		// Start timer
 		float delay = getMoveDuration(move);
 		if (!Float.isInfinite(delay)) {
-			moveEndHandle = executor.schedule(new MoveEndRunner(move),
-					(long) delay, TimeUnit.MILLISECONDS);
+			moveEndHandle = executor.schedule(new MoveEndRunner(move), (long) delay, TimeUnit.MILLISECONDS);
 		}
 	}
 
-	protected void movementStart(MoveType moveType, float distance, float angle) {
+	protected synchronized void movementStart(MoveType moveType, float distance, float angle) {
 		movementStart(moveType, distance, angle, 0);
 	}
 
-	private synchronized void movementStop() {
-		if (!isMoving())
+	private synchronized void movementStop(boolean isMoving) {
+		if (move == null)
 			return;
-
-		// Publish the *travelled* move distance and angle
-		Move travelledMove = new Move(move.getMoveType(),
-				getMovementIncrement(), getAngleIncrement(),
-				move.getTravelSpeed(), move.getRotateSpeed(), false);
-
-		for (MoveListener ml : moveListeners) {
-			ml.moveStopped(travelledMove, this);
-		}
 
 		// Reset current move
 		resetMove();
+
+		// Publish the *travelled* move distance and angle
+		Move travelledMove = new Move(move.getMoveType(), getMovementIncrement(), getAngleIncrement(),
+				move.getTravelSpeed(), move.getRotateSpeed(), isMoving);
+
+		List<MoveListener> listeners = new ArrayList<MoveListener>(moveListeners);
+		for (MoveListener ml : listeners) {
+			ml.moveStopped(travelledMove, this);
+		}
 	}
 
 	/**
@@ -368,8 +358,7 @@ public class VirtualPilot implements Pilot {
 		float target = move.getDistanceTraveled();
 		if (isInfiniteArc(move)) {
 			// Implementation: Use radius instead
-			throw new IllegalStateException(
-					"Simulator does not fully support arcs.");
+			throw new IllegalStateException("Simulator does not fully support arcs.");
 		}
 
 		// Compare absolute values, since target may be negative
@@ -397,8 +386,7 @@ public class VirtualPilot implements Pilot {
 		float target = move.getAngleTurned();
 		if (isInfiniteArc(move)) {
 			// Implementation: Use radius instead
-			throw new IllegalStateException(
-					"Simulator does not fully support arcs.");
+			throw new IllegalStateException("Simulator does not fully support arcs.");
 		}
 
 		// Compare absolute values, since target may be negative
@@ -427,8 +415,7 @@ public class VirtualPilot implements Pilot {
 			if (isInfiniteArc(move)) {
 				return Float.POSITIVE_INFINITY;
 			} else {
-				throw new IllegalStateException(
-						"Simulator does not fully support arcs.");
+				throw new IllegalStateException("Simulator does not fully support arcs.");
 			}
 		}
 		return Math.abs(duration) * 1000f;
@@ -441,8 +428,7 @@ public class VirtualPilot implements Pilot {
 	 * increments needs to be calculated based on the finite arc radius.
 	 */
 	private static boolean isInfiniteArc(Move move) {
-		return move.getMoveType() == MoveType.ARC
-				&& Float.isInfinite(move.getDistanceTraveled())
+		return move.getMoveType() == MoveType.ARC && Float.isInfinite(move.getDistanceTraveled())
 				&& Float.isInfinite(move.getAngleTurned());
 	}
 
@@ -458,8 +444,7 @@ public class VirtualPilot implements Pilot {
 
 	@Override
 	public Move getMovement() {
-		return new Move(move.getMoveType(), getMovementIncrement(),
-				getAngleIncrement(), isMoving());
+		return new Move(move.getMoveType(), getMovementIncrement(), getAngleIncrement(), isMoving());
 	}
 
 	@Override
@@ -483,7 +468,7 @@ public class VirtualPilot implements Pilot {
 		public void run() {
 			// Current move has ended
 			if (isMoving() && VirtualPilot.this.move == move) {
-				movementStop();
+				movementStop(false);
 			}
 		}
 

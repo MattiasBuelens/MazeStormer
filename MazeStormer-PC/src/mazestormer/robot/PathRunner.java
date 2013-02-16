@@ -13,13 +13,13 @@ public abstract class PathRunner extends Runner {
 
 	protected final ControllableRobot robot;
 	protected final Maze maze;
-	protected final Navigator navigator;
+	protected final Navigator2 navigator;
 
 	public PathRunner(ControllableRobot robot, Maze maze) {
 		super(robot.getPilot());
 		this.robot = robot;
 		this.maze = maze;
-		this.navigator = new Navigator(robot.getPilot(),
+		this.navigator = new Navigator2(robot.getPilot(),
 				robot.getPoseProvider());
 	}
 

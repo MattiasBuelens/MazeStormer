@@ -7,12 +7,13 @@ import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
-import mazestormer.robot.PathRunner;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.NavigatorListener;
+import mazestormer.robot.PathRunner;
+import mazestormer.robot.RunnerListener;
 import mazestormer.util.LongPoint;
 
-public class PathFindingController extends SubController implements
-		IPathFindingController {
+public class PathFindingController extends SubController implements IPathFindingController {
 
 	private TileSequenceRunner runner;
 
@@ -47,26 +48,19 @@ public class PathFindingController extends SubController implements
 	@Override
 	public void startStepAction(long goalX, long goalY) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
-				true);
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, true, false);
 		this.runner.start();
 	}
 
 	@Override
 	public void startAction(long goalX, long goalY) {
-		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
-				false);
-		this.runner.start();
+		startAction(goalX, goalY, false, false);
 	}
 
 	@Override
-	public void startAction(long goalX, long goalY, boolean singleStep,
-			boolean reposition) {
+	public void startAction(long goalX, long goalY, boolean singleStep, boolean reposition) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
-				singleStep);
-		this.runner.setReposition(reposition);
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, singleStep, reposition);
 		this.runner.start();
 	}
 
@@ -127,7 +121,7 @@ public class PathFindingController extends SubController implements
 		}
 	}
 
-	public class TileSequenceRunner extends PathRunner {
+	public class TileSequenceRunner extends PathRunner implements NavigatorListener {
 
 		private Tile goal;
 		private boolean singleStep;
@@ -141,30 +135,34 @@ public class PathFindingController extends SubController implements
 		 *            The robot who must follow a tile sequence.
 		 * @param maze
 		 *            The maze the robot is positioned in.
-		 * @param tiles
-		 *            The tile sequence the robot must follow.
+		 * @param goal
+		 *            The target tile.
+		 * @param singleStep
+		 *            Whether to move one step or follow the whole path.
+		 * @param reposition
+		 *            Whether to reposition the robot before navigating.
 		 */
-		public TileSequenceRunner(ControllableRobot robot, Maze maze, Tile goal,
-				boolean singleStep) {
+		public TileSequenceRunner(ControllableRobot robot, Maze maze, Tile goal, boolean singleStep, boolean reposition) {
 			super(robot, maze);
 			this.goal = goal;
 			this.singleStep = singleStep;
+			this.reposition = reposition;
 			initializeNavigator();
 		}
 
-		public void setSinglestep(boolean request) {
-			this.singleStep = request;
-		}
-
-		public void setReposition(boolean request) {
-			this.reposition = request;
-		}
-
 		private void initializeNavigator() {
-			List<Waypoint> waypoints = findPath(goal);
-			for (Waypoint waypoint : waypoints) {
-				navigator.addWaypoint(waypoint);
+			// Add listener
+			navigator.addNavigatorListener(this);
+
+			// Set path
+			List<Waypoint> path = findPath(goal);
+			if (singleStep && !path.isEmpty()) {
+				// Retain just the first way point
+				Waypoint step = path.get(0);
+				path.clear();
+				path.add(step);
 			}
+			navigator.setPath(path);
 		}
 
 		@Override
@@ -183,23 +181,67 @@ public class PathFindingController extends SubController implements
 
 		@Override
 		public void run() {
-			if (this.singleStep && this.reposition) {
-				new LineFinderController(getMainController()).startSearching();
-			}
-
-			this.navigator.singleStep(this.singleStep);
-			this.navigator.followPath();
-			if (this.singleStep) {
-				this.navigator.waitForStop();
+			if (this.reposition) {
+				startLineFinder();
 			} else {
-				while (!this.navigator.waitForStop()) {
-					Thread.yield();
-				}
+				startNavigator();
 			}
-
-			// Done
-			resolve();
 		}
 
+		private void startLineFinder() {
+			LineFinderRunner lineFinder = new LineFinderRunner(getRobot()) {
+				@Override
+				protected void log(String message) {
+					PathFindingController.this.log(message);
+				}
+			};
+			lineFinder.addListener(new RunnerListener() {
+				@Override
+				public void onStarted() {
+				}
+
+				@Override
+				public void onCompleted() {
+					startNavigator();
+				}
+
+				@Override
+				public void onCancelled() {
+					TileSequenceRunner.this.cancel();
+				}
+			});
+			lineFinder.start();
+		}
+
+		private void startNavigator() {
+			this.navigator.start();
+		}
+
+		@Override
+		public void navigatorStarted(Pose pose) {
+		}
+
+		@Override
+		public void navigatorStopped(Pose pose) {
+			cancel();
+		}
+
+		@Override
+		public void navigatorPaused(Pose pose, boolean onTransition) {
+			cancel();
+		}
+
+		@Override
+		public void navigatorResumed(Pose pose) {
+		}
+
+		@Override
+		public void navigatorAtWaypoint(Waypoint waypoint, Pose pose) {
+		}
+
+		@Override
+		public void navigatorCompleted(Waypoint waypoint, Pose pose) {
+			cancel();
+		}
 	}
 }

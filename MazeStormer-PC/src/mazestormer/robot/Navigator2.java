@@ -1,15 +1,14 @@
 package mazestormer.robot;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.google.common.base.Preconditions.*;
 
 import lejos.robotics.localization.PoseProvider;
-import lejos.robotics.navigation.NavigationListener;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.navigation.WaypointListener;
@@ -22,15 +21,14 @@ public class Navigator2 implements WaypointListener {
 	private final Pilot pilot;
 	private final PoseProvider poseProvider;
 
-	private Path path;
-	private List<NavigationListener> listeners = new ArrayList<NavigationListener>();
+	private List<Waypoint> path;
+	private List<NavigatorListener> listeners = new ArrayList<NavigatorListener>();
 
 	private AtomicBoolean isRunning = new AtomicBoolean();
 	private AtomicBoolean isPaused = new AtomicBoolean();
-	private State currentState;
-	private Waypoint node;
-	private AtomicInteger nodeIndex = new AtomicInteger();
-	private Future<?> nextTransition;
+	private volatile State currentState;
+	private volatile Waypoint node;
+	private volatile Future<?> nextTransition;
 
 	private State pauseState;
 
@@ -39,10 +37,17 @@ public class Navigator2 implements WaypointListener {
 		this.poseProvider = checkNotNull(poseProvider);
 	}
 
-	public void setPath(Path path) {
+	public List<Waypoint> getRemainingPath() {
+		return Collections.unmodifiableList(this.path);
+	}
+
+	public State getState() {
+		return currentState;
+	}
+
+	public void setPath(List<Waypoint> path) {
 		if (isRunning()) {
-			throw new IllegalStateException(
-					"Cannot change path while traversing.");
+			throw new IllegalStateException("Cannot change path while traversing.");
 		}
 		this.path = checkNotNull(path);
 	}
@@ -61,6 +66,7 @@ public class Navigator2 implements WaypointListener {
 	public void start() {
 		if (!isRunning()) {
 			isRunning.set(true);
+			reportStarted();
 			init();
 		}
 	}
@@ -74,7 +80,7 @@ public class Navigator2 implements WaypointListener {
 			isPaused.set(false);
 			if (nextTransition != null)
 				nextTransition.cancel();
-			reportInterrupted();
+			reportStopped();
 		}
 	}
 
@@ -82,11 +88,15 @@ public class Navigator2 implements WaypointListener {
 	 * Pause path traversal. Does <strong>not</strong> stop the pilot.
 	 */
 	public void pause() {
+		pause(false);
+	}
+
+	private void pause(boolean onTransition) {
 		if (isRunning() && !isPaused()) {
 			isPaused.set(true);
 			if (nextTransition != null)
 				nextTransition.cancel();
-			reportInterrupted();
+			reportPaused(onTransition);
 		}
 	}
 
@@ -96,6 +106,7 @@ public class Navigator2 implements WaypointListener {
 	public void resume() {
 		if (isRunning() && isPaused()) {
 			isPaused.set(false);
+			reportResumed();
 			currentState.execute(this);
 		}
 	}
@@ -120,23 +131,23 @@ public class Navigator2 implements WaypointListener {
 	}
 
 	/**
-	 * Add a navigation listener that is informed when the robot stops or
+	 * Add a navigator listener that is informed when the robot stops or
 	 * reaches a way point.
 	 * 
 	 * @param listener
-	 *            The new navigation listener.
+	 *            The new navigator listener.
 	 */
-	public void addNavigationListener(NavigationListener listener) {
+	public void addNavigatorListener(NavigatorListener listener) {
 		listeners.add(listener);
 	}
 
 	/**
-	 * Remove a registered navigation listener.
+	 * Remove a registered navigator listener.
 	 * 
 	 * @param listener
-	 *            The navigation listener.
+	 *            The navigator listener.
 	 */
-	public void removeNavigationListener(NavigationListener listener) {
+	public void removeNavigatorListener(NavigatorListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -162,11 +173,15 @@ public class Navigator2 implements WaypointListener {
 	 * Initialize the path traversal.
 	 */
 	private void init() {
-		// Get the first node in the path
-		node = path.remove(0);
-		nodeIndex.set(0);
-		// Start traversing
-		transition(State.ROTATE_TO);
+		if (pathCompleted()) {
+			// Empty path
+			finish();
+		} else {
+			// Get the first node in the path
+			node = path.remove(0);
+			// Start traversing
+			transition(State.ROTATE_TO);
+		}
 	}
 
 	/**
@@ -224,9 +239,15 @@ public class Navigator2 implements WaypointListener {
 		// Report
 		reportAtWaypoint();
 
+		transition(State.NEXT);
+	}
+
+	/**
+	 * Report target reached and get next node.
+	 */
+	private void next() {
 		// Next node
 		node = path.remove(0);
-		nodeIndex.incrementAndGet();
 		transition(State.ROTATE_TO);
 	}
 
@@ -239,7 +260,7 @@ public class Navigator2 implements WaypointListener {
 			currentState = nextState;
 			if (pauseState == currentState) {
 				// Pause requested before entering new state
-				pause();
+				pause(true);
 			} else if (!isPaused()) {
 				// Continue with new state
 				currentState.execute(this);
@@ -247,8 +268,7 @@ public class Navigator2 implements WaypointListener {
 		}
 	}
 
-	private void bindTransition(final Future<Boolean> future,
-			final State nextState) {
+	private void bindTransition(final Future<Boolean> future, final State nextState) {
 		future.addFutureListener(new FutureListener<Boolean>() {
 			@Override
 			public void futureResolved(Future<Boolean> future) {
@@ -272,28 +292,46 @@ public class Navigator2 implements WaypointListener {
 		this.nextTransition = future;
 	}
 
+	private void reportStarted() {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorStarted(pose);
+		}
+	}
+
+	private void reportStopped() {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorStopped(pose);
+		}
+	}
+
+	private void reportPaused(boolean onTransition) {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorPaused(pose, onTransition);
+		}
+	}
+
+	private void reportResumed() {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorResumed(pose);
+		}
+	}
+
 	private void reportAtWaypoint() {
 		Pose pose = poseProvider.getPose();
-		int index = nodeIndex.get();
-		for (NavigationListener l : listeners) {
-			l.atWaypoint(node, pose, index);
+		for (NavigatorListener l : listeners) {
+			l.navigatorAtWaypoint(node, pose);
 		}
 	}
 
 	private void reportComplete() {
 		Pose pose = poseProvider.getPose();
-		int index = nodeIndex.get();
-		for (NavigationListener l : listeners) {
-			l.atWaypoint(node, pose, index);
-			l.pathComplete(node, pose, index);
-		}
-	}
-
-	private void reportInterrupted() {
-		Pose pose = poseProvider.getPose();
-		int index = nodeIndex.get();
-		for (NavigationListener l : listeners) {
-			l.pathInterrupted(node, pose, index);
+		for (NavigatorListener l : listeners) {
+			l.navigatorAtWaypoint(node, pose);
+			l.navigatorCompleted(node, pose);
 		}
 	}
 
@@ -328,6 +366,14 @@ public class Navigator2 implements WaypointListener {
 			@Override
 			protected void execute(Navigator2 navigator) {
 				navigator.report();
+			}
+		},
+
+		// Not interruptible
+		NEXT {
+			@Override
+			protected void execute(Navigator2 navigator) {
+				navigator.next();
 			}
 		};
 

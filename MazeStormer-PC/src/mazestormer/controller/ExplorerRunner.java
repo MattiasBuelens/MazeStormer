@@ -10,12 +10,9 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lejos.robotics.RangeReading;
-import lejos.robotics.navigation.NavigationListener;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.objectdetection.RangeFeature;
-import lejos.robotics.pathfinding.Path;
-import lejos.util.Delay;
 import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.BarcodeRunnerListener;
 import mazestormer.barcode.BarcodeSpeed;
@@ -25,15 +22,16 @@ import mazestormer.maze.Maze.Target;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
-import mazestormer.robot.Navigator;
-import mazestormer.robot.PathRunner;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Navigator2;
+import mazestormer.robot.NavigatorListener;
+import mazestormer.robot.PathRunner;
 import mazestormer.robot.RunnerListener;
 import mazestormer.robot.RunnerTask;
 
 import com.google.common.primitives.Floats;
 
-public class ExplorerRunner extends PathRunner implements NavigationListener {
+public class ExplorerRunner extends PathRunner implements NavigatorListener {
 
 	private LinkedList<Tile> queue = new LinkedList<Tile>();
 	private Tile currentTile;
@@ -54,11 +52,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 * Current state of the explorer.
 	 */
 	private State state = State.NEXT;
-	/**
-	 * Flag indicating if the explorer should respond to incoming navigator
-	 * events. The barcode runner needs to disable events while it is running.
-	 */
-	private AtomicBoolean navigatorEnabled = new AtomicBoolean(true);
 	/**
 	 * Flag indicating if the explorer should periodically adjust the robot's
 	 * position by running the line finder.
@@ -81,7 +74,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		super(robot, maze);
 
 		// Navigator
-		navigator.addNavigationListener(this);
+		navigator.addNavigatorListener(this);
 
 		// Runners
 		lineFinder = new LineFinderRunner(robot) {
@@ -120,18 +113,6 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 	private void setState(State newState) {
 		state = newState;
-	}
-
-	private boolean isNavigatorEnabled() {
-		return navigatorEnabled.get();
-	}
-
-	private void enableNavigator() {
-		navigatorEnabled.set(true);
-	}
-
-	private void disableNavigator() {
-		navigatorEnabled.set(false);
 	}
 
 	public boolean isLineAdjustEnabled() {
@@ -193,8 +174,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		maze.clear();
 		setExplored(false);
 		setState(State.NEXT);
-		if (!isNavigatorEnabled())
-			enableNavigator();
+		navigator.stop();
 
 		// Queue starts with path only containing the root
 		Tile startTile = getCurrentTile();
@@ -277,15 +257,13 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		log("Go to " + goal.getPosition());
 
 		// Create path
-		navigator.clearPath();
-		List<Waypoint> waypoints = findPath(goal);
-		for (Waypoint waypoint : waypoints) {
-			navigator.addWaypoint(waypoint);
-		}
+		navigator.stop();
+		navigator.setPath(findPath(goal));
 
 		// Follow path until before traveling
 		setState(State.ROTATE);
-		navigator.followPathUntil(Navigator.State.TRAVEL);
+		navigator.pauseAt(Navigator2.State.TRAVEL);
+		navigator.start();
 	}
 
 	private void beforeTravel() {
@@ -304,13 +282,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		// Update state
 		setState(State.TRAVEL);
 		// Follow path until way point is reached
-		navigator.resumeFrom(Navigator.State.TRAVEL);
-	}
-
-	private void afterTravel() {
-		throwWhenCancelled();
-		// Next step
-		next();
+		navigator.pauseAt(Navigator2.State.NEXT);
+		navigator.resume();
 	}
 
 	private void next() {
@@ -338,9 +311,9 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	private void beforeBarcode() {
-		// Stop listening to navigator
-		disableNavigator();
-		// navigator.stop();
+		// Pause navigator
+		navigator.pause();
+		stop();
 		// Update state
 		setState(State.BARCODE);
 		log("Barcode found, pausing navigation");
@@ -355,12 +328,8 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 		setBarcodeTile(nextTile, barcode);
 		// Execute barcode action
 		executeBarcodeAction();
-		// Travel off barcode
-		travel(maze.getTileSize() / 4);
-		// Resume listening to navigator
-		enableNavigator();
-		// Next step
-		next();
+		// Resume navigator
+		navigator.resume();
 	}
 
 	private void setBarcodeTile(Tile tile, byte barcode) {
@@ -386,14 +355,12 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
-		RangeFeature feature = robot.getRangeDetector().scan(
-				getScanAngles(tile));
+		RangeFeature feature = robot.getRangeDetector().scan(getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
-				orientation = angleToOrientation(reading.getAngle()
-						+ maze.toRelative(getPose().getHeading()));
+				orientation = angleToOrientation(reading.getAngle() + maze.toRelative(getPose().getHeading()));
 				maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
@@ -419,10 +386,10 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	/**
-	 * Get the angles towards *unknown* edges to scan.
+	 * Get the angles towards <strong>unknown</strong> edges to scan.
 	 */
 	private float[] getScanAngles(Tile tile) {
-		ArrayList<Float> list = new ArrayList<Float>();
+		List<Float> list = new ArrayList<Float>();
 		// TODO: pas heading vastzetten als we linefinder gedaan hebben.
 		float heading = getPose().getHeading();
 
@@ -460,7 +427,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 			barcodeRunner.cancel();
 		} else {
 			// Only scan if next way point is not yet explored
-			Path path = navigator.getPath();
+			List<Waypoint> path = navigator.getRemainingPath();
 			if (path.isEmpty() || !getTileAt(path.get(0)).isExplored()) {
 				barcodeRunner.start();
 			} else {
@@ -516,51 +483,40 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 	}
 
 	@Override
-	public void atWaypoint(Waypoint waypoint, Pose pose, int sequence) {
+	public void navigatorStarted(Pose pose) {
+	}
+
+	@Override
+	public void navigatorStopped(Pose pose) {
+	}
+
+	@Override
+	public void navigatorAtWaypoint(Waypoint waypoint, Pose pose) {
 		incrementFindLineCounter();
 		toggleBarcodeRunner();
 		executeBarcodeAction();
 	}
 
-	private void pathComplete() {
-		// Dirty fix for synchronization with barcode
-		Delay.msDelay(200);
-
-		if (!isNavigatorEnabled())
-			return;
-
-		// Next tile reached
-		afterTravel();
-	}
-
-	private void pathInterrupted() {
-		if (!isNavigatorEnabled())
+	@Override
+	public void navigatorPaused(Pose pose, boolean onTransition) {
+		// Only respond to pauses on transitions
+		if (!onTransition)
 			return;
 
 		// Navigator is paused after rotating and before traveling
-		if (getState() == State.ROTATE) {
+		if (navigator.getState() == Navigator2.State.TRAVEL) {
 			beforeTravel();
 		}
 	}
 
 	@Override
-	public void pathComplete(final Waypoint waypoint, Pose pose, int sequence) {
-		start(new RunnerTask() {
-			@Override
-			public void run() throws CancellationException {
-				pathComplete();
-			}
-		});
+	public void navigatorResumed(Pose pose) {
 	}
 
 	@Override
-	public void pathInterrupted(Waypoint waypoint, Pose pose, int sequence) {
-		start(new RunnerTask() {
-			@Override
-			public void run() throws CancellationException {
-				pathInterrupted();
-			}
-		});
+	public void navigatorCompleted(Waypoint waypoint, Pose pose) {
+		// Next tile reached
+		next();
 	}
 
 	private class LineFinderListener implements RunnerListener {
@@ -597,12 +553,7 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 		@Override
 		public void onEndBarcode(final byte barcode) {
-			start(new RunnerTask() {
-				@Override
-				public void run() throws CancellationException {
-					afterBarcode(barcode);
-				}
-			});
+			afterBarcode(barcode);
 		}
 	}
 
@@ -620,16 +571,13 @@ public class ExplorerRunner extends PathRunner implements NavigationListener {
 
 		@Override
 		public int compare(Tile left, Tile right) {
-			double leftDistance = manhattanDistance(referencePosition,
-					left.getPosition());
-			double rightDistance = manhattanDistance(referencePosition,
-					right.getPosition());
+			double leftDistance = manhattanDistance(referencePosition, left.getPosition());
+			double rightDistance = manhattanDistance(referencePosition, right.getPosition());
 			return Double.compare(leftDistance, rightDistance);
 		}
 
 		public static double manhattanDistance(Point2D left, Point2D right) {
-			return Math.abs(left.getX() - right.getX())
-					+ Math.abs(left.getY() - right.getY());
+			return Math.abs(left.getX() - right.getX()) + Math.abs(left.getY() - right.getY());
 		}
 
 	}
