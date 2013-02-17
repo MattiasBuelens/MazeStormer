@@ -37,12 +37,16 @@ public class Navigator2 implements WaypointListener {
 		this.poseProvider = checkNotNull(poseProvider);
 	}
 
-	public List<Waypoint> getRemainingPath() {
-		return Collections.unmodifiableList(this.path);
-	}
-
 	public State getState() {
 		return currentState;
+	}
+
+	public Waypoint getCurrentTarget() {
+		return isRunning() ? node : null;
+	}
+
+	public List<Waypoint> getRemainingPath() {
+		return Collections.unmodifiableList(this.path);
 	}
 
 	public void setPath(List<Waypoint> path) {
@@ -271,7 +275,7 @@ public class Navigator2 implements WaypointListener {
 	private void bindTransition(final Future<Boolean> future, final State nextState) {
 		future.addFutureListener(new FutureListener<Boolean>() {
 			@Override
-			public void futureResolved(Future<Boolean> future) {
+			public void futureResolved(Future<? extends Boolean> future) {
 				try {
 					if (future.get().booleanValue()) {
 						// Transition when successfully completed
@@ -285,7 +289,7 @@ public class Navigator2 implements WaypointListener {
 			}
 
 			@Override
-			public void futureCancelled(Future<Boolean> future) {
+			public void futureCancelled(Future<? extends Boolean> future) {
 				// Ignore
 			}
 		});

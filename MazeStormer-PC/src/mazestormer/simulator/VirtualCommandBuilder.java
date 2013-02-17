@@ -15,20 +15,18 @@ import mazestormer.util.FutureListener;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class VirtualCommandBuilder implements
-		ConditionalCommandBuilder.CommandBuilder {
+public class VirtualCommandBuilder implements ConditionalCommandBuilder.CommandBuilder {
 
 	private final ControllableRobot robot;
 	private final ConditionFuture future;
 	private final List<Runnable> commands = new ArrayList<Runnable>();
 	private final List<Runnable> actions = new ArrayList<Runnable>();
 
-	private final ExecutorService executor = Executors
-			.newCachedThreadPool(factory);
+	private final ExecutorService executor = Executors.newCachedThreadPool(factory);
 	private final Runner actionRunner = new Runner();
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("VirtualCommandBuilder-%d").build();
+		.setNameFormat("VirtualCommandBuilder-%d").build();
 
 	public VirtualCommandBuilder(ControllableRobot robot, ConditionFuture future) {
 		this.robot = robot;
@@ -138,6 +136,7 @@ public class VirtualCommandBuilder implements
 			for (Runnable action : actions) {
 				action.run();
 			}
+			executor.shutdown();
 		}
 
 	}
@@ -151,14 +150,14 @@ public class VirtualCommandBuilder implements
 		}
 
 		@Override
-		public void futureResolved(Future<Void> future) {
+		public void futureResolved(Future<? extends Void> future) {
 			if (future == this.future) {
 				trigger();
 			}
 		}
 
 		@Override
-		public void futureCancelled(Future<Void> future) {
+		public void futureCancelled(Future<? extends Void> future) {
 		}
 
 	}

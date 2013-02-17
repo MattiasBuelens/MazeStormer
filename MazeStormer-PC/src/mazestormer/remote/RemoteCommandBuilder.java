@@ -19,20 +19,17 @@ import mazestormer.util.FutureListener;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class RemoteCommandBuilder extends ReportRequester<Void> implements
-		ConditionalCommandBuilder.CommandBuilder {
+public class RemoteCommandBuilder extends ReportRequester<Void> implements ConditionalCommandBuilder.CommandBuilder {
 
 	private final ConditionalCommand command;
 	private final List<Runnable> actions = new ArrayList<>();
 
-	private final ExecutorService executor = Executors
-			.newCachedThreadPool(factory);
+	private final ExecutorService executor = Executors.newCachedThreadPool(factory);
 	private final ActionRunner actionRunner = new ActionRunner();
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("RemoteCommandBuilder-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("RemoteCommandBuilder-%d")
+			.build();
 
-	public RemoteCommandBuilder(RemoteCommunicator communicator,
-			CommandType type, Condition condition) {
+	public RemoteCommandBuilder(RemoteCommunicator communicator, CommandType type, Condition condition) {
 		super(communicator);
 		command = new ConditionalCommand(type, condition);
 		command.setRequestId(communicator.nextRequestId());
@@ -113,14 +110,14 @@ public class RemoteCommandBuilder extends ReportRequester<Void> implements
 		}
 
 		@Override
-		public void futureResolved(Future<Void> future) {
+		public void futureResolved(Future<? extends Void> future) {
 			if (future == this.future) {
 				trigger();
 			}
 		}
 
 		@Override
-		public void futureCancelled(Future<Void> future) {
+		public void futureCancelled(Future<? extends Void> future) {
 		}
 
 	}

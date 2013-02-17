@@ -111,12 +111,12 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 		}
 	}
 
-	public void performAction(byte barcode) {
-		BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
+	public Future<?> performAction(byte barcode) {
+		return BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
 	}
 
-	public void performAction(Barcode barcode) {
-		BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
+	public Future<?> performAction(Barcode barcode) {
+		return BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
 	}
 
 	private void reset() {

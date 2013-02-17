@@ -157,14 +157,14 @@ public abstract class ConditionalCommandListener extends
 	}
 
 	@Override
-	public void futureResolved(Future<Void> future) {
+	public void futureResolved(Future<? extends Void> future) {
 		if (commandsByFuture.containsKey(future)) {
 			resolve(commandsByFuture.get(future));
 		}
 	}
 
 	@Override
-	public void futureCancelled(Future<Void> future) {
+	public void futureCancelled(Future<? extends Void> future) {
 		if (commandsByFuture.containsKey(future)) {
 			cancel(commandsByFuture.get(future));
 		}

@@ -32,4 +32,10 @@ public class VirtualConditionResolvers {
 		return resolver.add(condition);
 	}
 
+	public void terminate() {
+		for (VirtualConditionResolver<?, ?> resolver : resolvers.values()) {
+			resolver.terminate();
+		}
+	}
+
 }

@@ -14,7 +14,7 @@ public class AbstractFuture<V> implements Future<V> {
 	private volatile boolean isResolved = false;
 	private volatile V result;
 
-	private List<FutureListener<V>> listeners = new ArrayList<FutureListener<V>>();
+	private List<FutureListener<? super V>> listeners = new ArrayList<FutureListener<? super V>>();
 
 	private synchronized boolean isResolved() {
 		return isResolved;
@@ -97,23 +97,30 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	@Override
-	public void addFutureListener(FutureListener<V> listener) {
+	public void addFutureListener(FutureListener<? super V> listener) {
 		listeners.add(listener);
+
+		// Fire handlers on late listeners
+		if (isResolved()) {
+			listener.futureResolved(this);
+		} else if (isCancelled()) {
+			listener.futureCancelled(this);
+		}
 	}
 
 	@Override
-	public void removeFutureListener(FutureListener<V> listener) {
+	public void removeFutureListener(FutureListener<? super V> listener) {
 		listeners.remove(listener);
 	}
 
 	private void fireResolved() {
-		for (FutureListener<V> listener : listeners) {
+		for (FutureListener<? super V> listener : listeners) {
 			listener.futureResolved(this);
 		}
 	}
 
 	private void fireCancelled() {
-		for (FutureListener<V> listener : listeners) {
+		for (FutureListener<? super V> listener : listeners) {
 			listener.futureCancelled(this);
 		}
 	}

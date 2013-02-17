@@ -13,15 +13,12 @@ import mazestormer.util.FutureListener;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public abstract class Runner implements RunnerTask, RunnerListener,
-		FutureListener<Void> {
+public abstract class Runner implements RunnerTask, RunnerListener, FutureListener<Void> {
 
-	private static ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("Runner-%d").build();
+	private static ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("Runner-%d").build();
 
 	private final Pilot pilot;
-	private final ExecutorService executor = Executors
-			.newCachedThreadPool(factory);
+	private final ExecutorService executor = Executors.newCachedThreadPool(factory);
 	private final List<RunnerListener> listeners = new ArrayList<RunnerListener>();
 
 	private RunnerFuture future;
@@ -103,14 +100,14 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 	}
 
 	@Override
-	public void futureResolved(Future<Void> future) {
+	public void futureResolved(Future<? extends Void> future) {
 		for (RunnerListener listener : listeners) {
 			listener.onCompleted();
 		}
 	}
 
 	@Override
-	public void futureCancelled(Future<Void> future) {
+	public void futureCancelled(Future<? extends Void> future) {
 		for (RunnerListener listener : listeners) {
 			listener.onCancelled();
 		}
@@ -211,15 +208,13 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		travel(distance, false);
 	}
 
-	protected void travel(double distance, boolean immediateReturn)
-			throws CancellationException {
+	protected void travel(double distance, boolean immediateReturn) throws CancellationException {
 		throwWhenCancelled();
 		getPilot().travel(distance, immediateReturn);
 		throwWhenCancelled();
 	}
 
-	protected Future<Boolean> travelComplete(double distance)
-			throws CancellationException {
+	protected Future<Boolean> travelComplete(double distance) throws CancellationException {
 		throwWhenCancelled();
 		return getPilot().travelComplete(distance);
 	}
@@ -248,15 +243,13 @@ public abstract class Runner implements RunnerTask, RunnerListener,
 		rotate(angle, false);
 	}
 
-	protected void rotate(double angle, boolean immediateReturn)
-			throws CancellationException {
+	protected void rotate(double angle, boolean immediateReturn) throws CancellationException {
 		throwWhenCancelled();
 		getPilot().rotate(angle, immediateReturn);
 		throwWhenCancelled();
 	}
 
-	protected Future<Boolean> rotateComplete(double angle)
-			throws CancellationException {
+	protected Future<Boolean> rotateComplete(double angle) throws CancellationException {
 		throwWhenCancelled();
 		return getPilot().rotateComplete(angle);
 	}

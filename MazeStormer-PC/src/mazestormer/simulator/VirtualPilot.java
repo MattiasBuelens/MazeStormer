@@ -8,6 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.Move.MoveType;
@@ -28,10 +29,11 @@ public class VirtualPilot implements Pilot {
 	private final double maxRotateSpeed;
 	private double minRadius;
 
-	private Move move;
-	private boolean isMoving = false;
+	private volatile Move move;
+	private AtomicBoolean isMoving = new AtomicBoolean(false);
+
 	private ScheduledExecutorService executor;
-	private ScheduledFuture<?> moveEndHandle;
+	private volatile ScheduledFuture<?> moveEndHandle;
 
 	private List<MoveListener> moveListeners = Collections.synchronizedList(new ArrayList<MoveListener>());
 
@@ -267,7 +269,7 @@ public class VirtualPilot implements Pilot {
 
 		// Set current move
 		move = new Move(moveType, distance, angle, (float) getTravelSpeed(), (float) getRotateSpeed(), wasMoving);
-		isMoving = true;
+		isMoving.set(true);
 
 		// Publish the *targeted* move distance and angle
 		List<MoveListener> listeners = new ArrayList<MoveListener>(moveListeners);
@@ -293,7 +295,7 @@ public class VirtualPilot implements Pilot {
 		// Reset current move
 		resetMove();
 
-		// Publish the *travelled* move distance and angle
+		// Publish the *traveled* move distance and angle
 		Move travelledMove = new Move(move.getMoveType(), getMovementIncrement(), getAngleIncrement(),
 				move.getTravelSpeed(), move.getRotateSpeed(), isMoving);
 
@@ -312,12 +314,12 @@ public class VirtualPilot implements Pilot {
 		if (moveEndHandle != null) {
 			moveEndHandle.cancel(false);
 		}
-		isMoving = false;
+		isMoving.set(false);
 	}
 
 	@Override
 	public boolean isMoving() {
-		return isMoving;
+		return isMoving.get();
 	}
 
 	/**
@@ -347,11 +349,11 @@ public class VirtualPilot implements Pilot {
 	 * @return The move distance since it last started moving
 	 */
 	public float getMovementIncrement() {
-		// Time spent travelling so far
+		// Time spent traveling so far
 		long currentTime = System.currentTimeMillis();
 		float duration = (currentTime - move.getTimeStamp()) / 1000f;
 
-		// Currently travelled distance
+		// Currently traveled distance
 		float travelled = duration * move.getTravelSpeed();
 
 		// Target distance
@@ -363,7 +365,7 @@ public class VirtualPilot implements Pilot {
 
 		// Compare absolute values, since target may be negative
 		if (Math.abs(travelled) < Math.abs(target)) {
-			// Make travelled same sign as target
+			// Make traveled same sign as target
 			return Math.copySign(travelled, target);
 		} else {
 			// Target reached
@@ -391,7 +393,7 @@ public class VirtualPilot implements Pilot {
 
 		// Compare absolute values, since target may be negative
 		if (Math.abs(rotated) < Math.abs(target)) {
-			// Make travelled same sign as target
+			// Make traveled same sign as target
 			return Math.copySign(rotated, target);
 		} else {
 			// Target reached

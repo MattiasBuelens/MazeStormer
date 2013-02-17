@@ -6,11 +6,13 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Maze.Target;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.util.Future;
+import mazestormer.util.ImmediateFuture;
 
 public class GoalAction implements IAction {
 
 	@Override
-	public void performAction(ControllableRobot robot, Maze maze) {
+	public Future<?> performAction(ControllableRobot robot, Maze maze) {
 		checkNotNull(robot);
 		checkNotNull(maze);
 
@@ -20,5 +22,8 @@ public class GoalAction implements IAction {
 		Point relativePosition = maze.toRelative(pose.getLocation());
 		Point tilePosition = maze.toTile(relativePosition);
 		maze.setTarget(Target.GOAL, maze.getTileAt(tilePosition));
+
+		return new ImmediateFuture<Void>(null);
 	}
+
 }

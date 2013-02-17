@@ -10,7 +10,7 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
 	 * @param listener
 	 *            The future listener
 	 */
-	void addFutureListener(FutureListener<V> listener);
+	void addFutureListener(FutureListener<? super V> listener);
 
 	/**
 	 * Removes a future listener.
@@ -18,6 +18,6 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
 	 * @param listener
 	 *            The future listener
 	 */
-	void removeFutureListener(FutureListener<V> listener);
+	void removeFutureListener(FutureListener<? super V> listener);
 
 }
