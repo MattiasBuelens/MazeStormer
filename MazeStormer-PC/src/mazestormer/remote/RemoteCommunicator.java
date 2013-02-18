@@ -18,8 +18,7 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 	private volatile AtomicInteger nextRequestId = new AtomicInteger();
 
 	public RemoteCommunicator(NXTConnector connector) {
-		super(connector.getInputStream(), connector.getOutputStream(),
-				new ReportReader());
+		super(connector.getInputStream(), connector.getOutputStream(), new ReportReader());
 		this.connector = connector;
 		this.listeners = new CopyOnWriteArrayList<MessageListener<? super Report<?>>>();
 	}
@@ -47,7 +46,7 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 	 */
 	@Override
 	public void addListener(MessageListener<? super Report<?>> listener) {
-		listeners.add(listener);
+		super.addListener(listener);
 	}
 
 	/**
@@ -60,7 +59,7 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 	 */
 	@Override
 	public void removeListener(MessageListener<? super Report<?>> listener) {
-		listeners.remove(listener);
+		super.removeListener(listener);
 	}
 
 	/**
@@ -73,9 +72,12 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 	 */
 	@Override
 	public void trigger(final Report<?> report) {
-		// Call listeners
-		for (MessageListener<? super Report<?>> listener : listeners) {
-			listener.messageReceived(report);
-		}
+		super.trigger(report);
 	}
+
+	@Override
+	protected List<MessageListener<? super Report<?>>> getListeners() {
+		return listeners;
+	}
+
 }

@@ -1,0 +1,70 @@
+<class-diagram version="1.0.11" icons="true" always-add-relationships="false" generalizations="false" 
+  realizations="false" associations="false" dependencies="false" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ManualControlPanel.TravelAction" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/ui/ManualControlPanel.java" binary="false">    
+    <position height="-1" width="-1" x="100" y="26"/>    
+    <display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.ManualControlPanel" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/ui/ManualControlPanel.java" binary="false">    
+    <position height="-1" width="-1" x="99" y="81"/>    
+    <display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <interface id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Pilot" project="MazeStormer" 
+    file="/MazeStormer/src/mazestormer/robot/Pilot.java" binary="false">    
+    <position height="-1" width="-1" x="102" y="206"/>    
+    <display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.ManualControlController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/ManualControlController.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="99" y="141"/>    
+    <display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.MoveEvent" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/robot/MoveEvent.java" binary="false">    
+    <position height="-1" width="-1" x="284" y="25"/>    
+    <display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.MapController" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/MapController.java" binary="false">    
+    <position height="-1" width="-1" x="285" y="81"/>    
+    <display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.ui.map.RobotLayer" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/ui/map/RobotLayer.java" binary="false">    
+    <position height="-1" width="-1" x="285" y="141"/>    
+    <display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <nesting id="8">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </nesting>  
+  <classifier-display autosize="true" stereotype="false" package="true" initial-value="false" signature="true" 
+    visibility="true">    
+    <attributes public="false" package="false" protected="false" private="false"/>    
+    <operations public="false" package="false" protected="false" private="false"/>  
+  </classifier-display>  
+  <association-display labels="false" multiplicity="false"/>
+</class-diagram>

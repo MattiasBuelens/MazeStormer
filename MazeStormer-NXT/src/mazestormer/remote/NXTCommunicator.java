@@ -43,7 +43,7 @@ public class NXTCommunicator extends Communicator<Report<?>, Command> {
 	 */
 	@Override
 	public void addListener(MessageListener<? super Command> listener) {
-		listeners.add(listener);
+		super.addListener(listener);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class NXTCommunicator extends Communicator<Report<?>, Command> {
 	 */
 	@Override
 	public void removeListener(MessageListener<? super Command> listener) {
-		listeners.remove(listener);
+		super.removeListener(listener);
 	}
 
 	/**
@@ -72,10 +72,12 @@ public class NXTCommunicator extends Communicator<Report<?>, Command> {
 	 */
 	@Override
 	public void trigger(final Command command) {
-		// Call listeners
-		for (MessageListener<? super Command> listener : listeners) {
-			listener.messageReceived(command);
-		}
+		super.trigger(command);
+	}
+
+	@Override
+	protected List<MessageListener<? super Command>> getListeners() {
+		return listeners;
 	}
 
 }

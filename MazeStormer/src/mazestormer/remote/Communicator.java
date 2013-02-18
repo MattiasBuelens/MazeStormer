@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 public abstract class Communicator<S extends Message, R extends Message>
 		implements Runnable {
@@ -134,7 +135,9 @@ public abstract class Communicator<S extends Message, R extends Message>
 	 * @param listener
 	 *            The new listener.
 	 */
-	public abstract void addListener(MessageListener<? super R> listener);
+	public void addListener(MessageListener<? super R> listener) {
+		getListeners().add(listener);
+	}
 
 	/**
 	 * Removes a message listener.
@@ -142,7 +145,9 @@ public abstract class Communicator<S extends Message, R extends Message>
 	 * @param listener
 	 *            The listener to remove.
 	 */
-	public abstract void removeListener(MessageListener<? super R> listener);
+	public void removeListener(MessageListener<? super R> listener) {
+		getListeners().remove(listener);
+	}
 
 	/**
 	 * Triggers all registered message listeners.
@@ -150,7 +155,14 @@ public abstract class Communicator<S extends Message, R extends Message>
 	 * @param message
 	 *            The received message.
 	 */
-	public abstract void trigger(final R message);
+	public void trigger(final R message) {
+		// Call listeners
+		for (MessageListener<? super R> listener : getListeners()) {
+			listener.messageReceived(message);
+		}
+	}
+
+	protected abstract List<MessageListener<? super R>> getListeners();
 
 	public boolean isTerminated() {
 		return isTerminated;
