@@ -5,18 +5,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.navigation.WaypointListener;
 import lejos.robotics.pathfinding.Path;
-import mazestormer.util.Future;
-import mazestormer.util.FutureListener;
+import mazestormer.state.StateListener;
+import mazestormer.state.StateMachine;
 
-public class Navigator2 implements WaypointListener {
+public class Navigator2 extends StateMachine<Navigator2, NavigatorState>
+		implements StateListener<NavigatorState>, WaypointListener {
 
 	private final Pilot pilot;
 	private final PoseProvider poseProvider;
@@ -24,21 +23,12 @@ public class Navigator2 implements WaypointListener {
 	private List<Waypoint> path;
 	private List<NavigatorListener> listeners = new ArrayList<NavigatorListener>();
 
-	private AtomicBoolean isRunning = new AtomicBoolean();
-	private AtomicBoolean isPaused = new AtomicBoolean();
-	private volatile State currentState;
 	private volatile Waypoint node;
-	private volatile Future<?> nextTransition;
-
-	private State pauseState;
 
 	public Navigator2(Pilot pilot, PoseProvider poseProvider) {
 		this.pilot = checkNotNull(pilot);
 		this.poseProvider = checkNotNull(poseProvider);
-	}
-
-	public State getState() {
-		return currentState;
+		addStateListener(this);
 	}
 
 	public Waypoint getCurrentTarget() {
@@ -51,78 +41,10 @@ public class Navigator2 implements WaypointListener {
 
 	public void setPath(List<Waypoint> path) {
 		if (isRunning()) {
-			throw new IllegalStateException("Cannot change path while traversing.");
+			throw new IllegalStateException(
+					"Cannot change path while traversing.");
 		}
 		this.path = checkNotNull(path);
-	}
-
-	public boolean isRunning() {
-		return isRunning.get();
-	}
-
-	public boolean isPaused() {
-		return isPaused.get();
-	}
-
-	/**
-	 * Start path traversal.
-	 */
-	public void start() {
-		if (!isRunning()) {
-			isRunning.set(true);
-			reportStarted();
-			init();
-		}
-	}
-
-	/**
-	 * Stop path traversal. Does <strong>not</strong> stop the pilot.
-	 */
-	public void stop() {
-		if (isRunning()) {
-			isRunning.set(false);
-			isPaused.set(false);
-			if (nextTransition != null)
-				nextTransition.cancel();
-			reportStopped();
-		}
-	}
-
-	/**
-	 * Pause path traversal. Does <strong>not</strong> stop the pilot.
-	 */
-	public void pause() {
-		pause(false);
-	}
-
-	private void pause(boolean onTransition) {
-		if (isRunning() && !isPaused()) {
-			isPaused.set(true);
-			if (nextTransition != null)
-				nextTransition.cancel();
-			reportPaused(onTransition);
-		}
-	}
-
-	/**
-	 * Resume path traversal.
-	 */
-	public void resume() {
-		if (isRunning() && isPaused()) {
-			isPaused.set(false);
-			reportResumed();
-			currentState.execute(this);
-		}
-	}
-
-	/**
-	 * Pause this navigator before entering the given state.
-	 * 
-	 * @param pauseState
-	 *            The state to pause at.
-	 */
-	public void pauseAt(State pauseState) {
-		this.pauseState = pauseState;
 	}
 
 	/**
@@ -135,8 +57,8 @@ public class Navigator2 implements WaypointListener {
 	}
 
 	/**
-	 * Add a navigator listener that is informed when the robot stops or
-	 * reaches a way point.
+	 * Add a navigator listener that is informed when the robot stops or reaches
+	 * a way point.
 	 * 
 	 * @param listener
 	 *            The new navigator listener.
@@ -176,7 +98,8 @@ public class Navigator2 implements WaypointListener {
 	/**
 	 * Initialize the path traversal.
 	 */
-	private void init() {
+	@Override
+	protected void setup() {
 		if (pathCompleted()) {
 			// Empty path
 			finish();
@@ -184,7 +107,7 @@ public class Navigator2 implements WaypointListener {
 			// Get the first node in the path
 			node = path.remove(0);
 			// Start traversing
-			transition(State.ROTATE_TO);
+			transition(NavigatorState.ROTATE_TO);
 		}
 	}
 
@@ -192,9 +115,8 @@ public class Navigator2 implements WaypointListener {
 	 * Finish the path traversal.
 	 */
 	private void finish() {
-		// Clear state
-		isRunning.set(false);
-		isPaused.set(false);
+		// Stop
+		stop();
 		// Report
 		reportComplete();
 	}
@@ -202,38 +124,38 @@ public class Navigator2 implements WaypointListener {
 	/**
 	 * Rotate towards target.
 	 */
-	private void rotateToNode() {
+	void rotateToNode() {
 		Pose pose = poseProvider.getPose();
 		double bearing = pose.relativeBearing(node);
-		bindTransition(pilot.rotateComplete(bearing), State.TRAVEL);
+		bindTransition(pilot.rotateComplete(bearing), NavigatorState.TRAVEL);
 	}
 
 	/**
 	 * Travel towards target.
 	 */
-	private void travel() {
+	void travel() {
 		Pose pose = poseProvider.getPose();
 		double distance = pose.distanceTo(node);
-		bindTransition(pilot.travelComplete(distance), State.ROTATE_ON);
+		bindTransition(pilot.travelComplete(distance), NavigatorState.ROTATE_ON);
 	}
 
 	/**
 	 * Rotate on target.
 	 */
-	private void rotateOnTarget() {
+	void rotateOnTarget() {
 		if (node.isHeadingRequired()) {
 			Pose pose = poseProvider.getPose();
 			double heading = node.getHeading() - pose.getHeading();
-			bindTransition(pilot.rotateComplete(heading), State.REPORT);
+			bindTransition(pilot.rotateComplete(heading), NavigatorState.REPORT);
 		} else {
-			transition(State.REPORT);
+			transition(NavigatorState.REPORT);
 		}
 	}
 
 	/**
 	 * Report target reached and get next node.
 	 */
-	private void report() {
+	void report() {
 		if (pathCompleted()) {
 			// Finished
 			finish();
@@ -243,57 +165,16 @@ public class Navigator2 implements WaypointListener {
 		// Report
 		reportAtWaypoint();
 
-		transition(State.NEXT);
+		transition(NavigatorState.NEXT);
 	}
 
 	/**
 	 * Report target reached and get next node.
 	 */
-	private void next() {
+	void next() {
 		// Next node
 		node = path.remove(0);
-		transition(State.ROTATE_TO);
-	}
-
-	/*
-	 * Transitions
-	 */
-
-	private void transition(State nextState) {
-		if (isRunning()) {
-			currentState = nextState;
-			if (pauseState == currentState) {
-				// Pause requested before entering new state
-				pause(true);
-			} else if (!isPaused()) {
-				// Continue with new state
-				currentState.execute(this);
-			}
-		}
-	}
-
-	private void bindTransition(final Future<Boolean> future, final State nextState) {
-		future.addFutureListener(new FutureListener<Boolean>() {
-			@Override
-			public void futureResolved(Future<? extends Boolean> future) {
-				try {
-					if (future.get().booleanValue()) {
-						// Transition when successfully completed
-						transition(nextState);
-					} else {
-						// Interrupt, retry needed
-						pause();
-					}
-				} catch (InterruptedException | ExecutionException cannotHappen) {
-				}
-			}
-
-			@Override
-			public void futureCancelled(Future<? extends Boolean> future) {
-				// Ignore
-			}
-		});
-		this.nextTransition = future;
+		transition(NavigatorState.ROTATE_TO);
 	}
 
 	private void reportStarted() {
@@ -310,14 +191,14 @@ public class Navigator2 implements WaypointListener {
 		}
 	}
 
-	private void reportPaused(boolean onTransition) {
+	private void reportPaused(NavigatorState currentState, boolean onTransition) {
 		Pose pose = poseProvider.getPose();
 		for (NavigatorListener l : listeners) {
 			l.navigatorPaused(pose, onTransition);
 		}
 	}
 
-	private void reportResumed() {
+	private void reportResumed(NavigatorState currentState) {
 		Pose pose = poseProvider.getPose();
 		for (NavigatorListener l : listeners) {
 			l.navigatorResumed(pose);
@@ -339,50 +220,28 @@ public class Navigator2 implements WaypointListener {
 		}
 	}
 
-	public enum State {
+	@Override
+	public void stateStarted() {
+		reportStarted();
+	}
 
-		// Interruptible
-		ROTATE_TO {
-			@Override
-			protected void execute(Navigator2 navigator) {
-				navigator.rotateToNode();
-			}
-		},
+	@Override
+	public void stateStopped() {
+		reportStopped();
+	}
 
-		// Interruptible
-		TRAVEL {
-			@Override
-			protected void execute(Navigator2 navigator) {
-				navigator.travel();
-			}
-		},
+	@Override
+	public void statePaused(NavigatorState currentState, boolean onTransition) {
+		reportPaused((NavigatorState) currentState, onTransition);
+	}
 
-		// Interruptible
-		ROTATE_ON {
-			@Override
-			protected void execute(Navigator2 navigator) {
-				navigator.rotateOnTarget();
-			}
-		},
+	@Override
+	public void stateResumed(NavigatorState currentState) {
+		reportResumed((NavigatorState) currentState);
+	}
 
-		// Not interruptible
-		REPORT {
-			@Override
-			protected void execute(Navigator2 navigator) {
-				navigator.report();
-			}
-		},
-
-		// Not interruptible
-		NEXT {
-			@Override
-			protected void execute(Navigator2 navigator) {
-				navigator.next();
-			}
-		};
-
-		protected abstract void execute(Navigator2 navigator);
-
+	@Override
+	public void stateTransitioned(NavigatorState nextState) {
 	}
 
 }

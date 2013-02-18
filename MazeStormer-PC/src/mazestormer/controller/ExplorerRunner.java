@@ -24,8 +24,8 @@ import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.Navigator2;
 import mazestormer.robot.NavigatorListener;
+import mazestormer.robot.NavigatorState;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.RunnerListener;
 import mazestormer.robot.RunnerTask;
@@ -82,7 +82,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 
 		// Navigator
 		navigator.addNavigatorListener(this);
-		navigator.pauseAt(Navigator2.State.TRAVEL);
+		navigator.pauseAt(NavigatorState.TRAVEL);
 
 		// Runners
 		lineFinder = new LineFinderRunner(robot) {
