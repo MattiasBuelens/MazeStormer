@@ -24,7 +24,7 @@ import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.Navigator2;
+import mazestormer.robot.Navigator;
 import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.RunnerListener;
@@ -82,7 +82,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 
 		// Navigator
 		navigator.addNavigatorListener(this);
-		navigator.pauseAt(Navigator2.NavigatorState.TRAVEL);
+		navigator.pauseAt(Navigator.NavigatorState.TRAVEL);
 
 		// Runners
 		lineFinder = new LineFinderRunner(robot) {
@@ -557,7 +557,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 	}
 
 	@Override
-	public void navigatorPaused(Navigator2.NavigatorState currentState,
+	public void navigatorPaused(Navigator.NavigatorState currentState,
 			Pose pose, boolean onTransition) {
 		// Only respond to pauses on transitions
 		if (!onTransition)
@@ -574,7 +574,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 	}
 
 	@Override
-	public void navigatorResumed(Navigator2.NavigatorState currentState,
+	public void navigatorResumed(Navigator.NavigatorState currentState,
 			Pose pose) {
 	}
 

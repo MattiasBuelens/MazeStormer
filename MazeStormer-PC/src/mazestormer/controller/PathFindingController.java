@@ -8,7 +8,7 @@ import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.Navigator2;
+import mazestormer.robot.Navigator;
 import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.RunnerListener;
@@ -234,13 +234,13 @@ public class PathFindingController extends SubController implements
 		}
 
 		@Override
-		public void navigatorPaused(Navigator2.NavigatorState currentState,
+		public void navigatorPaused(Navigator.NavigatorState currentState,
 				Pose pose, boolean onTransition) {
 			cancel();
 		}
 
 		@Override
-		public void navigatorResumed(Navigator2.NavigatorState currentState,
+		public void navigatorResumed(Navigator.NavigatorState currentState,
 				Pose pose) {
 		}
 
