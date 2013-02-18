@@ -24,8 +24,8 @@ import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Navigator2;
 import mazestormer.robot.NavigatorListener;
-import mazestormer.robot.NavigatorState;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.RunnerListener;
 import mazestormer.robot.RunnerTask;
@@ -82,7 +82,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 
 		// Navigator
 		navigator.addNavigatorListener(this);
-		navigator.pauseAt(NavigatorState.TRAVEL);
+		navigator.pauseAt(Navigator2.NavigatorState.TRAVEL);
 
 		// Runners
 		lineFinder = new LineFinderRunner(robot) {
@@ -383,12 +383,14 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
-		RangeFeature feature = robot.getRangeDetector().scan(getScanAngles(tile));
+		RangeFeature feature = robot.getRangeDetector().scan(
+				getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
-				orientation = angleToOrientation(reading.getAngle() + maze.toRelative(getPose().getHeading()));
+				orientation = angleToOrientation(reading.getAngle()
+						+ maze.toRelative(getPose().getHeading()));
 				maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
@@ -483,7 +485,8 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 			log("Performing barcode action for " + currentTile.getPosition());
 			beforeBarcodeAction();
 			// Resume when action is done
-			Future<?> future = barcodeRunner.performAction(currentTile.getBarcode());
+			Future<?> future = barcodeRunner.performAction(currentTile
+					.getBarcode());
 			future.addFutureListener(new FutureListener<Object>() {
 				@Override
 				public void futureResolved(Future<?> future) {
@@ -554,12 +557,13 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 	}
 
 	@Override
-	public void navigatorPaused(Pose pose, boolean onTransition) {
+	public void navigatorPaused(Navigator2.NavigatorState currentState,
+			Pose pose, boolean onTransition) {
 		// Only respond to pauses on transitions
 		if (!onTransition)
 			return;
 
-		switch (navigator.getState()) {
+		switch (currentState) {
 		case TRAVEL:
 			// Paused after rotating and before traveling
 			beforeTravel();
@@ -570,7 +574,8 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 	}
 
 	@Override
-	public void navigatorResumed(Pose pose) {
+	public void navigatorResumed(Navigator2.NavigatorState currentState,
+			Pose pose) {
 	}
 
 	@Override
@@ -631,13 +636,16 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 
 		@Override
 		public int compare(Tile left, Tile right) {
-			double leftDistance = manhattanDistance(referencePosition, left.getPosition());
-			double rightDistance = manhattanDistance(referencePosition, right.getPosition());
+			double leftDistance = manhattanDistance(referencePosition,
+					left.getPosition());
+			double rightDistance = manhattanDistance(referencePosition,
+					right.getPosition());
 			return Double.compare(leftDistance, rightDistance);
 		}
 
 		public static double manhattanDistance(Point2D left, Point2D right) {
-			return Math.abs(left.getX() - right.getX()) + Math.abs(left.getY() - right.getY());
+			return Math.abs(left.getX() - right.getX())
+					+ Math.abs(left.getY() - right.getY());
 		}
 
 	}

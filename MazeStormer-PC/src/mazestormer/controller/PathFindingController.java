@@ -8,12 +8,14 @@ import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Navigator2;
 import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.PathRunner;
 import mazestormer.robot.RunnerListener;
 import mazestormer.util.LongPoint;
 
-public class PathFindingController extends SubController implements IPathFindingController {
+public class PathFindingController extends SubController implements
+		IPathFindingController {
 
 	private TileSequenceRunner runner;
 
@@ -48,7 +50,8 @@ public class PathFindingController extends SubController implements IPathFinding
 	@Override
 	public void startStepAction(long goalX, long goalY) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, true, false);
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
+				true, false);
 		this.runner.start();
 	}
 
@@ -58,9 +61,11 @@ public class PathFindingController extends SubController implements IPathFinding
 	}
 
 	@Override
-	public void startAction(long goalX, long goalY, boolean singleStep, boolean reposition) {
+	public void startAction(long goalX, long goalY, boolean singleStep,
+			boolean reposition) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, singleStep, reposition);
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
+				singleStep, reposition);
 		this.runner.start();
 	}
 
@@ -121,7 +126,8 @@ public class PathFindingController extends SubController implements IPathFinding
 		}
 	}
 
-	public class TileSequenceRunner extends PathRunner implements NavigatorListener {
+	public class TileSequenceRunner extends PathRunner implements
+			NavigatorListener {
 
 		private Tile goal;
 		private boolean singleStep;
@@ -142,7 +148,8 @@ public class PathFindingController extends SubController implements IPathFinding
 		 * @param reposition
 		 *            Whether to reposition the robot before navigating.
 		 */
-		public TileSequenceRunner(ControllableRobot robot, Maze maze, Tile goal, boolean singleStep, boolean reposition) {
+		public TileSequenceRunner(ControllableRobot robot, Maze maze,
+				Tile goal, boolean singleStep, boolean reposition) {
 			super(robot, maze);
 			this.goal = goal;
 			this.singleStep = singleStep;
@@ -227,12 +234,14 @@ public class PathFindingController extends SubController implements IPathFinding
 		}
 
 		@Override
-		public void navigatorPaused(Pose pose, boolean onTransition) {
+		public void navigatorPaused(Navigator2.NavigatorState currentState,
+				Pose pose, boolean onTransition) {
 			cancel();
 		}
 
 		@Override
-		public void navigatorResumed(Pose pose) {
+		public void navigatorResumed(Navigator2.NavigatorState currentState,
+				Pose pose) {
 		}
 
 		@Override

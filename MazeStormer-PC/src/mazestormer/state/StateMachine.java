@@ -10,8 +10,8 @@ import mazestormer.util.FutureListener;
 
 public abstract class StateMachine<M extends StateMachine<M, S>, S extends State<M, S>> {
 
-	private AtomicBoolean isRunning = new AtomicBoolean();
-	private AtomicBoolean isPaused = new AtomicBoolean();
+	private AtomicBoolean isRunning = new AtomicBoolean(false);
+	private AtomicBoolean isPaused = new AtomicBoolean(false);
 
 	private volatile S currentState;
 	private S pauseState;
@@ -19,17 +19,23 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 
 	private List<StateListener<S>> listeners = new ArrayList<StateListener<S>>();
 
-	protected StateMachine() {
-	}
-
+	/**
+	 * Get the current state of this state machine.
+	 */
 	public S getState() {
 		return currentState;
 	}
 
+	/**
+	 * Check whether this state machine is currently running.
+	 */
 	public boolean isRunning() {
 		return isRunning.get();
 	}
 
+	/**
+	 * Check whether this state machine is currently paused.
+	 */
 	public boolean isPaused() {
 		return isPaused.get();
 	}
@@ -129,6 +135,21 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 * Transitions
 	 */
 
+	/**
+	 * Transition to the given state.
+	 * 
+	 * <ul>
+	 * <li>If the state machine is ordered to pause before the given state using
+	 * {@link #pauseAt(State)}, it is paused.</li>
+	 * <li>If the state machine is currently paused, it will resume from the
+	 * given state when calling {@link #resume()}.</li>
+	 * <li>If the state machine is not paused, it immediately transitions to the
+	 * given state.</li>
+	 * </ul>
+	 * 
+	 * @param nextState
+	 *            The next state.
+	 */
 	protected void transition(S nextState) {
 		if (isRunning()) {
 			currentState = nextState;
@@ -143,6 +164,19 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		}
 	}
 
+	/**
+	 * Bind the given boolean future to the transition to the given state.
+	 * 
+	 * <p>
+	 * When the given boolean future is resolved, the state machine transitions
+	 * to the given state if the result is {@code true}, otherwise it pauses.
+	 * </p>
+	 * 
+	 * @param future
+	 *            The future which results in the transition.
+	 * @param nextState
+	 *            The next state.
+	 */
 	protected void bindTransition(final Future<Boolean> future,
 			final S nextState) {
 		future.addFutureListener(new FutureListener<Boolean>() {

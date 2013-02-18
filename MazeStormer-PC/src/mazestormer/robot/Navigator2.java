@@ -11,11 +11,13 @@ import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.navigation.WaypointListener;
 import lejos.robotics.pathfinding.Path;
+import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 
-public class Navigator2 extends StateMachine<Navigator2, NavigatorState>
-		implements StateListener<NavigatorState>, WaypointListener {
+public class Navigator2 extends
+		StateMachine<Navigator2, Navigator2.NavigatorState> implements
+		StateListener<Navigator2.NavigatorState>, WaypointListener {
 
 	private final Pilot pilot;
 	private final PoseProvider poseProvider;
@@ -177,6 +179,10 @@ public class Navigator2 extends StateMachine<Navigator2, NavigatorState>
 		transition(NavigatorState.ROTATE_TO);
 	}
 
+	/*
+	 * Events
+	 */
+
 	private void reportStarted() {
 		Pose pose = poseProvider.getPose();
 		for (NavigatorListener l : listeners) {
@@ -194,14 +200,14 @@ public class Navigator2 extends StateMachine<Navigator2, NavigatorState>
 	private void reportPaused(NavigatorState currentState, boolean onTransition) {
 		Pose pose = poseProvider.getPose();
 		for (NavigatorListener l : listeners) {
-			l.navigatorPaused(pose, onTransition);
+			l.navigatorPaused(currentState, pose, onTransition);
 		}
 	}
 
 	private void reportResumed(NavigatorState currentState) {
 		Pose pose = poseProvider.getPose();
 		for (NavigatorListener l : listeners) {
-			l.navigatorResumed(pose);
+			l.navigatorResumed(currentState, pose);
 		}
 	}
 
@@ -242,6 +248,54 @@ public class Navigator2 extends StateMachine<Navigator2, NavigatorState>
 
 	@Override
 	public void stateTransitioned(NavigatorState nextState) {
+	}
+
+	/*
+	 * States
+	 */
+
+	public enum NavigatorState implements State<Navigator2, NavigatorState> {
+
+		// Interruptible
+		ROTATE_TO {
+			@Override
+			public void execute(Navigator2 navigator) {
+				navigator.rotateToNode();
+			}
+		},
+
+		// Interruptible
+		TRAVEL {
+			@Override
+			public void execute(Navigator2 navigator) {
+				navigator.travel();
+			}
+		},
+
+		// Interruptible
+		ROTATE_ON {
+			@Override
+			public void execute(Navigator2 navigator) {
+				navigator.rotateOnTarget();
+			}
+		},
+
+		// Not interruptible
+		REPORT {
+			@Override
+			public void execute(Navigator2 navigator) {
+				navigator.report();
+			}
+		},
+
+		// Not interruptible
+		NEXT {
+			@Override
+			public void execute(Navigator2 navigator) {
+				navigator.next();
+			}
+		};
+
 	}
 
 }
