@@ -10,17 +10,17 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	/**
 	 * Left wheel diameter, in centimeters.
 	 */
-	public final static float leftWheelDiameter = 3.0f;
+	public final static float leftWheelDiameter = 5.6f;
 
 	/**
 	 * Right wheel diameter, in centimeters.
 	 */
-	public final static float rightWheelDiameter = 2.999f;
+	public final static float rightWheelDiameter = 5.6f * (39.1f/40f);
 
 	/**
 	 * Distance between center of wheels, in centimeters.
 	 */
-	public final static float trackWidth = 14.25f;// 14.3f;
+	public final static float trackWidth = 16.0f;// 14.3f;
 
 	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.
