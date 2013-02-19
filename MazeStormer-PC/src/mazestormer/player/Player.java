@@ -1,5 +1,6 @@
 package mazestormer.player;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
@@ -40,5 +41,10 @@ public class Player {
 			this.maze = new Maze();
 		}
 		return this.maze;
+	}
+	
+	public void setMaze(Maze maze) {
+		checkNotNull(maze);
+		this.maze = maze;
 	}
 }

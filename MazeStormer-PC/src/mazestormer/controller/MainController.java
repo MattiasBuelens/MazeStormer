@@ -62,7 +62,6 @@ public class MainController implements IMainController {
 	private final ConnectionContext connectionContext = new ConnectionContext();
 	private Connector connector;
 
-	private Maze maze;
 	private Maze sourceMaze;
 	private Tile goalTile;
 
@@ -80,9 +79,6 @@ public class MainController implements IMainController {
 	private IExplorerController explorerControl;
 	private ICheatController cheatControl;
 	private IGameController gameControl;
-
-	private IMapController map;
-	private ILogController log;
 
 	private IStateController state;
 
@@ -219,18 +215,12 @@ public class MainController implements IMainController {
 
 	@Override
 	public IMapController map() {
-		if (map == null) {
-			map = new MapController(this);
-		}
-		return map;
+		return gameControl().getPersonalPlayerController().map();
 	}
 
 	@Override
 	public ILogController log() {
-		if (log == null) {
-			log = new LogController(this);
-		}
-		return log;
+		return gameControl().getPersonalPlayerController().log();
 	}
 
 	@Override
@@ -253,6 +243,8 @@ public class MainController implements IMainController {
 	public void register(EventSource eventSource) {
 		eventSource.registerEventBus(getEventBus());
 	}
+	
+	// TODO: logging systeem overbrengen
 
 	/*
 	 * Logging
@@ -401,10 +393,11 @@ public class MainController implements IMainController {
 	 */
 
 	public Maze getMaze() {
-		if (maze == null) {
-			maze = new Maze();
-		}
-		return maze;
+		return gameControl().getPersonalPlayerController().getPlayer().getMaze();
+	}
+	
+	public void setMaze(Maze maze) {
+		gameControl().getPersonalPlayerController().getPlayer().setMaze(maze);
 	}
 
 	public Maze getSourceMaze() {
@@ -412,10 +405,6 @@ public class MainController implements IMainController {
 			sourceMaze = new Maze();
 		}
 		return sourceMaze;
-	}
-
-	public void setMaze(Maze maze) {
-		this.maze = maze;
 	}
 
 	public Tile getGoalTile() {

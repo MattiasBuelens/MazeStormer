@@ -9,6 +9,8 @@ public interface IGameController extends EventSource {
 	
 	public boolean hasAsPlayerController(IPlayerController pc);
 	
+	public IPlayerController getPersonalPlayerController();
+	
 	public IPlayerController getPlayerControllerAt(int index) 
 			throws IndexOutOfBoundsException;
 	
@@ -17,5 +19,4 @@ public interface IGameController extends EventSource {
 	public void addPlayerController(IPlayerController pc);
 	
 	public void removePlayerController(IPlayerController pc);
-
 }
