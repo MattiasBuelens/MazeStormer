@@ -27,6 +27,8 @@ public interface IMainController {
 	public ILogController log();
 
 	public IStateController state();
+	
+	public IGameController gameControl();
 
 	public void register(EventSource eventSource);
 

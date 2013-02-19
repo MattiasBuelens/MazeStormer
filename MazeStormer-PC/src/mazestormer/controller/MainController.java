@@ -79,6 +79,7 @@ public class MainController implements IMainController {
 	private ILineFinderController lineFinderControl;
 	private IExplorerController explorerControl;
 	private ICheatController cheatControl;
+	private IGameController gameControl;
 
 	private IMapController map;
 	private ILogController log;
@@ -238,6 +239,14 @@ public class MainController implements IMainController {
 			state = new StateController(this);
 		}
 		return state;
+	}
+	
+	@Override
+	public IGameController gameControl() {
+		if (gameControl == null) {
+			gameControl = new GameController(this);
+		}
+		return gameControl;
 	}
 
 	@Override
