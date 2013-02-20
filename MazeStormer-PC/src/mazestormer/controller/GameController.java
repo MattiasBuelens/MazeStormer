@@ -2,6 +2,7 @@ package mazestormer.controller;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import mazestormer.player.Player;
@@ -50,6 +51,11 @@ public class GameController extends SubController implements IGameController{
 	@Override
 	public void removePlayerController(IPlayerController pc) {
 		this.pcs.remove(pc);
+	}
+	
+	@Override
+	public List<IPlayerController> getPlayerControllers() {
+		return Collections.unmodifiableList(pcs);
 	}
 	
 	private List<IPlayerController> pcs = new ArrayList<IPlayerController>();

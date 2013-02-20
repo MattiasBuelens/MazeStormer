@@ -9,11 +9,15 @@ public class Player {
 	private String playerName;
 	private String playerID;
 	
-	private final Robot robot;
+	private Robot robot;
 	private Maze maze;
 	
+	public Player() {
+		
+	}
+	
 	public Player(Robot robot) {
-		this.robot = robot;
+		setRobot(robot);
 	}
 	
 	public String getPlayerName() {
@@ -34,6 +38,11 @@ public class Player {
 	
 	public Robot getRobot() {
 		return this.robot;
+	}
+	
+	public void setRobot(Robot robot) {
+		checkNotNull(robot);
+		this.robot = robot;
 	}
 	
 	public Maze getMaze() {

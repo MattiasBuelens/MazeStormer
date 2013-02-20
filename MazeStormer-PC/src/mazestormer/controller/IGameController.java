@@ -1,5 +1,7 @@
 package mazestormer.controller;
 
+import java.util.List;
+
 import mazestormer.player.Player;
 import mazestormer.util.EventSource;
 
@@ -19,4 +21,6 @@ public interface IGameController extends EventSource {
 	public void addPlayerController(IPlayerController pc);
 	
 	public void removePlayerController(IPlayerController pc);
+
+	public List<IPlayerController> getPlayerControllers();
 }

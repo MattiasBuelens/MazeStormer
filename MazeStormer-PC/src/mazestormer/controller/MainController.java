@@ -20,6 +20,7 @@ import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
+import mazestormer.player.Player;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.simulator.VirtualRobot;
@@ -64,6 +65,8 @@ public class MainController implements IMainController {
 
 	private Maze sourceMaze;
 	private Tile goalTile;
+	
+	private Player personalPlayer;
 
 	/*
 	 * Controllers
@@ -110,6 +113,8 @@ public class MainController implements IMainController {
 		// View
 		view = createView();
 		view.registerEventBus(getEventBus());
+		
+		createPersonalPlayer();
 
 		// Post initialized
 		postEvent(new InitializeEvent());
@@ -320,7 +325,9 @@ public class MainController implements IMainController {
 
 	public ControllableRobot getControllableRobot() throws IllegalStateException {
 		checkState(isConnected());
-		return connector.getRobot();
+		ControllableRobot r = connector.getRobot();
+		getPlayer().setRobot(r);
+		return r;
 	}
 
 	@Subscribe
@@ -393,11 +400,13 @@ public class MainController implements IMainController {
 	 */
 
 	public Maze getMaze() {
-		return gameControl().getPersonalPlayerController().getPlayer().getMaze();
+		// return gameControl().getPersonalPlayerController().getPlayer().getMaze();
+		return getPlayer().getMaze();
 	}
 	
 	public void setMaze(Maze maze) {
-		gameControl().getPersonalPlayerController().getPlayer().setMaze(maze);
+		// gameControl().getPersonalPlayerController().getPlayer().setMaze(maze);
+		getPlayer().setMaze(maze);
 	}
 
 	public Maze getSourceMaze() {
@@ -414,4 +423,20 @@ public class MainController implements IMainController {
 	public void setGoalTile(Tile tile) {
 		this.goalTile = tile;
 	}
+	
+	/*
+	 * Player
+	 */
+	
+	public Player getPlayer() {
+		return this.personalPlayer;
+	}
+	
+	private void createPersonalPlayer() {
+		this.personalPlayer = new Player();
+		this.personalPlayer.setPlayerName(PERSONAL_PLAYER_NAME);
+		gameControl().addPlayer(this.personalPlayer);
+	}
+	
+	public static final String PERSONAL_PLAYER_NAME = "Bob";
 }

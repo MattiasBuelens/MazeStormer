@@ -6,12 +6,10 @@ import java.beans.Beans;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
 
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.controller.IMainController;
-import mazestormer.ui.map.MapPanel;
 import mazestormer.util.EventSource;
 import net.miginfocom.swing.MigLayout;
 
@@ -25,12 +23,11 @@ public class MainView extends JFrame implements EventSource {
 	private final IMainController controller;
 
 	private EventBus eventBus;
-	private ViewPanel mapPanel;
+	private ViewPanel gameTabPanel;
 	private ViewPanel controlPanel;
 	// private ViewPanel parametersPanel;
 	private ViewPanel calibrationPanel;
 	private JPanel configurationPanel;
-	private JPanel logPanel;
 	private JPanel statePanel;
 
 	private JPanel mainPanel;
@@ -75,12 +72,8 @@ public class MainView extends JFrame implements EventSource {
 		this.controlPanel = new ManualControlPanel(controller.manualControl());
 		this.mainPanel.add(controlPanel, "cell 1 1,grow");
 
-		this.mapPanel = new MapPanel(controller.map());
-		this.mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
-		this.mainPanel.add(mapPanel, "cell 0 1,grow");
-
-		this.logPanel = new LogPanel(controller.log());
-		this.mainPanel.add(logPanel, "cell 0 2,grow");
+		this.gameTabPanel = new GameTabPanel(controller.gameControl());
+		this.mainPanel.add(gameTabPanel, "cell 0 1 1 2,grow");
 
 		this.statePanel = new StatePanel(controller.state());
 		this.mainPanel.add(statePanel, "cell 1 2,grow");
