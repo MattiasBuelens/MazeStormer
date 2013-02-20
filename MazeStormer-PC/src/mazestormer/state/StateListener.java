@@ -6,6 +6,8 @@ public interface StateListener<S extends State<?, ?>> {
 
 	public void stateStopped();
 
+	public void stateFinished();
+
 	public void statePaused(S currentState, boolean onTransition);
 
 	public void stateResumed(S currentState);

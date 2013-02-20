@@ -2,9 +2,6 @@ package mazestormer.simulator;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import mazestormer.command.ConditionalCommandBuilder;
 import mazestormer.command.ConditionalCommandBuilder.CommandBuilder;
@@ -13,20 +10,13 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-public class VirtualCommandBuilder implements ConditionalCommandBuilder.CommandBuilder {
+public class VirtualCommandBuilder implements
+		ConditionalCommandBuilder.CommandBuilder {
 
 	private final ControllableRobot robot;
 	private final ConditionFuture future;
 	private final List<Runnable> commands = new ArrayList<Runnable>();
 	private final List<Runnable> actions = new ArrayList<Runnable>();
-
-	private final ExecutorService executor = Executors.newCachedThreadPool(factory);
-	private final Runner actionRunner = new Runner();
-
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-		.setNameFormat("VirtualCommandBuilder-%d").build();
 
 	public VirtualCommandBuilder(ControllableRobot robot, ConditionFuture future) {
 		this.robot = robot;
@@ -40,7 +30,12 @@ public class VirtualCommandBuilder implements ConditionalCommandBuilder.CommandB
 	}
 
 	protected void trigger() {
-		executor.execute(actionRunner);
+		for (Runnable command : commands) {
+			command.run();
+		}
+		for (Runnable action : actions) {
+			action.run();
+		}
 	}
 
 	@Override
@@ -124,21 +119,6 @@ public class VirtualCommandBuilder implements ConditionalCommandBuilder.CommandB
 			}
 		});
 		return this;
-	}
-
-	private class Runner implements Runnable {
-
-		@Override
-		public void run() {
-			for (Runnable command : commands) {
-				command.run();
-			}
-			for (Runnable action : actions) {
-				action.run();
-			}
-			executor.shutdown();
-		}
-
 	}
 
 	private class Listener implements FutureListener<Void> {

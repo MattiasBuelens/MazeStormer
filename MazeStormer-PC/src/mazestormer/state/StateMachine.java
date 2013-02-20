@@ -46,7 +46,6 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	public void start() {
 		if (!isRunning()) {
 			isRunning.set(true);
-			reportStarted();
 			setup();
 		}
 	}
@@ -108,7 +107,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 * @param listener
 	 *            The new state listener.
 	 */
-	protected void addStateListener(StateListener<S> listener) {
+	public void addStateListener(StateListener<S> listener) {
 		listeners.add(listener);
 	}
 
@@ -118,7 +117,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 * @param listener
 	 *            The state listener.
 	 */
-	protected void removeStateListener(StateListener<S> listener) {
+	public void removeStateListener(StateListener<S> listener) {
 		listeners.remove(listener);
 	}
 
@@ -129,7 +128,16 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	/**
 	 * Initialize the state machine and transition to the first state.
 	 */
-	protected abstract void setup();
+	protected final void setup() {
+		reportStarted();
+	}
+
+	/**
+	 * Finish the state machine.
+	 */
+	protected final void finish() {
+		reportFinished();
+	}
 
 	/*
 	 * Transitions
@@ -165,11 +173,16 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	}
 
 	/**
-	 * Bind the given boolean future to the transition to the given state.
+	 * Bind the given future to the transition to the given state.
 	 * 
 	 * <p>
-	 * When the given boolean future is resolved, the state machine transitions
-	 * to the given state if the result is {@code true}, otherwise it pauses.
+	 * When the given future is resolved, the state machine transitions to the
+	 * given state.
+	 * </p>
+	 * 
+	 * <p>
+	 * If the future resolves to a {@link Boolean} result, the machine
+	 * transitions only if the result is {@code true}, otherwise it pauses.
 	 * </p>
 	 * 
 	 * @param future
@@ -177,25 +190,27 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 * @param nextState
 	 *            The next state.
 	 */
-	protected void bindTransition(final Future<Boolean> future,
-			final S nextState) {
-		future.addFutureListener(new FutureListener<Boolean>() {
+	protected void bindTransition(final Future<?> future, final S nextState) {
+		future.addFutureListener(new FutureListener<Object>() {
 			@Override
-			public void futureResolved(Future<? extends Boolean> future) {
+			public void futureResolved(Future<?> future) {
 				try {
-					if (future.get().booleanValue()) {
-						// Transition when successfully completed
-						transition(nextState);
-					} else {
+					Object result = future.get();
+					if (result instanceof Boolean
+							&& !((Boolean) result).booleanValue()) {
+
 						// Interrupt, retry needed
 						pause();
+					} else {
+						// Successfully completed, transition
+						transition(nextState);
 					}
 				} catch (InterruptedException | ExecutionException cannotHappen) {
 				}
 			}
 
 			@Override
-			public void futureCancelled(Future<? extends Boolean> future) {
+			public void futureCancelled(Future<?> future) {
 				// Ignore
 			}
 		});
@@ -232,6 +247,12 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		S state = getState();
 		for (StateListener<S> l : listeners) {
 			l.stateTransitioned(state);
+		}
+	}
+
+	private void reportFinished() {
+		for (StateListener<S> l : listeners) {
+			l.stateFinished();
 		}
 	}
 

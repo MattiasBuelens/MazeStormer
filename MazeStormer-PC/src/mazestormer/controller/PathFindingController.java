@@ -5,13 +5,14 @@ import java.util.List;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
+import mazestormer.line.LineFinderRunner;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.PathRunner;
-import mazestormer.robot.RunnerListener;
+import mazestormer.state.AbstractStateListener;
 import mazestormer.util.LongPoint;
 
 public class PathFindingController extends SubController implements
@@ -132,6 +133,7 @@ public class PathFindingController extends SubController implements
 		private Tile goal;
 		private boolean singleStep;
 		private boolean reposition;
+		private LineFinderRunner lineFinder;
 
 		/**
 		 * Create a new tile sequence runner with given robot, maze and goal
@@ -182,6 +184,10 @@ public class PathFindingController extends SubController implements
 		@Override
 		public void onCancelled() {
 			super.onCancelled();
+			// Stop line finder
+			if (lineFinder != null) {
+				lineFinder.stop();
+			}
 			// Post state
 			postState(PathFinderEvent.EventType.STOPPED);
 		}
@@ -196,27 +202,25 @@ public class PathFindingController extends SubController implements
 		}
 
 		private void startLineFinder() {
-			LineFinderRunner lineFinder = new LineFinderRunner(getRobot()) {
+			lineFinder = new LineFinderRunner(getRobot()) {
 				@Override
 				protected void log(String message) {
 					PathFindingController.this.log(message);
 				}
 			};
-			lineFinder.addListener(new RunnerListener() {
-				@Override
-				public void onStarted() {
-				}
+			lineFinder
+					.addStateListener(new AbstractStateListener<LineFinderRunner.LineFinderState>() {
+						@Override
+						public void stateFinished() {
+							stateStopped();
+							startNavigator();
+						}
 
-				@Override
-				public void onCompleted() {
-					startNavigator();
-				}
-
-				@Override
-				public void onCancelled() {
-					TileSequenceRunner.this.cancel();
-				}
-			});
+						@Override
+						public void stateStopped() {
+							lineFinder = null;
+						}
+					});
 			lineFinder.start();
 		}
 

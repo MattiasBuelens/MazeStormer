@@ -98,35 +98,9 @@ public class Navigator extends
 	 */
 
 	/**
-	 * Initialize the path traversal.
-	 */
-	@Override
-	protected void setup() {
-		if (pathCompleted()) {
-			// Empty path
-			finish();
-		} else {
-			// Get the first node in the path
-			node = path.remove(0);
-			// Start traversing
-			transition(NavigatorState.ROTATE_TO);
-		}
-	}
-
-	/**
-	 * Finish the path traversal.
-	 */
-	private void finish() {
-		// Stop
-		stop();
-		// Report
-		reportComplete();
-	}
-
-	/**
 	 * Rotate towards target.
 	 */
-	void rotateToNode() {
+	private void rotateToNode() {
 		Pose pose = poseProvider.getPose();
 		double bearing = pose.relativeBearing(node);
 		bindTransition(pilot.rotateComplete(bearing), NavigatorState.TRAVEL);
@@ -135,7 +109,7 @@ public class Navigator extends
 	/**
 	 * Travel towards target.
 	 */
-	void travel() {
+	private void travel() {
 		Pose pose = poseProvider.getPose();
 		double distance = pose.distanceTo(node);
 		bindTransition(pilot.travelComplete(distance), NavigatorState.ROTATE_ON);
@@ -144,7 +118,7 @@ public class Navigator extends
 	/**
 	 * Rotate on target.
 	 */
-	void rotateOnTarget() {
+	private void rotateOnTarget() {
 		if (node.isHeadingRequired()) {
 			Pose pose = poseProvider.getPose();
 			double heading = node.getHeading() - pose.getHeading();
@@ -157,7 +131,7 @@ public class Navigator extends
 	/**
 	 * Report target reached and get next node.
 	 */
-	void report() {
+	private void report() {
 		if (pathCompleted()) {
 			// Finished
 			finish();
@@ -173,7 +147,7 @@ public class Navigator extends
 	/**
 	 * Report target reached and get next node.
 	 */
-	void next() {
+	private void next() {
 		// Next node
 		node = path.remove(0);
 		transition(NavigatorState.ROTATE_TO);
@@ -228,12 +202,31 @@ public class Navigator extends
 
 	@Override
 	public void stateStarted() {
+		// Report
 		reportStarted();
+
+		if (pathCompleted()) {
+			// Empty path
+			finish();
+		} else {
+			// Get the first node in the path
+			node = path.remove(0);
+			// Start traversing
+			transition(NavigatorState.ROTATE_TO);
+		}
 	}
 
 	@Override
 	public void stateStopped() {
 		reportStopped();
+	}
+
+	@Override
+	public void stateFinished() {
+		// Stop
+		stop();
+		// Report
+		reportComplete();
 	}
 
 	@Override

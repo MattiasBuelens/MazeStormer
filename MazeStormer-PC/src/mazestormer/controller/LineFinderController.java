@@ -1,9 +1,11 @@
 package mazestormer.controller;
 
 import mazestormer.connect.ConnectEvent;
+import mazestormer.line.LineFinderEvent;
+import mazestormer.line.LineFinderRunner;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.RunnerListener;
+import mazestormer.state.AbstractStateListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -43,14 +45,14 @@ public class LineFinderController extends SubController implements
 				LineFinderController.this.log(message);
 			}
 		};
-		runner.addListener(new LineFinderListener());
+		runner.addStateListener(new LineFinderListener());
 		runner.start();
 	}
 
 	@Override
 	public void stopSearching() {
 		if (runner != null) {
-			runner.shutdown();
+			runner.stop();
 			runner = null;
 		}
 	}
@@ -59,24 +61,22 @@ public class LineFinderController extends SubController implements
 		postEvent(new LineFinderEvent(eventType));
 	}
 
-	private class LineFinderListener implements RunnerListener {
+	private class LineFinderListener extends
+			AbstractStateListener<LineFinderRunner.LineFinderState> {
 
 		@Override
-		public void onStarted() {
-			// Post state
+		public void stateStarted() {
 			postState(LineFinderEvent.EventType.STARTED);
 		}
 
 		@Override
-		public void onCompleted() {
-			// Post state
+		public void stateStopped() {
 			postState(LineFinderEvent.EventType.STOPPED);
 		}
 
 		@Override
-		public void onCancelled() {
-			// Post state
-			postState(LineFinderEvent.EventType.STOPPED);
+		public void stateFinished() {
+			stateStopped();
 		}
 
 	}

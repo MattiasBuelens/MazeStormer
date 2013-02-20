@@ -19,7 +19,7 @@ import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.IPolygonControlController;
 import mazestormer.controller.IPolygonControlController.Direction;
-import mazestormer.controller.PolygonEvent;
+import mazestormer.polygon.PolygonEvent;
 import mazestormer.robot.StopEvent;
 import net.miginfocom.swing.MigLayout;
 

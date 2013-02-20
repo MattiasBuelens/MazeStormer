@@ -1,7 +1,6 @@
 package mazestormer.robot;
 
 import lejos.geom.Point;
-import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.ConditionalCommandBuilder;
 import mazestormer.detect.RangeFeatureDetector;
 

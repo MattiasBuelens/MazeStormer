@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,6 +16,7 @@ import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.BarcodeRunnerListener;
 import mazestormer.barcode.BarcodeSpeed;
+import mazestormer.line.LineFinderRunner;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Maze.Target;
@@ -27,8 +27,7 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.PathRunner;
-import mazestormer.robot.RunnerListener;
-import mazestormer.robot.RunnerTask;
+import mazestormer.state.AbstractStateListener;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
@@ -91,7 +90,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 				ExplorerRunner.this.log(message);
 			}
 		};
-		lineFinder.addListener(new LineFinderListener());
+		lineFinder.addStateListener(new LineFinderListener());
 		barcodeRunner = new BarcodeRunner(robot, maze) {
 			@Override
 			protected void log(String message) {
@@ -175,7 +174,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 	public void shutdown() {
 		// Shutdown everything
 		super.shutdown();
-		lineFinder.shutdown();
+		lineFinder.stop();
 		barcodeRunner.shutdown();
 		getPilot().stop();
 	}
@@ -307,15 +306,17 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 	}
 
 	private void beforeLineFinder() {
+		// TODO Remove: throwWhenCancelled
 		throwWhenCancelled();
 		// Update state
 		setState(State.LINE);
 	}
 
 	private void afterLineFinder() {
+		// TODO Remove: throwWhenCancelled
 		throwWhenCancelled();
 		// Cancel line finder if still running
-		lineFinder.cancel();
+		lineFinder.stop();
 		// Start barcode runner
 		if (shouldBarcode()) {
 			barcodeRunner.start();
@@ -336,7 +337,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 		setState(State.BARCODE);
 		log("Barcode found, pausing navigation");
 		// Cancel line finder if still running
-		lineFinder.cancel();
+		lineFinder.stop();
 	}
 
 	private void afterBarcode(byte barcode) {
@@ -584,29 +585,16 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 		next();
 	}
 
-	private class LineFinderListener implements RunnerListener {
+	private class LineFinderListener extends
+			AbstractStateListener<LineFinderRunner.LineFinderState> {
 		@Override
-		public void onStarted() {
-			start(new RunnerTask() {
-				@Override
-				public void run() throws CancellationException {
-					beforeLineFinder();
-				}
-			});
+		public void stateStarted() {
+			beforeLineFinder();
 		}
 
 		@Override
-		public void onCompleted() {
-			start(new RunnerTask() {
-				@Override
-				public void run() throws CancellationException {
-					afterLineFinder();
-				}
-			});
-		}
-
-		@Override
-		public void onCancelled() {
+		public void stateFinished() {
+			afterLineFinder();
 		}
 	}
 
