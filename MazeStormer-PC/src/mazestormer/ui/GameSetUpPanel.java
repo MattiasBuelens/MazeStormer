@@ -2,7 +2,6 @@ package mazestormer.ui;
 
 import java.awt.event.ActionEvent;
 import java.beans.Beans;
-import java.util.List;
 
 import javax.swing.border.TitledBorder;
 
