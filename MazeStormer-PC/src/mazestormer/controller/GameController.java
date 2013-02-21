@@ -14,6 +14,11 @@ public class GameController extends SubController implements IGameController{
 	}
 	
 	@Override
+	public IPlayerController getPersonalPlayerController() {
+		return getPlayerControllerAt(0);
+	}
+	
+	@Override
 	public int getAmountOfPlayerControllers() {
 		return this.pcs.size();
 	}

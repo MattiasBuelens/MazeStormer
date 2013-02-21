@@ -21,4 +21,6 @@ public interface IGameController extends EventSource {
 	public void removePlayerController(IPlayerController pc);
 
 	public List<IPlayerController> getPlayerControllers();
+
+	public IPlayerController getPersonalPlayerController();
 }
