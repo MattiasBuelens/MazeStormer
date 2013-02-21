@@ -3,7 +3,7 @@ package mazestormer.controller;
 public class GameSetUpEvent {
 
 	public enum EventType {
-		JOINED, LEFT, DISCONNECTED;
+		JOINED, LEFT, DISCONNECTED, NOT_READY;
 	}
 
 	private final EventType eventType;

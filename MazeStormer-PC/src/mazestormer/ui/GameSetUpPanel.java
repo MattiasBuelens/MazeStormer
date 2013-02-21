@@ -16,6 +16,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 
 import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
@@ -111,9 +112,16 @@ public class GameSetUpPanel extends ViewPanel {
 		case DISCONNECTED :
 			enableGameButtons(true);
 			break;
+		case NOT_READY :
+			showNotReady();
+			break;
 		default:
 			break;
 		}
+	}
+	
+	private void showNotReady() {
+		JOptionPane.showMessageDialog(null,"You have to select a robot type and/or source maze\n before you could create or join a game.", "Setup", 1);
 	}
 	
 	private void createGame() {
