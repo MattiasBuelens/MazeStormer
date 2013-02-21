@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -11,14 +11,14 @@ import mazestormer.robot.AbstractCalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 
-public class RemoteLightSensor extends AbstractCalibratedLightSensor {
+public class PhysicalLightSensor extends AbstractCalibratedLightSensor {
 
 	private boolean isFloodlight = false;
 	private final LightValueRequester lightValueRequester;
 
-	private final RemoteCommunicator communicator;
+	private final PhysicalCommunicator communicator;
 
-	public RemoteLightSensor(RemoteCommunicator communicator) {
+	public PhysicalLightSensor(PhysicalCommunicator communicator) {
 		this.communicator = communicator;
 		lightValueRequester = new LightValueRequester(communicator);
 		setup();
@@ -44,7 +44,7 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 	@Override
 	public int getNormalizedLightValue() {
 		try {
-			return lightValueRequester.request().get(RemoteRobot.requestTimeout, TimeUnit.MILLISECONDS);
+			return lightValueRequester.request().get(PhysicalRobot.requestTimeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
@@ -94,9 +94,9 @@ public class RemoteLightSensor extends AbstractCalibratedLightSensor {
 		return ControllableRobot.sensorRadius;
 	}
 
-	public static class LightValueRequester extends ReportRequester<Integer> {
+	public static class LightValueRequester extends PhysicalRequester<Integer> {
 
-		public LightValueRequester(RemoteCommunicator communicator) {
+		public LightValueRequester(PhysicalCommunicator communicator) {
 			super(communicator);
 		}
 

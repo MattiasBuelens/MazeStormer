@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import mazestormer.util.FutureListener;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class RemoteCommandBuilder extends ReportRequester<Void> implements
+public class PhysicalCommandBuilder extends PhysicalRequester<Void> implements
 		ConditionalCommandBuilder.CommandBuilder {
 
 	private final ConditionalCommand command;
@@ -29,9 +29,9 @@ public class RemoteCommandBuilder extends ReportRequester<Void> implements
 			.newCachedThreadPool(factory);
 	private final ActionRunner actionRunner = new ActionRunner();
 	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("RemoteCommandBuilder-%d").build();
+			.setNameFormat("PhysicalCommandBuilder-%d").build();
 
-	public RemoteCommandBuilder(RemoteCommunicator communicator,
+	public PhysicalCommandBuilder(PhysicalCommunicator communicator,
 			CommandType type, Condition condition) {
 		super(communicator);
 		command = new ConditionalCommand(type, condition);

@@ -1,26 +1,29 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import mazestormer.command.Command;
 import mazestormer.command.RequestCommand;
+import mazestormer.remote.MessageListener;
+import mazestormer.remote.MessageSender;
+import mazestormer.remote.MessageType;
 import mazestormer.report.Report;
 import mazestormer.report.RequestReport;
 import mazestormer.util.Future;
 
-public class ReportRequester<V> extends MessageSender<RequestCommand<V>>
+public class PhysicalRequester<V> extends MessageSender<RequestCommand<V>>
 		implements MessageListener<Report<?>> {
 
-	private Map<Integer, RequestFuture<V>> futures = new HashMap<Integer, RequestFuture<V>>();
+	private Map<Integer, PhysicalFuture<V>> futures = new HashMap<Integer, PhysicalFuture<V>>();
 
-	public ReportRequester(RemoteCommunicator communicator) {
+	public PhysicalRequester(PhysicalCommunicator communicator) {
 		super(communicator);
 	}
 
 	@Override
-	public RemoteCommunicator getCommunicator() {
-		return (RemoteCommunicator) super.getCommunicator();
+	public PhysicalCommunicator getCommunicator() {
+		return (PhysicalCommunicator) super.getCommunicator();
 	}
 
 	protected Future<V> request(MessageType<Command> requestType) {
@@ -37,7 +40,7 @@ public class ReportRequester<V> extends MessageSender<RequestCommand<V>>
 		request.setRequestId(requestId);
 
 		// Create future
-		RequestFuture<V> future = new RequestFuture<V>(request);
+		PhysicalFuture<V> future = new PhysicalFuture<V>(request);
 		futures.put(requestId, future);
 
 		// Send request
@@ -54,7 +57,7 @@ public class ReportRequester<V> extends MessageSender<RequestCommand<V>>
 		@SuppressWarnings("unchecked")
 		RequestReport<V> requestReport = (RequestReport<V>) report;
 		int requestId = requestReport.getRequestId();
-		RequestFuture<V> future = futures.get(requestId);
+		PhysicalFuture<V> future = futures.get(requestId);
 
 		// Remove future if report resolves it
 		if (future != null && future.tryResolve(requestReport)) {
