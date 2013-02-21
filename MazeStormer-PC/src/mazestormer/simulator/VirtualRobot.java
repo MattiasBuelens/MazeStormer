@@ -10,6 +10,7 @@ import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
+import mazestormer.robot.CompassSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.SoundPlayer;
@@ -88,6 +89,12 @@ public class VirtualRobot implements ControllableRobot {
 			soundPlayer = new VirtualSoundPlayer();
 		}
 		return soundPlayer;
+	}
+
+	@Override
+	public CompassSensor getCompass() {
+		throw new UnsupportedOperationException(
+				"Virtual compass not implemented yet.");
 	}
 
 	public VirtualCollisionDetector getCollisionDetector() {

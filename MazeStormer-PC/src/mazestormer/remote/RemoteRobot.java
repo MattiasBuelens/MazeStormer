@@ -8,6 +8,7 @@ import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
+import mazestormer.robot.CompassSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.SoundPlayer;
@@ -23,6 +24,7 @@ public class RemoteRobot extends RemoteComponent implements ControllableRobot {
 	private PoseProvider poseProvider;
 
 	private RemoteLightSensor light;
+	private RemoteCompassSensor compass;
 
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
@@ -81,6 +83,14 @@ public class RemoteRobot extends RemoteComponent implements ControllableRobot {
 			soundPlayer = new RemoteSoundPlayer(getCommunicator());
 		}
 		return soundPlayer;
+	}
+
+	@Override
+	public CompassSensor getCompass() {
+		if (compass == null) {
+			compass = new RemoteCompassSensor(getCommunicator());
+		}
+		return compass;
 	}
 
 	@Override
