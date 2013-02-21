@@ -2,6 +2,7 @@ package mazestormer.controller;
 
 import mazestormer.barcode.ActionType;
 import mazestormer.barcode.BarcodeRunner;
+import mazestormer.barcode.BarcodeRunner.BarcodeState;
 import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
@@ -9,7 +10,7 @@ import mazestormer.barcode.Threshold;
 import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Runner;
-import mazestormer.robot.RunnerListener;
+import mazestormer.state.StateListener;
 
 public class BarcodeController extends SubController implements
 		IBarcodeController {
@@ -92,7 +93,7 @@ public class BarcodeController extends SubController implements
 				BarcodeController.this.log(message);
 			}
 		};
-		barcodeRunner.addListener(new BarcodeListener());
+		barcodeRunner.addStateListener(new BarcodeListener());
 		barcodeRunner.setPerformAction(false);
 		barcodeRunner.setScanSpeed(getScanSpeed());
 
@@ -104,7 +105,7 @@ public class BarcodeController extends SubController implements
 	@Override
 	public void stopScan() {
 		if (barcodeRunner != null) {
-			barcodeRunner.cancel();
+			barcodeRunner.stop();
 			barcodeRunner = null;
 		}
 	}
@@ -115,6 +116,7 @@ public class BarcodeController extends SubController implements
 	}
 
 	private void onScanStopped() {
+		// Stop pilot
 		getRobot().getPilot().stop();
 		// Post state
 		postState(BarcodeScanEvent.EventType.STOPPED);
@@ -122,6 +124,36 @@ public class BarcodeController extends SubController implements
 
 	private void postState(BarcodeScanEvent.EventType eventType) {
 		postEvent(new BarcodeScanEvent(eventType));
+	}
+
+	@Override
+	public double getLowSpeed() {
+		return BarcodeSpeed.LOW.getBarcodeSpeedValue();
+	}
+
+	@Override
+	public void setLowSpeed(double speed) {
+		BarcodeSpeed.LOW.setBarcodeSpeedValue(speed);
+	}
+
+	@Override
+	public double getHighSpeed() {
+		return BarcodeSpeed.HIGH.getBarcodeSpeedValue();
+	}
+
+	@Override
+	public void setHighSpeed(double speed) {
+		BarcodeSpeed.HIGH.setBarcodeSpeedValue(speed);
+	}
+
+	@Override
+	public double getLowerSpeedBound() {
+		return BarcodeSpeed.LOWERBOUND.getBarcodeSpeedValue();
+	}
+
+	@Override
+	public double getUpperSpeedBound() {
+		return BarcodeSpeed.UPPERBOUND.getBarcodeSpeedValue();
 	}
 
 	private class ActionRunner extends Runner {
@@ -163,52 +195,35 @@ public class BarcodeController extends SubController implements
 
 	}
 
-	private class BarcodeListener implements RunnerListener {
+	private class BarcodeListener implements StateListener<BarcodeState> {
 
 		@Override
-		public void onStarted() {
+		public void stateStarted() {
 			onScanStarted();
 		}
 
 		@Override
-		public void onCompleted() {
+		public void stateStopped() {
 			onScanStopped();
 		}
 
 		@Override
-		public void onCancelled() {
-			onScanStopped();
+		public void stateFinished() {
+			stateStopped();
+		}
+
+		@Override
+		public void statePaused(BarcodeState currentState, boolean onTransition) {
+		}
+
+		@Override
+		public void stateResumed(BarcodeState currentState) {
+		}
+
+		@Override
+		public void stateTransitioned(BarcodeState nextState) {
 		}
 
 	}
 
-	@Override
-	public double getLowSpeed() {
-		return BarcodeSpeed.LOW.getBarcodeSpeedValue();
-	}
-
-	@Override
-	public void setLowSpeed(double speed) {
-		BarcodeSpeed.LOW.setBarcodeSpeedValue(speed);
-	}
-
-	@Override
-	public double getHighSpeed() {
-		return BarcodeSpeed.HIGH.getBarcodeSpeedValue();
-	}
-
-	@Override
-	public void setHighSpeed(double speed) {
-		BarcodeSpeed.HIGH.setBarcodeSpeedValue(speed);
-	}
-
-	@Override
-	public double getLowerSpeedBound() {
-		return BarcodeSpeed.LOWERBOUND.getBarcodeSpeedValue();
-	}
-
-	@Override
-	public double getUpperSpeedBound() {
-		return BarcodeSpeed.UPPERBOUND.getBarcodeSpeedValue();
-	}
 }

@@ -11,19 +11,30 @@ import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.Runner;
-import mazestormer.robot.RunnerTask;
+import mazestormer.state.State;
+import mazestormer.state.StateListener;
+import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
 import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 
-public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
+public class BarcodeRunner extends
+		StateMachine<BarcodeRunner, BarcodeRunner.BarcodeState> implements
+		StateListener<BarcodeRunner.BarcodeState>, BarcodeRunnerListener {
+
+	/*
+	 * Constants
+	 */
 
 	// private static final double START_BAR_LENGTH = 1.8; // [cm]
 	// private static final double BAR_LENGTH = 1.85; // [cm]
 	private static final int BLACK_THRESHOLD = 50;
 	private static final float NOISE_LENGTH = 0.65f;
+
+	/*
+	 * Settings
+	 */
 
 	private final ControllableRobot robot;
 	private final Maze maze;
@@ -31,31 +42,22 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	private double scanSpeed = 2; // cm/sec
 	private double originalTravelSpeed;
 
-	private Future<Void> handle;
-	private double startOffset;
-	private Pose oldPose;
-	private Pose newPose;
-	private boolean blackToWhite;
-	private List<Float> distances = new ArrayList<Float>();
+	/*
+	 * State
+	 */
+
+	private volatile Pose strokeStart;
+	private volatile Pose strokeEnd;
+	private final List<Float> distances = new ArrayList<Float>();
 
 	private final List<BarcodeRunnerListener> listeners = new ArrayList<BarcodeRunnerListener>();
 
 	public BarcodeRunner(ControllableRobot robot, Maze maze) {
-		super(robot.getPilot());
 		this.robot = robot;
 		this.maze = maze;
 
-		this.startOffset = robot.getLightSensor().getSensorRadius();
-
 		addBarcodeListener(this);
-	}
-
-	protected ControllableRobot getRobot() {
-		return robot;
-	}
-
-	protected Maze getMaze() {
-		return maze;
+		addStateListener(this);
 	}
 
 	public double getScanSpeed() {
@@ -75,11 +77,15 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	}
 
 	protected Pose getPose() {
-		return getRobot().getPoseProvider().getPose();
+		return robot.getPoseProvider().getPose();
 	}
 
 	protected double getBarLength() {
-		return getMaze().getBarLength();
+		return maze.getBarLength();
+	}
+
+	protected float getStartOffset() {
+		return robot.getLightSensor().getSensorRadius();
 	}
 
 	protected void log(String message) {
@@ -112,145 +118,110 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 	}
 
 	public Future<?> performAction(byte barcode) {
-		return BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
+		return performAction(BarcodeDecoder.getAction(barcode));
 	}
 
 	public Future<?> performAction(Barcode barcode) {
-		return BarcodeDecoder.getAction(barcode).performAction(getRobot(), getMaze());
+		return performAction(BarcodeDecoder.getAction(barcode));
 	}
 
-	private void reset() {
-		// Cancel condition handle
-		if (handle != null)
-			handle.cancel();
-
-		// Restore original speed
-		getPilot().setTravelSpeed(originalTravelSpeed);
+	protected Future<?> performAction(IAction action) {
+		return action.performAction(robot, maze);
 	}
 
-	@Override
-	public void onCompleted() {
-		super.onCompleted();
-		reset();
-	}
-
-	@Override
-	public void onCancelled() {
-		super.onCancelled();
-		reset();
-	}
-
-	private void onBlack(final RunnerTask task) {
+	private Future<Void> onFirstBlack() {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
-		handle = getRobot().when(condition).stop().run(prepare(task)).build();
-		// handle = getRobot().when(condition).run(prepare(task)).build();
+		return robot.when(condition).stop().build();
 	}
 
-	@Override
-	public void run() {
-		// Reset
-		originalTravelSpeed = getTravelSpeed();
+	private Future<Void> onWhiteToBlack() {
+		Condition condition = new LightCompareCondition(
+				ConditionType.LIGHT_SMALLER_THAN,
+				Threshold.WHITE_BLACK.getThresholdValue());
+		return robot.when(condition).build();
+	}
+
+	private Future<Void> onBlackToWhite() {
+		Condition condition = new LightCompareCondition(
+				ConditionType.LIGHT_GREATER_THAN,
+				Threshold.BLACK_WHITE.getThresholdValue());
+		return robot.when(condition).build();
+	}
+
+	private void findStart() {
+		// Save original speed
+		originalTravelSpeed = robot.getPilot().getTravelSpeed();
+		// Reset state
+		strokeStart = null;
+		strokeEnd = null;
 		distances.clear();
-		robot.getLightSensor().setFloodlight(true);
 
+		// Find first black line
 		log("Start looking for black line.");
-		onBlack(new RunnerTask() {
-			@Override
-			public void run() {
-				onBlackBackward();
-			}
-		});
+		bindTransition(onFirstBlack(), BarcodeState.GO_TO_START);
 	}
 
-	private void onBlackBackward() {
+	private void goToStart() {
 		// Notify listeners
 		for (BarcodeRunnerListener listener : listeners) {
 			listener.onStartBarcode();
 		}
-		throwWhenCancelled();
 
 		log("Go to the begin of the barcode zone.");
-		// stop();
-		setTravelSpeed(getScanSpeed());
+		robot.getPilot().setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
 		// travel(- START_BAR_LENGTH / 2);
-		travel(-startOffset);
-
-		oldPose = getPose();
-		blackToWhite = true;
-
-		forward();
-		loop();
+		bindTransition(robot.getPilot().travelComplete(-getStartOffset()),
+				BarcodeState.STROKE_START);
 	}
 
-	private void loop() {
-		if (blackToWhite) {
-			onTrespassBW();
+	private void strokeStart() {
+		// At begin of barcode
+		strokeStart = getPose();
+		// Find white stroke
+		transition(BarcodeState.FIND_STROKE_WHITE);
+		// Go forward
+		robot.getPilot().forward();
+	}
+
+	private void findWhiteStroke() {
+		bindTransition(onBlackToWhite(), BarcodeState.STROKE_WHITE);
+	}
+
+	private void findBlackStroke() {
+		bindTransition(onWhiteToBlack(), BarcodeState.STROKE_BLACK);
+	}
+
+	private void stroke(boolean foundBlack) {
+		// Get stroke width
+		strokeEnd = getPose();
+		float strokeWidth = getPoseDiff(strokeStart, strokeEnd);
+		boolean nextStrokeBlack;
+
+		if (strokeWidth >= NOISE_LENGTH) {
+			// Store width
+			distances.add(strokeWidth);
+			// Set start of next stroke
+			strokeStart = strokeEnd;
+			// Find next stroke
+			nextStrokeBlack = !foundBlack;
 		} else {
-			onTrespassWB();
-		}
-	}
-
-	private void onTrespassBW() {
-		onTrespassNewWhite(new RunnerTask() {
-			@Override
-			public void run() {
-				onChange();
-			}
-		});
-	}
-
-	private void onTrespassWB() {
-		onTrespassNewBlack(new RunnerTask() {
-			@Override
-			public void run() {
-				onChange();
-			}
-		});
-	}
-
-	private void onTrespassNewBlack(final RunnerTask task) {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_SMALLER_THAN,
-				Threshold.WHITE_BLACK.getThresholdValue());
-		handle = getRobot().when(condition).run(prepare(task)).build();
-	}
-
-	private void onTrespassNewWhite(final RunnerTask task) {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_GREATER_THAN,
-				Threshold.BLACK_WHITE.getThresholdValue());
-		handle = getRobot().when(condition).run(prepare(task)).build();
-	}
-
-	private void onChange() {
-		newPose = getPose();
-		float distance = getPoseDiff(this.oldPose, this.newPose);
-		if (distance >= NOISE_LENGTH) {
-			distances.add(distance);
-			oldPose = this.newPose;
-			blackToWhite = !this.blackToWhite;
+			// Noise detected, retry same stroke
+			nextStrokeBlack = foundBlack;
 		}
 
 		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1)
 				* getBarLength()) {
 			// Iterate
-			loop();
+			if (nextStrokeBlack) {
+				transition(BarcodeState.FIND_STROKE_BLACK);
+			} else {
+				transition(BarcodeState.FIND_STROKE_WHITE);
+			}
 		} else {
 			// Completed
-			completed();
-		}
-	}
-
-	private void completed() {
-		// Read barcode
-		byte barcode = (byte) readBarcode(distances);
-		// Done
-		resolve();
-		// Notify listeners
-		for (BarcodeRunnerListener listener : listeners) {
-			listener.onEndBarcode(barcode);
+			transition(BarcodeState.FINISH);
 		}
 	}
 
@@ -270,8 +241,8 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 				// TODO Check with start offset
 				// at = Math.max((distance - START_BAR_LENGTH) / barLength,
 				// 0);
-				at = Math.max((distance - startOffset - barLength) / barLength,
-						0);
+				at = Math.max((distance - getStartOffset() - barLength)
+						/ barLength, 0);
 			} else {
 				at = Math.max(distance / barLength, 1);
 			}
@@ -300,6 +271,94 @@ public class BarcodeRunner extends Runner implements BarcodeRunnerListener {
 			sum += value;
 		}
 		return sum;
+	}
+
+	@Override
+	public void stateStarted() {
+		// Start
+		transition(BarcodeState.FIND_START);
+	}
+
+	@Override
+	public void stateStopped() {
+		// Restore original speed
+		robot.getPilot().setTravelSpeed(originalTravelSpeed);
+	}
+
+	@Override
+	public void stateFinished() {
+		// Reset
+		stateStopped();
+		// Read barcode
+		byte barcode = (byte) readBarcode(distances);
+		// Notify listeners
+		for (BarcodeRunnerListener listener : listeners) {
+			listener.onEndBarcode(barcode);
+		}
+	}
+
+	@Override
+	public void statePaused(BarcodeState currentState, boolean onTransition) {
+	}
+
+	@Override
+	public void stateResumed(BarcodeState currentState) {
+	}
+
+	@Override
+	public void stateTransitioned(BarcodeState nextState) {
+	}
+
+	public enum BarcodeState implements State<BarcodeRunner, BarcodeState> {
+		FIND_START {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.findStart();
+			}
+		},
+		GO_TO_START {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.goToStart();
+			}
+		},
+		STROKE_START {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.strokeStart();
+			}
+		},
+		FIND_STROKE_BLACK {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.findBlackStroke();
+			}
+		},
+		FIND_STROKE_WHITE {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.findWhiteStroke();
+			}
+		},
+		STROKE_BLACK {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.stroke(true);
+			}
+		},
+		STROKE_WHITE {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.stroke(false);
+			}
+		},
+		FINISH {
+			@Override
+			public void execute(BarcodeRunner runner) {
+				runner.finish();
+			}
+		}
+
 	}
 
 }

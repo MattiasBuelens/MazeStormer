@@ -31,12 +31,16 @@ public class LineFinderRunner extends
 	private final static int threshold = 85;
 
 	/*
-	 * Saved arguments
+	 * Settings
 	 */
 
 	private final ControllableRobot robot;
 	private double originalTravelSpeed;
 	private double originalRotateSpeed;
+	
+	/*
+	 * State
+	 */
 
 	private volatile double lineWidth;
 

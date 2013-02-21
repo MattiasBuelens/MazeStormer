@@ -13,10 +13,19 @@ public class PolygonRunner extends
 		StateMachine<PolygonRunner, PolygonRunner.PolygonState> implements
 		StateListener<PolygonRunner.PolygonState> {
 
+	/*
+	 * Settings
+	 */
+
 	private final Pilot pilot;
 	private final int nbSides;
 	private final double sideLength;
 	private final double cornerAngle;
+
+	/*
+	 * State
+	 */
+
 	private final AtomicInteger remaining = new AtomicInteger();
 
 	public PolygonRunner(Pilot pilot, int nbSides, double sideLength,

@@ -175,7 +175,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 		// Shutdown everything
 		super.shutdown();
 		lineFinder.stop();
-		barcodeRunner.shutdown();
+		barcodeRunner.stop();
 		getPilot().stop();
 	}
 
@@ -552,7 +552,7 @@ public class ExplorerRunner extends PathRunner implements NavigatorListener {
 		incrementFindLineCounter();
 		toggleBarcode();
 		// Cancel barcode scanner if still running
-		barcodeRunner.cancel();
+		barcodeRunner.stop();
 		// Execute barcode action on this tile
 		executeBarcodeAction();
 	}
