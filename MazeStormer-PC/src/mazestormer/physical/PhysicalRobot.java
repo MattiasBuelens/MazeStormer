@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
@@ -8,35 +8,37 @@ import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
+import mazestormer.robot.CompassSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.SoundPlayer;
 
-public class RemoteRobot extends RemoteComponent implements ControllableRobot {
+public class PhysicalRobot extends PhysicalComponent implements ControllableRobot {
 
 	/**
 	 * Timeout for synchronous requests.
 	 */
 	public static final int requestTimeout = 10000;
 
-	private RemotePilot pilot;
+	private PhysicalPilot pilot;
 	private PoseProvider poseProvider;
 
-	private RemoteLightSensor light;
+	private PhysicalLightSensor light;
+	private PhysicalCompassSensor compass;
 
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
 
 	private SoundPlayer soundPlayer;
 
-	public RemoteRobot(RemoteCommunicator communicator) {
+	public PhysicalRobot(PhysicalCommunicator communicator) {
 		super(communicator);
 	}
 
 	@Override
 	public Pilot getPilot() {
 		if (pilot == null) {
-			pilot = new RemotePilot(getCommunicator());
+			pilot = new PhysicalPilot(getCommunicator());
 		}
 		return pilot;
 	}
@@ -44,7 +46,7 @@ public class RemoteRobot extends RemoteComponent implements ControllableRobot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new RemoteLightSensor(getCommunicator());
+			light = new PhysicalLightSensor(getCommunicator());
 		}
 		return light;
 	}
@@ -52,7 +54,7 @@ public class RemoteRobot extends RemoteComponent implements ControllableRobot {
 	// @Override
 	protected RangeScanner getRangeScanner() {
 		if (scanner == null) {
-			scanner = new RemoteRangeScanner(getCommunicator());
+			scanner = new PhysicalRangeScanner(getCommunicator());
 		}
 		return scanner;
 	}
@@ -78,14 +80,22 @@ public class RemoteRobot extends RemoteComponent implements ControllableRobot {
 	@Override
 	public SoundPlayer getSoundPlayer() {
 		if (soundPlayer == null) {
-			soundPlayer = new RemoteSoundPlayer(getCommunicator());
+			soundPlayer = new PhysicalSoundPlayer(getCommunicator());
 		}
 		return soundPlayer;
 	}
 
 	@Override
+	public CompassSensor getCompass() {
+		if (compass == null) {
+			compass = new PhysicalCompassSensor(getCommunicator());
+		}
+		return compass;
+	}
+
+	@Override
 	public CommandBuilder when(Condition condition) {
-		RemoteCommandBuilder builder = new RemoteCommandBuilder(
+		PhysicalCommandBuilder builder = new PhysicalCommandBuilder(
 				getCommunicator(), CommandType.WHEN, condition);
 		addMessageListener(builder);
 		return builder;

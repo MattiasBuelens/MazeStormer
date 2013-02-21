@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +11,14 @@ import mazestormer.command.PilotParameterCommand;
 import mazestormer.command.RotateCommand;
 import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
+import mazestormer.remote.MessageListener;
 import mazestormer.report.MoveReport;
 import mazestormer.report.Report;
 import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
 import mazestormer.util.Future;
 
-public class RemotePilot extends RemoteComponent implements Pilot {
+public class PhysicalPilot extends PhysicalComponent implements Pilot {
 
 	private boolean isMoving = false;
 	private double travelSpeed;
@@ -26,7 +27,7 @@ public class RemotePilot extends RemoteComponent implements Pilot {
 
 	private List<MoveListener> moveListeners = new ArrayList<MoveListener>();
 
-	public RemotePilot(RemoteCommunicator communicator) {
+	public PhysicalPilot(PhysicalCommunicator communicator) {
 		super(communicator);
 		resetMovement();
 		setup();

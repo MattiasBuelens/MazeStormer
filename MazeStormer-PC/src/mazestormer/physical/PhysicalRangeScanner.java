@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 
 import java.util.concurrent.TimeUnit;
@@ -10,12 +10,12 @@ import mazestormer.command.CommandType;
 import mazestormer.command.ScanCommand;
 import mazestormer.util.Future;
 
-public class RemoteRangeScanner extends RemoteComponent implements RangeScanner {
+public class PhysicalRangeScanner extends PhysicalComponent implements RangeScanner {
 
 	private float[] angles;
 	private final ScanRequester scanRequester;
 
-	public RemoteRangeScanner(RemoteCommunicator communicator) {
+	public PhysicalRangeScanner(PhysicalCommunicator communicator) {
 		super(communicator);
 		scanRequester = new ScanRequester(getCommunicator());
 		setup();
@@ -37,7 +37,7 @@ public class RemoteRangeScanner extends RemoteComponent implements RangeScanner 
 	@Override
 	public RangeReadings getRangeValues() {
 		try {
-			return scanRequester.request(getAngles()).get(RemoteRobot.requestTimeout, TimeUnit.MILLISECONDS);
+			return scanRequester.request(getAngles()).get(PhysicalRobot.requestTimeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -51,7 +51,7 @@ public class RemoteRangeScanner extends RemoteComponent implements RangeScanner 
 
 	public static class ScanRequester extends ReportRequester<RangeReadings> {
 
-		public ScanRequester(RemoteCommunicator communicator) {
+		public ScanRequester(PhysicalCommunicator communicator) {
 			super(communicator);
 		}
 

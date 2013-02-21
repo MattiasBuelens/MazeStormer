@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +14,13 @@ import mazestormer.condition.Condition;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-public class RemoteCommandBuilder extends ReportRequester<Void> implements
+public class PhysicalCommandBuilder extends ReportRequester<Void> implements
 		ConditionalCommandBuilder.CommandBuilder {
 
 	private final ConditionalCommand command;
 	private final List<Runnable> actions = new ArrayList<Runnable>();
 
-	public RemoteCommandBuilder(RemoteCommunicator communicator,
+	public PhysicalCommandBuilder(PhysicalCommunicator communicator,
 			CommandType type, Condition condition) {
 		super(communicator);
 		command = new ConditionalCommand(type, condition);

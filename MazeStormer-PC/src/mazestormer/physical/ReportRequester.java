@@ -1,10 +1,13 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import mazestormer.command.Command;
 import mazestormer.command.RequestCommand;
+import mazestormer.remote.MessageListener;
+import mazestormer.remote.MessageSender;
+import mazestormer.remote.MessageType;
 import mazestormer.report.Report;
 import mazestormer.report.RequestReport;
 import mazestormer.util.Future;
@@ -14,13 +17,13 @@ public class ReportRequester<V> extends MessageSender<RequestCommand<V>>
 
 	private Map<Integer, RequestFuture<V>> futures = new HashMap<Integer, RequestFuture<V>>();
 
-	public ReportRequester(RemoteCommunicator communicator) {
+	public ReportRequester(PhysicalCommunicator communicator) {
 		super(communicator);
 	}
 
 	@Override
-	public RemoteCommunicator getCommunicator() {
-		return (RemoteCommunicator) super.getCommunicator();
+	public PhysicalCommunicator getCommunicator() {
+		return (PhysicalCommunicator) super.getCommunicator();
 	}
 
 	protected Future<V> request(MessageType<Command> requestType) {

@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import mazestormer.command.RequestCommand;
 import mazestormer.report.RequestReport;

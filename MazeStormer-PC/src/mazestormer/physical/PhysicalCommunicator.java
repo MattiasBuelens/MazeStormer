@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,12 +10,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import lejos.pc.comm.NXTConnector;
 import mazestormer.command.Command;
+import mazestormer.remote.Communicator;
+import mazestormer.remote.MessageListener;
 import mazestormer.report.Report;
 import mazestormer.report.ReportReader;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class RemoteCommunicator extends Communicator<Command, Report<?>> {
+public class PhysicalCommunicator extends Communicator<Command, Report<?>> {
 
 	private NXTConnector connector;
 	private final List<MessageListener<? super Report<?>>> listeners;
@@ -23,11 +25,11 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 	private volatile AtomicInteger nextRequestId = new AtomicInteger();
 
 	private static ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("RemoteCommunicator-%d").build();
+			.setNameFormat("PhysicalCommunicator-%d").build();
 	private final ExecutorService executor = Executors
 			.newCachedThreadPool(factory);
 
-	public RemoteCommunicator(NXTConnector connector) {
+	public PhysicalCommunicator(NXTConnector connector) {
 		super(connector.getInputStream(), connector.getOutputStream(),
 				new ReportReader());
 		this.connector = connector;
@@ -89,7 +91,7 @@ public class RemoteCommunicator extends Communicator<Command, Report<?>> {
 		executor.submit(new Runnable() {
 			@Override
 			public void run() {
-				RemoteCommunicator.super.trigger(report);
+				PhysicalCommunicator.super.trigger(report);
 			}
 		});
 	}

@@ -1,13 +1,13 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import mazestormer.command.CommandType;
 import mazestormer.command.PlaySoundCommand;
 import mazestormer.robot.RobotSound;
 import mazestormer.robot.SoundPlayer;
 
-public class RemoteSoundPlayer extends RemoteComponent implements SoundPlayer {
+public class PhysicalSoundPlayer extends PhysicalComponent implements SoundPlayer {
 
-	public RemoteSoundPlayer(RemoteCommunicator communicator) {
+	public PhysicalSoundPlayer(PhysicalCommunicator communicator) {
 		super(communicator);
 	}
 
