@@ -7,6 +7,11 @@ import javax.swing.BoxLayout;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import net.miginfocom.swing.MigLayout;
+
+import com.google.common.eventbus.Subscribe;
+
+import mazestormer.controller.GameEvent;
 import mazestormer.controller.IGameController;
 import mazestormer.controller.IPlayerController;
 import mazestormer.ui.map.MapPanel;
@@ -43,15 +48,31 @@ public class GameTabPanel extends ViewPanel {
 	private void createTabs() {
 		for(IPlayerController pc : this.controller.getPlayerControllers()) {
 			JPanel temp = new JPanel();
-			temp.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+			
+			temp.setLayout(new MigLayout("", "[grow]", "[grow][::200px,growprio 50,grow]"));
 		
 			MapPanel mapPanel = new MapPanel(pc.map());
 			mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
 			LogPanel logPanel = new LogPanel(pc.log());
 			
-			temp.add(mapPanel);
-			temp.add(logPanel);
+			temp.add(mapPanel, "cell 0 0,grow");
+			temp.add(logPanel, "cell 0 2,grow");
 			this.tabbedPane.addTab(pc.getPlayer().getPlayerName(), temp);
+		}
+		validate();
+	}
+	
+	@Subscribe
+	public void onGameEvent(GameEvent e) {
+		switch(e.getEventType()) {
+		case PLAYER_ADDED :
+			createTabs();
+			break;
+		case PLAYER_REMOVED :
+			createTabs();
+			break;
+		default:
+			break;
 		}
 	}
 }

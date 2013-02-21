@@ -29,9 +29,10 @@ public interface IMainController {
 	public IStateController state();
 	
 	public IGameController gameControl();
+	
+	public IGameSetUpController gameSetUpControl();
 
 	public void register(EventSource eventSource);
 
-	IExplorerController explorerControl();
-
+	public IExplorerController explorerControl();
 }

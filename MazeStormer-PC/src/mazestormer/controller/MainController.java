@@ -82,6 +82,7 @@ public class MainController implements IMainController {
 	private IExplorerController explorerControl;
 	private ICheatController cheatControl;
 	private IGameController gameControl;
+	private IGameSetUpController gameSetUpControl;
 
 	private IStateController state;
 
@@ -242,6 +243,14 @@ public class MainController implements IMainController {
 			gameControl = new GameController(this);
 		}
 		return gameControl;
+	}
+	
+	@Override
+	public IGameSetUpController gameSetUpControl() {
+		if (gameSetUpControl == null) {
+			gameSetUpControl = new GameSetUpController(this);
+		}
+		return gameSetUpControl;
 	}
 
 	@Override

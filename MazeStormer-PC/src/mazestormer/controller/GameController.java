@@ -46,11 +46,14 @@ public class GameController extends SubController implements IGameController{
 	public void addPlayerController(IPlayerController pc) {
 		checkNotNull(pc);
 		this.pcs.add(pc);
+		onPlayerAdded();
 	}
 	
 	@Override
 	public void removePlayerController(IPlayerController pc) {
+		checkNotNull(pc);
 		this.pcs.remove(pc);
+		onPlayerRemoved();
 	}
 	
 	@Override
@@ -59,5 +62,16 @@ public class GameController extends SubController implements IGameController{
 	}
 	
 	private List<IPlayerController> pcs = new ArrayList<IPlayerController>();
-
+	
+	private void onPlayerAdded() {
+		postState(GameEvent.EventType.PLAYER_ADDED);
+	}
+	
+	private void onPlayerRemoved() {
+		postState(GameEvent.EventType.PLAYER_REMOVED);
+	}
+	
+	private void postState(GameEvent.EventType eventType) {
+		postEvent(new GameEvent(eventType));
+	}
 }
