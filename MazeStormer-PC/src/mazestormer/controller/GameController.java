@@ -8,8 +8,6 @@ import java.util.List;
 import mazestormer.player.Player;
 
 public class GameController extends SubController implements IGameController{
-	
-	private static final int PERSONAL_ROBOT_INDEX = 0;
 
 	public GameController(MainController mainController) {
 		super(mainController);
@@ -23,11 +21,6 @@ public class GameController extends SubController implements IGameController{
 	@Override
 	public boolean hasAsPlayerController(IPlayerController pc) {
 		return this.pcs.contains(pc);
-	}
-	
-	@Override
-	public IPlayerController getPersonalPlayerController() {
-		return this.pcs.get(PERSONAL_ROBOT_INDEX);
 	}
 	
 	@Override
