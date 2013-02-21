@@ -14,7 +14,7 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	/**
 	 * Right wheel diameter, in centimeters.
 	 */
-	public final static float rightWheelDiameter = 5.6f * (39.1f/40f);
+	public final static float rightWheelDiameter = 5.6f * (39.1f / 40f);
 
 	/**
 	 * Distance between center of wheels, in centimeters.
@@ -62,7 +62,7 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	/**
 	 * Get the range scanner of this robot.
 	 */
-	//public RangeScanner getRangeScanner();
+	// public RangeScanner getRangeScanner();
 
 	/**
 	 * Get the range feature detector of this robot.
@@ -73,6 +73,11 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	 * Get the sound player of this robot.
 	 */
 	public SoundPlayer getSoundPlayer();
+
+	/**
+	 * Get the compass of this robot.
+	 */
+	public CompassSensor getCompass();
 
 	/**
 	 * Terminate this robot.

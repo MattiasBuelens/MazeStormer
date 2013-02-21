@@ -10,14 +10,14 @@ import lejos.pc.comm.NXTConnector;
 import lejos.pc.comm.NXTInfo;
 import mazestormer.command.CommandType;
 import mazestormer.command.ShutdownCommand;
-import mazestormer.remote.RemoteCommunicator;
-import mazestormer.remote.RemoteRobot;
+import mazestormer.physical.PhysicalCommunicator;
+import mazestormer.physical.PhysicalRobot;
 import mazestormer.robot.ControllableRobot;
 
-public class RemoteConnector implements Connector {
+public class PhysicalConnector implements Connector {
 
 	private NXTConnector connector;
-	private RemoteCommunicator communicator;
+	private PhysicalCommunicator communicator;
 	private ControllableRobot robot;
 
 	@Override
@@ -43,10 +43,10 @@ public class RemoteConnector implements Connector {
 		}
 
 		// Create communicator
-		communicator = new RemoteCommunicator(connector);
+		communicator = new PhysicalCommunicator(connector);
 
 		// Create robot
-		robot = new RemoteRobot(communicator);
+		robot = new PhysicalRobot(communicator);
 
 		// Start communicating
 		communicator.start();
