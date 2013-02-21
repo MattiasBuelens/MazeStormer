@@ -34,8 +34,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	private boolean isReady() {
 		if(getMainController().getPlayer().getRobot() == null) {
 			return false;
-		} else if(getMainController().getPlayer().getRobot().getClass().isInstance(mazestormer.simulator.VirtualRobot.class)
-				&& getMainController().getSourceMaze() == null) {
+		} else if(mazestormer.simulator.VirtualRobot.class.isInstance(getMainController().getPlayer().getRobot())
+				&& getMainController().getSourceMaze().getNumberOfTiles() == 0) {
 			return false;
 		}
 		return true;

@@ -108,6 +108,10 @@ public class Maze extends AbstractEventSource {
 	public Mesh getMesh() {
 		return mesh;
 	}
+	
+	public int getNumberOfTiles() {
+		return tiles.values().size();
+	}
 
 	/**
 	 * Get the tile at the given tile position.
