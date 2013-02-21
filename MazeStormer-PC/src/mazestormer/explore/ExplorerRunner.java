@@ -1,4 +1,4 @@
-package mazestormer.controller;
+package mazestormer.explore;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

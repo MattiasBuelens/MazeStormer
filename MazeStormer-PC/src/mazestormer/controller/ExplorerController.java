@@ -1,5 +1,7 @@
 package mazestormer.controller;
 
+import mazestormer.explore.ExplorerEvent;
+import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.RunnerListener;
