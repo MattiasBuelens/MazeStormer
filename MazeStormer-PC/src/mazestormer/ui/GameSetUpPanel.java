@@ -124,7 +124,9 @@ public class GameSetUpPanel extends ViewPanel {
 	}
 	
 	private void createGame() {
-		this.controller.createGame();
+		String gameID = "";
+		//TODO @Matthias extra tekstvak om het gameID zelf te kiezen.
+		this.controller.createGame(gameID);
 	}
 	private void joinGame() {
 		this.controller.joinGame((String) this.lobbyModel.getSelectedItem());

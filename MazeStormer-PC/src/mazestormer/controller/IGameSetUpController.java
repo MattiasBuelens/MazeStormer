@@ -4,7 +4,7 @@ import mazestormer.util.EventSource;
 
 public interface IGameSetUpController extends EventSource {
 	
-	public void createGame();
+	public void createGame(String gameID);
 	
 	public void joinGame(String gameID);
 	
