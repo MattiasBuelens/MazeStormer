@@ -25,13 +25,13 @@ import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Maze.Target;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.Navigator.NavigatorState;
 import mazestormer.robot.NavigatorListener;
-import mazestormer.robot.PathFinder;
 import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;
@@ -39,7 +39,8 @@ import mazestormer.state.StateMachine;
 
 import com.google.common.primitives.Floats;
 
-public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.ExplorerState> implements
+public class ExplorerRunner extends
+		StateMachine<ExplorerRunner, ExplorerRunner.ExplorerState> implements
 		StateListener<ExplorerRunner.ExplorerState>, NavigatorListener {
 
 	/*
@@ -96,7 +97,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		addStateListener(this);
 
 		// Navigator
-		this.navigator = new Navigator(robot.getPilot(), robot.getPoseProvider());
+		this.navigator = new Navigator(robot.getPilot(),
+				robot.getPoseProvider());
 		navigator.addNavigatorListener(this);
 		navigator.pauseAt(Navigator.NavigatorState.TRAVEL);
 
@@ -248,7 +250,9 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		if (!isExplored() && currentTile.hasBarcode()) {
 			log("Performing barcode action for " + currentTile.getPosition());
 			// Resume when action is done
-			bindTransition(barcodeScanner.performAction(currentTile.getBarcode()), ExplorerState.NAVIGATE);
+			bindTransition(
+					barcodeScanner.performAction(currentTile.getBarcode()),
+					ExplorerState.NAVIGATE);
 		} else {
 			// No action, just continue
 			transition(ExplorerState.NAVIGATE);
@@ -272,7 +276,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 			// Travel off barcode
 			double clearDistance = getBarcodeClearingDistance();
 			log("Travel off barcode: " + clearDistance);
-			bindTransition(robot.getPilot().travelComplete(clearDistance), ExplorerState.BEFORE_TRAVEL);
+			bindTransition(robot.getPilot().travelComplete(clearDistance),
+					ExplorerState.BEFORE_TRAVEL);
 		} else {
 			// No barcode
 			transition(ExplorerState.BEFORE_TRAVEL);
@@ -375,7 +380,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		// Clean up to prevent barcode scanner from resetting the new speed
 		barcodeScanner.stop();
 		// Start traveling at high speed
-		robot.getPilot().setTravelSpeed(BarcodeSpeed.HIGH.getBarcodeSpeedValue());
+		robot.getPilot().setTravelSpeed(
+				BarcodeSpeed.HIGH.getBarcodeSpeedValue());
 
 		// Traverse new path
 		transition(ExplorerState.NEXT_CYCLE);
@@ -385,9 +391,9 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 	 * Set the barcode and edges of a tile.
 	 * 
 	 * @param tile
-	 * 			The tile.
+	 *            The tile.
 	 * @param barcode
-	 * 			The barcode.
+	 *            The barcode.
 	 */
 	private void setBarcodeTile(Tile tile, byte barcode) {
 		float relativeHeading = maze.toRelative(getPose().getHeading());
@@ -412,12 +418,14 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
-		RangeFeature feature = robot.getRangeDetector().scan(getScanAngles(tile));
+		RangeFeature feature = robot.getRangeDetector().scan(
+				getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
-				orientation = angleToOrientation(reading.getAngle() + maze.toRelative(getPose().getHeading()));
+				orientation = angleToOrientation(reading.getAngle()
+						+ maze.toRelative(getPose().getHeading()));
 				maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
@@ -462,8 +470,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 	}
 
 	/**
-	 * Get the distance necessary to travel off the barcode
-	 * on which the robot is currently located.
+	 * Get the distance necessary to travel off the barcode on which the robot
+	 * is currently located.
 	 */
 	private double getBarcodeClearingDistance() {
 		Point currentPosition = getPose().getLocation();
@@ -471,7 +479,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		Waypoint nextWaypoint = navigator.getCurrentTarget();
 
 		// Get traveling line
-		Line line = new Line(currentWaypoint.x, currentWaypoint.y, nextWaypoint.x, nextWaypoint.y);
+		Line line = new Line(currentWaypoint.x, currentWaypoint.y,
+				nextWaypoint.x, nextWaypoint.y);
 		float angle = currentWaypoint.angleTo(nextWaypoint);
 
 		// Get target position to clear barcode
@@ -620,7 +629,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 	}
 
 	@Override
-	public void navigatorPaused(NavigatorState currentState, Pose pose, boolean onTransition) {
+	public void navigatorPaused(NavigatorState currentState, Pose pose,
+			boolean onTransition) {
 		// Only respond to pauses on transitions
 		if (!onTransition)
 			return;
@@ -650,7 +660,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		transition(ExplorerState.NEXT_CYCLE);
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends
+			AbstractStateListener<LineFinderRunner.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(ExplorerState.AFTER_LINE_ADJUST);
@@ -683,13 +694,16 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 
 		@Override
 		public int compare(Tile left, Tile right) {
-			double leftDistance = manhattanDistance(referencePosition, left.getPosition());
-			double rightDistance = manhattanDistance(referencePosition, right.getPosition());
+			double leftDistance = manhattanDistance(referencePosition,
+					left.getPosition());
+			double rightDistance = manhattanDistance(referencePosition,
+					right.getPosition());
 			return Double.compare(leftDistance, rightDistance);
 		}
 
 		public static double manhattanDistance(Point2D left, Point2D right) {
-			return Math.abs(left.getX() - right.getX()) + Math.abs(left.getY() - right.getY());
+			return Math.abs(left.getX() - right.getX())
+					+ Math.abs(left.getY() - right.getY());
 		}
 
 	}
