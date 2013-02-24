@@ -4,10 +4,9 @@ import mazestormer.explore.ExplorerEvent;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.RunnerListener;
+import mazestormer.state.AbstractStateListener;
 
-public class ExplorerController extends SubController implements
-		IExplorerController {
+public class ExplorerController extends SubController implements IExplorerController {
 
 	private ExplorerRunner runner;
 	private boolean isLineAdjustEnabled = true;
@@ -61,14 +60,14 @@ public class ExplorerController extends SubController implements
 		runner.setLineAdjustInterval(getLineAdjustInterval());
 		runner.setScanSpeed(getBarcodeController().getScanSpeed());
 		// Start
-		runner.addListener(new ExplorerListener());
+		runner.addStateListener(new ExplorerListener());
 		runner.start();
 	}
 
 	@Override
 	public void stopExploring() {
 		if (runner != null) {
-			runner.shutdown();
+			runner.stop();
 			runner = null;
 		}
 	}
@@ -99,21 +98,21 @@ public class ExplorerController extends SubController implements
 		}
 	}
 
-	private class ExplorerListener implements RunnerListener {
+	private class ExplorerListener extends AbstractStateListener<ExplorerRunner.ExplorerState> {
 
 		@Override
-		public void onStarted() {
+		public void stateStarted() {
 			postState(ExplorerEvent.EventType.STARTED);
 		}
 
 		@Override
-		public void onCompleted() {
-			onCancelled();
+		public void stateStopped() {
+			postState(ExplorerEvent.EventType.STOPPED);
 		}
 
 		@Override
-		public void onCancelled() {
-			postState(ExplorerEvent.EventType.STOPPED);
+		public void stateFinished() {
+			stateStopped();
 		}
 
 	}

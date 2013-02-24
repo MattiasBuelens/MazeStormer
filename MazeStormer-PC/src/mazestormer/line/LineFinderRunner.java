@@ -65,7 +65,7 @@ public class LineFinderRunner extends
 		return robot.when(condition).stop().build();
 	}
 
-	private void findLineStart() {
+	protected void findLineStart() {
 		// Save original speeds
 		originalTravelSpeed = robot.getPilot().getTravelSpeed();
 		originalRotateSpeed = robot.getPilot().getRotateSpeed();
@@ -77,7 +77,7 @@ public class LineFinderRunner extends
 		bindTransition(onLine(), LineFinderState.FIND_LINE_END);
 	}
 
-	private void findLineEnd() {
+	protected void findLineEnd() {
 		log("On line, start looking for end of line.");
 
 		// Travel forward until off line
@@ -87,7 +87,7 @@ public class LineFinderRunner extends
 		bindTransition(offLine(), LineFinderState.ROTATE_CENTER);
 	}
 
-	private void rotateCenter() {
+	protected void rotateCenter() {
 		log("Off line, positioning robot on line edge.");
 
 		lineWidth = robot.getPilot().getMovement().getDistanceTraveled();
@@ -102,14 +102,14 @@ public class LineFinderRunner extends
 				LineFinderState.ROTATE_FIXED);
 	}
 
-	private void rotateFixed() {
+	protected void rotateFixed() {
 		// Rotate fixed angle
 		robot.getPilot().setRotateSpeed(fastRotateSpeed);
 		bindTransition(robot.getPilot().rotateComplete(fastRotateAngle),
 				LineFinderState.ROTATE_UNTIL_LINE);
 	}
 
-	private void rotateUntilLine() {
+	protected void rotateUntilLine() {
 		// Rotate until on line again
 		log("Start looking for line again.");
 		robot.getPilot().setRotateSpeed(slowRotateSpeed);
@@ -118,7 +118,7 @@ public class LineFinderRunner extends
 		bindTransition(onLine(), LineFinderState.POSITION_PERPENDICULAR);
 	}
 
-	private void positionPerpendicular() {
+	protected void positionPerpendicular() {
 		log("On line, rotating robot perpendicular to line.");
 
 		// Get sensor angle
@@ -132,7 +132,7 @@ public class LineFinderRunner extends
 				LineFinderState.POSITION_CENTER);
 	}
 
-	private void positionCenter() {
+	protected void positionCenter() {
 		// Position robot center on center of line
 		log("Positioning on center of line.");
 		double offset = -lineWidth / 2;

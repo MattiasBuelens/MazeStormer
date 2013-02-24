@@ -149,7 +149,7 @@ public class BarcodeRunner extends
 		return robot.when(condition).build();
 	}
 
-	private void findStart() {
+	protected void findStart() {
 		// Save original speed
 		originalTravelSpeed = robot.getPilot().getTravelSpeed();
 		// Reset state
@@ -162,7 +162,7 @@ public class BarcodeRunner extends
 		bindTransition(onFirstBlack(), BarcodeState.GO_TO_START);
 	}
 
-	private void goToStart() {
+	protected void goToStart() {
 		// Notify listeners
 		for (BarcodeRunnerListener listener : listeners) {
 			listener.onStartBarcode();
@@ -176,7 +176,7 @@ public class BarcodeRunner extends
 				BarcodeState.STROKE_START);
 	}
 
-	private void strokeStart() {
+	protected void strokeStart() {
 		// At begin of barcode
 		strokeStart = getPose();
 		// Find white stroke
@@ -185,15 +185,15 @@ public class BarcodeRunner extends
 		robot.getPilot().forward();
 	}
 
-	private void findWhiteStroke() {
+	protected void findWhiteStroke() {
 		bindTransition(onBlackToWhite(), BarcodeState.STROKE_WHITE);
 	}
 
-	private void findBlackStroke() {
+	protected void findBlackStroke() {
 		bindTransition(onWhiteToBlack(), BarcodeState.STROKE_BLACK);
 	}
 
-	private void stroke(boolean foundBlack) {
+	protected void stroke(boolean foundBlack) {
 		// Get stroke width
 		strokeEnd = getPose();
 		float strokeWidth = getPoseDiff(strokeStart, strokeEnd);

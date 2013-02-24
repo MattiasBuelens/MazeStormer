@@ -2,7 +2,6 @@ package mazestormer.controller;
 
 import mazestormer.barcode.ActionType;
 import mazestormer.barcode.BarcodeRunner;
-import mazestormer.barcode.BarcodeRunner.BarcodeState;
 import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
@@ -10,10 +9,9 @@ import mazestormer.barcode.Threshold;
 import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Runner;
-import mazestormer.state.StateListener;
+import mazestormer.state.AbstractStateListener;
 
-public class BarcodeController extends SubController implements
-		IBarcodeController {
+public class BarcodeController extends SubController implements IBarcodeController {
 
 	private ActionRunner actionRunner;
 	private BarcodeRunner barcodeRunner;
@@ -195,7 +193,7 @@ public class BarcodeController extends SubController implements
 
 	}
 
-	private class BarcodeListener implements StateListener<BarcodeState> {
+	private class BarcodeListener extends AbstractStateListener<BarcodeRunner.BarcodeState> {
 
 		@Override
 		public void stateStarted() {
@@ -210,18 +208,6 @@ public class BarcodeController extends SubController implements
 		@Override
 		public void stateFinished() {
 			stateStopped();
-		}
-
-		@Override
-		public void statePaused(BarcodeState currentState, boolean onTransition) {
-		}
-
-		@Override
-		public void stateResumed(BarcodeState currentState) {
-		}
-
-		@Override
-		public void stateTransitioned(BarcodeState nextState) {
 		}
 
 	}

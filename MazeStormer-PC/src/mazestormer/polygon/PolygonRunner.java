@@ -41,7 +41,7 @@ public class PolygonRunner extends
 	/**
 	 * Next side.
 	 */
-	private void next() {
+	protected void next() {
 		if (remaining.getAndDecrement() > 0) {
 			// Start traveling along side
 			transition(PolygonState.TRAVEL);
@@ -54,14 +54,14 @@ public class PolygonRunner extends
 	/**
 	 * Travel along side.
 	 */
-	private void travel() {
+	protected void travel() {
 		bindTransition(pilot.travelComplete(sideLength), PolygonState.ROTATE);
 	}
 
 	/**
 	 * Rotate on corner.
 	 */
-	private void rotate() {
+	protected void rotate() {
 		bindTransition(pilot.rotateComplete(cornerAngle), PolygonState.NEXT);
 	}
 

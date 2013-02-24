@@ -16,7 +16,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 
 	private volatile S currentState;
 	private S pauseState;
-	private volatile Future<?> nextTransition;
+	private List<Future<?>> transitionBindings = new ArrayList<Future<?>>();
 
 	private List<StateListener<S>> listeners = new ArrayList<StateListener<S>>();
 
@@ -58,8 +58,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		if (isRunning()) {
 			isRunning.set(false);
 			isPaused.set(false);
-			if (nextTransition != null)
-				nextTransition.cancel();
+			clearBindings();
 			reportStopped();
 		}
 	}
@@ -74,8 +73,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	private void pause(boolean onTransition) {
 		if (isRunning() && !isPaused()) {
 			isPaused.set(true);
-			if (nextTransition != null)
-				nextTransition.cancel();
+			clearBindings();
 			reportPaused(onTransition);
 		}
 	}
@@ -88,7 +86,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 			isPaused.set(false);
 			reportResumed();
 			// Resume current state
-			currentState.execute(self());
+			execute(currentState);
 		}
 	}
 
@@ -102,58 +100,57 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		this.pauseState = pauseState;
 	}
 
-	/**
-	 * Fork this state machine and join when another machine reaches a given
-	 * state.
-	 * 
-	 * <p>
-	 * This state machine is paused immediately and is resumed when the other
-	 * machine transitions to the given join state. If the other machine doesn't
-	 * reach the given state before stopping or finishing, this machine remains
-	 * paused.
-	 * </p>
-	 * 
-	 * <p>
-	 * The returned future indicates the result of the join.
-	 * </p>
-	 * 
-	 * @param joiner
-	 *            The other state machine to join.
-	 * @param joinState
-	 *            The state at which to join the other state machine.
-	 */
-	public <T extends State<?, T>> Future<Boolean> forkJoin(
-			final StateMachine<?, T> joiner, final T joinState) {
-		// Resume when join state reached
-		final StateFuture<T> joinFuture = new StateFuture<T>(joinState);
-		joinFuture.addFutureListener(new FutureListener<Boolean>() {
-			@Override
-			public void futureResolved(Future<? extends Boolean> future) {
-				try {
-					if (future.get().booleanValue()) {
-						// Joined, resume parent
-						resume();
-					}
-					// Clean up
-					joiner.removeStateListener(joinFuture);
-				} catch (InterruptedException | ExecutionException cannotHappen) {
-				}
-			}
-
-			@Override
-			public void futureCancelled(Future<? extends Boolean> future) {
-			}
-		});
-
-		// Listen to child
-		joiner.addStateListener(joinFuture);
-		// Pause child when in join state
-		joiner.pauseAt(joinState);
-		// Pause parent
-		pause();
-
-		return joinFuture;
-	}
+//	/**
+//	 * Fork this state machine and join when another machine reaches a given
+//	 * state.
+//	 * 
+//	 * <p>
+//	 * This state machine is paused immediately and is resumed when the other
+//	 * machine transitions to the given join state. If the other machine doesn't
+//	 * reach the given state before stopping or finishing, this machine remains
+//	 * paused.
+//	 * </p>
+//	 * 
+//	 * <p>
+//	 * The returned future indicates the result of the join.
+//	 * </p>
+//	 * 
+//	 * @param joiner
+//	 *            The other state machine to join.
+//	 * @param joinState
+//	 *            The state at which to join the other state machine.
+//	 */
+//	public <T extends State<?, T>> Future<Boolean> forkJoin(final StateMachine<?, T> joiner, final T joinState) {
+//		// Resume when join state reached
+//		final StateFuture<T> joinFuture = new StateFuture<T>(joinState);
+//		joinFuture.addFutureListener(new FutureListener<Boolean>() {
+//			@Override
+//			public void futureResolved(Future<? extends Boolean> future) {
+//				try {
+//					if (future.get().booleanValue()) {
+//						// Joined, resume parent
+//						resume();
+//					}
+//					// Clean up
+//					joiner.removeStateListener(joinFuture);
+//				} catch (InterruptedException | ExecutionException cannotHappen) {
+//				}
+//			}
+//
+//			@Override
+//			public void futureCancelled(Future<? extends Boolean> future) {
+//			}
+//		});
+//
+//		// Listen to child
+//		joiner.addStateListener(joinFuture);
+//		// Pause child when in join state
+//		joiner.pauseAt(joinState);
+//		// Pause parent
+//		pause();
+//
+//		return joinFuture;
+//	}
 
 	/**
 	 * Add a state listener that is informed of state machine events.
@@ -221,7 +218,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 				pause(true);
 			} else if (!isPaused()) {
 				// Continue with new state
-				currentState.execute(self());
+				execute(currentState);
 			}
 		}
 	}
@@ -250,9 +247,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 			public void futureResolved(Future<?> future) {
 				try {
 					Object result = future.get();
-					if (result instanceof Boolean
-							&& !((Boolean) result).booleanValue()) {
-
+					if (result instanceof Boolean && !((Boolean) result).booleanValue()) {
 						// Interrupt, retry needed
 						pause();
 					} else {
@@ -268,7 +263,45 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 				// Ignore
 			}
 		});
-		this.nextTransition = future;
+		// Register binding
+		addBinding(future);
+	}
+
+	/**
+	 * Execute the given state.
+	 * 
+	 * @param state
+	 * 			The state to execute.
+	 */
+	private void execute(S state) {
+		// Clean up
+		clearBindings();
+		// Execute
+		state.execute(self());
+	}
+
+	/**
+	 * Register a transition binding for the current state.
+	 *  
+	 * @param binding
+	 * 			The new binding.
+	 */
+	private void addBinding(Future<?> binding) {
+		synchronized (transitionBindings) {
+			transitionBindings.add(binding);
+		}
+	}
+
+	/**
+	 * Clear all transition bindings bound to the current state.
+	 */
+	private void clearBindings() {
+		synchronized (transitionBindings) {
+			for (Future<?> binding : transitionBindings) {
+				binding.cancel();
+			}
+			transitionBindings.clear();
+		}
 	}
 
 	private void reportStarted() {
@@ -315,8 +348,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		return (M) this;
 	}
 
-	protected class StateFuture<T extends State<?, ?>> extends
-			AbstractFuture<Boolean> implements StateListener<T> {
+	protected class StateFuture<T extends State<?, ?>> extends AbstractFuture<Boolean> implements StateListener<T> {
 
 		private final T checkState;
 

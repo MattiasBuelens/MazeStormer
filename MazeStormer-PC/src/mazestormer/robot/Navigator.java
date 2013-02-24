@@ -15,8 +15,7 @@ import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 
-public class Navigator extends
-		StateMachine<Navigator, Navigator.NavigatorState> implements
+public class Navigator extends StateMachine<Navigator, Navigator.NavigatorState> implements
 		StateListener<Navigator.NavigatorState>, WaypointListener {
 
 	private final Pilot pilot;
@@ -43,8 +42,7 @@ public class Navigator extends
 
 	public void setPath(List<Waypoint> path) {
 		if (isRunning()) {
-			throw new IllegalStateException(
-					"Cannot change path while traversing.");
+			throw new IllegalStateException("Cannot change path while traversing.");
 		}
 		this.path = checkNotNull(path);
 	}
@@ -100,7 +98,7 @@ public class Navigator extends
 	/**
 	 * Rotate towards target.
 	 */
-	private void rotateToNode() {
+	protected void rotateToNode() {
 		Pose pose = poseProvider.getPose();
 		double bearing = pose.relativeBearing(node);
 		bindTransition(pilot.rotateComplete(bearing), NavigatorState.TRAVEL);
@@ -109,7 +107,7 @@ public class Navigator extends
 	/**
 	 * Travel towards target.
 	 */
-	private void travel() {
+	protected void travel() {
 		Pose pose = poseProvider.getPose();
 		double distance = pose.distanceTo(node);
 		bindTransition(pilot.travelComplete(distance), NavigatorState.ROTATE_ON);
@@ -118,7 +116,7 @@ public class Navigator extends
 	/**
 	 * Rotate on target.
 	 */
-	private void rotateOnTarget() {
+	protected void rotateOnTarget() {
 		if (node.isHeadingRequired()) {
 			Pose pose = poseProvider.getPose();
 			double heading = node.getHeading() - pose.getHeading();
@@ -131,7 +129,7 @@ public class Navigator extends
 	/**
 	 * Report target reached and get next node.
 	 */
-	private void report() {
+	protected void report() {
 		if (pathCompleted()) {
 			// Finished
 			finish();
@@ -147,7 +145,7 @@ public class Navigator extends
 	/**
 	 * Report target reached and get next node.
 	 */
-	private void next() {
+	protected void next() {
 		// Next node
 		node = path.remove(0);
 		transition(NavigatorState.ROTATE_TO);
