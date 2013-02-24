@@ -10,6 +10,7 @@ import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.state.AbstractStateListener;
 import mazestormer.util.Future;
+import mazestormer.util.FutureListener;
 
 public class BarcodeController extends SubController implements
 		IBarcodeController {
@@ -37,13 +38,18 @@ public class BarcodeController extends SubController implements
 
 	@Override
 	public void startAction(ActionType actionType) {
+		// Post state
+		postActionState(BarcodeActionEvent.EventType.STARTED);
+		// Start action
 		this.action = getAction(actionType)
 				.performAction(getRobot(), getMaze());
+		this.action.addFutureListener(new ActionListener());
 	}
 
 	@Override
 	public void stopAction() {
 		if (this.action != null) {
+			// Stop action
 			this.action.cancel();
 			this.action = null;
 		}
@@ -109,20 +115,12 @@ public class BarcodeController extends SubController implements
 		}
 	}
 
-	private void onScanStarted() {
-		// Post state
-		postState(BarcodeScanEvent.EventType.STARTED);
-	}
-
-	private void onScanStopped() {
-		// Stop pilot
-		getRobot().getPilot().stop();
-		// Post state
-		postState(BarcodeScanEvent.EventType.STOPPED);
-	}
-
-	private void postState(BarcodeScanEvent.EventType eventType) {
+	private void postScanState(BarcodeScanEvent.EventType eventType) {
 		postEvent(new BarcodeScanEvent(eventType));
+	}
+
+	private void postActionState(BarcodeActionEvent.EventType eventType) {
+		postEvent(new BarcodeActionEvent(eventType));
 	}
 
 	@Override
@@ -155,17 +153,37 @@ public class BarcodeController extends SubController implements
 		return BarcodeSpeed.UPPERBOUND.getBarcodeSpeedValue();
 	}
 
+	private class ActionListener implements FutureListener<Object> {
+
+		@Override
+		public void futureResolved(Future<? extends Object> future) {
+			// Post state
+			postActionState(BarcodeActionEvent.EventType.STOPPED);
+		}
+
+		@Override
+		public void futureCancelled(Future<? extends Object> future) {
+			// Stop robot
+			getRobot().getPilot().stop();
+			// Post state
+			postActionState(BarcodeActionEvent.EventType.STOPPED);
+		}
+
+	}
+
 	private class BarcodeListener extends
 			AbstractStateListener<BarcodeRunner.BarcodeState> {
 
 		@Override
 		public void stateStarted() {
-			onScanStarted();
+			// Post state
+			postScanState(BarcodeScanEvent.EventType.STARTED);
 		}
 
 		@Override
 		public void stateStopped() {
-			onScanStopped();
+			// Post state
+			postScanState(BarcodeScanEvent.EventType.STOPPED);
 		}
 
 		@Override
