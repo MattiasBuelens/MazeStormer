@@ -29,7 +29,12 @@ public enum ControlMode {
 	/**
 	 * Path finder tester
 	 */
-	PathFinder("Find path");
+	PathFinder("Find path"),
+	
+	/**
+	 * Team Treasure Trek
+	 */
+	TeamTreasureTrek("Team Treasure Trek");
 
 	private final String name;
 
@@ -40,5 +45,4 @@ public enum ControlMode {
 	public String toString() {
 		return name;
 	}
-
 }
