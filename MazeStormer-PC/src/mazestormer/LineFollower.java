@@ -12,7 +12,7 @@ public class LineFollower {
 
 	public static void main(String[] aArg) throws Exception {
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.Remote);
+				.getConnector(RobotType.PHYSICAL);
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");
 		connector.connect(context);

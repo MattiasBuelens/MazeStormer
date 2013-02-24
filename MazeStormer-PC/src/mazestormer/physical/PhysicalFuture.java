@@ -1,14 +1,14 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import mazestormer.command.RequestCommand;
 import mazestormer.report.RequestReport;
 import mazestormer.util.AbstractFuture;
 
-public class RequestFuture<V> extends AbstractFuture<V> {
+public class PhysicalFuture<V> extends AbstractFuture<V> {
 
 	private final int requestId;
 
-	public RequestFuture(RequestCommand<V> request) {
+	public PhysicalFuture(RequestCommand<V> request) {
 		this.requestId = request.getRequestId();
 	}
 

@@ -1,4 +1,4 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.util.concurrent.TimeUnit;
 
@@ -6,12 +6,12 @@ import mazestormer.command.CommandType;
 import mazestormer.robot.CompassSensor;
 import mazestormer.util.Future;
 
-public class RemoteCompassSensor extends RemoteComponent implements
+public class PhysicalCompassSensor extends PhysicalComponent implements
 		CompassSensor {
 
 	private final CompassValueRequester compassValueRequester;
 
-	public RemoteCompassSensor(RemoteCommunicator communicator) {
+	public PhysicalCompassSensor(PhysicalCommunicator communicator) {
 		super(communicator);
 		compassValueRequester = new CompassValueRequester(communicator);
 		setup();
@@ -29,16 +29,16 @@ public class RemoteCompassSensor extends RemoteComponent implements
 	public float getDegrees() {
 		try {
 			return compassValueRequester.request().get(
-					RemoteRobot.requestTimeout, TimeUnit.MILLISECONDS);
+					PhysicalRobot.requestTimeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
 		}
 	}
 
-	public static class CompassValueRequester extends ReportRequester<Float> {
+	public static class CompassValueRequester extends PhysicalRequester<Float> {
 
-		public CompassValueRequester(RemoteCommunicator communicator) {
+		public CompassValueRequester(PhysicalCommunicator communicator) {
 			super(communicator);
 		}
 

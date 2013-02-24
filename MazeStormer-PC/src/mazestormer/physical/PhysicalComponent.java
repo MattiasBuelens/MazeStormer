@@ -1,22 +1,24 @@
-package mazestormer.remote;
+package mazestormer.physical;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import mazestormer.command.Command;
+import mazestormer.remote.MessageListener;
+import mazestormer.remote.MessageSender;
 import mazestormer.report.Report;
 
-public abstract class RemoteComponent extends MessageSender<Command> {
+public abstract class PhysicalComponent extends MessageSender<Command> {
 
 	private List<MessageListener<Report<?>>> messageListeners = new ArrayList<MessageListener<Report<?>>>();
 
-	public RemoteComponent(RemoteCommunicator communicator) {
+	public PhysicalComponent(PhysicalCommunicator communicator) {
 		super(communicator);
 	}
 
 	@Override
-	public RemoteCommunicator getCommunicator() {
-		return (RemoteCommunicator) super.getCommunicator();
+	public PhysicalCommunicator getCommunicator() {
+		return (PhysicalCommunicator) super.getCommunicator();
 	}
 
 	/**

@@ -1,5 +1,16 @@
 package mazestormer.connect;
 
 public enum RobotType {
-	Remote, Virtual;
+	PHYSICAL {
+		@Override
+		public String toString() {
+			return "Physical";
+		}
+	},
+	VIRTUAL {
+		@Override
+		public String toString() {
+			return "Virtual";
+		}
+	}
 }
