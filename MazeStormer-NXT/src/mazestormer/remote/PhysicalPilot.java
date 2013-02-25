@@ -24,8 +24,9 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 	private MovementReporter movementReporter;
 
 	public PhysicalPilot(NXTCommunicator communicator) {
-		super(ControllableRobot.leftWheelDiameter, ControllableRobot.rightWheelDiameter,
-				ControllableRobot.trackWidth, Motor.A, Motor.B, false);
+		super(ControllableRobot.leftWheelDiameter,
+				ControllableRobot.rightWheelDiameter,
+				ControllableRobot.trackWidth, Motor.B, Motor.A, false);
 
 		this.communicator = communicator;
 		setup();
