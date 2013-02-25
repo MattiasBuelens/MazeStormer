@@ -1,4 +1,6 @@
-package mazestormer.controller;
+package mazestormer.polygon;
+
+import mazestormer.controller.ActionEvent;
 
 public class PolygonEvent extends ActionEvent {
 

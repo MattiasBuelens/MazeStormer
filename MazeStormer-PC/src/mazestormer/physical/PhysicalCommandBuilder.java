@@ -2,9 +2,6 @@ package mazestormer.physical;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 import mazestormer.command.CommandType;
 import mazestormer.command.ConditionalCommand;
@@ -17,19 +14,11 @@ import mazestormer.condition.Condition;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-public class PhysicalCommandBuilder extends PhysicalRequester<Void> implements
+public class PhysicalCommandBuilder extends ReportRequester<Void> implements
 		ConditionalCommandBuilder.CommandBuilder {
 
 	private final ConditionalCommand command;
-	private final List<Runnable> actions = new ArrayList<>();
-
-	private final ExecutorService executor = Executors
-			.newCachedThreadPool(factory);
-	private final ActionRunner actionRunner = new ActionRunner();
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("PhysicalCommandBuilder-%d").build();
+	private final List<Runnable> actions = new ArrayList<Runnable>();
 
 	public PhysicalCommandBuilder(PhysicalCommunicator communicator,
 			CommandType type, Condition condition) {
@@ -46,7 +35,9 @@ public class PhysicalCommandBuilder extends PhysicalRequester<Void> implements
 	}
 
 	protected void trigger() {
-		executor.execute(actionRunner);
+		for (Runnable action : actions) {
+			action.run();
+		}
 	}
 
 	@Override
@@ -93,17 +84,6 @@ public class PhysicalCommandBuilder extends PhysicalRequester<Void> implements
 		return this;
 	}
 
-	private class ActionRunner implements Runnable {
-
-		@Override
-		public void run() {
-			for (Runnable action : actions) {
-				action.run();
-			}
-		}
-
-	}
-
 	private class Listener implements FutureListener<Void> {
 
 		private final Future<Void> future;
@@ -113,14 +93,14 @@ public class PhysicalCommandBuilder extends PhysicalRequester<Void> implements
 		}
 
 		@Override
-		public void futureResolved(Future<Void> future) {
+		public void futureResolved(Future<? extends Void> future) {
 			if (future == this.future) {
 				trigger();
 			}
 		}
 
 		@Override
-		public void futureCancelled(Future<Void> future) {
+		public void futureCancelled(Future<? extends Void> future) {
 		}
 
 	}

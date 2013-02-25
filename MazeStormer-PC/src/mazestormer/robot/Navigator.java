@@ -1,300 +1,50 @@
 package mazestormer.robot;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
-import java.util.concurrent.CancellationException;
+import java.util.Collections;
+import java.util.List;
 
 import lejos.robotics.localization.PoseProvider;
-import lejos.robotics.navigation.NavigationListener;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.navigation.WaypointListener;
 import lejos.robotics.pathfinding.Path;
+import mazestormer.state.State;
+import mazestormer.state.StateListener;
+import mazestormer.state.StateMachine;
 
-public class Navigator extends Runner implements WaypointListener {
+public class Navigator extends StateMachine<Navigator, Navigator.NavigatorState> implements
+		StateListener<Navigator.NavigatorState>, WaypointListener {
 
-	private PoseProvider poseProvider;
+	private final Pilot pilot;
+	private final PoseProvider poseProvider;
 
-	private State nextState = State.NEXT_STEP;
-	private State stopState = null;
+	private List<Waypoint> path;
+	private List<NavigatorListener> listeners = new ArrayList<NavigatorListener>();
 
-	private Path path = new Path();
-	private Pose pose = new Pose();
-	private Waypoint destination;
-	private int sequenceNr;
+	private volatile Waypoint node;
 
-	private boolean checkPose = false;
-	private static final double maxDistanceError = 1;
-	private static final double maxHeadingError = 5;
-
-	private ArrayList<NavigationListener> listeners = new ArrayList<NavigationListener>();
-
-	/**
-	 * If true, causes Nav.run() to break whenever way point is reached.
-	 */
-	private boolean singleStep = false;
-
-	public enum State {
-		NEXT_STEP, ROTATE, TRAVEL, END_STEP
-	}
-
-	/**
-	 * Creates a navigator controlling the given pilot and using the given pose
-	 * provider for localization.
-	 * 
-	 * @param pilot
-	 *            The pilot.
-	 * @param poseProvider
-	 *            The pose provider.
-	 */
 	public Navigator(Pilot pilot, PoseProvider poseProvider) {
-		super(pilot);
-		this.poseProvider = poseProvider;
+		this.pilot = checkNotNull(pilot);
+		this.poseProvider = checkNotNull(poseProvider);
+		addStateListener(this);
 	}
 
-	/**
-	 * Adds a NavigationListener that is informed when a the robot stops or
-	 * reaches a way point.
-	 * 
-	 * @param listener
-	 *            The new navigation listener.
-	 */
-	public void addNavigationListener(NavigationListener listener) {
-		if (!listeners.contains(listener))
-			listeners.add(listener);
+	public Waypoint getCurrentTarget() {
+		return isRunning() ? node : null;
 	}
 
-	public void removeNavigationListener(NavigationListener listener) {
-		listeners.remove(listener);
+	public List<Waypoint> getRemainingPath() {
+		return Collections.unmodifiableList(this.path);
 	}
 
-	/**
-	 * Gets the pose provider in use.
-	 * 
-	 * @return The pose provider.
-	 */
-	public PoseProvider getPoseProvider() {
-		return poseProvider;
-	}
-
-	/**
-	 * Sets the pose provider to use.
-	 * 
-	 * @param poseProvider
-	 *            The new pose provider.
-	 */
-	public void setPoseProvider(PoseProvider poseProvider) {
-		this.poseProvider = poseProvider;
-	}
-
-	/**
-	 * Sets the path that the navigator will traverse. By default, the robot
-	 * will not stop along the way. If the robot is moving when this method is
-	 * called, it stops and the current path is replaced by the new one.
-	 * 
-	 * @param path
-	 *            to be followed.
-	 */
-	public void setPath(Path path) {
-		if (path == null)
-			return;
-		if (isRunning())
-			stop();
-		this.path = path;
-		singleStep = false;
-		sequenceNr = 0;
-	}
-
-	/**
-	 * Clears the current path. If the robot is moving when this method is
-	 * called, it stops.
-	 */
-	public void clearPath() {
-		stop();
-		path.clear();
-	}
-
-	/**
-	 * Gets the current path.
-	 * 
-	 * @return The path.
-	 */
-	public Path getPath() {
-		return path;
-	}
-
-	/**
-	 * Starts traversing the path. This method is non-blocking.
-	 * 
-	 * @param path
-	 *            to be followed.
-	 */
-	public void followPath(Path path) {
-		followPathUntil(path, null);
-	}
-
-	public void followPathUntil(Path path, State untilState) {
-		if (path == null)
-			return;
-		this.path = path;
-		followPathUntil(untilState);
-	}
-
-	/**
-	 * Starts the robot traversing the current path. This method is
-	 * non-blocking.
-	 */
-	public void followPath() {
-		followPathUntil(null);
-	}
-
-	public void followPathUntil(State untilState) {
-		if (path.isEmpty())
-			return;
-		stopState = untilState;
-		restart();
-	}
-
-	/**
-	 * Resume the navigator from the given state.
-	 * 
-	 * @param state
-	 *            The next state.
-	 */
-	public void resumeFrom(State state) {
-		nextState = state;
-		followPath();
-	}
-
-	/**
-	 * Controls whether the robot stops at each way point along its path;
-	 * applies to the current path only. The robot will move to the next way
-	 * point if you call {@link #followPath()}.
-	 * 
-	 * @param singleStep
-	 *            If <code>true</code>, the robot stops at each way point.
-	 */
-	public void singleStep(boolean singleStep) {
-		this.singleStep = singleStep;
-	}
-
-	public boolean checksPose() {
-		return checkPose;
-	}
-
-	public void setCheckPose(boolean checkPose) {
-		this.checkPose = checkPose;
-	}
-
-	/**
-	 * Starts the robot moving toward the destination. If no path exists, a new
-	 * one is created consisting of the destination, otherwise the destination
-	 * is added to the path. This method is non-blocking, and is equivalent to
-	 * <code>addWaypoint(Waypoint); followPath();</code>
-	 * 
-	 * @param destination
-	 *            The way point to be reached.
-	 */
-	public void goTo(Waypoint destination) {
-		if (pathCompleted())
-			singleStep = false;
-		addWaypoint(destination);
-		followPath();
-	}
-
-	/**
-	 * Starts the moving toward the destination way point created from the
-	 * parameters. If no path exists, a new one is created, otherwise the new
-	 * way point is added to the path. This method is non-blocking, and is
-	 * equivalent to <code>addWaypoint(float x, float y); followPath();</code>
-	 * 
-	 * @param x
-	 *            X-coordinate of the destination.
-	 * @param y
-	 *            Y-coordinate of the destination.
-	 */
-	public void goTo(float x, float y) {
-		goTo(new Waypoint(x, y));
-	}
-
-	/**
-	 * Starts the moving toward the destination way point created from the
-	 * parameters. If no path exists, a new one is created, otherwise the new
-	 * way point is added to the path. This method is non-blocking, and is
-	 * equivalent to
-	 * <code>addWaypoint(float x, float y, float heading); followPath();</code>
-	 * 
-	 * @param x
-	 *            X-coordinate of the destination.
-	 * @param y
-	 *            X-coordinate of the destination.
-	 * @param heading
-	 *            Desired robot heading at arrival.
-	 */
-	public void goTo(float x, float y, float heading) {
-		goTo(new Waypoint(x, y, heading));
-	}
-
-	/**
-	 * Adds a way point to the end of the path.
-	 * 
-	 * @param waypoint
-	 *            The way point to be added.
-	 */
-	public void addWaypoint(Waypoint waypoint) {
-		if (pathCompleted()) {
-			sequenceNr = 0;
-			singleStep = false;
+	public void setPath(List<Waypoint> path) {
+		if (isRunning()) {
+			throw new IllegalStateException("Cannot change path while traversing.");
 		}
-		path.add(waypoint);
-	}
-
-	/**
-	 * Constructs a new way point from the parameters and adds it to the end of
-	 * the path.
-	 * 
-	 * @param x
-	 *            X-coordinate of the way point.
-	 * @param y
-	 *            Y-coordinate of the way point.
-	 */
-	public void addWaypoint(float x, float y) {
-		addWaypoint(new Waypoint(x, y));
-	}
-
-	/**
-	 * Constructs a new way point from the parameters and adds it to the end of
-	 * the path.
-	 * 
-	 * @param x
-	 *            X-coordinate of the way point.
-	 * @param y
-	 *            Y-coordinate of the way point.
-	 * @param heading
-	 *            The heading of the robot when it reaches the way point.
-	 */
-	public void addWaypoint(float x, float y, float heading) {
-		addWaypoint(new Waypoint(x, y, heading));
-	}
-
-	/**
-	 * Stops the robot. The robot will resume its path traversal if you call
-	 * {@link #followPath()}.
-	 */
-	public void stop() {
-		if (cancel()) {
-			callListeners();
-		}
-	}
-
-	/**
-	 * Gets the way point to which the robot is presently moving.
-	 * 
-	 * @return The way point, or null if the path is empty.
-	 */
-	public Waypoint getWaypoint() {
-		if (path.isEmpty())
-			return null;
-		return path.get(0);
+		this.path = checkNotNull(path);
 	}
 
 	/**
@@ -307,160 +57,236 @@ public class Navigator extends Runner implements WaypointListener {
 	}
 
 	/**
-	 * Waits for the robot to stop for any reason; returns <code>true</code> if
-	 * the robot stopped at the final way point of the path.
+	 * Add a navigator listener that is informed when the robot stops or reaches
+	 * a way point.
 	 * 
-	 * @return True if and only if the path is completed.
+	 * @param listener
+	 *            The new navigator listener.
 	 */
-	public boolean waitForStop() {
-		while (isMoving()) {
-			Thread.yield();
-		}
-		return pathCompleted();
+	public void addNavigatorListener(NavigatorListener listener) {
+		listeners.add(listener);
 	}
 
 	/**
-	 * Checks whether the robot is moving towards a way point.
+	 * Remove a registered navigator listener.
 	 * 
-	 * @return True if and only if the robot is moving.
+	 * @param listener
+	 *            The navigator listener.
 	 */
-	public boolean isMoving() {
-		return isRunning();
+	public void removeNavigatorListener(NavigatorListener listener) {
+		listeners.remove(listener);
 	}
 
+	@Override
+	public void addWaypoint(Waypoint wp) {
+		if (pathCompleted()) {
+			path = new Path();
+		}
+		path.add(wp);
+	}
+
+	@Override
 	public void pathGenerated() {
-		// Currently does nothing
+		// TODO Auto-generated method stub
+
 	}
 
-	private void callListeners() {
-		pose = poseProvider.getPose();
-		for (NavigationListener l : listeners) {
-			if (!isRunning()) {
-				l.pathInterrupted(destination, pose, sequenceNr);
-			} else {
-				l.atWaypoint(destination, pose, sequenceNr);
-				if (pathCompleted()) {
-					l.pathComplete(destination, pose, sequenceNr);
-				}
-			}
+	/*
+	 * Path traversal
+	 */
+
+	/**
+	 * Rotate towards target.
+	 */
+	protected void rotateToNode() {
+		Pose pose = poseProvider.getPose();
+		double bearing = pose.relativeBearing(node);
+		bindTransition(pilot.rotateComplete(bearing), NavigatorState.TRAVEL);
+	}
+
+	/**
+	 * Travel towards target.
+	 */
+	protected void travel() {
+		Pose pose = poseProvider.getPose();
+		double distance = pose.distanceTo(node);
+		bindTransition(pilot.travelComplete(distance), NavigatorState.ROTATE_ON);
+	}
+
+	/**
+	 * Rotate on target.
+	 */
+	protected void rotateOnTarget() {
+		if (node.isHeadingRequired()) {
+			Pose pose = poseProvider.getPose();
+			double heading = node.getHeading() - pose.getHeading();
+			bindTransition(pilot.rotateComplete(heading), NavigatorState.REPORT);
+		} else {
+			transition(NavigatorState.REPORT);
+		}
+	}
+
+	/**
+	 * Report target reached and get next node.
+	 */
+	protected void report() {
+		if (pathCompleted()) {
+			// Finished
+			finish();
+			return;
+		}
+
+		// Report
+		reportAtWaypoint();
+
+		transition(NavigatorState.NEXT);
+	}
+
+	/**
+	 * Report target reached and get next node.
+	 */
+	protected void next() {
+		// Next node
+		node = path.remove(0);
+		transition(NavigatorState.ROTATE_TO);
+	}
+
+	/*
+	 * Events
+	 */
+
+	private void reportStarted() {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorStarted(pose);
+		}
+	}
+
+	private void reportStopped() {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorStopped(pose);
+		}
+	}
+
+	private void reportPaused(NavigatorState currentState, boolean onTransition) {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorPaused(currentState, pose, onTransition);
+		}
+	}
+
+	private void reportResumed(NavigatorState currentState) {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorResumed(currentState, pose);
+		}
+	}
+
+	private void reportAtWaypoint() {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorAtWaypoint(node, pose);
+		}
+	}
+
+	private void reportComplete() {
+		Pose pose = poseProvider.getPose();
+		for (NavigatorListener l : listeners) {
+			l.navigatorAtWaypoint(node, pose);
+			l.navigatorCompleted(node, pose);
 		}
 	}
 
 	@Override
-	public void run() throws CancellationException {
-		step();
-	}
+	public void stateStarted() {
+		// Report
+		reportStarted();
 
-	private void step() throws CancellationException {
-		switch (nextState) {
-		case NEXT_STEP:
-		default:
-			nextStep();
-			break;
-		case ROTATE:
-			rotateStart();
-			break;
-		case TRAVEL:
-			travel();
-			break;
-		case END_STEP:
-			rotateDestination();
-			endStep();
-			break;
-		}
-		throwWhenCancelled();
-
-		// Stop when going to cancel state
-		if (nextState == stopState) {
-			stop();
-			return;
-		}
-
-		// Step again
-		step();
-	}
-
-	private void nextStep() {
-		throwWhenCancelled();
-		destination = getWaypoint();
-		nextState = State.ROTATE;
-	}
-
-	private void rotateStart() {
-		throwWhenCancelled();
-		// Rotate towards destination
-		pose = poseProvider.getPose();
-		float destinationBearing = pose.relativeBearing(destination);
-		rotate(destinationBearing, true);
-		waitComplete();
-		nextState = State.TRAVEL;
-	}
-
-	private void travel() {
-		throwWhenCancelled();
-		// Travel towards destination
-		pose = poseProvider.getPose();
-		float distance = pose.distanceTo(destination);
-		travel(distance, true);
-		waitComplete();
-		nextState = State.END_STEP;
-	}
-
-	private void rotateDestination() {
-		throwWhenCancelled();
-		// Apply destination heading
-		if (destination.isHeadingRequired()) {
-			pose = poseProvider.getPose();
-			rotate(destination.getHeading() - pose.getHeading(), true);
-			waitComplete();
+		if (pathCompleted()) {
+			// Empty path
+			finish();
+		} else {
+			// Get the first node in the path
+			node = path.remove(0);
+			// Start traversing
+			transition(NavigatorState.ROTATE_TO);
 		}
 	}
 
-	private void endStep() {
-		throwWhenCancelled();
-		pose = poseProvider.getPose();
-		nextState = State.NEXT_STEP;
-
-		// Confirm final pose
-		if (checksPose() && !validPose()) {
-			cancel();
-			return;
-		}
-
-		if (isRunning() && !pathCompleted()) {
-			// Presumably at way point
-			path.remove(0);
-			sequenceNr++;
-		}
-		// Call listeners
-		callListeners();
-		// Stop when path completed or single step
-		if (pathCompleted() || singleStep) {
-			resolve();
-		}
+	@Override
+	public void stateStopped() {
+		reportStopped();
 	}
 
-	private boolean validPose() {
-		double distanceError = destination.distance(pose.getLocation());
-		if (distanceError > maxDistanceError) {
-			return false;
-		}
-		if (destination.isHeadingRequired()) {
-			double headingError = Math.abs(destination.getHeading()
-					- pose.getHeading());
-			if (headingError > maxHeadingError) {
-				return false;
+	@Override
+	public void stateFinished() {
+		// Stop
+		stop();
+		// Report
+		reportComplete();
+	}
+
+	@Override
+	public void statePaused(NavigatorState currentState, boolean onTransition) {
+		reportPaused((NavigatorState) currentState, onTransition);
+	}
+
+	@Override
+	public void stateResumed(NavigatorState currentState) {
+		reportResumed((NavigatorState) currentState);
+	}
+
+	@Override
+	public void stateTransitioned(NavigatorState nextState) {
+	}
+
+	/*
+	 * States
+	 */
+
+	public enum NavigatorState implements State<Navigator, NavigatorState> {
+
+		// Interruptible
+		ROTATE_TO {
+			@Override
+			public void execute(Navigator navigator) {
+				navigator.rotateToNode();
 			}
-		}
-		return true;
-	}
+		},
 
-	private void waitComplete() {
-		Pilot pilot = getPilot();
-		while (pilot.isMoving() && isRunning()) {
-			Thread.yield();
-		}
-		throwWhenCancelled();
+		// Interruptible
+		TRAVEL {
+			@Override
+			public void execute(Navigator navigator) {
+				navigator.travel();
+			}
+		},
+
+		// Interruptible
+		ROTATE_ON {
+			@Override
+			public void execute(Navigator navigator) {
+				navigator.rotateOnTarget();
+			}
+		},
+
+		// Not interruptible
+		REPORT {
+			@Override
+			public void execute(Navigator navigator) {
+				navigator.report();
+			}
+		},
+
+		// Not interruptible
+		NEXT {
+			@Override
+			public void execute(Navigator navigator) {
+				navigator.next();
+			}
+		};
+
 	}
 
 }

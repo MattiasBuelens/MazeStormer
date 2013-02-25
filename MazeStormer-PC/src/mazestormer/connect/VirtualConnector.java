@@ -1,18 +1,12 @@
 package mazestormer.connect;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkState;
 import mazestormer.maze.Maze;
-import mazestormer.robot.Pilot;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Pilot;
 import mazestormer.simulator.VirtualRobot;
 
 public class VirtualConnector implements Connector {
-
-	/*
-	 * Default virtual speeds
-	 */
-	private static final double travelSpeed = 40d; // cm/sec
-	private static final double rotateSpeed = 180d; // degrees/sec
 
 	private ControllableRobot robot;
 
@@ -35,11 +29,12 @@ public class VirtualConnector implements Connector {
 		robot = createRobot(context.getSourceMaze());
 	}
 
-	private ControllableRobot createRobot(Maze loadedMaze) {
+	private static ControllableRobot createRobot(Maze loadedMaze) {
 		ControllableRobot robot = new VirtualRobot(loadedMaze);
+		// Set default speeds
 		Pilot pilot = robot.getPilot();
-		pilot.setTravelSpeed(travelSpeed);
-		pilot.setRotateSpeed(rotateSpeed);
+		pilot.setTravelSpeed(ControllableRobot.travelSpeed);
+		pilot.setRotateSpeed(ControllableRobot.rotateSpeed);
 		return robot;
 	}
 

@@ -69,6 +69,8 @@ public abstract class ConditionalCommandListener extends
 	 *            The conditional command to execute.
 	 */
 	protected void resolve(ConditionalCommand command) {
+		// Send report
+		send(createReport(command));
 		// Execute linked commands
 		switch (command.getType()) {
 		case WHEN:
@@ -79,8 +81,6 @@ public abstract class ConditionalCommandListener extends
 		default:
 			break;
 		}
-		// Send report
-		send(createReport(command));
 		// Unregister
 		unregister(command);
 	}
@@ -157,14 +157,14 @@ public abstract class ConditionalCommandListener extends
 	}
 
 	@Override
-	public void futureResolved(Future<Void> future) {
+	public void futureResolved(Future<? extends Void> future) {
 		if (commandsByFuture.containsKey(future)) {
 			resolve(commandsByFuture.get(future));
 		}
 	}
 
 	@Override
-	public void futureCancelled(Future<Void> future) {
+	public void futureCancelled(Future<? extends Void> future) {
 		if (commandsByFuture.containsKey(future)) {
 			cancel(commandsByFuture.get(future));
 		}

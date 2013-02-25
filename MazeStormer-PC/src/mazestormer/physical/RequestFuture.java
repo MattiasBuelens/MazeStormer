@@ -4,11 +4,11 @@ import mazestormer.command.RequestCommand;
 import mazestormer.report.RequestReport;
 import mazestormer.util.AbstractFuture;
 
-public class PhysicalFuture<V> extends AbstractFuture<V> {
+public class RequestFuture<V> extends AbstractFuture<V> {
 
 	private final int requestId;
 
-	public PhysicalFuture(RequestCommand<V> request) {
+	public RequestFuture(RequestCommand<V> request) {
 		this.requestId = request.getRequestId();
 	}
 

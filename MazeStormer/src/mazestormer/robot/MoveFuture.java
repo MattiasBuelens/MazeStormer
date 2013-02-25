@@ -12,10 +12,10 @@ import mazestormer.util.FutureListener;
  * A future which resolves when a move of the given type is fully completed.
  * 
  * <p>
- * A move is considered as completed when a move with that type is stopped
- * and the pilot is not moving at that time. If it is still moving, it would
- * indicate that the move was partially completed and interrupted by a
- * different move.
+ * A move is considered as completed when a move with that type is stopped and
+ * the pilot is not moving at that time. If it is still moving, it would
+ * indicate that the move was partially completed and interrupted by a different
+ * move.
  * </p>
  */
 public class MoveFuture extends AbstractFuture<Boolean> implements
@@ -64,12 +64,12 @@ public class MoveFuture extends AbstractFuture<Boolean> implements
 	}
 
 	@Override
-	public void futureResolved(Future<Boolean> future) {
+	public void futureResolved(Future<? extends Boolean> future) {
 		unregister();
 	}
 
 	@Override
-	public void futureCancelled(Future<Boolean> future) {
+	public void futureCancelled(Future<? extends Boolean> future) {
 		unregister();
 	}
 

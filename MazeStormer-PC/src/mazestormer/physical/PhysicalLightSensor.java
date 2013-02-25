@@ -94,7 +94,7 @@ public class PhysicalLightSensor extends AbstractCalibratedLightSensor {
 		return ControllableRobot.sensorRadius;
 	}
 
-	public static class LightValueRequester extends PhysicalRequester<Integer> {
+	public static class LightValueRequester extends ReportRequester<Integer> {
 
 		public LightValueRequester(PhysicalCommunicator communicator) {
 			super(communicator);

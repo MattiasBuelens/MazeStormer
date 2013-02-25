@@ -8,12 +8,12 @@ import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.CompassSensor;
-import mazestormer.robot.Pilot;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
 
-public class PhysicalRobot extends PhysicalComponent implements ControllableRobot {
+public class PhysicalRobot extends PhysicalComponent implements
+		ControllableRobot {
 
 	/**
 	 * Timeout for synchronous requests.
@@ -24,7 +24,6 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 	private PoseProvider poseProvider;
 
 	private PhysicalLightSensor light;
-	private PhysicalCompassSensor compass;
 
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
@@ -83,14 +82,6 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 			soundPlayer = new PhysicalSoundPlayer(getCommunicator());
 		}
 		return soundPlayer;
-	}
-
-	@Override
-	public CompassSensor getCompass() {
-		if (compass == null) {
-			compass = new PhysicalCompassSensor(getCommunicator());
-		}
-		return compass;
 	}
 
 	@Override
