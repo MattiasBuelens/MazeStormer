@@ -1,41 +1,37 @@
 package mazestormer.controller;
 
+import java.io.IOException;
+
 import mazestormer.player.Game;
-import mazestormer.rabbitmq.Config;
-import mazestormer.rabbitmq.ConnectionMode;
-import mazestormer.rabbitmq.MQChannel;
 
 public class GameSetUpController extends SubController implements
 		IGameSetUpController {
 
 	private Game game;
 
-	private final MQChannel channel;
-
 	public GameSetUpController(MainController mainController) {
 		super(mainController);
-		this.channel = new MQChannel(ConnectionMode.LOCAL);
 	}
 
 	@Override
 	public void createGame(String gameID) {
-		this.game = new Game(gameID);
-		this.game.addPlayer(getMainController().getPlayer());
-		this.channel.addToGameList(this.game);
-		this.channel.subscribeGameToJoin(this.game);
-		onJoin();
+		try {
+			this.game = new Game(gameID, getMainController().getPlayer());
+			onJoin();
+		} catch (IOException e) {
+			// TODO Handle this error, write to log?
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void joinGame(String gameID) {
-		this.channel.sendMessageTo("request", "race." + gameID + ".join");
 		// TODO Auto-generated method stub
 		onJoin();
 	}
 
 	@Override
 	public String[] refreshLobby() {
-		channel.sendMessageTo("race.replyTo_Brons", Config.GAME_LIST);
 		// TODO Auto-generated method stub
 		String[] lobby = { "one", "two" };
 		return lobby;

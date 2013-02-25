@@ -11,7 +11,7 @@ public interface Config {
 	public static final String LOCAL_HOST = "localhost";
 	
 	// the default exchange that will be used for races during the official demo's
-	public static final String EXCHANGE_NAME = "RaceExchange";
+	public static final String OFFICIAL_EXCHANGE_NAME = "RaceExchange";
 	public static final String LAUNCH_ROUTING_KEY = "race.launch";
 	
 	public static final String GAME_LIST = "game.list";
