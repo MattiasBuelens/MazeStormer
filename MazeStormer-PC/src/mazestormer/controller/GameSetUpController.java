@@ -18,15 +18,15 @@ public class GameSetUpController extends SubController implements
 
 	@Override
 	public void createGame(String gameID) {
-		game = new Game(gameID);
-		channel.addToGameList(game);
-		channel.subscribeGameToJoin(game);
+		this.game = new Game(gameID);
+		this.channel.addToGameList(this.game);
+		this.channel.subscribeGameToJoin(this.game);
 		onJoin();
 	}
 
 	@Override
 	public void joinGame(String gameID) {
-		channel.sendMessageTo("request", "race." + gameID + ".join");
+		this.channel.sendMessageTo("request", "race." + gameID + ".join");
 		// TODO Auto-generated method stub
 		onJoin();
 	}
@@ -45,7 +45,7 @@ public class GameSetUpController extends SubController implements
 	}
 
 	private boolean isReady() {
-		// TODO
+		// TODO cheating still possible
 		if (getMainController().getPlayer().getRobot() == null) {
 			return false;
 		} else if (mazestormer.simulator.VirtualRobot.class
