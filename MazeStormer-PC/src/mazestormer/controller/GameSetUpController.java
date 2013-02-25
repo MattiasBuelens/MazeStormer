@@ -1,6 +1,7 @@
 package mazestormer.controller;
 
 import mazestormer.player.Game;
+import mazestormer.rabbitmq.Config;
 import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.rabbitmq.MQChannel;
 
@@ -19,6 +20,7 @@ public class GameSetUpController extends SubController implements
 	@Override
 	public void createGame(String gameID) {
 		this.game = new Game(gameID);
+		this.game.addPlayer(getMainController().getPlayer());
 		this.channel.addToGameList(this.game);
 		this.channel.subscribeGameToJoin(this.game);
 		onJoin();
@@ -33,6 +35,7 @@ public class GameSetUpController extends SubController implements
 
 	@Override
 	public String[] refreshLobby() {
+		channel.sendMessageTo("race.replyTo_Brons", Config.GAME_LIST);
 		// TODO Auto-generated method stub
 		String[] lobby = { "one", "two" };
 		return lobby;
