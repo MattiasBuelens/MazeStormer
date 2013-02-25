@@ -4,12 +4,13 @@ import mazestormer.player.Game;
 import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.rabbitmq.MQChannel;
 
-public class GameSetUpController extends SubController implements IGameSetUpController {
+public class GameSetUpController extends SubController implements
+		IGameSetUpController {
 
 	private Game game;
-	
+
 	private final MQChannel channel;
-	
+
 	public GameSetUpController(MainController mainController) {
 		super(mainController);
 		this.channel = new MQChannel(ConnectionMode.LOCAL);
@@ -25,7 +26,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	@Override
 	public void joinGame(String gameID) {
-		channel.sendMessageTo("request", "race."+gameID+".join");
+		channel.sendMessageTo("request", "race." + gameID + ".join");
 		// TODO Auto-generated method stub
 		onJoin();
 	}
@@ -33,7 +34,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	@Override
 	public String[] refreshLobby() {
 		// TODO Auto-generated method stub
-		String[] lobby = {"one", "two"};
+		String[] lobby = { "one", "two" };
 		return lobby;
 	}
 
@@ -42,37 +43,38 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		// TODO Auto-generated method stub
 		onLeave();
 	}
-	
+
 	private boolean isReady() {
 		// TODO
-		if(getMainController().getPlayer().getRobot() == null) {
+		if (getMainController().getPlayer().getRobot() == null) {
 			return false;
-		} else if(mazestormer.simulator.VirtualRobot.class.isInstance(getMainController().getPlayer().getRobot())
+		} else if (mazestormer.simulator.VirtualRobot.class
+				.isInstance(getMainController().getPlayer().getRobot())
 				&& getMainController().getSourceMaze().getNumberOfTiles() == 0) {
 			return false;
 		}
 		return true;
 	}
-	
+
 	private void onJoin() {
-		if(isReady())
+		if (isReady())
 			postState(GameSetUpEvent.EventType.JOINED);
 		else
 			onNotReady();
 	}
-	
+
 	private void onLeave() {
 		postState(GameSetUpEvent.EventType.LEFT);
 	}
-	
+
 	private void onDisconnect() {
 		postState(GameSetUpEvent.EventType.DISCONNECTED);
 	}
-	
+
 	private void onNotReady() {
 		postState(GameSetUpEvent.EventType.NOT_READY);
 	}
-	
+
 	private void postState(GameSetUpEvent.EventType eventType) {
 		postEvent(new GameSetUpEvent(eventType));
 	}
