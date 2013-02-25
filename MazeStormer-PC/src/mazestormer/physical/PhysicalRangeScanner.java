@@ -49,7 +49,7 @@ public class PhysicalRangeScanner extends PhysicalComponent implements RangeScan
 		return null;
 	}
 
-	public static class ScanRequester extends PhysicalRequester<RangeReadings> {
+	public static class ScanRequester extends ReportRequester<RangeReadings> {
 
 		public ScanRequester(PhysicalCommunicator communicator) {
 			super(communicator);

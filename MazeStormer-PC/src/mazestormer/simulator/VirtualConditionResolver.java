@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -14,8 +15,8 @@ import mazestormer.condition.ConditionFuture;
 
 public abstract class VirtualConditionResolver<C extends Condition, V> {
 
-	private boolean isRunning = false;
-	private boolean isTerminated = false;
+	private AtomicBoolean isRunning = new AtomicBoolean(false);
+	private AtomicBoolean isTerminated = new AtomicBoolean(false);
 
 	private final Set<Future> futures = new CopyOnWriteArraySet<Future>();
 	private final ExecutorService executor;
@@ -48,33 +49,34 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 	}
 
 	protected void start() {
-		isRunning = true;
+		isRunning.set(true);
 		// Start resolving
 		executor.execute(new Runner());
 	}
 
 	protected void stop() {
-		isRunning = false;
+		isRunning.set(false);
 		// Cancel any remaining futures
 		for (Future future : futures) {
 			future.cancel(true);
 		}
+		futures.clear();
 	}
 
 	protected boolean isRunning() {
-		return isRunning;
+		return isRunning.get();
 	}
 
 	public boolean isTerminated() {
-		return isTerminated;
+		return isTerminated.get();
 	}
 
 	public void terminate() {
-		isTerminated = true;
-		for (Future future : futures) {
-			future.cancel(true);
+		if (!isTerminated()) {
+			isTerminated.set(true);
+			stop();
+			executor.shutdown();
 		}
-		futures.clear();
 	}
 
 	protected abstract V getValue();

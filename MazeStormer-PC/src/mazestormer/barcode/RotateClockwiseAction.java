@@ -3,13 +3,16 @@ package mazestormer.barcode;
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.util.Future;
 
-public class RotateClockwiseAction implements IAction{
+public class RotateClockwiseAction implements IAction {
 
 	@Override
-	public void performAction(ControllableRobot robot, Maze maze) {
+	public Future<?> performAction(ControllableRobot robot, Maze maze) {
 		checkNotNull(robot);
 		checkNotNull(maze);
-		robot.getPilot().rotate(-360);
+		robot.getPilot().stop();
+		return robot.getPilot().rotateComplete(-360);
 	}
+
 }

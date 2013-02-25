@@ -2,16 +2,20 @@ package mazestormer.barcode;
 
 import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.util.Future;
 
-public interface IAction{
-	
+public interface IAction {
+
 	/**
+	 * Execute this action.
 	 * 
 	 * @param	robot
 	 * 			The robot that must perform this action.
+	 * @return	A future which is resolved when the action is completed.
 	 * @throws 	IllegalStateException
-	 * 			The given robot must be a valid robot.
+	 * 			If the given robot is not valid.
 	 * 			| robot != null
 	 */
-	public abstract void performAction(ControllableRobot robot, Maze maze);
+	public abstract Future<?> performAction(ControllableRobot robot, Maze maze);
+
 }

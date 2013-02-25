@@ -1,8 +1,10 @@
 package mazestormer.controller;
 
+import mazestormer.polygon.PolygonEvent;
+import mazestormer.polygon.PolygonRunner;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Runner;
 import mazestormer.robot.StopEvent;
+import mazestormer.state.AbstractStateListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -21,14 +23,15 @@ public class PolygonControlController extends SubController implements
 
 	@Override
 	public void startPolygon(int nbSides, double sideLength, Direction direction) {
-		runner = new PolygonRunner(nbSides, sideLength, direction);
+		runner = new PolygonRunner(getPilot(), nbSides, sideLength, direction);
+		runner.addStateListener(new PolygonListener());
 		runner.start();
 	}
 
 	@Override
 	public void stopPolygon() {
 		if (runner != null) {
-			runner.shutdown();
+			runner.stop();
 			runner = null;
 		}
 	}
@@ -47,45 +50,22 @@ public class PolygonControlController extends SubController implements
 		postEvent(new PolygonEvent(eventType));
 	}
 
-	private class PolygonRunner extends Runner {
-
-		private final int nbSides;
-		private final double sideLength;
-		private final Direction direction;
-
-		public PolygonRunner(int nbSides, double sideLength, Direction direction) {
-			super(PolygonControlController.this.getPilot());
-			this.nbSides = nbSides;
-			this.sideLength = sideLength;
-			this.direction = direction;
-		}
+	private class PolygonListener extends
+			AbstractStateListener<PolygonRunner.PolygonState> {
 
 		@Override
-		public void onStarted() {
-			super.onStarted();
-			// Post state
+		public void stateStarted() {
 			postState(PolygonEvent.EventType.STARTED);
 		}
 
 		@Override
-		public void onCancelled() {
-			super.onCancelled();
-			// Post state
+		public void stateStopped() {
 			postState(PolygonEvent.EventType.STOPPED);
 		}
 
 		@Override
-		public void run() {
-			int parity = (direction == Direction.ClockWise) ? -1 : 1;
-			double angle = (double) parity * 360d / (double) nbSides;
-
-			for (int i = 0; i < nbSides; ++i) {
-				travel(sideLength);
-				rotate(angle);
-			}
-
-			// Done
-			cancel();
+		public void stateFinished() {
+			stateStopped();
 		}
 
 	}

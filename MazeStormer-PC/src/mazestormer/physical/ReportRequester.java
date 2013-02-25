@@ -12,12 +12,12 @@ import mazestormer.report.Report;
 import mazestormer.report.RequestReport;
 import mazestormer.util.Future;
 
-public class PhysicalRequester<V> extends MessageSender<RequestCommand<V>>
+public class ReportRequester<V> extends MessageSender<RequestCommand<V>>
 		implements MessageListener<Report<?>> {
 
-	private Map<Integer, PhysicalFuture<V>> futures = new HashMap<Integer, PhysicalFuture<V>>();
+	private Map<Integer, RequestFuture<V>> futures = new HashMap<Integer, RequestFuture<V>>();
 
-	public PhysicalRequester(PhysicalCommunicator communicator) {
+	public ReportRequester(PhysicalCommunicator communicator) {
 		super(communicator);
 	}
 
@@ -40,7 +40,7 @@ public class PhysicalRequester<V> extends MessageSender<RequestCommand<V>>
 		request.setRequestId(requestId);
 
 		// Create future
-		PhysicalFuture<V> future = new PhysicalFuture<V>(request);
+		RequestFuture<V> future = new RequestFuture<V>(request);
 		futures.put(requestId, future);
 
 		// Send request
@@ -57,7 +57,7 @@ public class PhysicalRequester<V> extends MessageSender<RequestCommand<V>>
 		@SuppressWarnings("unchecked")
 		RequestReport<V> requestReport = (RequestReport<V>) report;
 		int requestId = requestReport.getRequestId();
-		PhysicalFuture<V> future = futures.get(requestId);
+		RequestFuture<V> future = futures.get(requestId);
 
 		// Remove future if report resolves it
 		if (future != null && future.tryResolve(requestReport)) {

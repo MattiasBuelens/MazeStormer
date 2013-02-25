@@ -3,6 +3,9 @@ package mazestormer.physical;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lejos.pc.comm.NXTConnector;
@@ -12,6 +15,8 @@ import mazestormer.remote.MessageListener;
 import mazestormer.report.Report;
 import mazestormer.report.ReportReader;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 public class PhysicalCommunicator extends Communicator<Command, Report<?>> {
 
 	private NXTConnector connector;
@@ -19,8 +24,14 @@ public class PhysicalCommunicator extends Communicator<Command, Report<?>> {
 
 	private volatile AtomicInteger nextRequestId = new AtomicInteger();
 
+	private static ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("PhysicalCommunicator-%d").build();
+	private final ExecutorService executor = Executors
+			.newCachedThreadPool(factory);
+
 	public PhysicalCommunicator(NXTConnector connector) {
-		super(connector.getInputStream(), connector.getOutputStream(), new ReportReader());
+		super(connector.getInputStream(), connector.getOutputStream(),
+				new ReportReader());
 		this.connector = connector;
 		this.listeners = new CopyOnWriteArrayList<MessageListener<? super Report<?>>>();
 	}
@@ -32,6 +43,9 @@ public class PhysicalCommunicator extends Communicator<Command, Report<?>> {
 	@Override
 	public void terminate() throws IOException {
 		super.terminate();
+		if (!executor.isShutdown()) {
+			executor.shutdown();
+		}
 		if (connector != null) {
 			connector.close();
 			connector = null;
@@ -74,7 +88,12 @@ public class PhysicalCommunicator extends Communicator<Command, Report<?>> {
 	 */
 	@Override
 	public void trigger(final Report<?> report) {
-		super.trigger(report);
+		executor.submit(new Runnable() {
+			@Override
+			public void run() {
+				PhysicalCommunicator.super.trigger(report);
+			}
+		});
 	}
 
 	@Override
