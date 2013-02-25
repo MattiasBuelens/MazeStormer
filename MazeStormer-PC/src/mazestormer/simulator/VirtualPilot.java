@@ -313,6 +313,7 @@ public class VirtualPilot implements Pilot {
 	private void resetMove() {
 		if (moveEndHandle != null) {
 			moveEndHandle.cancel(false);
+			moveEndHandle = null;
 		}
 		isMoving.set(false);
 	}
