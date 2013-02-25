@@ -123,8 +123,15 @@ public class GameSetUpPanel extends ViewPanel {
 		JOptionPane.showMessageDialog(null,"You have to select a robot type and/or source maze\n before you could create or join a game.", "Setup", 1);
 	}
 	
+	private String askForGameName() {
+		return JOptionPane.showInputDialog(null, "You have to give a game name.", "New game", 3);
+	}
+	
 	private void createGame() {
-		this.controller.createGame();
+		String gameName = askForGameName();
+		if(gameName != null) {
+			this.controller.createGame(gameName.trim());
+		}
 	}
 	private void joinGame() {
 		this.controller.joinGame((String) this.lobbyModel.getSelectedItem());

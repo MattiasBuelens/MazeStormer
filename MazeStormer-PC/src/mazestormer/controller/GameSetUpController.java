@@ -7,7 +7,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	@Override
-	public void createGame() {
+	public void createGame(String gameName) {
 		// TODO Auto-generated method stub
 		onJoin();
 	}
