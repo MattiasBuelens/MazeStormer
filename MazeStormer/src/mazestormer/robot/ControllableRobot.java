@@ -75,11 +75,6 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	public SoundPlayer getSoundPlayer();
 
 	/**
-	 * Get the compass of this robot.
-	 */
-	public CompassSensor getCompass();
-
-	/**
 	 * Terminate this robot.
 	 */
 	public void terminate();

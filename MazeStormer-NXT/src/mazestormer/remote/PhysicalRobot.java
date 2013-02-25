@@ -14,9 +14,8 @@ import mazestormer.condition.Condition;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RotatingRangeScanner;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.CompassSensor;
-import mazestormer.robot.Pilot;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
 
 public class PhysicalRobot extends NXTComponent implements ControllableRobot,
@@ -26,7 +25,6 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 	private PhysicalLightSensor light;
 	private PhysicalRangeScanner scanner;
 	private PhysicalSoundPlayer soundPlayer;
-	private PhysicalCompassSensor compass;
 	private PoseProvider poseProvider;
 
 	public PhysicalRobot(NXTCommunicator communicator) {
@@ -70,11 +68,6 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		return soundPlayer;
 	}
 
-	@Override
-	public CompassSensor getCompass() {
-		return compass;
-	}
-
 	private void setup() {
 		final NXTCommunicator comm = getCommunicator();
 
@@ -94,9 +87,6 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(comm);
-		
-		// Compass
-		compass = new PhysicalCompassSensor(comm);
 
 		// Command listeners
 		addMessageListener(this);

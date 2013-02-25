@@ -42,17 +42,6 @@ public enum ReportType implements MessageType<Report<?>> {
 	},
 
 	/*
-	 * Compass
-	 */
-
-	COMPASS_VALUE {
-		@Override
-		public Report<Float> build() {
-			return new CompassReadReport(this);
-		}
-	},
-
-	/*
 	 * Light sensor
 	 */
 

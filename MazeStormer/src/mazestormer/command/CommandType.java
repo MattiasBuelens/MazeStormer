@@ -92,16 +92,6 @@ public enum CommandType implements MessageType<Command> {
 	},
 
 	/*
-	 * Compass
-	 */
-	COMPASS_READ {
-		@Override
-		public Command build() {
-			return new CompassReadCommand(this);
-		}
-	},
-
-	/*
 	 * Sound player
 	 */
 
