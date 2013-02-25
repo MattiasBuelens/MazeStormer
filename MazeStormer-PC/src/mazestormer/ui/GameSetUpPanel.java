@@ -15,7 +15,9 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
@@ -34,6 +36,7 @@ public class GameSetUpPanel extends ViewPanel {
 	private JButton refresh;
 	private JButton leave;
 	private ComboBoxModel<String> lobbyModel;
+	private JTextField newGameID;
 	
 	private final Action createNewAction = new CreateNewAction();
 	private final Action joinAction = new JoinAction();
@@ -45,9 +48,10 @@ public class GameSetUpPanel extends ViewPanel {
 		
 		setBorder(new TitledBorder(null, "Game SetUp",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new MigLayout("", "[][grow]", "[][][][]"));
+		setLayout(new MigLayout("", "[grow 75][100px:n,grow][fill]", "[][][][]"));
 		
 		createButtons();
+		createInputField();
 		createList();
 		
 		if (!Beans.isDesignTime())
@@ -60,25 +64,25 @@ public class GameSetUpPanel extends ViewPanel {
 	
 	private void createButtons() {
 		this.createNew = new JButton("New button");
-		add(this.createNew, "cell 0 0");
+		add(this.createNew, "cell 2 0");
 		this.createNew.setAction(this.createNewAction);
 		this.createNew.setText("");
 		this.createNew.setIcon(new ListAllIcon(24, 24));
 		
 		this.join = new JButton("New button");
-		add(this.join, "cell 0 1");
+		add(this.join, "cell 2 1");
 		this.join.setAction(this.joinAction);
 		this.join.setText("");
 		this.join.setIcon(new GoNextIcon(24, 24));
 		
 		this.refresh = new JButton("New button");
-		add(this.refresh, "cell 0 2");
+		add(this.refresh, "cell 2 2");
 		this.refresh.setAction(this.refreshAction);
 		this.refresh.setText("");
 		this.refresh.setIcon(new ViewRefreshIcon(24, 24));
 		
 		this.leave = new JButton("New button");
-		add(this.leave, "cell 0 3");
+		add(this.leave, "cell 2 3");
 		this.leave.setAction(this.leaveAction);
 		this.leave.setText("");
 		this.leave.setIcon(new SystemLogOutIcon(24, 24));
@@ -86,11 +90,26 @@ public class GameSetUpPanel extends ViewPanel {
 		enableGameButtons(true);
 	}
 	
+	private void createInputField() {
+		JLabel lblLow = new JLabel("New Game");
+		add(lblLow, "cell 0 0");
+		
+		this.newGameID = new JTextField();
+		add(this.newGameID, "cell 1 0,grow");
+	}
+	
+	private String getNewGameId() {
+		return this.newGameID.getText();
+	}
+	
 	private void createList() {
+		JLabel lbl = new JLabel("Lobby");
+		add(lbl, "cell 0 1");
+		
 		JComboBox<String> lobbyBox = new JComboBox<String>();
 		this.lobbyModel = new DefaultComboBoxModel<String>(refreshLobby());
 		lobbyBox.setModel(this.lobbyModel);
-		add(lobbyBox, "cell 1 0,grow");
+		add(lobbyBox, "cell 1 1,grow");
 	}
 	
 	private void enableGameButtons(boolean request) {
@@ -123,12 +142,8 @@ public class GameSetUpPanel extends ViewPanel {
 		JOptionPane.showMessageDialog(null,"You have to select a robot type and/or source maze\n before you could create or join a game.", "Setup", 1);
 	}
 	
-	private String askForGameID() {
-		return JOptionPane.showInputDialog(null, "You have to give a game identifier.", "New game", 3);
-	}
-	
 	private void createGame() {
-		String gameID = askForGameID();
+		String gameID = getNewGameId();
 		if(gameID != null) {
 			this.controller.createGame(gameID.trim());
 		}
