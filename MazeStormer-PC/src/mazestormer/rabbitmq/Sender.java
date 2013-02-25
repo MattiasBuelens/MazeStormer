@@ -30,7 +30,7 @@ public class Sender {
 	}
 
 	private void send(Map<String, Object> message, String routingKey)
-			throws IOException {
+			throws IOException, NullPointerException {
 		if (message == null) {
 			throw new NullPointerException("Message cannot be null.");
 		}
