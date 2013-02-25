@@ -13,6 +13,7 @@ import mazestormer.command.ShutdownCommand;
 import mazestormer.physical.PhysicalCommunicator;
 import mazestormer.physical.PhysicalRobot;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Pilot;
 
 public class PhysicalConnector implements Connector {
 
@@ -46,10 +47,20 @@ public class PhysicalConnector implements Connector {
 		communicator = new PhysicalCommunicator(connector);
 
 		// Create robot
-		robot = new PhysicalRobot(communicator);
+		robot = createRobot(communicator);
 
 		// Start communicating
 		communicator.start();
+	}
+
+	private static ControllableRobot createRobot(
+			PhysicalCommunicator communicator) {
+		ControllableRobot robot = new PhysicalRobot(communicator);
+		// Set default speeds
+		Pilot pilot = robot.getPilot();
+		pilot.setTravelSpeed(ControllableRobot.travelSpeed);
+		pilot.setRotateSpeed(ControllableRobot.rotateSpeed);
+		return robot;
 	}
 
 	private boolean createConnection(String deviceName) {

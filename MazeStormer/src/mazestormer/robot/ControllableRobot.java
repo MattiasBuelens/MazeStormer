@@ -22,6 +22,16 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	public final static float trackWidth = 16.0f;// 14.3f;
 
 	/**
+	 * Default travel speed, in centimeters per seconds.
+	 */
+	public static final double travelSpeed = 10d;
+
+	/**
+	 * Default rotation speed, in degrees per seconds.
+	 */
+	public static final double rotateSpeed = 90d;
+
+	/**
 	 * Distance between light sensor and center of wheel axis, in centimeters.
 	 */
 	// public final static float sensorOffset = 7.2f;

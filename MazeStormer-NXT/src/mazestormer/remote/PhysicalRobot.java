@@ -78,7 +78,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		light = new PhysicalLightSensor(comm, SensorPort.S1);
 
 		// Scanner
-		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S2);
+		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S4);
 		RegulatedMotor headMotor = Motor.C;
 		float gearRatio = ControllableRobot.sensorGearRatio;
 		RangeScanner headScanner = new RotatingRangeScanner(headMotor,

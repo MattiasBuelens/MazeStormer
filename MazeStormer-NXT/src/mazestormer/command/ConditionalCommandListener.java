@@ -69,6 +69,8 @@ public abstract class ConditionalCommandListener extends
 	 *            The conditional command to execute.
 	 */
 	protected void resolve(ConditionalCommand command) {
+		// Send report
+		send(createReport(command));
 		// Execute linked commands
 		switch (command.getType()) {
 		case WHEN:
@@ -79,8 +81,6 @@ public abstract class ConditionalCommandListener extends
 		default:
 			break;
 		}
-		// Send report
-		send(createReport(command));
 		// Unregister
 		unregister(command);
 	}
