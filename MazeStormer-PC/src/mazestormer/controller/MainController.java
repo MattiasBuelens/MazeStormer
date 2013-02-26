@@ -87,12 +87,6 @@ public class MainController implements IMainController {
 	private IStateController state;
 
 	/*
-	 * Logging
-	 */
-	private String logName = "MazeStormer";
-	private Logger logger;
-
-	/*
 	 * View
 	 */
 	private EventSource view;
@@ -257,24 +251,6 @@ public class MainController implements IMainController {
 	public void register(EventSource eventSource) {
 		eventSource.registerEventBus(getEventBus());
 	}
-	
-	// TODO: logging systeem overbrengen
-
-	/*
-	 * Logging
-	 */
-
-	public String getLogName() {
-		return logName;
-	}
-
-	public Logger getLogger() {
-		if (logger == null) {
-			logger = Logger.getLogger(getLogName());
-			logger.setLevel(Level.ALL);
-		}
-		return logger;
-	}
 
 	/*
 	 * Initialization
@@ -288,7 +264,7 @@ public class MainController implements IMainController {
 
 	@Subscribe
 	public void logInitialize(InitializeEvent e) {
-		getLogger().info("Initialized.");
+		getPlayer().getLogger().info("Initialized.");
 	}
 
 	/*
@@ -322,9 +298,9 @@ public class MainController implements IMainController {
 	@Subscribe
 	public void logConnect(ConnectEvent e) {
 		if (e.isConnected()) {
-			getLogger().info("Connected to robot.");
+			getPlayer().getLogger().info("Connected to robot.");
 		} else {
-			getLogger().info("Disconnected from robot.");
+			getPlayer().getLogger().info("Disconnected from robot.");
 		}
 	}
 
@@ -350,13 +326,13 @@ public class MainController implements IMainController {
 
 		@Override
 		public void moveStarted(Move event, MoveProvider mp) {
-			getLogger().fine("Move started: " + event.toString());
+			getPlayer().getLogger().fine("Move started: " + event.toString());
 			postEvent(new MoveEvent(MoveEvent.EventType.STARTED, event));
 		}
 
 		@Override
 		public void moveStopped(Move event, MoveProvider mp) {
-			getLogger().fine("Move stopped: " + event.toString());
+			getPlayer().getLogger().fine("Move stopped: " + event.toString());
 			postEvent(new MoveEvent(MoveEvent.EventType.STOPPED, event));
 		}
 
@@ -374,7 +350,7 @@ public class MainController implements IMainController {
 			vRobot.getCollisionObserver().addCollisionListener(new CollisionListener() {
 				@Override
 				public void brutalCrashOccured() {
-					getLogger().severe("A collision occured, please retreat.");
+					getPlayer().getLogger().severe("A collision occured, please retreat.");
 				}
 			});
 		}

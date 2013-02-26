@@ -1,7 +1,5 @@
 package mazestormer.controller;
 
-import java.io.IOException;
-
 import mazestormer.player.Game;
 
 public class GameSetUpController extends SubController implements

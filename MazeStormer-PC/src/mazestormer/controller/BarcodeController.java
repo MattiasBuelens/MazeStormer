@@ -33,7 +33,7 @@ public class BarcodeController extends SubController implements
 	}
 
 	private void log(String logText) {
-		getMainController().getLogger().info(logText);
+		getMainController().getPlayer().getLogger().info(logText);
 	}
 
 	@Override

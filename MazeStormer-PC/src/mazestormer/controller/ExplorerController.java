@@ -40,7 +40,7 @@ public class ExplorerController extends SubController implements IExplorerContro
 	}
 
 	private void log(String logText) {
-		getMainController().getLogger().info(logText);
+		getMainController().getPlayer().getLogger().info(logText);
 	}
 
 	private void postState(ExplorerEvent.EventType eventType) {
