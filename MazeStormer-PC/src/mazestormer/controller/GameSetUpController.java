@@ -14,26 +14,15 @@ public class GameSetUpController extends SubController implements
 	}
 
 	@Override
-	public void createGame(String gameID) {
-		try {
-			this.game = new Game(gameID, getMainController().getPlayer());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		onJoin();
-	}
-
-	@Override
 	public void joinGame(String gameID) {
 		// TODO Auto-generated method stub
 		onJoin();
 	}
-
+	
 	@Override
-	public String[] refreshLobby() {
-		// TODO Auto-generated method stub
-		String[] lobby = { "one", "two" };
-		return lobby;
+	public void startGame() {
+		//TODO Auto-generated method stub
+		onStart();
 	}
 
 	@Override
@@ -59,6 +48,10 @@ public class GameSetUpController extends SubController implements
 			postState(GameSetUpEvent.EventType.JOINED);
 		else
 			onNotReady();
+	}
+	
+	private void onStart() {
+		//TODO
 	}
 
 	private void onLeave() {
