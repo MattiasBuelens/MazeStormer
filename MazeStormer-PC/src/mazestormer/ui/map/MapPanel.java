@@ -32,10 +32,10 @@ import org.w3c.dom.svg.SVGDocument;
 import com.google.common.eventbus.Subscribe;
 import javax.swing.JButton;
 
-public class MapPanel extends ViewPanel implements MapLayerHandler{
+public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private final String playerID;
 
 	private boolean isFollowing;
@@ -177,7 +177,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	@Subscribe
 	public void onMapChanged(MapChangeEvent event) {
-		if(event.getPlayerID().equals(playerID)) {
+		if (event.getPlayerID().equals(playerID)) {
 			setMap(event.getDocument());
 		}
 	}
@@ -194,14 +194,14 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 			}
 		});
 
+		layer.setMapLayerHandler(this);
 		layerMenuItems.put(layer, menuItem);
 		menuLayers.add(menuItem);
 	}
 
 	@Subscribe
 	public void onMapLayerAdded(MapLayerAddEvent event) {
-		if(event.getPlayerID().equals(getPlayerID())) {
-			event.getLayer().setMapLayerHandler(this);
+		if (event.getPlayerID().equals(getPlayerID())) {
 			addLayerMenuItem(event.getLayer());
 		}
 	}
@@ -224,7 +224,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	@Subscribe
 	public void onMapRobotPoseChanged(MapRobotPoseChangeEvent event) {
-		if(event.getPlayerID().equals(getPlayerID())) {
+		if (event.getPlayerID().equals(getPlayerID())) {
 			updateRobotPose(event.getPose());
 		}
 	}
@@ -233,7 +233,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 	private static void addPopup(Component component, final JPopupMenu popup) {
 
 	}
-	
+
 	public String getPlayerID() {
 		return this.playerID;
 	}
@@ -319,8 +319,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	@Override
 	public void requestDOMChange(Runnable request) {
-		canvas.getUpdateManager().getUpdateRunnableQueue()
-		.invokeLater(request);
+		canvas.getUpdateManager().getUpdateRunnableQueue().invokeLater(request);
 	}
 
 	@Override

@@ -57,7 +57,7 @@ public abstract class MapLayer extends AbstractEventSource implements
 	}
 
 	public void setVisible(boolean visible) {
-		if (this.isVisible != visible) {
+		if (getMapLayerHandler() != null && this.isVisible != visible) {
 			getMapLayerHandler().layerPropertyChanged(this, "isVisible", visible);
 		}
 		this.isVisible = visible;
