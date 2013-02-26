@@ -22,7 +22,7 @@ public class Game {
 	private final Client client;
 	private final Handler handler;
 
-	public Game(String id, Player localPlayer) throws IOException {
+	public Game(String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 
 		// TODO Implement handler!
@@ -33,7 +33,10 @@ public class Game {
 		addPlayer(localPlayer);
 	}
 
-	public void addPlayer(Player p) {
+	public void addPlayer(Player p) throws IllegalStateException {
+		if(!isJoinable()) {
+			throw new IllegalStateException("The game is not joinable.");
+		}
 		players.add(p);
 	}
 
