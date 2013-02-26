@@ -125,7 +125,9 @@ public class VirtualPilot implements Pilot {
 
 	@Override
 	public void stop() {
-		movementStop(isMoving());
+		if (isMoving()) {
+			movementStop(true);
+		}
 		waitComplete();
 	}
 
@@ -268,11 +270,13 @@ public class VirtualPilot implements Pilot {
 			movementStop(true);
 
 		// Set current move
-		move = new Move(moveType, distance, angle, (float) getTravelSpeed(), (float) getRotateSpeed(), wasMoving);
+		Move move = new Move(moveType, distance, angle,
+				(float) getTravelSpeed(), (float) getRotateSpeed(), wasMoving);
+		this.move = move;
 		isMoving.set(true);
 
 		// Publish the *targeted* move distance and angle
-		List<MoveListener> listeners = new ArrayList<MoveListener>(moveListeners);
+		MoveListener[] listeners = moveListeners.toArray(new MoveListener[0]);
 		for (MoveListener ml : listeners) {
 			ml.moveStarted(move, this);
 		}
@@ -280,7 +284,8 @@ public class VirtualPilot implements Pilot {
 		// Start timer
 		float delay = getMoveDuration(move);
 		if (!Float.isInfinite(delay)) {
-			moveEndHandle = executor.schedule(new MoveEndRunner(move), (long) delay, TimeUnit.MILLISECONDS);
+			moveEndHandle = executor.schedule(new MoveEndRunner(move),
+					(long) delay, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -288,7 +293,7 @@ public class VirtualPilot implements Pilot {
 		movementStart(moveType, distance, angle, 0);
 	}
 
-	private synchronized void movementStop(boolean isMoving) {
+	private void movementStop(boolean wasMoving) {
 		if (move == null)
 			return;
 
@@ -296,10 +301,11 @@ public class VirtualPilot implements Pilot {
 		resetMove();
 
 		// Publish the *traveled* move distance and angle
-		Move travelledMove = new Move(move.getMoveType(), getMovementIncrement(), getAngleIncrement(),
-				move.getTravelSpeed(), move.getRotateSpeed(), isMoving);
+		Move travelledMove = new Move(move.getMoveType(),
+				getMovementIncrement(), getAngleIncrement(),
+				move.getTravelSpeed(), move.getRotateSpeed(), wasMoving);
 
-		List<MoveListener> listeners = new ArrayList<MoveListener>(moveListeners);
+		MoveListener[] listeners = moveListeners.toArray(new MoveListener[0]);
 		for (MoveListener ml : listeners) {
 			ml.moveStopped(travelledMove, this);
 		}
