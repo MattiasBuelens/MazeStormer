@@ -23,9 +23,8 @@ import mazestormer.controller.IMapController;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapChangeEvent;
-import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
-import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
+import mazestormer.ui.map.event.MapLayerHandler;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 
 import org.w3c.dom.svg.SVGDocument;
@@ -33,9 +32,11 @@ import org.w3c.dom.svg.SVGDocument;
 import com.google.common.eventbus.Subscribe;
 import javax.swing.JButton;
 
-public class MapPanel extends ViewPanel {
+public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	private static final long serialVersionUID = 1L;
+	
+	private String playerID;
 
 	private boolean isFollowing;
 
@@ -56,8 +57,9 @@ public class MapPanel extends ViewPanel {
 
 	public static final double zoomFactor = 1.5d;
 
-	public MapPanel(IMapController controller) {
+	public MapPanel(IMapController controller, String playerID) {
 		this.controller = controller;
+		this.playerID = playerID;
 
 		setLayout(new BorderLayout(0, 0));
 
@@ -195,24 +197,9 @@ public class MapPanel extends ViewPanel {
 	}
 
 	@Subscribe
-	public void onMapDOMChange(MapDOMChangeRequest request) {
-		canvas.getUpdateManager().getUpdateRunnableQueue()
-				.invokeLater(request.getRequest());
-	}
-
-	@Subscribe
 	public void onMapLayerAdded(MapLayerAddEvent event) {
+		event.getLayer().setMapLayerHandler(this);
 		addLayerMenuItem(event.getLayer());
-	}
-
-	@Subscribe
-	public void onMapLayerPropertyChanged(MapLayerPropertyChangeEvent event) {
-		if (event.getPropertyName() == "isVisible") {
-			JMenuItem menuItem = layerMenuItems.get(event.getLayer());
-			if (menuItem != null) {
-				menuItem.setSelected((Boolean) event.getPropertyValue());
-			}
-		}
 	}
 
 	public boolean isFollowing() {
@@ -239,6 +226,10 @@ public class MapPanel extends ViewPanel {
 	// Dummy method to trick the designer into showing the popup menus
 	private static void addPopup(Component component, final JPopupMenu popup) {
 
+	}
+	
+	public String getPlayerID() {
+		return this.playerID;
 	}
 
 	private class GoToRobotAction extends AbstractAction {
@@ -317,6 +308,23 @@ public class MapPanel extends ViewPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			controller.clearRanges();
+		}
+	}
+
+	@Override
+	public void requestDOMChange(Runnable request) {
+		canvas.getUpdateManager().getUpdateRunnableQueue()
+		.invokeLater(request);
+	}
+
+	@Override
+	public void layerPropertyChanged(MapLayer layer, String propertyName,
+			Object propertyValue) {
+		if (propertyName.equals("isVisible")) {
+			JMenuItem menuItem = layerMenuItems.get(layer);
+			if (menuItem != null) {
+				menuItem.setSelected((Boolean) propertyValue);
+			}
 		}
 	}
 

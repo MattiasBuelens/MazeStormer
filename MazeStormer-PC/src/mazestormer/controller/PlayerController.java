@@ -14,6 +14,11 @@ public class PlayerController extends SubController implements IPlayerController
 	}
 	
 	@Override
+	public String getPlayerID() {
+		return getPlayer().getPlayerID();
+	}
+	
+	@Override
 	public Player getPlayer() {
 		return this.player;
 	}

@@ -6,6 +6,8 @@ import mazestormer.util.EventSource;
 public interface IPlayerController extends EventSource {
 	
 	public Player getPlayer();
+	
+	public String getPlayerID();
 
 	public IMapController map();
 	

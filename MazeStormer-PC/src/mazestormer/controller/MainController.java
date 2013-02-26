@@ -417,6 +417,10 @@ public class MainController implements IMainController {
 		return this.personalPlayer;
 	}
 	
+	public String getPlayerID() {
+		return getPlayer().getPlayerID();
+	}
+	
 	private void createPersonalPlayer() {
 		this.personalPlayer = new Player();
 		this.personalPlayer.setPlayerID(PERSONAL_PLAYER_NAME);

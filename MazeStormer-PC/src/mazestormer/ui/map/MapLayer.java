@@ -4,8 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Comparator;
 
-import mazestormer.ui.map.event.MapDOMChangeRequest;
-import mazestormer.ui.map.event.MapLayerPropertyChangeEvent;
+import mazestormer.ui.map.event.MapLayerHandler;
 import mazestormer.util.AbstractEventSource;
 
 import org.apache.batik.dom.AbstractDocument;
@@ -59,8 +58,7 @@ public abstract class MapLayer extends AbstractEventSource implements
 
 	public void setVisible(boolean visible) {
 		if (this.isVisible != visible) {
-			postEvent(new MapLayerPropertyChangeEvent(this, "isVisible",
-					visible));
+			getMapLayerHandler().layerPropertyChanged(this, "isVisible", visible);
 		}
 		this.isVisible = visible;
 
@@ -85,7 +83,11 @@ public abstract class MapLayer extends AbstractEventSource implements
 	}
 
 	protected void invokeDOMChange(Runnable request) {
-		postEvent(new MapDOMChangeRequest(request));
+		if(getMapLayerHandler() == null) {
+			request.run();
+		} else {
+			getMapLayerHandler().requestDOMChange(request);
+		}
 	}
 
 	public Element build(AbstractDocument document) {
@@ -119,5 +121,14 @@ public abstract class MapLayer extends AbstractEventSource implements
 		}
 
 	}
-
+	
+	public void setMapLayerHandler(MapLayerHandler mapLayerHandler) {
+		this.mapLayerHandler = mapLayerHandler;
+	}
+	
+	private MapLayerHandler getMapLayerHandler() {
+		return this.mapLayerHandler;
+	}
+	
+	private MapLayerHandler mapLayerHandler;
 }

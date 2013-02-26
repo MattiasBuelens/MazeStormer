@@ -51,13 +51,13 @@ public class GameTabPanel extends ViewPanel {
 			
 			temp.setLayout(new MigLayout("", "[grow]", "[grow][::200px,growprio 50,grow]"));
 		
-			MapPanel mapPanel = new MapPanel(pc.map());
+			MapPanel mapPanel = new MapPanel(pc.map(), pc.getPlayerID());
 			mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
 			LogPanel logPanel = new LogPanel(pc.log());
 			
 			temp.add(mapPanel, "cell 0 0,grow");
 			temp.add(logPanel, "cell 0 2,grow");
-			this.tabbedPane.addTab(pc.getPlayer().getPlayerID(), temp);
+			this.tabbedPane.addTab(pc.getPlayerID(), temp);
 		}
 		validate();
 	}

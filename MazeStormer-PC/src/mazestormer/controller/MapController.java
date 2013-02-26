@@ -20,14 +20,12 @@ import mazestormer.ui.map.MazeLayer;
 import mazestormer.ui.map.RangesLayer;
 import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapChangeEvent;
-import mazestormer.ui.map.event.MapDOMChangeRequest;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 import mazestormer.util.MapUtils;
 
 import org.w3c.dom.svg.SVGDocument;
 
-import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -96,7 +94,7 @@ public class MapController extends SubController implements IMapController {
 	private void addLayer(MapLayer layer) {
 		layer.registerEventBus(getEventBus());
 		map.addLayer(layer);
-		postEvent(new MapLayerAddEvent(layer));
+		postEvent(new MapLayerAddEvent(layer, getPlayer().getPlayerID()));
 	}
 	
 	private Player getPlayer() {
@@ -131,7 +129,7 @@ public class MapController extends SubController implements IMapController {
 			robotLayer.setRotationAngle(pose.getHeading());
 		}
 
-		postEvent(new MapRobotPoseChangeEvent(pose));
+		postEvent(new MapRobotPoseChangeEvent(pose, getPlayer().getPlayerID()));
 	}
 
 	private void invokeUpdateRobotPose() {
@@ -216,19 +214,6 @@ public class MapController extends SubController implements IMapController {
 		} else {
 			// Stop updating when move ended
 			cancelUpdater();
-		}
-	}
-
-	/**
-	 * When no view is attached yet, DOM change requests may not be consumed by
-	 * any listener and potentially get lost.
-	 * 
-	 * This event listener catches these dead requests and runs them directly.
-	 */
-	@Subscribe
-	public void recoverDeadDOMChangeRequest(DeadEvent event) {
-		if (event.getEvent() instanceof MapDOMChangeRequest) {
-			((MapDOMChangeRequest) event.getEvent()).getRequest().run();
 		}
 	}
 
