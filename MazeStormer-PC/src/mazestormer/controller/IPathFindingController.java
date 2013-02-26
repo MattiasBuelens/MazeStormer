@@ -2,7 +2,7 @@ package mazestormer.controller;
 
 import mazestormer.util.EventSource;
 
-public interface IPathFindingController extends EventSource{
+public interface IPathFindingController extends EventSource {
 	
 	public void startStepAction(long goalX, long goalY);
 	
