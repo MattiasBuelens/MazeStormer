@@ -21,7 +21,7 @@ public class PlayerController extends SubController implements IPlayerController
 	@Override
 	public IMapController map() {
 		if (this.map == null) {
-			this.map = new MapController(this.getMainController());
+			this.map = new MapController(this.getMainController(), getPlayer());
 		}
 		return this.map;
 	}
@@ -29,7 +29,7 @@ public class PlayerController extends SubController implements IPlayerController
 	@Override
 	public ILogController log() {
 		if (this.log == null) {
-			this.log = new LogController(this.getMainController());
+			this.log = new LogController(this.getMainController(), getPlayer());
 		}
 		return this.log;
 	}

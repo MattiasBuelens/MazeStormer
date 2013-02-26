@@ -2,15 +2,24 @@ package mazestormer.controller;
 
 import java.util.logging.Handler;
 
-public class LogController extends SubController implements ILogController {
+import mazestormer.player.Player;
 
-	public LogController(MainController mainController) {
+public class LogController extends SubController implements ILogController {
+	
+	private Player player;
+
+	public LogController(MainController mainController, Player player) {
 		super(mainController);
+		this.player = player;
+	}
+	
+	private Player getPlayer() {
+		return this.player;
 	}
 
 	@Override
 	public void addLogHandler(Handler handler) {
-		getMainController().getLogger().addHandler(handler);
+		getPlayer().getLogger().addHandler(handler);
 	}
 
 }

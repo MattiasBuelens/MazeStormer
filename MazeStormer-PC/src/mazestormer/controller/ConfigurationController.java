@@ -25,11 +25,11 @@ public class ConfigurationController extends SubController implements
 	}
 
 	private void log(String logText) {
-		getMainController().getLogger().info(logText);
+		getMainController().getPlayer().getLogger().info(logText);
 	}
 
 	private void warning(String logText) {
-		getMainController().getLogger().warning(logText);
+		getMainController().getPlayer().getLogger().warning(logText);
 	}
 
 	@Override

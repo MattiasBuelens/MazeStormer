@@ -47,7 +47,7 @@ public class PathFindingController extends SubController implements
 	}
 
 	private void log(String logText) {
-		getMainController().getLogger().info(logText);
+		getMainController().getPlayer().getLogger().info(logText);
 	}
 
 	private void postState(PathFinderEvent.EventType eventType) {

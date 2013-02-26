@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.maze.Maze;
+import mazestormer.player.Player;
 import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
@@ -32,6 +33,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class MapController extends SubController implements IMapController {
 
+	private Player player;
+	
 	private MapDocument map;
 	private RobotLayer robotLayer;
 	private MazeLayer mazeLayer;
@@ -43,15 +46,17 @@ public class MapController extends SubController implements IMapController {
 	private Runnable updateTask = new UpdateTask();
 	private ScheduledFuture<?> updateHandle;
 	private long updateInterval;
-
+	
 	private static final ThreadFactory factory = new ThreadFactoryBuilder()
 			.setNameFormat("MapController-%d").build();
 
 	private static final long defaultUpdateInterval = 1000 / 25;
 
-	public MapController(MainController mainController) {
+	public MapController(MainController mainController, Player player) {
 		super(mainController);
 		setUpdateInterval(defaultUpdateInterval);
+		
+		this.player = player;
 
 		createMap();
 		createLayers();
@@ -71,13 +76,15 @@ public class MapController extends SubController implements IMapController {
 		robotLayer = new RobotLayer("Robot");
 		addLayer(robotLayer);
 
-		Maze sourceMaze = getMainController().getSourceMaze();
-		sourceMazeLayer = new MazeLayer("Source maze", sourceMaze);
-		sourceMazeLayer.setZIndex(1);
-		sourceMazeLayer.setOpacity(0.5f);
-		addLayer(sourceMazeLayer);
+		if(getMainController().getPlayer() == getPlayer()) {
+			Maze sourceMaze = getMainController().getSourceMaze();
+			sourceMazeLayer = new MazeLayer("Source maze", sourceMaze);
+			sourceMazeLayer.setZIndex(1);
+			sourceMazeLayer.setOpacity(0.5f);
+			addLayer(sourceMazeLayer);
+		}
 
-		Maze maze = getMainController().getMaze();
+		Maze maze = getPlayer().getMaze();
 		mazeLayer = new MazeLayer("Discovered maze", maze);
 		mazeLayer.setZIndex(2);
 		addLayer(mazeLayer);
@@ -90,6 +97,10 @@ public class MapController extends SubController implements IMapController {
 		layer.registerEventBus(getEventBus());
 		map.addLayer(layer);
 		postEvent(new MapLayerAddEvent(layer));
+	}
+	
+	private Player getPlayer() {
+		return this.player;
 	}
 
 	@Override
@@ -109,7 +120,7 @@ public class MapController extends SubController implements IMapController {
 
 	@Override
 	public Pose getRobotPose() {
-		return MapUtils.toMapCoordinates(getMainController().getPose());
+		return MapUtils.toMapCoordinates(getPlayer().getRobot().getPoseProvider().getPose());
 	}
 
 	private void updateRobotPose() {
@@ -180,7 +191,7 @@ public class MapController extends SubController implements IMapController {
 	public void clearMazeOnConnect(ConnectEvent e) {
 		if (e.isConnected()) {
 			// Clear detected maze
-			getMainController().getMaze().clear();
+			getPlayer().getMaze().clear();
 			// Clear detected ranges
 			clearRanges();
 		}

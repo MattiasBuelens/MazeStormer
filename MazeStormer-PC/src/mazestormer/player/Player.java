@@ -1,6 +1,10 @@
 package mazestormer.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
@@ -10,6 +14,11 @@ public class Player {
 	
 	private Robot robot;
 	private Maze maze;
+	
+	/*
+	 * Logging
+	 */
+	private Logger logger;
 	
 	public Player() {
 		
@@ -46,5 +55,17 @@ public class Player {
 	public void setMaze(Maze maze) {
 		checkNotNull(maze);
 		this.maze = maze;
+	}
+	
+	/*
+	 * Logging
+	 */
+
+	public Logger getLogger() {
+		if (logger == null) {
+			logger = Logger.getLogger(getPlayerID());
+			logger.setLevel(Level.ALL);
+		}
+		return logger;
 	}
 }
