@@ -2,7 +2,7 @@
   associations="true" dependencies="true" nesting-relationships="true">  
   <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.CalibrationController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/CalibrationController.java" binary="false">    
-    <position height="-1" width="-1" x="670" y="576"/>    
+    <position height="-1" width="-1" x="519" y="574"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -11,7 +11,7 @@
   <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.ConfigurationController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/ConfigurationController.java" 
     binary="false">    
-    <position height="-1" width="-1" x="686" y="243"/>    
+    <position height="-1" width="-1" x="535" y="241"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -19,7 +19,7 @@
   </class>  
   <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.LogController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/LogController.java" binary="false">    
-    <position height="-1" width="-1" x="520" y="319"/>    
+    <position height="-1" width="-1" x="369" y="317"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -27,7 +27,7 @@
   </class>  
   <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.MainController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/MainController.java" binary="false">    
-    <position height="-1" width="-1" x="517" y="462"/>    
+    <position height="-1" width="-1" x="366" y="460"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -35,224 +35,183 @@
   </class>  
   <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.MapController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/MapController.java" binary="false">    
-    <position height="-1" width="-1" x="308" y="281"/>    
+    <position height="-1" width="-1" x="157" y="279"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.ParametersController" 
-    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/ParametersController.java" binary="false">    
-    <position height="-1" width="-1" x="296" y="574"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.ScanController" 
-    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/ScanController.java" binary="false">    
-    <position height="-1" width="-1" x="139" y="320"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="false" protected="false" private="false"/>    
-    </display>  
-  </class>  
-  <class id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.StateController" 
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.StateController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/StateController.java" binary="false">    
-    <position height="-1" width="-1" x="465" y="574"/>    
+    <position height="-1" width="-1" x="314" y="572"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="9" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.SubController" 
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.SubController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/SubController.java" binary="false">    
-    <position height="-1" width="-1" x="502" y="57"/>    
+    <position height="-1" width="-1" x="351" y="55"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PlayerController" 
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.PlayerController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/PlayerController.java" binary="false">    
-    <position height="-1" width="-1" x="500" y="203"/>    
+    <position height="-1" width="-1" x="349" y="201"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="true"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.GameSetUpController" 
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.GameSetUpController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/GameSetUpController.java" binary="false">    
-    <position height="-1" width="-1" x="852" y="224"/>    
+    <position height="-1" width="-1" x="701" y="222"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="12" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.GameController" 
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.controller.GameController" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/controller/GameController.java" binary="false">    
-    <position height="-1" width="-1" x="829" y="576"/>    
+    <position height="-1" width="-1" x="678" y="574"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <dependency id="13">    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <generalization id="14">    
-    <bendpoint x="578" y="262"/>    
-    <bendpoint x="577" y="155"/>    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <dependency id="15">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <dependency id="16">    
-    <bendpoint x="457" y="519"/>    
+  <dependency id="11">    
     <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="4"/>  
+    <end type="TARGET" refId="3"/>  
   </dependency>  
-  <generalization id="17">    
-    <bendpoint x="964" y="303"/>    
-    <bendpoint x="968" y="171"/>    
-    <end type="SOURCE" refId="12"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <dependency id="18">    
+  <dependency id="12">    
     <end type="SOURCE" refId="5"/>    
     <end type="TARGET" refId="4"/>  
   </dependency>  
-  <dependency id="19">    
-    <bendpoint x="450" y="324"/>    
-    <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <dependency id="20">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <dependency id="21">    
-    <end type="SOURCE" refId="12"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <dependency id="22">    
-    <bendpoint x="624" y="515"/>    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="1"/>  
-  </dependency>  
-  <association id="23">    
-    <bendpoint x="425" y="120"/>    
-    <bendpoint x="426" y="344"/>    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="24" name="mainController">        
-        <position height="15" width="75" x="446" y="369"/>      
+  <generalization id="13">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <association id="14">    
+    <bendpoint x="274" y="118"/>    
+    <bendpoint x="275" y="342"/>    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="15" name="mainController">        
+        <position height="15" width="75" x="295" y="367"/>      
       </attribute>      
-      <multiplicity id="25" minimum="0" maximum="1"/>    
+      <multiplicity id="16" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="4" navigable="true"/>    
     <display labels="true" multiplicity="false"/>  
   </association>  
-  <dependency id="26">    
-    <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="5"/>  
-  </dependency>  
-  <dependency id="27">    
+  <dependency id="17">    
+    <bendpoint x="545" y="496"/>    
     <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="8"/>  
-  </dependency>  
-  <dependency id="28">    
-    <bendpoint x="318" y="522"/>    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="6"/>  
-  </dependency>  
-  <dependency id="29">    
-    <bendpoint x="696" y="498"/>    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="12"/>  
-  </dependency>  
-  <dependency id="30">    
-    <end type="SOURCE" refId="12"/>    
     <end type="TARGET" refId="10"/>  
   </dependency>  
-  <generalization id="31">    
+  <dependency id="18">    
     <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <dependency id="32">    
-    <bendpoint x="618" y="380"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="19">    
+    <end type="SOURCE" refId="1"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="20">    
+    <bendpoint x="467" y="378"/>    
     <end type="SOURCE" refId="4"/>    
     <end type="TARGET" refId="2"/>  
   </dependency>  
-  <generalization id="33">    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="9"/>  
+  <generalization id="21">    
+    <bendpoint x="427" y="260"/>    
+    <bendpoint x="426" y="153"/>    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="7"/>  
   </generalization>  
+  <generalization id="22">    
+    <bendpoint x="580" y="155"/>    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <dependency id="23">    
+    <bendpoint x="299" y="322"/>    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="24">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="25">    
+    <bendpoint x="446" y="147"/>    
+    <bendpoint x="446" y="317"/>    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <generalization id="26">    
+    <bendpoint x="813" y="301"/>    
+    <bendpoint x="817" y="169"/>    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <dependency id="27">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="5"/>  
+  </dependency>  
+  <generalization id="28">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <dependency id="29">    
+    <bendpoint x="306" y="517"/>    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="30">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="6"/>  
+  </dependency>  
+  <generalization id="31">    
+    <bendpoint x="493" y="155"/>    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <dependency id="32">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="4"/>  
+  </dependency>  
+  <dependency id="33">    
+    <bendpoint x="473" y="513"/>    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="1"/>  
+  </dependency>  
   <dependency id="34">    
-    <bendpoint x="597" y="149"/>    
-    <bendpoint x="597" y="319"/>    
+    <bendpoint x="577" y="370"/>    
     <end type="SOURCE" refId="9"/>    
     <end type="TARGET" refId="4"/>  
   </dependency>  
   <dependency id="35">    
-    <bendpoint x="175" y="413"/>    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <dependency id="36">    
     <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="3"/>  
+    <end type="TARGET" refId="8"/>  
   </dependency>  
-  <dependency id="37">    
-    <bendpoint x="743" y="396"/>    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="11"/>  
-  </dependency>  
-  <generalization id="38">    
-    <bendpoint x="731" y="157"/>    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <generalization id="39">    
-    <bendpoint x="70" y="390"/>    
-    <bendpoint x="71" y="161"/>    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <dependency id="40">    
-    <bendpoint x="728" y="372"/>    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <dependency id="41">    
-    <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="4"/>  
-  </dependency>  
-  <generalization id="42">    
-    <bendpoint x="45" y="397"/>    
-    <bendpoint x="47" y="139"/>    
+  <generalization id="36">    
+    <bendpoint x="37" y="430"/>    
+    <bendpoint x="36" y="136"/>    
     <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="9"/>  
+    <end type="TARGET" refId="7"/>  
   </generalization>  
-  <generalization id="43">    
-    <bendpoint x="644" y="157"/>    
-    <end type="SOURCE" refId="2"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <generalization id="44">    
-    <bendpoint x="190" y="139"/>    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <generalization id="45">    
-    <bendpoint x="942" y="297"/>    
-    <bendpoint x="943" y="181"/>    
+  <generalization id="37">    
+    <bendpoint x="791" y="295"/>    
+    <bendpoint x="792" y="179"/>    
     <end type="SOURCE" refId="1"/>    
-    <end type="TARGET" refId="9"/>  
+    <end type="TARGET" refId="7"/>  
   </generalization>  
+  <dependency id="38">    
+    <bendpoint x="592" y="394"/>    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="9"/>  
+  </dependency>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="true" package="false" protected="false" private="false"/>    
