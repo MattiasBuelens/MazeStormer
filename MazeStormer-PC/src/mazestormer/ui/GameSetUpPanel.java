@@ -11,10 +11,7 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -23,203 +20,161 @@ import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.ListAllIcon;
 import com.javarichclient.icon.tango.actions.SystemLogOutIcon;
-import com.javarichclient.icon.tango.actions.ViewRefreshIcon;
 
 public class GameSetUpPanel extends ViewPanel {
-	
+
 	private static final long serialVersionUID = 1521591580799849697L;
-	
+
 	private final IGameSetUpController controller;
-	
-	private JButton createNew;
-	private JButton join;
-	private JButton refresh;
-	private JButton leave;
-	private ComboBoxModel<String> lobbyModel;
-	private JTextField newGameID;
-	
-	private final Action createNewAction = new CreateNewAction();
+	private final JButton join = new JButton();
+	private final JButton start = new JButton();
+	private final JButton leave = new JButton();
+	private final JTextField gameID  = new JTextField();
+
 	private final Action joinAction = new JoinAction();
-	private final Action refreshAction = new RefreshAction();
+	private final Action startAction = new StartAction();
 	private final Action leaveAction = new LeaveAction();
 
 	public GameSetUpPanel(IGameSetUpController controller) {
 		this.controller = controller;
-		
-		setBorder(new TitledBorder(null, "Game SetUp",
+
+		setBorder(new TitledBorder(null, "Team Treasure Trek",
 				TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new MigLayout("", "[grow 75][100px:n,grow][fill]", "[][][][]"));
-		
+		setLayout(new MigLayout("", "[][100px:n,grow][fill]", "[][]"));
+
 		createButtons();
 		createInputField();
-		createList();
-		
+
 		if (!Beans.isDesignTime())
 			registerController();
 	}
-	
+
 	private void registerController() {
 		registerEventBus(this.controller.getEventBus());
 	}
-	
+
 	private void createButtons() {
-		this.createNew = new JButton("New button");
-		add(this.createNew, "cell 2 0");
-		this.createNew.setAction(this.createNewAction);
-		this.createNew.setText("");
-		this.createNew.setIcon(new ListAllIcon(24, 24));
-		
-		this.join = new JButton("New button");
-		add(this.join, "cell 2 1");
+		join.setToolTipText("Join the game");
+		add(this.join, "cell 2 0");
 		this.join.setAction(this.joinAction);
 		this.join.setText("");
-		this.join.setIcon(new GoNextIcon(24, 24));
+		this.join.setIcon(new ListAllIcon(24, 24));
 		
-		this.refresh = new JButton("New button");
-		add(this.refresh, "cell 2 2");
-		this.refresh.setAction(this.refreshAction);
-		this.refresh.setText("");
-		this.refresh.setIcon(new ViewRefreshIcon(24, 24));
-		
-		this.leave = new JButton("New button");
-		add(this.leave, "cell 2 3");
+		start.setToolTipText("Start the game");
+		add(this.start, "cell 1 1,alignx right");
+		this.start.setAction(this.startAction);
+		this.start.setText("");
+		this.start.setIcon(new GoNextIcon(24, 24));
+
+		leave.setToolTipText("Leave");
+		add(this.leave, "cell 2 1");
 		this.leave.setAction(this.leaveAction);
 		this.leave.setText("");
 		this.leave.setIcon(new SystemLogOutIcon(24, 24));
-		
+
 		enableGameButtons(true);
 	}
-	
+
 	private void createInputField() {
-		JLabel lblLow = new JLabel("New Game");
+		JLabel lblLow = new JLabel("Join game");
 		add(lblLow, "cell 0 0");
-		
-		this.newGameID = new JTextField();
-		add(this.newGameID, "cell 1 0,grow");
+		add(this.gameID, "cell 1 0,grow");
 	}
-	
-	private String getNewGameId() {
-		return this.newGameID.getText();
+
+	private String getGameId() {
+		return this.gameID.getText();
 	}
-	
-	private void createList() {
-		JLabel lbl = new JLabel("Lobby");
-		add(lbl, "cell 0 1");
-		
-		JComboBox<String> lobbyBox = new JComboBox<String>();
-		this.lobbyModel = new DefaultComboBoxModel<String>(refreshLobby());
-		lobbyBox.setModel(this.lobbyModel);
-		add(lobbyBox, "cell 1 1,grow");
-	}
-	
+
 	private void enableGameButtons(boolean request) {
-		createNew.setEnabled(request);
 		join.setEnabled(request);
+		start.setEnabled(!request);
 		leave.setEnabled(!request);
 	}
-	
+
 	@Subscribe
 	public void onGameEvent(GameSetUpEvent e) {
-		switch(e.getEventType()) {
-		case JOINED :
+		switch (e.getEventType()) {
+		case JOINED:
 			enableGameButtons(false);
 			break;
-		case LEFT :
+		case LEFT:
 			enableGameButtons(true);
 			break;
-		case DISCONNECTED :
+		case DISCONNECTED:
 			enableGameButtons(true);
 			break;
-		case NOT_READY :
+		case NOT_READY:
 			showNotReady();
 			break;
 		default:
 			break;
 		}
 	}
-	
+
 	private void showNotReady() {
-		JOptionPane.showMessageDialog(null,"You have to select a robot type and/or source maze\n before you could create or join a game.", "Setup", 1);
+		JOptionPane
+				.showMessageDialog(
+						null,
+						"You have to select a robot type and/or source maze\n before you could create or join a game.",
+						"Setup", 1);
 	}
-	
-	private void createGame() {
-		String gameID = getNewGameId();
-		if(gameID != null) {
-			this.controller.createGame(gameID.trim());
-		}
-	}
+
 	private void joinGame() {
-		this.controller.joinGame((String) this.lobbyModel.getSelectedItem());
+		String id = getGameId();
+		if (!id.equals(""))
+			this.controller.joinGame(id);
 	}
 	
-	private String[] refreshLobby() {
-		return this.controller.refreshLobby();
+	private void startGame() {
+		this.controller.startGame();
 	}
-	
+
 	private void leaveGame() {
 		this.controller.leaveGame();
 	}
-	
-	private class CreateNewAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		
-		public CreateNewAction() {
-			putValue(NAME, "Create new game");
-			putValue(SHORT_DESCRIPTION,
-					"Create new game");
-		}
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			createGame();
-		}
-		
-	}
-	
 	private class JoinAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
-		
+
 		public JoinAction() {
 			putValue(NAME, "Join selected game");
-			putValue(SHORT_DESCRIPTION,
-					"Join selected game");
+			putValue(SHORT_DESCRIPTION, "Join selected game");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			joinGame();
 		}
-		
-	}
-	
-	private class RefreshAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		
-		public RefreshAction() {
-			putValue(NAME, "Refresh gamelobby");
-			putValue(SHORT_DESCRIPTION,
-					"Refresh gamelobby");
-		}
 
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			refreshLobby();
-		}
 	}
 	
+	private class StartAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public StartAction() {
+			putValue(NAME, "Start selected game");
+			putValue(SHORT_DESCRIPTION, "Start selected game");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			startGame();
+		}
+		
+	}
+
 	private class LeaveAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
-		
+
 		public LeaveAction() {
 			putValue(NAME, "Leave current game");
-			putValue(SHORT_DESCRIPTION,
-					"Leave current game");
+			putValue(SHORT_DESCRIPTION, "Leave current game");
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			leaveGame();
-			
+
 		}
 	}
 }
