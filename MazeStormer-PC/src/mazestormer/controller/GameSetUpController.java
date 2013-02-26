@@ -1,5 +1,7 @@
 package mazestormer.controller;
 
+import java.io.IOException;
+
 import mazestormer.player.Game;
 
 public class GameSetUpController extends SubController implements
@@ -13,8 +15,12 @@ public class GameSetUpController extends SubController implements
 
 	@Override
 	public void joinGame(String gameID) {
-		// TODO Auto-generated method stub
-		onJoin();
+		try {
+			this.game = new Game(gameID, getMainController().getPlayer());
+			onJoin();
+		} catch (IOException | IllegalStateException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
