@@ -2,7 +2,7 @@
   associations="true" dependencies="true" nesting-relationships="true">  
   <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.player.Player" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/player/Player.java" binary="false">    
-    <position height="-1" width="-1" x="389" y="191"/>    
+    <position height="-1" width="-1" x="367" y="197"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -10,7 +10,7 @@
   </class>  
   <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.maze.Maze" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/maze/Maze.java" binary="false">    
-    <position height="-1" width="-1" x="225" y="363"/>    
+    <position height="-1" width="-1" x="197" y="375"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -18,7 +18,7 @@
   </class>  
   <interface id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Robot" project="MazeStormer" 
     file="/MazeStormer/src/mazestormer/robot/Robot.java" binary="false">    
-    <position height="-1" width="-1" x="627" y="82"/>    
+    <position height="-1" width="-1" x="354" y="368"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -26,7 +26,7 @@
   </interface>  
   <interface id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.ControllableRobot" 
     project="MazeStormer" file="/MazeStormer/src/mazestormer/robot/ControllableRobot.java" binary="false">    
-    <position height="-1" width="-1" x="631" y="241"/>    
+    <position height="-1" width="-1" x="358" y="527"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -34,7 +34,7 @@
   </interface>  
   <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.observable.ObservableRobot" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/observable/ObservableRobot.java" binary="false">    
-    <position height="-1" width="-1" x="404" y="371"/>    
+    <position height="-1" width="-1" x="114" y="640"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
@@ -42,7 +42,7 @@
   </class>  
   <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.physical.PhysicalRobot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/physical/PhysicalRobot.java" binary="false">    
-    <position height="-1" width="-1" x="685" y="380"/>    
+    <position height="-1" width="-1" x="412" y="666"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -50,7 +50,7 @@
   </class>  
   <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.simulator.VirtualRobot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/simulator/VirtualRobot.java" binary="false">    
-    <position height="-1" width="-1" x="575" y="380"/>    
+    <position height="-1" width="-1" x="302" y="666"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -66,7 +66,7 @@
   </class>  
   <class id="9" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.Client" project="htttp-peno" 
     file="/htttp-peno/src/peno/htttp/Client.java" binary="false">    
-    <position height="-1" width="-1" x="-27" y="146"/>    
+    <position height="-1" width="-1" x="-17" y="333"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="true" protected="true" private="true"/>    
@@ -74,86 +74,88 @@
   </class>  
   <interface id="10" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.Handler" project="htttp-peno" 
     file="/htttp-peno/src/peno/htttp/Handler.java" binary="false">    
-    <position height="-1" width="-1" x="-37" y="333"/>    
+    <position height="-1" width="-1" x="14" y="509"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <generalization id="11">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <realization id="12">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
-  <realization id="13">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
+  <association id="11">    
+    <bendpoint x="123" y="418"/>    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="12" name="handler">        
+        <position height="15" width="43" x="118" y="432"/>      
+      </attribute>      
+      <multiplicity id="13" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
   <association id="14">    
     <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="15" name="robot">        
-        <position height="15" width="32" x="483" y="117"/>      
-      </attribute>      
+      <attribute id="15" name="maze"/>      
       <multiplicity id="16" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <association id="17">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="18" name="handler">        
-        <position height="15" width="43" x="37" y="256"/>      
-      </attribute>      
-      <multiplicity id="19" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <association id="20">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="21" name="players">        
-        <position height="15" width="43" x="276" y="166"/>      
-      </attribute>      
-      <multiplicity id="22" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <association id="23">    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="24" name="handler"/>      
-      <multiplicity id="25" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <realization id="26">    
-    <bendpoint x="486" y="291"/>    
-    <bendpoint x="499" y="166"/>    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="3"/>  
-  </realization>  
-  <association id="27">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="28" name="maze"/>      
-      <multiplicity id="29" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="false"/>  
   </association>  
-  <association id="30">    
+  <generalization id="17">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <realization id="18">    
+    <bendpoint x="226" y="452"/>    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
+  <association id="19">    
+    <bendpoint x="258" y="72"/>    
+    <bendpoint x="309" y="71"/>    
     <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="31" name="client">        
-        <position height="15" width="32" x="90" y="165"/>      
+      <attribute id="20" name="players">        
+        <position height="15" width="43" x="253" y="57"/>      
       </attribute>      
-      <multiplicity id="32" minimum="0" maximum="1"/>    
+      <multiplicity id="21" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <realization id="22">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
+  <association id="23">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="24" name="client">        
+        <position height="15" width="32" x="76" y="220"/>      
+      </attribute>      
+      <multiplicity id="25" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="9" navigable="true"/>    
     <display labels="true" multiplicity="false"/>  
   </association>  
+  <association id="26">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="27" name="robot">        
+        <position height="15" width="32" x="210" y="403"/>      
+      </attribute>      
+      <multiplicity id="28" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="29">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="30" name="handler"/>      
+      <multiplicity id="31" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <realization id="32">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="true" package="true" protected="true" private="true"/>    
