@@ -6,7 +6,6 @@ import mazestormer.robot.Robot;
 
 public class Player {
 	
-	private String playerName;
 	private String playerID;
 	
 	private Robot robot;
@@ -18,14 +17,6 @@ public class Player {
 	
 	public Player(Robot robot) {
 		setRobot(robot);
-	}
-	
-	public String getPlayerName() {
-		return this.playerName;
-	}
-	
-	public void setPlayerName(String playerName) {
-		this.playerName = playerName;
 	}
 	
 	public String getPlayerID() {

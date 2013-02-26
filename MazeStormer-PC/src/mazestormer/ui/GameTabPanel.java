@@ -57,7 +57,7 @@ public class GameTabPanel extends ViewPanel {
 			
 			temp.add(mapPanel, "cell 0 0,grow");
 			temp.add(logPanel, "cell 0 2,grow");
-			this.tabbedPane.addTab(pc.getPlayer().getPlayerName(), temp);
+			this.tabbedPane.addTab(pc.getPlayer().getPlayerID(), temp);
 		}
 		validate();
 	}

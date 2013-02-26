@@ -17,11 +17,10 @@ public class GameSetUpController extends SubController implements
 	public void createGame(String gameID) {
 		try {
 			this.game = new Game(gameID, getMainController().getPlayer());
-			onJoin();
 		} catch (IOException e) {
-			// TODO Handle this error, write to log?
 			e.printStackTrace();
 		}
+		onJoin();
 	}
 
 	@Override

@@ -443,7 +443,7 @@ public class MainController implements IMainController {
 	
 	private void createPersonalPlayer() {
 		this.personalPlayer = new Player();
-		this.personalPlayer.setPlayerName(PERSONAL_PLAYER_NAME);
+		this.personalPlayer.setPlayerID(PERSONAL_PLAYER_NAME);
 		gameControl().addPlayer(this.personalPlayer);
 	}
 	
