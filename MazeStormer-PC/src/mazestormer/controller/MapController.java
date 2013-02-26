@@ -31,7 +31,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class MapController extends SubController implements IMapController {
 
-	private Player player;
+	private final Player player;
 	
 	private MapDocument map;
 	private RobotLayer robotLayer;
@@ -67,7 +67,7 @@ public class MapController extends SubController implements IMapController {
 		map.setViewRect(new Rectangle(-500, -500, 1000, 1000));
 
 		SVGDocument document = map.getDocument();
-		postEvent(new MapChangeEvent(document));
+		postEvent(new MapChangeEvent(document, getPlayer().getPlayerID()));
 	}
 
 	private void createLayers() {

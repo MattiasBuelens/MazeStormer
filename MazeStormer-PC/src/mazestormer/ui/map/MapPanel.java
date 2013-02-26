@@ -36,7 +36,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	private static final long serialVersionUID = 1L;
 	
-	private String playerID;
+	private final String playerID;
 
 	private boolean isFollowing;
 
@@ -177,7 +177,9 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	@Subscribe
 	public void onMapChanged(MapChangeEvent event) {
-		setMap(event.getDocument());
+		if(event.getPlayerID().equals(playerID)) {
+			setMap(event.getDocument());
+		}
 	}
 
 	private void addLayerMenuItem(final MapLayer layer) {
@@ -198,8 +200,10 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	@Subscribe
 	public void onMapLayerAdded(MapLayerAddEvent event) {
-		event.getLayer().setMapLayerHandler(this);
-		addLayerMenuItem(event.getLayer());
+		if(event.getPlayerID().equals(getPlayerID())) {
+			event.getLayer().setMapLayerHandler(this);
+			addLayerMenuItem(event.getLayer());
+		}
 	}
 
 	public boolean isFollowing() {
@@ -220,7 +224,9 @@ public class MapPanel extends ViewPanel implements MapLayerHandler{
 
 	@Subscribe
 	public void onMapRobotPoseChanged(MapRobotPoseChangeEvent event) {
-		updateRobotPose(event.getPose());
+		if(event.getPlayerID().equals(getPlayerID())) {
+			updateRobotPose(event.getPose());
+		}
 	}
 
 	// Dummy method to trick the designer into showing the popup menus
