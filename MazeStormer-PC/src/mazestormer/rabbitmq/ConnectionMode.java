@@ -1,30 +1,44 @@
 package mazestormer.rabbitmq;
 
+import java.io.IOException;
+
+import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 public enum ConnectionMode {
-	
+
 	LOCAL {
 		@Override
-		public ConnectionFactory getConnectionFactory() {
+		public ConnectionFactory createConnectionFactory() {
 			ConnectionFactory factory = new ConnectionFactory();
-		    factory.setHost(Config.LOCAL_HOST);
-		    return factory;
+			factory.setHost("localhost");
+			return factory;
 		}
-	}, PENO {
+	},
+	PENO {
 		@Override
-		public ConnectionFactory getConnectionFactory() {
+		public ConnectionFactory createConnectionFactory() {
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setUsername(Config.USER_NAME);
-			factory.setPassword(Config.PASSWORD);
-			factory.setVirtualHost(Config.VIRTUAL_HOST);
+			factory.setUsername(PenoConfig.USER_NAME);
+			factory.setPassword(PenoConfig.PASSWORD);
+			factory.setVirtualHost(PenoConfig.VIRTUAL_HOST);
 			factory.setRequestedHeartbeat(0);
-			factory.setHost(Config.HOST_NAME);
-			factory.setPort(Config.PORT);
+			factory.setHost(PenoConfig.HOST_NAME);
+			factory.setPort(PenoConfig.PORT);
 			return factory;
 		}
 	};
-	
-	public abstract ConnectionFactory getConnectionFactory();
+
+	private final ConnectionFactory connectionFactory;
+
+	private ConnectionMode() {
+		this.connectionFactory = createConnectionFactory();
+	}
+
+	public Connection newConnection() throws IOException {
+		return connectionFactory.newConnection();
+	}
+
+	protected abstract ConnectionFactory createConnectionFactory();
 
 }

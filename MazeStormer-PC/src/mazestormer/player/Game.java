@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mazestormer.rabbitmq.ConnectionMode;
-import mazestormer.rabbitmq.Sender;
+import peno.htttp.Client;
+import peno.htttp.Handler;
 
 public class Game {
 
@@ -18,12 +19,17 @@ public class Game {
 
 	private boolean hasStarted;
 
-	private final Sender sender;
+	private final Client client;
+	private final Handler handler;
 
 	public Game(String id, Player localPlayer) throws IOException {
 		this.id = id;
-		this.sender = new Sender(ConnectionMode.LOCAL, id,
-				localPlayer.getPlayerID());
+
+		// TODO Implement handler!
+		this.handler = null;
+		this.client = new Client(ConnectionMode.LOCAL.newConnection(), handler,
+				id, localPlayer.getPlayerID());
+
 		addPlayer(localPlayer);
 	}
 
