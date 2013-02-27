@@ -69,7 +69,7 @@
     <position height="-1" width="-1" x="162" y="289"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="false" package="true" protected="true" private="true"/>    
+      <operations public="true" package="true" protected="true" private="false"/>    
     </display>  
   </class>  
   <interface id="10" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.Handler" project="htttp-peno" 
@@ -80,40 +80,45 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <association id="11">    
+  <realization id="11">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
+  <realization id="12">    
+    <bendpoint x="405" y="408"/>    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
+  <association id="13">    
+    <bendpoint x="437" y="28"/>    
+    <bendpoint x="488" y="27"/>    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="14" name="players">        
+        <position height="15" width="43" x="432" y="13"/>      
+      </attribute>      
+      <multiplicity id="15" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="16">    
     <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="12" name="handler"/>      
-      <multiplicity id="13" minimum="0" maximum="1"/>    
+      <attribute id="17" name="handler"/>      
+      <multiplicity id="18" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="10" navigable="true"/>    
     <display labels="true" multiplicity="false"/>  
   </association>  
-  <association id="14">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="15" name="robot">        
-        <position height="15" width="32" x="389" y="359"/>      
+  <association id="19">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="20" name="client">        
+        <position height="15" width="32" x="255" y="176"/>      
       </attribute>      
-      <multiplicity id="16" minimum="0" maximum="1"/>    
+      <multiplicity id="21" minimum="0" maximum="1"/>    
     </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
+    <end type="TARGET" refId="9" navigable="true"/>    
     <display labels="true" multiplicity="false"/>  
   </association>  
-  <association id="17">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="18" name="maze"/>      
-      <multiplicity id="19" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <realization id="20">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
-  <realization id="21">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
   <association id="22">    
     <bendpoint x="302" y="374"/>    
     <end type="SOURCE" refId="8" navigable="false">      
@@ -126,36 +131,31 @@
     <display labels="true" multiplicity="false"/>  
   </association>  
   <realization id="25">    
-    <bendpoint x="405" y="408"/>    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="3"/>  
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="4"/>  
   </realization>  
-  <generalization id="26">    
+  <association id="26">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="27" name="robot">        
+        <position height="15" width="32" x="389" y="359"/>      
+      </attribute>      
+      <multiplicity id="28" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="29">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="30" name="maze"/>      
+      <multiplicity id="31" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <generalization id="32">    
     <end type="SOURCE" refId="4"/>    
     <end type="TARGET" refId="3"/>  
   </generalization>  
-  <association id="27">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="28" name="client">        
-        <position height="15" width="32" x="255" y="176"/>      
-      </attribute>      
-      <multiplicity id="29" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="9" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <association id="30">    
-    <bendpoint x="437" y="28"/>    
-    <bendpoint x="488" y="27"/>    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="31" name="players">        
-        <position height="15" width="43" x="432" y="13"/>      
-      </attribute>      
-      <multiplicity id="32" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="true" package="true" protected="true" private="true"/>    
