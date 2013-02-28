@@ -185,6 +185,7 @@ public class MainView extends JFrame implements EventSource {
 				this.hidden = !this.hidden;
 				calibrationPanel.setVisible((this.hidden == true) ? false : configurationPanel.isVisible());
 				controlPanel.setVisible(!this.hidden);
+				statePanel.setVisible(!this.hidden);
 				getContentPane().validate();
 			}
 		};
