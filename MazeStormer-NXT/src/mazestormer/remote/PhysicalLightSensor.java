@@ -81,8 +81,12 @@ public class PhysicalLightSensor extends LightSensor implements
 		lightListeners.remove(listener);
 	}
 
-	protected void callLightListeners(int normalizedLightValue) {
-		for (LightValueListener listener : lightListeners) {
+	protected void callLightListeners(final int normalizedLightValue) {
+		// Clone listeners array for safe iteration
+		final LightValueListener[] listeners = lightListeners
+				.toArray(new LightValueListener[lightListeners.size()]);
+		// Call listeners
+		for (LightValueListener listener : listeners) {
 			listener.lightValueChanged(normalizedLightValue);
 		}
 	}
@@ -217,8 +221,18 @@ public class PhysicalLightSensor extends LightSensor implements
 		public void lightValueChanged(int normalizedLightValue) {
 			int lightValue = getLightValue(normalizedLightValue);
 			if (matches(lightValue)) {
+				// Remove as light listener
 				removeLightListener(this);
-				resolve();
+				/*
+				 * Resolve in separate thread to ensure no deadlocks can occur
+				 * on the light sensor port listener.
+				 */
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						resolve();
+					}
+				}).start();
 			}
 		}
 
