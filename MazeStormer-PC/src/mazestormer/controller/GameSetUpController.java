@@ -1,8 +1,9 @@
 package mazestormer.controller;
 
-import java.io.IOException;
+import java.util.logging.Logger;
 
 import mazestormer.player.Game;
+import peno.htttp.Callback;
 
 public class GameSetUpController extends SubController implements
 		IGameSetUpController {
@@ -13,26 +14,63 @@ public class GameSetUpController extends SubController implements
 		super(mainController);
 	}
 
+	private Logger getLogger() {
+		return getMainController().getPlayer().getLogger();
+	}
+
 	@Override
 	public void joinGame(String gameID) {
-		try {
-			this.game = new Game(gameID, getMainController().getPlayer());
-			onJoin();
-		} catch (IOException | IllegalStateException e) {
-			e.printStackTrace();
+		if (!isReady()) {
+			onNotReady();
+			return;
 		}
-	}
-	
-	@Override
-	public void startGame() {
-		//TODO Auto-generated method stub
-		onStart();
+
+		try {
+			game = new Game(gameID, getMainController().getPlayer());
+			game.join(new Callback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					onJoin();
+				}
+
+				@Override
+				public void onFailure(Throwable t) {
+					getLogger()
+							.warning("Error when joining: " + t.getMessage());
+				}
+			});
+		} catch (Exception e) {
+			getLogger().warning("Error when joining: " + e.getMessage());
+		}
 	}
 
 	@Override
 	public void leaveGame() {
+		try {
+			if (game == null) {
+				throw new Exception("Not connected.");
+			}
+			game.leave(new Callback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					onLeave();
+				}
+
+				@Override
+				public void onFailure(Throwable t) {
+					getLogger()
+							.warning("Error when leaving: " + t.getMessage());
+				}
+			});
+		} catch (Exception e) {
+			getLogger().warning("Error when leaving: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public void startGame() {
 		// TODO Auto-generated method stub
-		onLeave();
+		onStart();
 	}
 
 	private boolean isReady() {
@@ -48,29 +86,31 @@ public class GameSetUpController extends SubController implements
 	}
 
 	private void onJoin() {
-		if (isReady())
-			postState(GameSetUpEvent.EventType.JOINED);
-		else
-			onNotReady();
+		getLogger().info("Joined");
+		postState(GameSetUpEvent.EventType.JOINED);
 	}
-	
+
 	private void onStart() {
-		//TODO
+		// TODO
 	}
 
 	private void onLeave() {
+		getLogger().info("Left");
 		postState(GameSetUpEvent.EventType.LEFT);
 	}
 
 	private void onDisconnect() {
+		getLogger().info("Disconnected");
 		postState(GameSetUpEvent.EventType.DISCONNECTED);
 	}
 
 	private void onNotReady() {
+		getLogger().info("Not ready");
 		postState(GameSetUpEvent.EventType.NOT_READY);
 	}
 
 	private void postState(GameSetUpEvent.EventType eventType) {
 		postEvent(new GameSetUpEvent(eventType));
 	}
+
 }

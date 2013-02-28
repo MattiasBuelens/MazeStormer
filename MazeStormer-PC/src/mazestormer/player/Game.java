@@ -2,15 +2,20 @@ package mazestormer.player;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mazestormer.rabbitmq.ConnectionMode;
+import peno.htttp.Callback;
 import peno.htttp.Client;
+import peno.htttp.GameState;
 import peno.htttp.Handler;
 
 public class Game {
 
-	private final List<Player> players = new ArrayList<Player>();
+	private String localPlayer;
+	private final Map<String, Player> players = new HashMap<String, Player>();
 
 	/**
 	 * Used to identify on the server
@@ -20,32 +25,23 @@ public class Game {
 	private boolean hasStarted;
 
 	private final Client client;
-	private final Handler handler;
+	private final GameHandler handler;
 
-	public Game(String id, Player localPlayer) throws IOException, IllegalStateException {
+	public Game(String id, Player localPlayer) throws IOException,
+			IllegalStateException {
 		this.id = id;
+		this.localPlayer = localPlayer.getPlayerID();
 
 		// TODO Implement handler!
-		this.handler = null;
-		this.client = new Client(ConnectionMode.LOCAL.newConnection(), handler,
-				id, localPlayer.getPlayerID());
+		this.handler = new GameHandler();
+		this.client = new Client(ConnectionMode.LOCAL.newConnection(),
+				this.handler, id, this.localPlayer);
 
 		addPlayer(localPlayer);
 	}
 
-	public void addPlayer(Player p) throws IllegalStateException {
-		if(!isJoinable()) {
-			throw new IllegalStateException("The game is not joinable.");
-		}
-		players.add(p);
-	}
-
-	public void removePlayer(Player p) {
-		players.remove(p);
-	}
-
-	public Player getPersonalPlayer() {
-		return players.get(0);
+	public Player getLocalPlayer() {
+		return players.get(localPlayer);
 	}
 
 	public String getId() {
@@ -56,15 +52,68 @@ public class Game {
 		return players.size();
 	}
 
-	public boolean hasStarted() {
-		return this.hasStarted;
+	protected void addPlayer(Player player) {
+		players.put(player.getPlayerID(), player);
 	}
 
-	public void start() {
-		this.hasStarted = true;
+	protected void removePlayer(Player player) {
+		players.remove(player.getPlayerID());
 	}
 
-	public boolean isJoinable() {
-		return !hasStarted() && getNbOfPlayers() < 4;
+	public void join(Callback<Void> callback) {
+		try {
+			client.join(callback);
+		} catch (Exception e) {
+			callback.onFailure(e);
+		}
+	}
+
+	public void leave(Callback<Void> callback) {
+		try {
+			client.leave();
+			callback.onSuccess(null);
+		} catch (Exception e) {
+			callback.onFailure(e);
+		}
+	}
+
+	public void pause() {
+		// TODO Auto-generated method stub
+	}
+
+	private class GameHandler implements Handler {
+
+		@Override
+		public void gameStarted() {
+			System.out.println("Game started");
+		}
+
+		@Override
+		public void gameStopped() {
+			System.out.println("Game stopped");
+		}
+
+		@Override
+		public void gamePaused() {
+			System.out.println("Game paused");
+		}
+
+		@Override
+		public void playerJoined(String playerID) {
+			System.out.println("Player " + playerID + " joined");
+		}
+
+		@Override
+		public void playerLeft(String playerID) {
+			System.out.println("Player " + playerID + " left");
+		}
+
+		@Override
+		public void playerPosition(String playerID, double x, double y,
+				double angle) {
+			System.out.println("Player " + playerID + " position: " + x + ", "
+					+ y + " @ " + angle + "°");
+		}
+
 	}
 }
