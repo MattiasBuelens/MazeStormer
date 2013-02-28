@@ -43,6 +43,7 @@ public class BarcodeRunner extends
 	private boolean performAction;
 	private double scanSpeed = 2; // cm/sec
 	private double originalTravelSpeed;
+	private BarcodeMapping mapping = new ExplorerBarcodeMapping();
 
 	/*
 	 * State
@@ -60,7 +61,6 @@ public class BarcodeRunner extends
 		addBarcodeListener(this);
 		addStateListener(this);
 	}
-	
 
 	public ControllableRobot getRobot() {
 		return (ControllableRobot) player.getRobot();
@@ -98,6 +98,14 @@ public class BarcodeRunner extends
 		return getRobot().getLightSensor().getSensorRadius();
 	}
 
+	public BarcodeMapping getMapping() {
+		return mapping;
+	}
+
+	public void setMapping(BarcodeMapping mapping) {
+		this.mapping = mapping;
+	}
+
 	protected void log(String message) {
 		System.out.println(message);
 	}
@@ -128,11 +136,11 @@ public class BarcodeRunner extends
 	}
 
 	public Future<?> performAction(byte barcode) {
-		return performAction(BarcodeDecoder.getAction(barcode, ModeBarcodeMapping.ExploringTheMaze));
+		return performAction(getMapping().getAction(barcode));
 	}
 
 	public Future<?> performAction(Barcode barcode) {
-		return performAction(BarcodeDecoder.getAction(barcode, ModeBarcodeMapping.ExploringTheMaze));
+		return performAction(getMapping().getAction(barcode));
 	}
 
 	protected Future<?> performAction(IAction action) {

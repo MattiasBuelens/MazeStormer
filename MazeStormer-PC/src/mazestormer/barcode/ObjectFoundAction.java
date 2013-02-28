@@ -3,7 +3,6 @@ package mazestormer.barcode;
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.maze.Maze;
 import mazestormer.player.Player;
-import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Robot;
 import mazestormer.util.Future;
 

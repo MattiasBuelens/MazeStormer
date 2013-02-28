@@ -17,6 +17,7 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.BarcodeRunnerListener;
 import mazestormer.barcode.BarcodeSpeed;
@@ -96,8 +97,8 @@ public class ExplorerRunner extends
 		addStateListener(this);
 
 		// Navigator
-		this.navigator = new Navigator(getRobot().getPilot(),
-				getRobot().getPoseProvider());
+		this.navigator = new Navigator(getRobot().getPilot(), getRobot()
+				.getPoseProvider());
 		navigator.addNavigatorListener(this);
 		navigator.pauseAt(Navigator.NavigatorState.TRAVEL);
 
@@ -125,7 +126,7 @@ public class ExplorerRunner extends
 		// Barcode actions are manually executed
 		barcodeScanner.setPerformAction(false);
 	}
-	
+
 	public ControllableRobot getRobot() {
 		return (ControllableRobot) player.getRobot();
 	}
@@ -168,6 +169,10 @@ public class ExplorerRunner extends
 
 	public void setScanSpeed(double scanSpeed) {
 		barcodeScanner.setScanSpeed(scanSpeed);
+	}
+
+	public void setBarcodeMapping(BarcodeMapping mapping) {
+		barcodeScanner.setMapping(mapping);
 	}
 
 	private void reset() {
@@ -433,7 +438,8 @@ public class ExplorerRunner extends
 			for (RangeReading reading : feature.getRangeReadings()) {
 				orientation = angleToOrientation(reading.getAngle()
 						+ getMaze().toRelative(getPose().getHeading()));
-				getMaze().setEdge(tile.getPosition(), orientation, EdgeType.WALL);
+				getMaze().setEdge(tile.getPosition(), orientation,
+						EdgeType.WALL);
 			}
 		}
 		// Replace unknown edges with openings
