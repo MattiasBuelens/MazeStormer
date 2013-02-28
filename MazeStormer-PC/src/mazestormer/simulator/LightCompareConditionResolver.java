@@ -23,9 +23,9 @@ public class LightCompareConditionResolver extends
 		int threshold = condition.getThreshold();
 		switch (condition.getType()) {
 		case LIGHT_GREATER_THAN:
-			return lightValue > threshold;
+			return lightValue >= threshold;
 		case LIGHT_SMALLER_THAN:
-			return lightValue < threshold;
+			return lightValue <= threshold;
 		default:
 			return false;
 		}
