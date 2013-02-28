@@ -118,11 +118,11 @@ public class BarcodeRunner extends
 	}
 
 	public Future<?> performAction(byte barcode) {
-		return performAction(BarcodeDecoder.getAction(barcode));
+		return performAction(BarcodeDecoder.getAction(barcode, ModeBarcodeMapping.ExploringTheMaze));
 	}
 
 	public Future<?> performAction(Barcode barcode) {
-		return performAction(BarcodeDecoder.getAction(barcode));
+		return performAction(BarcodeDecoder.getAction(barcode, ModeBarcodeMapping.ExploringTheMaze));
 	}
 
 	protected Future<?> performAction(IAction action) {
