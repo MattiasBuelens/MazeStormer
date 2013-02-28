@@ -6,7 +6,7 @@ import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
-import mazestormer.maze.Maze;
+import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.state.AbstractStateListener;
 import mazestormer.util.Future;
@@ -24,12 +24,12 @@ public class BarcodeController extends SubController implements
 		super(mainController);
 	}
 
-	private ControllableRobot getRobot() {
-		return getMainController().getControllableRobot();
+	private Player getPlayer() {
+		return getMainController().getPlayer();
 	}
 
-	private Maze getMaze() {
-		return getMainController().getMaze();
+	private ControllableRobot getRobot() {
+		return getMainController().getControllableRobot();
 	}
 
 	private void log(String logText) {
@@ -42,7 +42,7 @@ public class BarcodeController extends SubController implements
 		postActionState(BarcodeActionEvent.EventType.STARTED);
 		// Start action
 		this.action = getAction(actionType)
-				.performAction(getRobot(), getMaze());
+				.performAction(getPlayer());
 		this.action.addFutureListener(new ActionListener());
 	}
 
@@ -92,7 +92,7 @@ public class BarcodeController extends SubController implements
 	@Override
 	public void startScan() {
 		// Prepare
-		barcodeRunner = new BarcodeRunner(getRobot(), getMaze()) {
+		barcodeRunner = new BarcodeRunner(getPlayer()) {
 			@Override
 			protected void log(String message) {
 				BarcodeController.this.log(message);

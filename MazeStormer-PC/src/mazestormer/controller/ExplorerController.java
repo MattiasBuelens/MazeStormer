@@ -2,8 +2,7 @@ package mazestormer.controller;
 
 import mazestormer.explore.ExplorerEvent;
 import mazestormer.explore.ExplorerRunner;
-import mazestormer.maze.Maze;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.player.Player;
 import mazestormer.state.AbstractStateListener;
 
 public class ExplorerController extends SubController implements IExplorerController {
@@ -31,12 +30,8 @@ public class ExplorerController extends SubController implements IExplorerContro
 		return getMainController().cheatControl();
 	}
 
-	private ControllableRobot getRobot() {
-		return getMainController().getControllableRobot();
-	}
-
-	private Maze getMaze() {
-		return getMainController().getMaze();
+	private Player getPlayer() {
+		return getMainController().getPlayer();
 	}
 
 	private void log(String logText) {
@@ -49,7 +44,7 @@ public class ExplorerController extends SubController implements IExplorerContro
 
 	@Override
 	public void startExploring() {
-		runner = new ExplorerRunner(getRobot(), getMaze()) {
+		runner = new ExplorerRunner(getPlayer()) {
 			@Override
 			protected void log(String message) {
 				ExplorerController.this.log(message);

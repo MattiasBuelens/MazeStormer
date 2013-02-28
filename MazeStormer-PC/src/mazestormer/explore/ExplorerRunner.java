@@ -28,6 +28,7 @@ import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileType;
+import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.Navigator.NavigatorState;
@@ -61,8 +62,7 @@ public class ExplorerRunner extends
 	/*
 	 * Settings
 	 */
-	private final ControllableRobot robot;
-	private final Maze maze;
+	private final Player player;
 
 	/**
 	 * Flag indicating if the explorer should periodically adjust the robot's
@@ -91,22 +91,21 @@ public class ExplorerRunner extends
 	 */
 	private AtomicBoolean shouldLineAdjust = new AtomicBoolean(false);
 
-	public ExplorerRunner(ControllableRobot robot, Maze maze) {
-		this.robot = checkNotNull(robot);
-		this.maze = checkNotNull(maze);
+	public ExplorerRunner(Player player) {
+		this.player = checkNotNull(player);
 		addStateListener(this);
 
 		// Navigator
-		this.navigator = new Navigator(robot.getPilot(),
-				robot.getPoseProvider());
+		this.navigator = new Navigator(getRobot().getPilot(),
+				getRobot().getPoseProvider());
 		navigator.addNavigatorListener(this);
 		navigator.pauseAt(Navigator.NavigatorState.TRAVEL);
 
 		// Path finder
-		this.pathFinder = new PathFinder(maze);
+		this.pathFinder = new PathFinder(getMaze());
 
 		// Line finder
-		this.lineFinder = new LineFinderRunner(robot) {
+		this.lineFinder = new LineFinderRunner(getRobot()) {
 			@Override
 			protected void log(String message) {
 				ExplorerRunner.this.log(message);
@@ -115,7 +114,7 @@ public class ExplorerRunner extends
 		lineFinder.addStateListener(new LineFinderListener());
 
 		// Barcode scanner
-		this.barcodeScanner = new BarcodeRunner(robot, maze) {
+		this.barcodeScanner = new BarcodeRunner(player) {
 			@Override
 			protected void log(String message) {
 				ExplorerRunner.this.log(message);
@@ -125,6 +124,14 @@ public class ExplorerRunner extends
 
 		// Barcode actions are manually executed
 		barcodeScanner.setPerformAction(false);
+	}
+	
+	public ControllableRobot getRobot() {
+		return (ControllableRobot) player.getRobot();
+	}
+
+	public Maze getMaze() {
+		return player.getMaze();
 	}
 
 	protected void log(String message) {
@@ -165,7 +172,7 @@ public class ExplorerRunner extends
 
 	private void reset() {
 		// Reset state
-		maze.clear();
+		getMaze().clear();
 		setExplored(false);
 		// Stop subroutines
 		navigator.stop();
@@ -276,7 +283,7 @@ public class ExplorerRunner extends
 			// Travel off barcode
 			double clearDistance = getBarcodeClearingDistance();
 			log("Travel off barcode: " + clearDistance);
-			bindTransition(robot.getPilot().travelComplete(clearDistance),
+			bindTransition(getRobot().getPilot().travelComplete(clearDistance),
 					ExplorerState.BEFORE_TRAVEL);
 		} else {
 			// No barcode
@@ -365,12 +372,12 @@ public class ExplorerRunner extends
 		setExplored(true);
 
 		// Add goal
-		Tile goal = maze.getTarget(Target.GOAL);
+		Tile goal = getMaze().getTarget(Target.GOAL);
 		if (goal != null) {
 			queue.addFirst(goal);
 		}
 		// Add checkpoint before goal
-		Tile checkPoint = maze.getTarget(Target.CHECKPOINT);
+		Tile checkPoint = getMaze().getTarget(Target.CHECKPOINT);
 		if (checkPoint != null) {
 			queue.addFirst(checkPoint);
 		}
@@ -380,7 +387,7 @@ public class ExplorerRunner extends
 		// Clean up to prevent barcode scanner from resetting the new speed
 		barcodeScanner.stop();
 		// Start traveling at high speed
-		robot.getPilot().setTravelSpeed(
+		getRobot().getPilot().setTravelSpeed(
 				BarcodeSpeed.HIGH.getBarcodeSpeedValue());
 
 		// Traverse new path
@@ -396,21 +403,21 @@ public class ExplorerRunner extends
 	 *            The barcode.
 	 */
 	private void setBarcodeTile(Tile tile, byte barcode) {
-		float relativeHeading = maze.toRelative(getPose().getHeading());
+		float relativeHeading = getMaze().toRelative(getPose().getHeading());
 		Orientation heading = angleToOrientation(relativeHeading);
 
 		// Make straight tile
 		for (Orientation wall : TileType.STRAIGHT.getWalls(heading)) {
-			maze.setEdge(tile.getPosition(), wall, EdgeType.WALL);
+			getMaze().setEdge(tile.getPosition(), wall, EdgeType.WALL);
 		}
 		// Replace unknown edges with openings
 		for (Orientation orientation : tile.getUnknownSides()) {
-			maze.setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
+			getMaze().setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
 		}
 		// Mark as explored
 		tile.setExplored();
 		// Set barcode
-		maze.setBarcode(tile.getPosition(), barcode);
+		getMaze().setBarcode(tile.getPosition(), barcode);
 	}
 
 	/**
@@ -418,20 +425,20 @@ public class ExplorerRunner extends
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
-		RangeFeature feature = robot.getRangeDetector().scan(
+		RangeFeature feature = getRobot().getRangeDetector().scan(
 				getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
 				orientation = angleToOrientation(reading.getAngle()
-						+ maze.toRelative(getPose().getHeading()));
-				maze.setEdge(tile.getPosition(), orientation, EdgeType.WALL);
+						+ getMaze().toRelative(getPose().getHeading()));
+				getMaze().setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
 		// Replace unknown edges with openings
 		for (Orientation orientation : tile.getUnknownSides()) {
-			maze.setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
+			getMaze().setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
 		}
 	}
 
@@ -441,7 +448,7 @@ public class ExplorerRunner extends
 	 */
 	private void selectTiles(Tile tile) {
 		for (Orientation direction : tile.getOpenSides()) {
-			Tile neighborTile = maze.getOrCreateNeighbor(tile, direction);
+			Tile neighborTile = getMaze().getOrCreateNeighbor(tile, direction);
 			// Reject the new paths with loops
 			if (!neighborTile.isExplored() && !queue.contains(neighborTile)) {
 				// Add the new paths to front of queue
@@ -502,7 +509,7 @@ public class ExplorerRunner extends
 	 * Get the distance necessary to travel off a barcode.
 	 */
 	private float getBarcodeClearing() {
-		return maze.getTileSize() / 3f;
+		return getMaze().getTileSize() / 3f;
 	}
 
 	/*
@@ -578,7 +585,7 @@ public class ExplorerRunner extends
 	 * Get the current pose of the robot.
 	 */
 	private Pose getPose() {
-		return robot.getPoseProvider().getPose();
+		return getRobot().getPoseProvider().getPose();
 	}
 
 	/*

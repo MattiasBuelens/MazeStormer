@@ -1,5 +1,7 @@
 package mazestormer.barcode;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.maze.Maze;
+import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;
@@ -36,8 +39,7 @@ public class BarcodeRunner extends
 	 * Settings
 	 */
 
-	private final ControllableRobot robot;
-	private final Maze maze;
+	private final Player player;
 	private boolean performAction;
 	private double scanSpeed = 2; // cm/sec
 	private double originalTravelSpeed;
@@ -52,12 +54,20 @@ public class BarcodeRunner extends
 
 	private final List<BarcodeRunnerListener> listeners = new ArrayList<BarcodeRunnerListener>();
 
-	public BarcodeRunner(ControllableRobot robot, Maze maze) {
-		this.robot = robot;
-		this.maze = maze;
+	public BarcodeRunner(Player player) {
+		this.player = checkNotNull(player);
 
 		addBarcodeListener(this);
 		addStateListener(this);
+	}
+	
+
+	public ControllableRobot getRobot() {
+		return (ControllableRobot) player.getRobot();
+	}
+
+	public Maze getMaze() {
+		return player.getMaze();
 	}
 
 	public double getScanSpeed() {
@@ -77,15 +87,15 @@ public class BarcodeRunner extends
 	}
 
 	protected Pose getPose() {
-		return robot.getPoseProvider().getPose();
+		return getRobot().getPoseProvider().getPose();
 	}
 
 	protected double getBarLength() {
-		return maze.getBarLength();
+		return getMaze().getBarLength();
 	}
 
 	protected float getStartOffset() {
-		return robot.getLightSensor().getSensorRadius();
+		return getRobot().getLightSensor().getSensorRadius();
 	}
 
 	protected void log(String message) {
@@ -126,32 +136,32 @@ public class BarcodeRunner extends
 	}
 
 	protected Future<?> performAction(IAction action) {
-		return action.performAction(robot, maze);
+		return action.performAction(player);
 	}
 
 	private Future<Void> onFirstBlack() {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
-		return robot.when(condition).stop().build();
+		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> onWhiteToBlack() {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_SMALLER_THAN,
 				Threshold.WHITE_BLACK.getThresholdValue());
-		return robot.when(condition).build();
+		return getRobot().when(condition).build();
 	}
 
 	private Future<Void> onBlackToWhite() {
 		Condition condition = new LightCompareCondition(
 				ConditionType.LIGHT_GREATER_THAN,
 				Threshold.BLACK_WHITE.getThresholdValue());
-		return robot.when(condition).build();
+		return getRobot().when(condition).build();
 	}
 
 	protected void findStart() {
 		// Save original speed
-		originalTravelSpeed = robot.getPilot().getTravelSpeed();
+		originalTravelSpeed = getRobot().getPilot().getTravelSpeed();
 		// Reset state
 		strokeStart = null;
 		strokeEnd = null;
@@ -169,10 +179,10 @@ public class BarcodeRunner extends
 		}
 
 		log("Go to the begin of the barcode zone.");
-		robot.getPilot().setTravelSpeed(getScanSpeed());
+		getRobot().getPilot().setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
 		// travel(- START_BAR_LENGTH / 2);
-		bindTransition(robot.getPilot().travelComplete(-getStartOffset()),
+		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()),
 				BarcodeState.STROKE_START);
 	}
 
@@ -182,7 +192,7 @@ public class BarcodeRunner extends
 		// Find white stroke
 		transition(BarcodeState.FIND_STROKE_WHITE);
 		// Go forward
-		robot.getPilot().forward();
+		getRobot().getPilot().forward();
 	}
 
 	protected void findWhiteStroke() {
@@ -282,7 +292,7 @@ public class BarcodeRunner extends
 	@Override
 	public void stateStopped() {
 		// Restore original speed
-		robot.getPilot().setTravelSpeed(originalTravelSpeed);
+		getRobot().getPilot().setTravelSpeed(originalTravelSpeed);
 	}
 
 	@Override
