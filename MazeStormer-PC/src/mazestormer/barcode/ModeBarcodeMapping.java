@@ -9,20 +9,20 @@ public enum ModeBarcodeMapping {
 		}
 		
 		protected void setActions() {
-			actions[0] = new NoAction();
-			actions[1] = new NoAction();
-			actions[2] = new NoAction();
-			actions[3] = new NoAction();
-			actions[4] = new NoAction();
-			actions[5] = new NoAction();
-			actions[6] = new NoAction();
-			actions[7] = new NoAction();
-			actions[11] = new NoAction();
-			actions[13] = new NoAction();
-			actions[15] = new NoAction();
-			actions[17] = new NoAction();
-			actions[19] = new NoAction();
-			actions[21] = new NoAction();
+			actions[0] = new ObjectFoundAction();
+			actions[1] = new ObjectFoundAction();
+			actions[2] = new ObjectFoundAction();
+			actions[3] = new ObjectFoundAction();
+			actions[4] = new ObjectFoundAction();
+			actions[5] = new ObjectFoundAction();
+			actions[6] = new ObjectFoundAction();
+			actions[7] = new ObjectFoundAction();
+			actions[11] = new SeesawAction();
+			actions[13] = new SeesawAction();
+			actions[15] = new SeesawAction();
+			actions[17] = new SeesawAction();
+			actions[19] = new SeesawAction();
+			actions[21] = new SeesawAction();
 			actions[55] = new NoAction();
 			actions[47] = new NoAction();
 			actions[43] = new NoAction();
