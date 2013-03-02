@@ -20,6 +20,7 @@ import javax.swing.JToolBar;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.controller.IMapController;
+import mazestormer.player.IPlayer;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapChangeEvent;
@@ -36,7 +37,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	private static final long serialVersionUID = 1L;
 
-	private final String playerID;
+	private final IPlayer player;
 
 	private boolean isFollowing;
 
@@ -57,9 +58,9 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	public static final double zoomFactor = 1.5d;
 
-	public MapPanel(IMapController controller, String playerID) {
+	public MapPanel(IMapController controller, IPlayer player) {
 		this.controller = controller;
-		this.playerID = playerID;
+		this.player = player;
 
 		setLayout(new BorderLayout(0, 0));
 
@@ -177,14 +178,13 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	@Subscribe
 	public void onMapChanged(MapChangeEvent event) {
-		if (event.getPlayerID().equals(playerID)) {
+		if (event.getPlayer().equals(player)) {
 			setMap(event.getDocument());
 		}
 	}
 
 	private void addLayerMenuItem(final MapLayer layer) {
-		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(
-				layer.getName());
+		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(layer.getName());
 		menuItem.setSelected(layer.isVisible());
 		menuItem.addItemListener(new ItemListener() {
 			@Override
@@ -201,7 +201,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	@Subscribe
 	public void onMapLayerAdded(MapLayerAddEvent event) {
-		if (event.getPlayerID().equals(getPlayerID())) {
+		if (event.getPlayer().equals(player)) {
 			addLayerMenuItem(event.getLayer());
 		}
 	}
@@ -224,7 +224,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	@Subscribe
 	public void onMapRobotPoseChanged(MapRobotPoseChangeEvent event) {
-		if (event.getPlayerID().equals(getPlayerID())) {
+		if (event.getPlayer().equals(player)) {
 			updateRobotPose(event.getPose());
 		}
 	}
@@ -232,10 +232,6 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	// Dummy method to trick the designer into showing the popup menus
 	private static void addPopup(Component component, final JPopupMenu popup) {
 
-	}
-
-	public String getPlayerID() {
-		return this.playerID;
 	}
 
 	private class GoToRobotAction extends AbstractAction {
@@ -323,8 +319,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	}
 
 	@Override
-	public void layerPropertyChanged(MapLayer layer, String propertyName,
-			Object propertyValue) {
+	public void layerPropertyChanged(MapLayer layer, String propertyName, Object propertyValue) {
 		if (propertyName.equals("isVisible")) {
 			JMenuItem menuItem = layerMenuItems.get(layer);
 			if (menuItem != null) {

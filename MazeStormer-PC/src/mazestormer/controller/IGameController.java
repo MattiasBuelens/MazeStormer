@@ -1,26 +1,17 @@
 package mazestormer.controller;
 
-import java.util.List;
+import java.util.Collection;
 
+import mazestormer.player.IPlayer;
 import mazestormer.player.Player;
 import mazestormer.util.EventSource;
 
 public interface IGameController extends EventSource {
-	
-	public int getAmountOfPlayerControllers();
-	
-	public boolean hasAsPlayerController(IPlayerController pc);
-	
-	public IPlayerController getPlayerControllerAt(int index) 
-			throws IndexOutOfBoundsException;
-	
-	public void addPlayer(Player p);
-	
-	public void addPlayerController(IPlayerController pc);
-	
-	public void removePlayerController(IPlayerController pc);
 
-	public List<IPlayerController> getPlayerControllers();
+	public Collection<IPlayerController> getPlayerControllers();
 
 	public IPlayerController getPersonalPlayerController();
+
+	public IPlayerController getPlayerController(IPlayer player);
+
 }

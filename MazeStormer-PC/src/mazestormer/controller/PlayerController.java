@@ -3,26 +3,21 @@ package mazestormer.controller;
 import mazestormer.player.Player;
 
 public class PlayerController extends SubController implements IPlayerController {
-	
+
 	private Player player;
 	private IMapController map;
 	private ILogController log;
-	
+
 	public PlayerController(MainController mainController, Player player) {
 		super(mainController);
 		this.player = player;
 	}
-	
-	@Override
-	public String getPlayerID() {
-		return getPlayer().getPlayerID();
-	}
-	
+
 	@Override
 	public Player getPlayer() {
 		return this.player;
 	}
-	
+
 	@Override
 	public IMapController map() {
 		if (this.map == null) {
@@ -38,4 +33,5 @@ public class PlayerController extends SubController implements IPlayerController
 		}
 		return this.log;
 	}
+
 }

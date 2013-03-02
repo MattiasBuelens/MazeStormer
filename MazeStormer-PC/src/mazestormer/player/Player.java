@@ -8,55 +8,56 @@ import java.util.logging.Logger;
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
-public class Player {
-	
+public class Player implements IPlayer {
+
 	private String playerID;
-	
+
 	private Robot robot;
 	private Maze maze;
-	
+
 	/*
 	 * Logging
 	 */
 	private Logger logger;
-	
+
 	public Player() {
-		
+
 	}
-	
+
 	public Player(Robot robot) {
 		setRobot(robot);
 	}
-	
+
+	@Override
 	public String getPlayerID() {
 		return this.playerID;
 	}
-	
+
 	public void setPlayerID(String playerID) {
 		this.playerID = playerID;
 	}
-	
+
 	public Robot getRobot() {
 		return this.robot;
 	}
-	
+
 	public void setRobot(Robot robot) {
 		checkNotNull(robot);
 		this.robot = robot;
 	}
-	
+
 	public Maze getMaze() {
 		if (this.maze == null) {
 			this.maze = new Maze();
 		}
 		return this.maze;
 	}
-	
+
 	public void setMaze(Maze maze) {
 		checkNotNull(maze);
 		this.maze = maze;
 	}
-	
+
 	/*
 	 * Logging
 	 */

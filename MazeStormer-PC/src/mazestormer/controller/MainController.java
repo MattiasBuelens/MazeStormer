@@ -6,8 +6,6 @@ import java.awt.EventQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
@@ -21,8 +19,8 @@ import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
-import mazestormer.robot.MoveEvent;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.MoveEvent;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
@@ -65,8 +63,9 @@ public class MainController implements IMainController {
 
 	private Maze sourceMaze;
 	private Tile goalTile;
-	
+
 	private Player personalPlayer;
+	public static final String defaultPlayerName = "Brons";
 
 	/*
 	 * Controllers
@@ -108,7 +107,7 @@ public class MainController implements IMainController {
 		// View
 		view = createView();
 		view.registerEventBus(getEventBus());
-		
+
 		createPersonalPlayer();
 
 		// Post initialized
@@ -230,7 +229,7 @@ public class MainController implements IMainController {
 		}
 		return state;
 	}
-	
+
 	@Override
 	public IGameController gameControl() {
 		if (gameControl == null) {
@@ -238,7 +237,7 @@ public class MainController implements IMainController {
 		}
 		return gameControl;
 	}
-	
+
 	@Override
 	public IGameSetUpController gameSetUpControl() {
 		if (gameSetUpControl == null) {
@@ -385,12 +384,10 @@ public class MainController implements IMainController {
 	 */
 
 	public Maze getMaze() {
-		// return gameControl().getPersonalPlayerController().getPlayer().getMaze();
 		return getPlayer().getMaze();
 	}
-	
+
 	public void setMaze(Maze maze) {
-		// gameControl().getPersonalPlayerController().getPlayer().setMaze(maze);
 		getPlayer().setMaze(maze);
 	}
 
@@ -401,31 +398,18 @@ public class MainController implements IMainController {
 		return sourceMaze;
 	}
 
-	public Tile getGoalTile() {
-		return this.goalTile;
-	}
-
-	public void setGoalTile(Tile tile) {
-		this.goalTile = tile;
-	}
-	
 	/*
 	 * Player
 	 */
-	
+
 	public Player getPlayer() {
-		return this.personalPlayer;
+		return personalPlayer;
 	}
-	
-	public String getPlayerID() {
-		return getPlayer().getPlayerID();
-	}
-	
+
 	private void createPersonalPlayer() {
-		this.personalPlayer = new Player();
-		this.personalPlayer.setPlayerID(PERSONAL_PLAYER_NAME);
-		gameControl().addPlayer(this.personalPlayer);
+		personalPlayer = new Player();
+		personalPlayer.setPlayerID(defaultPlayerName);
+		postEvent(new PlayerEvent(PlayerEvent.EventType.PLAYER_ADDED, personalPlayer));
 	}
-	
-	public static final String PERSONAL_PLAYER_NAME = "Bob";
+
 }

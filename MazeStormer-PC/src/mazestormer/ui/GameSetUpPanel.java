@@ -26,11 +26,14 @@ public class GameSetUpPanel extends ViewPanel {
 	private static final long serialVersionUID = 1521591580799849697L;
 
 	private final IGameSetUpController controller;
+	private final JButton rename = new JButton();
 	private final JButton join = new JButton();
 	private final JButton start = new JButton();
 	private final JButton leave = new JButton();
-	private final JTextField gameID  = new JTextField();
+	private final JTextField playerID = new JTextField();
+	private final JTextField gameID = new JTextField();
 
+	private final Action renameAction = new RenameAction();
 	private final Action joinAction = new JoinAction();
 	private final Action startAction = new StartAction();
 	private final Action leaveAction = new LeaveAction();
@@ -38,54 +41,75 @@ public class GameSetUpPanel extends ViewPanel {
 	public GameSetUpPanel(IGameSetUpController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Team Treasure Trek",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new MigLayout("", "[][100px:n,grow][fill]", "[][]"));
+		setBorder(new TitledBorder(null, "Team Treasure Trek", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setLayout(new MigLayout("", "[][100px:n,grow][fill]", "[][][]"));
 
+		createPlayerID();
+		createJoinGame();
 		createButtons();
-		createInputField();
+
+		enableGameButtons(true);
 
 		if (!Beans.isDesignTime())
 			registerController();
 	}
 
 	private void registerController() {
-		registerEventBus(this.controller.getEventBus());
+		registerEventBus(controller.getEventBus());
+
+		playerID.setText(controller.getPlayerID());
+	}
+
+	private void createPlayerID() {
+		JLabel lblName = new JLabel("Player name");
+		add(lblName, "cell 0 0");
+
+		add(playerID, "cell 1 0,grow");
+
+		rename.setToolTipText("Set player name");
+		rename.setAction(renameAction);
+		rename.setText("");
+		rename.setIcon(new GoNextIcon(24, 24));
+		add(rename, "cell 2 0");
+	}
+
+	private String getPlayerID() {
+		return playerID.getText();
+	}
+
+	private void createJoinGame() {
+		JLabel lblLow = new JLabel("Join game");
+		add(lblLow, "cell 0 1");
+
+		add(gameID, "cell 1 1,grow");
+
+		join.setToolTipText("Join the game");
+		join.setAction(joinAction);
+		join.setText("");
+		join.setIcon(new ListAllIcon(24, 24));
+		add(join, "cell 2 1");
+	}
+
+	private String getGameID() {
+		return gameID.getText();
 	}
 
 	private void createButtons() {
-		join.setToolTipText("Join the game");
-		add(this.join, "cell 2 0");
-		this.join.setAction(this.joinAction);
-		this.join.setText("");
-		this.join.setIcon(new ListAllIcon(24, 24));
-		
 		start.setToolTipText("Start the game");
-		add(this.start, "cell 1 1,alignx right");
-		this.start.setAction(this.startAction);
-		this.start.setText("");
-		this.start.setIcon(new GoNextIcon(24, 24));
+		start.setAction(startAction);
+		start.setText("");
+		start.setIcon(new GoNextIcon(24, 24));
+		add(start, "cell 1 2,alignx right");
 
-		leave.setToolTipText("Leave");
-		add(this.leave, "cell 2 1");
-		this.leave.setAction(this.leaveAction);
-		this.leave.setText("");
-		this.leave.setIcon(new SystemLogOutIcon(24, 24));
-
-		enableGameButtons(true);
-	}
-
-	private void createInputField() {
-		JLabel lblLow = new JLabel("Join game");
-		add(lblLow, "cell 0 0");
-		add(this.gameID, "cell 1 0,grow");
-	}
-
-	private String getGameId() {
-		return this.gameID.getText();
+		leave.setToolTipText("Leave the game");
+		leave.setAction(leaveAction);
+		leave.setText("");
+		leave.setIcon(new SystemLogOutIcon(24, 24));
+		add(leave, "cell 2 2");
 	}
 
 	private void enableGameButtons(boolean request) {
+		rename.setEnabled(request);
 		join.setEnabled(request);
 		start.setEnabled(!request);
 		leave.setEnabled(!request);
@@ -112,25 +136,44 @@ public class GameSetUpPanel extends ViewPanel {
 	}
 
 	private void showNotReady() {
-		JOptionPane
-				.showMessageDialog(
-						null,
-						"You have to select a robot type and/or source maze\n before you could create or join a game.",
-						"Setup", 1);
+		JOptionPane.showMessageDialog(null,
+				"You have to select a robot type and/or source maze\n before you could create or join a game.",
+				"Setup", 1);
+	}
+
+	private void setPlayerID() {
+		String id = getPlayerID();
+		if (!id.isEmpty())
+			controller.setPlayerID(id);
 	}
 
 	private void joinGame() {
-		String id = getGameId();
-		if (!id.equals(""))
-			this.controller.joinGame(id);
+		String id = getGameID();
+		if (!id.isEmpty())
+			controller.joinGame(id);
 	}
-	
+
 	private void startGame() {
-		this.controller.startGame();
+		controller.startGame();
 	}
 
 	private void leaveGame() {
-		this.controller.leaveGame();
+		controller.leaveGame();
+	}
+
+	private class RenameAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public RenameAction() {
+			putValue(NAME, "Set player name");
+			putValue(SHORT_DESCRIPTION, "Set player name");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			setPlayerID();
+		}
+
 	}
 
 	private class JoinAction extends AbstractAction {
@@ -147,7 +190,7 @@ public class GameSetUpPanel extends ViewPanel {
 		}
 
 	}
-	
+
 	private class StartAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -155,12 +198,12 @@ public class GameSetUpPanel extends ViewPanel {
 			putValue(NAME, "Start selected game");
 			putValue(SHORT_DESCRIPTION, "Start selected game");
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			startGame();
 		}
-		
+
 	}
 
 	private class LeaveAction extends AbstractAction {

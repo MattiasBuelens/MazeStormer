@@ -3,10 +3,10 @@ package mazestormer.controller;
 import java.util.logging.Logger;
 
 import mazestormer.player.Game;
+import mazestormer.player.Player;
 import peno.htttp.Callback;
 
-public class GameSetUpController extends SubController implements
-		IGameSetUpController {
+public class GameSetUpController extends SubController implements IGameSetUpController {
 
 	private Game game;
 
@@ -16,6 +16,18 @@ public class GameSetUpController extends SubController implements
 
 	private Logger getLogger() {
 		return getMainController().getPlayer().getLogger();
+	}
+
+	@Override
+	public String getPlayerID() {
+		return getMainController().getPlayer().getPlayerID();
+	}
+
+	@Override
+	public void setPlayerID(String playerID) {
+		Player player = getMainController().getPlayer();
+		player.setPlayerID(playerID);
+		postEvent(new PlayerEvent(PlayerEvent.EventType.PLAYER_RENAMED, player));
 	}
 
 	@Override
@@ -35,8 +47,7 @@ public class GameSetUpController extends SubController implements
 
 				@Override
 				public void onFailure(Throwable t) {
-					getLogger()
-							.warning("Error when joining: " + t.getMessage());
+					getLogger().warning("Error when joining: " + t.getMessage());
 				}
 			});
 		} catch (Exception e) {
@@ -58,8 +69,7 @@ public class GameSetUpController extends SubController implements
 
 				@Override
 				public void onFailure(Throwable t) {
-					getLogger()
-							.warning("Error when leaving: " + t.getMessage());
+					getLogger().warning("Error when leaving: " + t.getMessage());
 				}
 			});
 		} catch (Exception e) {
@@ -77,8 +87,7 @@ public class GameSetUpController extends SubController implements
 		// TODO cheating still possible
 		if (getMainController().getPlayer().getRobot() == null) {
 			return false;
-		} else if (mazestormer.simulator.VirtualRobot.class
-				.isInstance(getMainController().getPlayer().getRobot())
+		} else if (mazestormer.simulator.VirtualRobot.class.isInstance(getMainController().getPlayer().getRobot())
 				&& getMainController().getSourceMaze().getNumberOfTiles() == 0) {
 			return false;
 		}

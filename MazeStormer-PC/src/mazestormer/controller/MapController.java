@@ -32,28 +32,26 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class MapController extends SubController implements IMapController {
 
 	private final Player player;
-	
+
 	private MapDocument map;
 	private RobotLayer robotLayer;
 	private MazeLayer mazeLayer;
 	private MazeLayer sourceMazeLayer;
 	private RangesLayer rangesLayer;
 
-	private ScheduledExecutorService executor = Executors
-			.newSingleThreadScheduledExecutor(factory);
+	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(factory);
 	private Runnable updateTask = new UpdateTask();
 	private ScheduledFuture<?> updateHandle;
 	private long updateInterval;
-	
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("MapController-%d").build();
+
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MapController-%d").build();
 
 	private static final long defaultUpdateInterval = 1000 / 25;
 
 	public MapController(MainController mainController, Player player) {
 		super(mainController);
 		setUpdateInterval(defaultUpdateInterval);
-		
+
 		this.player = player;
 
 		createMap();
@@ -67,14 +65,14 @@ public class MapController extends SubController implements IMapController {
 		map.setViewRect(new Rectangle(-500, -500, 1000, 1000));
 
 		SVGDocument document = map.getDocument();
-		postEvent(new MapChangeEvent(document, getPlayer().getPlayerID()));
+		postEvent(new MapChangeEvent(document, getPlayer()));
 	}
 
 	private void createLayers() {
 		robotLayer = new RobotLayer("Robot");
 		addLayer(robotLayer);
 
-		if(getMainController().getPlayer() == getPlayer()) {
+		if (getMainController().getPlayer() == getPlayer()) {
 			Maze sourceMaze = getMainController().getSourceMaze();
 			sourceMazeLayer = new MazeLayer("Source maze", sourceMaze);
 			sourceMazeLayer.setZIndex(1);
@@ -94,9 +92,9 @@ public class MapController extends SubController implements IMapController {
 	private void addLayer(MapLayer layer) {
 		layer.registerEventBus(getEventBus());
 		map.addLayer(layer);
-		postEvent(new MapLayerAddEvent(layer, getPlayer().getPlayerID()));
+		postEvent(new MapLayerAddEvent(layer, getPlayer()));
 	}
-	
+
 	private Player getPlayer() {
 		return this.player;
 	}
@@ -129,7 +127,7 @@ public class MapController extends SubController implements IMapController {
 			robotLayer.setRotationAngle(pose.getHeading());
 		}
 
-		postEvent(new MapRobotPoseChangeEvent(pose, getPlayer().getPlayerID()));
+		postEvent(new MapRobotPoseChangeEvent(pose, getPlayer()));
 	}
 
 	private void invokeUpdateRobotPose() {
@@ -163,8 +161,7 @@ public class MapController extends SubController implements IMapController {
 		// Cancel if still running
 		cancelUpdater();
 		// Reschedule updater
-		updateHandle = executor.scheduleAtFixedRate(updateTask, 0,
-				getUpdateInterval(), TimeUnit.MILLISECONDS);
+		updateHandle = executor.scheduleAtFixedRate(updateTask, 0, getUpdateInterval(), TimeUnit.MILLISECONDS);
 	}
 
 	private void cancelUpdater() {
