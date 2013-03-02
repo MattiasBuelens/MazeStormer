@@ -80,16 +80,14 @@ public class Game {
 	}
 
 	public void terminate() {
-		if (client != null) {
-			client.shutdown();
-		}
+		client.shutdown();
 	}
 
 	private class GameHandler implements Handler {
 
 		@Override
 		public void gameStarted() {
-			System.out.println("Game started");
+			System.out.println("Game started, player number: " + client.getPlayerNumber());
 		}
 
 		@Override
