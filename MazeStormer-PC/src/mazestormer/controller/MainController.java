@@ -17,7 +17,6 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
-import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
@@ -62,7 +61,6 @@ public class MainController implements IMainController {
 	private Connector connector;
 
 	private Maze sourceMaze;
-	private Tile goalTile;
 
 	private Player personalPlayer;
 	public static final String defaultPlayerName = "Brons";

@@ -1,15 +1,12 @@
 package mazestormer.player;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import mazestormer.rabbitmq.ConnectionMode;
 import peno.htttp.Callback;
 import peno.htttp.Client;
-import peno.htttp.GameState;
 import peno.htttp.Handler;
 
 public class Game {
@@ -22,20 +19,16 @@ public class Game {
 	 */
 	private final String id;
 
-	private boolean hasStarted;
-
 	private final Client client;
 	private final GameHandler handler;
 
-	public Game(String id, Player localPlayer) throws IOException,
-			IllegalStateException {
+	public Game(String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer.getPlayerID();
 
 		// TODO Implement handler!
 		this.handler = new GameHandler();
-		this.client = new Client(ConnectionMode.LOCAL.newConnection(),
-				this.handler, id, this.localPlayer);
+		this.client = new Client(ConnectionMode.LOCAL.newConnection(), this.handler, id, this.localPlayer);
 
 		addPlayer(localPlayer);
 	}
@@ -77,8 +70,19 @@ public class Game {
 		}
 	}
 
-	public void pause() {
-		// TODO Auto-generated method stub
+	public void setReady(boolean isReady, Callback<Void> callback) {
+		try {
+			client.setReady(isReady);
+			callback.onSuccess(null);
+		} catch (Exception e) {
+			callback.onFailure(e);
+		}
+	}
+
+	public void terminate() {
+		if (client != null) {
+			client.shutdown();
+		}
 	}
 
 	private class GameHandler implements Handler {
@@ -101,19 +105,25 @@ public class Game {
 		@Override
 		public void playerJoined(String playerID) {
 			System.out.println("Player " + playerID + " joined");
+			// Call addPlayer()
 		}
 
 		@Override
 		public void playerLeft(String playerID) {
 			System.out.println("Player " + playerID + " left");
+			// Call removePlayer()
 		}
 
 		@Override
-		public void playerPosition(String playerID, double x, double y,
-				double angle) {
-			System.out.println("Player " + playerID + " position: " + x + ", "
-					+ y + " @ " + angle + "°");
+		public void playerPosition(String playerID, double x, double y, double angle) {
+			System.out.println("Player " + playerID + " position: " + x + ", " + y + " @ " + angle + "°");
+		}
+
+		@Override
+		public void playerFoundObject(String playerID) {
+			System.out.println("Player " + playerID + " found their object");
 		}
 
 	}
+
 }

@@ -339,7 +339,6 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			});
 		}
 
-		// TODO: UNKNOWN color?
 		private void update() {
 			String color = unknownColor;
 			boolean dashed = false;

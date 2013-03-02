@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import mazestormer.player.Game;
 import mazestormer.player.Player;
+import mazestormer.simulator.VirtualRobot;
 import peno.htttp.Callback;
 
 public class GameSetUpController extends SubController implements IGameSetUpController {
@@ -79,18 +80,42 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	@Override
 	public void startGame() {
-		// TODO Auto-generated method stub
-		onStart();
+		try {
+			if (game == null) {
+				throw new Exception("Not connected.");
+			}
+			game.setReady(true, new Callback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					onStart();
+				}
+
+				@Override
+				public void onFailure(Throwable t) {
+					getLogger().warning("Error when starting: " + t.getMessage());
+				}
+			});
+		} catch (Exception e) {
+			getLogger().warning("Error when starting: " + e.getMessage());
+		}
 	}
 
 	private boolean isReady() {
 		// TODO cheating still possible
 		if (getMainController().getPlayer().getRobot() == null) {
 			return false;
-		} else if (mazestormer.simulator.VirtualRobot.class.isInstance(getMainController().getPlayer().getRobot())
+		}
+
+		/*
+		 * TODO Do we really care about not having a maze configured? In the
+		 * worst case scenario, the virtual robot will simply travel forever in
+		 * an empty space.
+		 */
+		if (getMainController().getPlayer().getRobot() instanceof VirtualRobot
 				&& getMainController().getSourceMaze().getNumberOfTiles() == 0) {
 			return false;
 		}
+
 		return true;
 	}
 
@@ -104,6 +129,9 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private void onLeave() {
+		game.terminate();
+		game = null;
+
 		getLogger().info("Left");
 		postState(GameSetUpEvent.EventType.LEFT);
 	}
