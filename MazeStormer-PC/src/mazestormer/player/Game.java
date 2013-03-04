@@ -59,7 +59,7 @@ public class Game {
 				public void onSuccess(Void result) {
 					// Call listeners
 					for (GameListener gl : gls) {
-						gl.onGameLeft();
+						gl.onGameJoined();
 					}
 					// Callback
 					callback.onSuccess(result);
