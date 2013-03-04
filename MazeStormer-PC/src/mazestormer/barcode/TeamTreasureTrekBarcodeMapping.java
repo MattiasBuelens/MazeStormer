@@ -1,24 +1,24 @@
 package mazestormer.barcode;
 
-import mazestormer.player.Game;
+import mazestormer.game.GameRunner;
 
 public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 
 	private static IAction[] actions = new IAction[40];
 
-	public TeamTreasureTrekBarcodeMapping(Game game) {
-		createActions(game);
+	public TeamTreasureTrekBarcodeMapping(GameRunner gameRunner) {
+		createActions(gameRunner);
 	}
 
-	private void createActions(Game game) {
-		actions[0] = new ObjectFoundAction(0, 0);
-		actions[1] = new ObjectFoundAction(1, 0);
-		actions[2] = new ObjectFoundAction(2, 0);
-		actions[3] = new ObjectFoundAction(3, 0);
-		actions[4] = new ObjectFoundAction(0, 1);
-		actions[5] = new ObjectFoundAction(1, 1);
-		actions[6] = new ObjectFoundAction(2, 1);
-		actions[7] = new ObjectFoundAction(3, 1);
+	private void createActions(GameRunner gameRunner) {
+		actions[0] = new ObjectFoundAction(0, 0, gameRunner);
+		actions[1] = new ObjectFoundAction(1, 0, gameRunner);
+		actions[2] = new ObjectFoundAction(2, 0, gameRunner);
+		actions[3] = new ObjectFoundAction(3, 0, gameRunner);
+		actions[4] = new ObjectFoundAction(0, 1, gameRunner);
+		actions[5] = new ObjectFoundAction(1, 1, gameRunner);
+		actions[6] = new ObjectFoundAction(2, 1, gameRunner);
+		actions[7] = new ObjectFoundAction(3, 1, gameRunner);
 		actions[11] = new SeesawAction();
 		actions[13] = new SeesawAction();
 		actions[15] = new SeesawAction();

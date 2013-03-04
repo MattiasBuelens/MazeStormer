@@ -583,8 +583,32 @@ public class ExplorerRunner extends
 	/**
 	 * Get the current tile at which the robot is located.
 	 */
-	private Tile getCurrentTile() {
+	public Tile getCurrentTile() {
 		return pathFinder.getTileAt(getPose());
+	}
+
+	/**
+	 * Get the next tile to which the robot is navigating.
+	 */
+	public Tile getNextTile() {
+		return nextTile;
+	}
+
+	/**
+	 * Pop the next tile from the queue. Internal use only.
+	 */
+	public Tile pollTile() {
+		return queue.pollFirst();
+	}
+
+	/**
+	 * Restart the cycle for the current tile. Internal use only.
+	 */
+	public void restartCycle() {
+		// Re-add current tile to queue
+		queue.addFirst(currentTile);
+		// Next cycle
+		transition(ExplorerState.NEXT_CYCLE);
 	}
 
 	/**

@@ -22,13 +22,15 @@ public class Game {
 	private final Client client;
 	private final GameHandler handler;
 
-	public Game(String id, Player localPlayer) throws IOException, IllegalStateException {
+	public Game(String id, Player localPlayer) throws IOException,
+			IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer.getPlayerID();
 
 		// TODO Implement handler!
 		this.handler = new GameHandler();
-		this.client = new Client(ConnectionMode.LOCAL.newConnection(), this.handler, id, this.localPlayer);
+		this.client = new Client(ConnectionMode.LOCAL.newConnection(),
+				this.handler, id, this.localPlayer);
 
 		addPlayer(localPlayer);
 	}
@@ -87,7 +89,8 @@ public class Game {
 
 		@Override
 		public void gameStarted() {
-			System.out.println("Game started, player number: " + client.getPlayerNumber());
+			System.out.println("Game started, player number: "
+					+ client.getPlayerNumber());
 		}
 
 		@Override
@@ -113,8 +116,10 @@ public class Game {
 		}
 
 		@Override
-		public void playerPosition(String playerID, double x, double y, double angle) {
-			System.out.println("Player " + playerID + " position: " + x + ", " + y + " @ " + angle + "°");
+		public void playerPosition(String playerID, double x, double y,
+				double angle) {
+			System.out.println("Player " + playerID + " position: " + x + ", "
+					+ y + " @ " + angle + "°");
 		}
 
 		@Override
@@ -122,6 +127,20 @@ public class Game {
 			System.out.println("Player " + playerID + " found their object");
 		}
 
+	}
+
+	public int getObjectNumber() {
+		return client.getPlayerNumber();
+	}
+
+	public void objectFound() {
+		try {
+			client.foundObject();
+		} catch (IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Could not report object found");
+			e.printStackTrace();
+		}
 	}
 
 }
