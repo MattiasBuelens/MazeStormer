@@ -44,6 +44,10 @@ public class Game {
 	public int getNbOfPlayers() {
 		return players.size();
 	}
+	
+	public Player getPlayer(String playerID) {
+		return players.get(playerID);
+	}
 
 	protected void addPlayer(Player player) {
 		players.put(player.getPlayerID(), player);
@@ -82,46 +86,54 @@ public class Game {
 	public void terminate() {
 		client.shutdown();
 	}
+	
+	private void logToSpecific(String playerID, String message) {
+		players.get(playerID).getLogger().info(message);
+	}
+	
+	private void logToAll(String message) {
+		for(Player p : players.values()) {
+			p.getLogger().info(message);
+		}
+	}
 
 	private class GameHandler implements Handler {
 
 		@Override
 		public void gameStarted() {
-			System.out.println("Game started, player number: " + client.getPlayerNumber());
+			logToAll("Game started, player number: " + client.getPlayerNumber());
 		}
 
 		@Override
 		public void gameStopped() {
-			System.out.println("Game stopped");
+			logToAll("Game stopped");
 		}
 
 		@Override
 		public void gamePaused() {
-			System.out.println("Game paused");
+			logToAll("Game paused");
 		}
 
 		@Override
 		public void playerJoined(String playerID) {
-			System.out.println("Player " + playerID + " joined");
+			logToSpecific(playerID, "Player " + playerID + " joined");
 			// Call addPlayer()
 		}
 
 		@Override
 		public void playerLeft(String playerID) {
-			System.out.println("Player " + playerID + " left");
+			logToSpecific(playerID, "Player " + playerID + " left");
 			// Call removePlayer()
 		}
 
 		@Override
 		public void playerPosition(String playerID, double x, double y, double angle) {
-			System.out.println("Player " + playerID + " position: " + x + ", " + y + " @ " + angle + "°");
+			logToSpecific(playerID, " position: " + x + ", " + y + " @ " + angle + "°");
 		}
 
 		@Override
 		public void playerFoundObject(String playerID) {
-			System.out.println("Player " + playerID + " found their object");
+			logToSpecific(playerID, "Player " + playerID + " found their object");
 		}
-
 	}
-
 }
