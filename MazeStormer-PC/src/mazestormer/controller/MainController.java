@@ -239,7 +239,7 @@ public class MainController implements IMainController {
 	@Override
 	public IGameSetUpController gameSetUpControl() {
 		if (gameSetUpControl == null) {
-			gameSetUpControl = new GameSetUpController(this);
+			gameSetUpControl = new GameSetUpController(this, gameControl());
 		}
 		return gameSetUpControl;
 	}
@@ -407,7 +407,7 @@ public class MainController implements IMainController {
 	private void createPersonalPlayer() {
 		personalPlayer = new Player();
 		personalPlayer.setPlayerID(defaultPlayerName);
-		postEvent(new PlayerEvent(PlayerEvent.EventType.PLAYER_ADDED, personalPlayer));
+		gameControl().addPlayer(personalPlayer);
 	}
 
 }

@@ -4,11 +4,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.google.common.eventbus.Subscribe;
-
+import mazestormer.controller.PlayerEvent.EventType;
+import mazestormer.observable.ObservableRobot;
 import mazestormer.player.IPlayer;
 import mazestormer.player.Player;
 
@@ -30,14 +31,65 @@ public class GameController extends SubController implements IGameController {
 		return getPlayerController(getMainController().getPlayer());
 	}
 
-	private void addPlayer(Player p) {
-		checkNotNull(p);
-		this.pcs.put(p, new PlayerController(this.getMainController(), p));
+	@Override
+	public boolean isPersonalPlayer(String playerID) {
+		return getMainController().getPlayer().getPlayerID().equals(playerID);
 	}
 
-	private void removePlayer(Player p) {
+	@Override
+	public void addPlayer(String playerID) {
+		checkNotNull(playerID);
+		if (getPlayer(playerID) == null) {
+			addPlayer(new Player(playerID, new ObservableRobot()));
+		}
+	}
+
+	@Override
+	public void addPlayer(Player p) {
+		checkNotNull(p);
+		this.pcs.put(p, new PlayerController(this.getMainController(), p));
+		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, p));
+	}
+
+	@Override
+	public void removePlayer(String playerID) {
+		checkNotNull(playerID);
+		Player player = (Player) getPlayer(playerID);
+		if (player != null) {
+			removePlayer(player);
+		}
+	}
+
+	@Override
+	public void removePlayer(Player p) {
 		checkNotNull(p);
 		this.pcs.remove(p);
+		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, p));
+	}
+
+	@Override
+	public void removeOtherPlayers() {
+		Iterator<Map.Entry<IPlayer, IPlayerController>> it = this.pcs
+				.entrySet().iterator();
+
+		while (it.hasNext()) {
+			Map.Entry<IPlayer, IPlayerController> entry = it.next();
+			Player player = (Player) entry.getKey();
+			if (!isPersonalPlayer(player.getPlayerID())) {
+				postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, player));
+				it.remove();
+			}
+		}
+	}
+
+	@Override
+	public IPlayer getPlayer(String playerID) {
+		for (IPlayer p : this.pcs.keySet()) {
+			if (p.getPlayerID().equals(playerID)) {
+				return p;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -45,18 +97,18 @@ public class GameController extends SubController implements IGameController {
 		return Collections.unmodifiableCollection(pcs.values());
 	}
 
-	@Subscribe
-	public void onPlayerEvent(PlayerEvent e) {
-		switch (e.getEventType()) {
-		case PLAYER_ADDED:
-			addPlayer((Player) e.getPlayer());
-			break;
-		case PLAYER_REMOVED:
-			removePlayer((Player) e.getPlayer());
-			break;
-		default:
-			break;
+	@Override
+	public void logTo(String playerID, String message) {
+		for (IPlayer p : this.pcs.keySet()) {
+			if (p.getPlayerID().equals(playerID))
+				((Player) p).getLogger().info(message);
 		}
 	}
 
+	@Override
+	public void logToAll(String message) {
+		for (IPlayer p : this.pcs.keySet()) {
+			((Player) p).getLogger().info(message);
+		}
+	}
 }
