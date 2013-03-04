@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.game.GameRunner;
 import mazestormer.rabbitmq.ConnectionMode;
 import peno.htttp.Callback;
 import peno.htttp.Client;
@@ -13,27 +14,24 @@ import peno.htttp.Handler;
 
 public class Game {
 
-	private String localPlayer;
-
-	private final List<GameListener> gls = new ArrayList<GameListener>();
-
-	/**
-	 * Used to identify on the server
-	 */
 	private final String id;
+	private final Player localPlayer;
 
 	private final Client client;
+	private final GameRunner runner;
+
 	private final GameHandler handler;
+	private final List<GameListener> gls = new ArrayList<GameListener>();
 
 	public Game(String id, Player localPlayer) throws IOException,
 			IllegalStateException {
 		this.id = id;
-		this.localPlayer = localPlayer.getPlayerID();
+		this.localPlayer = localPlayer;
 
-		// TODO Implement handler!
 		this.handler = new GameHandler();
 		this.client = new Client(ConnectionMode.LOCAL.newConnection(),
-				this.handler, id, this.localPlayer);
+				this.handler, id, localPlayer.getPlayerID());
+		this.runner = new GameRunner(localPlayer, this);
 	}
 
 	public void addGameListener(GameListener gl) {
@@ -156,10 +154,6 @@ public class Game {
 			}
 		}
 
-	}
-
-	public int getObjectNumber() {
-		return client.getPlayerNumber();
 	}
 
 	public void objectFound() {

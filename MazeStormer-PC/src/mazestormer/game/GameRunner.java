@@ -2,28 +2,40 @@ package mazestormer.game;
 
 import java.util.EnumSet;
 
+import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Orientation;
 import mazestormer.player.Game;
+import mazestormer.player.GameListener;
 import mazestormer.player.Player;
+import mazestormer.robot.ControllableRobot;
 
-public class GameRunner {
+public class GameRunner implements GameListener {
 
+	private final Player player;
 	private final Game game;
 	private final ExplorerRunner explorerRunner;
 
+	private int objectNumber;
+
 	public GameRunner(Player player, Game game) {
+		this.player = player;
 		this.explorerRunner = new ExplorerRunner(player);
 		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(
 				this));
 
 		this.game = game;
+		game.addGameListener(this);
+	}
+
+	private ControllableRobot getRobot() {
+		return (ControllableRobot) player.getRobot();
 	}
 
 	public int getObjectNumber() {
-		return game.getObjectNumber();
+		return objectNumber;
 	}
 
 	public void setWallsOnNextTile() {
@@ -46,6 +58,48 @@ public class GameRunner {
 
 		// Restart cycle
 		explorerRunner.restartCycle();
+	}
+
+	@Override
+	public void onGameJoined() {
+	}
+
+	@Override
+	public void onGameLeft() {
+	}
+
+	@Override
+	public void onGameStarted(int playerNumber) {
+		objectNumber = playerNumber;
+		explorerRunner.start();
+	}
+
+	@Override
+	public void onGamePaused() {
+		explorerRunner.pause();
+		getRobot().getPilot().stop();
+	}
+
+	@Override
+	public void onGameStopped() {
+		explorerRunner.stop();
+		getRobot().getPilot().stop();
+	}
+
+	@Override
+	public void onPlayerJoined(String playerID) {
+	}
+
+	@Override
+	public void onPlayerLeft(String playerID) {
+	}
+
+	@Override
+	public void onObjectFound(String playerID) {
+	}
+
+	@Override
+	public void onPositionUpdate(String playerID, Pose pose) {
 	}
 
 }
