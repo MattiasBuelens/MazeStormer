@@ -2,7 +2,9 @@ package mazestormer.controller;
 
 import java.util.logging.Logger;
 
+import lejos.robotics.navigation.Pose;
 import mazestormer.player.Game;
+import mazestormer.player.GameListener;
 import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
 import peno.htttp.Callback;
@@ -10,9 +12,15 @@ import peno.htttp.Callback;
 public class GameSetUpController extends SubController implements IGameSetUpController {
 
 	private Game game;
+	private final IGameController gameController;
 
-	public GameSetUpController(MainController mainController) {
+	public GameSetUpController(MainController mainController, IGameController gameController) {
 		super(mainController);
+		this.gameController = gameController;
+	}
+	
+	private IGameController getGameController() {
+		return this.gameController;
 	}
 
 	private Logger getLogger() {
@@ -40,6 +48,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		try {
 			game = new Game(gameID, getMainController().getPlayer());
+			game.addGameListener(this.gl);
 			game.join(new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
@@ -149,5 +158,46 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	private void postState(GameSetUpEvent.EventType eventType) {
 		postEvent(new GameSetUpEvent(eventType));
 	}
+	
+	private GameListener gl = new GameListener(){
 
+		@Override
+		public void onGameStarted(int playerNumber) {
+			getGameController().logToAll("Game started, player number: " + playerNumber);
+		}
+
+		@Override
+		public void onGamePaused() {
+			getGameController().logToAll("Game paused");
+		}
+
+		@Override
+		public void onGameStopped() {
+			getGameController().logToAll("Game stopped");
+		}
+
+		@Override
+		public void onPlayerJoined(String playerID) {
+			getGameController().addPlayer(playerID);
+			getGameController().logToSpecific(playerID, "Player " + playerID + " joined");
+			
+		}
+
+		@Override
+		public void onPlayerLeft(String playerID) {
+			getGameController().removePlayer((Player) getGameController().getPlayer(playerID));
+			getGameController().logToSpecific(playerID, "Player " + playerID + " left");
+			
+		}
+
+		@Override
+		public void onObjectFound(String playerID) {
+			getGameController().logToSpecific(playerID, "Player " + playerID + " found their object");
+		}
+
+		@Override
+		public void onPositionUpdate(String playerID, Pose pose) {
+			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider().setPose(pose);
+		}
+	};
 }

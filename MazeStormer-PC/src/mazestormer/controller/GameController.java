@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.google.common.eventbus.Subscribe;
 
+import mazestormer.observable.ObservableRobot;
 import mazestormer.player.IPlayer;
 import mazestormer.player.Player;
 
@@ -29,17 +30,36 @@ public class GameController extends SubController implements IGameController {
 	public IPlayerController getPersonalPlayerController() {
 		return getPlayerController(getMainController().getPlayer());
 	}
+	
+	@Override
+	public void addPlayer(String playerID) {
+		checkNotNull(playerID);
+		Player p = new Player(playerID, new ObservableRobot());
+		this.pcs.put(p, new PlayerController(this.getMainController(), p));
+	}
 
-	private void addPlayer(Player p) {
+	@Override
+	public void addPlayer(Player p) {
 		checkNotNull(p);
 		this.pcs.put(p, new PlayerController(this.getMainController(), p));
 	}
 
-	private void removePlayer(Player p) {
+	@Override
+	public void removePlayer(Player p) {
 		checkNotNull(p);
 		this.pcs.remove(p);
 	}
-
+	
+	@Override
+	public IPlayer getPlayer(String playerID) {
+		for(IPlayer p : this.pcs.keySet()) {
+			if(p.getPlayerID().equals(playerID)) {
+				return p;
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public Collection<IPlayerController> getPlayerControllers() {
 		return Collections.unmodifiableCollection(pcs.values());
@@ -58,5 +78,19 @@ public class GameController extends SubController implements IGameController {
 			break;
 		}
 	}
-
+	
+	@Override
+	public void logToSpecific(String playerID, String message) {
+		for(IPlayer p : this.pcs.keySet()) {
+			if(p.getPlayerID().equals(playerID))
+				((Player) p).getLogger().info(message);
+		}
+	}
+	
+	@Override
+	public void logToAll(String message) {
+		for(IPlayer p : this.pcs.keySet()) {
+			((Player) p).getLogger().info(message);
+		}
+	}
 }

@@ -13,5 +13,17 @@ public interface IGameController extends EventSource {
 	public IPlayerController getPersonalPlayerController();
 
 	public IPlayerController getPlayerController(IPlayer player);
+	
+	public void logToAll(String message);
+	
+	public void logToSpecific(String playerID, String message);
+	
+	public void addPlayer(String playerID);
+	
+	public void addPlayer(Player p);
+
+	public void removePlayer(Player p);
+
+	public IPlayer getPlayer(String playerID);
 
 }
