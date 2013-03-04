@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,7 +39,9 @@ public class GameController extends SubController implements IGameController {
 	@Override
 	public void addPlayer(String playerID) {
 		checkNotNull(playerID);
-		addPlayer(new Player(playerID, new ObservableRobot()));
+		if (getPlayer(playerID) == null) {
+			addPlayer(new Player(playerID, new ObservableRobot()));
+		}
 	}
 
 	@Override
@@ -62,6 +65,21 @@ public class GameController extends SubController implements IGameController {
 		checkNotNull(p);
 		this.pcs.remove(p);
 		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, p));
+	}
+
+	@Override
+	public void removeOtherPlayers() {
+		Iterator<Map.Entry<IPlayer, IPlayerController>> it = this.pcs
+				.entrySet().iterator();
+
+		while (it.hasNext()) {
+			Map.Entry<IPlayer, IPlayerController> entry = it.next();
+			Player player = (Player) entry.getKey();
+			if (!isPersonalPlayer(player.getPlayerID())) {
+				postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, player));
+				it.remove();
+			}
+		}
 	}
 
 	@Override

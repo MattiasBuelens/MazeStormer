@@ -159,11 +159,7 @@ public class GameSetUpController extends SubController implements
 		@Override
 		public void onGameLeft() {
 			// Remove all non-local players
-			for (String playerID : game.getPlayers()) {
-				if (!getGameController().isPersonalPlayer(playerID)) {
-					getGameController().removePlayer(playerID);
-				}
-			}
+			getGameController().removeOtherPlayers();
 			// Log
 			logToAll("Left");
 			postState(GameSetUpEvent.EventType.LEFT);
@@ -187,14 +183,13 @@ public class GameSetUpController extends SubController implements
 		@Override
 		public void onPlayerJoined(String playerID) {
 			getGameController().addPlayer(playerID);
-			logTo(playerID, "Player " + playerID + " joined");
+			logToAll("Player " + playerID + " joined");
 		}
 
 		@Override
 		public void onPlayerLeft(String playerID) {
-			getGameController().removePlayer(
-					(Player) getGameController().getPlayer(playerID));
-			logTo(playerID, "Player " + playerID + " left");
+			getGameController().removePlayer(playerID);
+			logToAll("Player " + playerID + " left");
 		}
 
 		@Override
@@ -207,5 +202,6 @@ public class GameSetUpController extends SubController implements
 			((Player) getGameController().getPlayer(playerID)).getRobot()
 					.getPoseProvider().setPose(pose);
 		}
+
 	};
 }

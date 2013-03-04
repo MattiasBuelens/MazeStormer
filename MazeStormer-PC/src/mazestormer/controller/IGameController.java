@@ -18,7 +18,7 @@ public interface IGameController extends EventSource {
 
 	public void logTo(String playerID, String message);
 
-	boolean isPersonalPlayer(String playerID);
+	public boolean isPersonalPlayer(String playerID);
 
 	public void addPlayer(String playerID);
 
@@ -27,6 +27,8 @@ public interface IGameController extends EventSource {
 	public void removePlayer(String playerID);
 
 	public void removePlayer(Player p);
+
+	public void removeOtherPlayers();
 
 	public IPlayer getPlayer(String playerID);
 
