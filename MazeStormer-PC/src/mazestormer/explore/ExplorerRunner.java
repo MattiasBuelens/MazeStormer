@@ -238,8 +238,7 @@ public class ExplorerRunner extends
 		log("Go to " + nextTile.getPosition());
 
 		// Create path
-		navigator.stop();
-		navigator.setPath(pathFinder.findPath(getCurrentTile(), nextTile));
+		createPath();
 
 		// Follow path until before traveling
 		transition(ExplorerState.NEXT_WAYPOINT);
@@ -602,13 +601,11 @@ public class ExplorerRunner extends
 	}
 
 	/**
-	 * Restart the cycle for the current tile. Internal use only.
+	 * Create the path to the next tile. Internal use only.
 	 */
-	public void restartCycle() {
-		// Re-add current tile to queue
-		queue.addFirst(currentTile);
-		// Next cycle
-		transition(ExplorerState.NEXT_CYCLE);
+	public void createPath() {
+		navigator.stop();
+		navigator.setPath(pathFinder.findPath(getCurrentTile(), nextTile));
 	}
 
 	/**

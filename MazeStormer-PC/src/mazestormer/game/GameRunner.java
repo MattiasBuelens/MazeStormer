@@ -56,8 +56,10 @@ public class GameRunner implements GameListener {
 		// Remove next tile from queue
 		explorerRunner.pollTile();
 
-		// Restart cycle
-		explorerRunner.restartCycle();
+		// Create new path
+		explorerRunner.createPath();
+
+		// TODO Let barcode action resolve its future
 	}
 
 	@Override

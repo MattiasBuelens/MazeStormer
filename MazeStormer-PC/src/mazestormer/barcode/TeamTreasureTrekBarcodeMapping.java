@@ -25,10 +25,6 @@ public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 		actions[17] = new SeesawAction();
 		actions[19] = new SeesawAction();
 		actions[21] = new SeesawAction();
-		actions[55] = new NoAction();
-		actions[47] = new NoAction();
-		actions[43] = new NoAction();
-		actions[39] = new NoAction();
 	}
 
 	@Override

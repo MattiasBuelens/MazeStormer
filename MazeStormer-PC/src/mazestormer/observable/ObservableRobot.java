@@ -4,11 +4,10 @@ import lejos.robotics.localization.PoseProvider;
 import mazestormer.robot.Robot;
 
 public class ObservableRobot implements Robot {
-	
+
 	private PoseProvider poseProvider;
-	
+
 	public ObservableRobot() {
-		
 	}
 
 	@Override
