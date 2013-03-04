@@ -1,7 +1,5 @@
 package mazestormer.controller;
 
-import java.util.logging.Logger;
-
 import lejos.robotics.navigation.Pose;
 import mazestormer.player.Game;
 import mazestormer.player.GameListener;
@@ -9,22 +7,28 @@ import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
 import peno.htttp.Callback;
 
-public class GameSetUpController extends SubController implements IGameSetUpController {
+public class GameSetUpController extends SubController implements
+		IGameSetUpController {
 
 	private Game game;
 	private final IGameController gameController;
 
-	public GameSetUpController(MainController mainController, IGameController gameController) {
+	public GameSetUpController(MainController mainController,
+			IGameController gameController) {
 		super(mainController);
 		this.gameController = gameController;
 	}
-	
+
 	private IGameController getGameController() {
 		return this.gameController;
 	}
 
-	private Logger getLogger() {
-		return getMainController().getPlayer().getLogger();
+	private void logToAll(String message) {
+		getGameController().logToAll(message);
+	}
+
+	private void logTo(String playerID, String message) {
+		getGameController().logTo(playerID, message);
 	}
 
 	@Override
@@ -52,16 +56,15 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			game.join(new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					onJoin();
 				}
 
 				@Override
 				public void onFailure(Throwable t) {
-					getLogger().warning("Error when joining: " + t.getMessage());
+					logToAll("Error when joining: " + t.getMessage());
 				}
 			});
 		} catch (Exception e) {
-			getLogger().warning("Error when joining: " + e.getMessage());
+			logToAll("Error when joining: " + e.getMessage());
 		}
 	}
 
@@ -74,38 +77,39 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			game.leave(new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					onLeave();
 				}
 
 				@Override
 				public void onFailure(Throwable t) {
-					getLogger().warning("Error when leaving: " + t.getMessage());
+					logToAll("Error when leaving: " + t.getMessage());
 				}
 			});
 		} catch (Exception e) {
-			getLogger().warning("Error when leaving: " + e.getMessage());
+			logToAll("Error when leaving: " + e.getMessage());
 		}
 	}
 
 	@Override
 	public void startGame() {
+		if (game == null) {
+			logToAll("Error when readying: not connected.");
+			return;
+		}
+
 		try {
-			if (game == null) {
-				throw new Exception("Not connected.");
-			}
 			game.setReady(true, new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					onStart();
+					logToAll("Ready");
 				}
 
 				@Override
 				public void onFailure(Throwable t) {
-					getLogger().warning("Error when starting: " + t.getMessage());
+					logToAll("Error when readying: " + t.getMessage());
 				}
 			});
 		} catch (Exception e) {
-			getLogger().warning("Error when starting: " + e.getMessage());
+			logToAll("Error when readying: " + e.getMessage());
 		}
 	}
 
@@ -128,76 +132,80 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		return true;
 	}
 
-	private void onJoin() {
-		getLogger().info("Joined");
-		postState(GameSetUpEvent.EventType.JOINED);
-	}
-
-	private void onStart() {
-		// TODO
-	}
-
-	private void onLeave() {
-		game.terminate();
-		game = null;
-
-		getLogger().info("Left");
-		postState(GameSetUpEvent.EventType.LEFT);
-	}
-
-	private void onDisconnect() {
-		getLogger().info("Disconnected");
-		postState(GameSetUpEvent.EventType.DISCONNECTED);
-	}
-
 	private void onNotReady() {
-		getLogger().info("Not ready");
+		logToAll("Error when joining: not ready to join.");
 		postState(GameSetUpEvent.EventType.NOT_READY);
 	}
 
 	private void postState(GameSetUpEvent.EventType eventType) {
 		postEvent(new GameSetUpEvent(eventType));
 	}
-	
-	private GameListener gl = new GameListener(){
+
+	private GameListener gl = new GameListener() {
+
+		@Override
+		public void onGameJoined() {
+			// Add all non-local players
+			for (String playerID : game.getPlayers()) {
+				if (!getGameController().isPersonalPlayer(playerID)) {
+					getGameController().addPlayer(playerID);
+				}
+			}
+			// Log
+			logToAll("Joined");
+			postState(GameSetUpEvent.EventType.JOINED);
+		}
+
+		@Override
+		public void onGameLeft() {
+			// Remove all non-local players
+			for (String playerID : game.getPlayers()) {
+				if (!getGameController().isPersonalPlayer(playerID)) {
+					getGameController().removePlayer(playerID);
+				}
+			}
+			// Log
+			logToAll("Left");
+			postState(GameSetUpEvent.EventType.LEFT);
+		}
 
 		@Override
 		public void onGameStarted(int playerNumber) {
-			getGameController().logToAll("Game started, player number: " + playerNumber);
+			logToAll("Game started, player number: " + playerNumber);
 		}
 
 		@Override
 		public void onGamePaused() {
-			getGameController().logToAll("Game paused");
+			logToAll("Game paused");
 		}
 
 		@Override
 		public void onGameStopped() {
-			getGameController().logToAll("Game stopped");
+			logToAll("Game stopped");
 		}
 
 		@Override
 		public void onPlayerJoined(String playerID) {
 			getGameController().addPlayer(playerID);
-			getGameController().logToSpecific(playerID, "Player " + playerID + " joined");
-			
+			logTo(playerID, "Player " + playerID + " joined");
 		}
 
 		@Override
 		public void onPlayerLeft(String playerID) {
-			getGameController().removePlayer((Player) getGameController().getPlayer(playerID));
-			getGameController().logToSpecific(playerID, "Player " + playerID + " left");
-			
+			getGameController().removePlayer(
+					(Player) getGameController().getPlayer(playerID));
+			logTo(playerID, "Player " + playerID + " left");
 		}
 
 		@Override
 		public void onObjectFound(String playerID) {
-			getGameController().logToSpecific(playerID, "Player " + playerID + " found their object");
+			logTo(playerID, "Player " + playerID + " found their object");
 		}
 
 		@Override
 		public void onPositionUpdate(String playerID, Pose pose) {
-			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider().setPose(pose);
+			((Player) getGameController().getPlayer(playerID)).getRobot()
+					.getPoseProvider().setPose(pose);
 		}
 	};
 }

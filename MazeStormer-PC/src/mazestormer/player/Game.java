@@ -3,6 +3,7 @@ package mazestormer.player;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.rabbitmq.ConnectionMode;
@@ -13,7 +14,7 @@ import peno.htttp.Handler;
 public class Game {
 
 	private String localPlayer;
-	
+
 	private final List<GameListener> gls = new ArrayList<GameListener>();
 
 	/**
@@ -24,19 +25,21 @@ public class Game {
 	private final Client client;
 	private final GameHandler handler;
 
-	public Game(String id, Player localPlayer) throws IOException, IllegalStateException {
+	public Game(String id, Player localPlayer) throws IOException,
+			IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer.getPlayerID();
 
 		// TODO Implement handler!
 		this.handler = new GameHandler();
-		this.client = new Client(ConnectionMode.LOCAL.newConnection(), this.handler, id, this.localPlayer);
+		this.client = new Client(ConnectionMode.LOCAL.newConnection(),
+				this.handler, id, this.localPlayer);
 	}
-	
+
 	public void addGameListener(GameListener gl) {
 		this.gls.add(gl);
 	}
-	
+
 	public void removeGameListener(GameListener gl) {
 		this.gls.remove(gl);
 	}
@@ -45,9 +48,29 @@ public class Game {
 		return id;
 	}
 
-	public void join(Callback<Void> callback) {
+	public Set<String> getPlayers() {
+		return client.getPlayers();
+	}
+
+	public void join(final Callback<Void> callback) {
 		try {
-			client.join(callback);
+			client.join(new Callback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					// Call listeners
+					for (GameListener gl : gls) {
+						gl.onGameLeft();
+					}
+					// Callback
+					callback.onSuccess(result);
+				}
+
+				@Override
+				public void onFailure(Throwable t) {
+					callback.onFailure(t);
+				}
+
+			});
 		} catch (Exception e) {
 			callback.onFailure(e);
 		}
@@ -56,6 +79,11 @@ public class Game {
 	public void leave(Callback<Void> callback) {
 		try {
 			client.leave();
+			// Call listeners
+			for (GameListener gl : gls) {
+				gl.onGameLeft();
+			}
+			// Callback
 			callback.onSuccess(null);
 		} catch (Exception e) {
 			callback.onFailure(e);
@@ -79,54 +107,54 @@ public class Game {
 
 		@Override
 		public void gameStarted() {
-			for(GameListener gl : gls) {
+			for (GameListener gl : gls) {
 				gl.onGameStarted(client.getPlayerNumber());
 			}
 		}
 
 		@Override
 		public void gameStopped() {
-			for(GameListener gl : gls) {
+			for (GameListener gl : gls) {
 				gl.onGameStopped();
 			}
 		}
 
 		@Override
 		public void gamePaused() {
-			for(GameListener gl : gls) {
+			for (GameListener gl : gls) {
 				gl.onGamePaused();
 			}
 		}
 
 		@Override
 		public void playerJoined(String playerID) {
-			for(GameListener gl : gls) {
+			for (GameListener gl : gls) {
 				gl.onPlayerJoined(playerID);
 			}
-			// Call addPlayer()
 		}
 
 		@Override
 		public void playerLeft(String playerID) {
-			for(GameListener gl : gls) {
+			for (GameListener gl : gls) {
 				gl.onPlayerLeft(playerID);
 			}
-			// Call removePlayer()
 		}
 
 		@Override
-		public void playerPosition(String playerID, double x, double y, double angle) {
+		public void playerPosition(String playerID, double x, double y,
+				double angle) {
 			Pose p = new Pose((float) x, (float) y, (float) angle);
-			for(GameListener gl : gls) {
+			for (GameListener gl : gls) {
 				gl.onPositionUpdate(playerID, p);
 			}
 		}
 
 		@Override
 		public void playerFoundObject(String playerID) {
-			for(GameListener gl : gls) {
+			for (GameListener gl : gls) {
 				gl.onObjectFound(playerID);
 			}
 		}
+
 	}
 }

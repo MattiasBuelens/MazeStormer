@@ -31,6 +31,11 @@ public class GameController extends SubController implements IGameController {
 	}
 
 	@Override
+	public boolean isPersonalPlayer(String playerID) {
+		return getMainController().getPlayer().getPlayerID().equals(playerID);
+	}
+
+	@Override
 	public void addPlayer(String playerID) {
 		checkNotNull(playerID);
 		addPlayer(new Player(playerID, new ObservableRobot()));
@@ -41,6 +46,15 @@ public class GameController extends SubController implements IGameController {
 		checkNotNull(p);
 		this.pcs.put(p, new PlayerController(this.getMainController(), p));
 		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, p));
+	}
+
+	@Override
+	public void removePlayer(String playerID) {
+		checkNotNull(playerID);
+		Player player = (Player) getPlayer(playerID);
+		if (player != null) {
+			removePlayer(player);
+		}
 	}
 
 	@Override
@@ -66,7 +80,7 @@ public class GameController extends SubController implements IGameController {
 	}
 
 	@Override
-	public void logToSpecific(String playerID, String message) {
+	public void logTo(String playerID, String message) {
 		for (IPlayer p : this.pcs.keySet()) {
 			if (p.getPlayerID().equals(playerID))
 				((Player) p).getLogger().info(message);
