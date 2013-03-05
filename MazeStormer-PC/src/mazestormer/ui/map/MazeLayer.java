@@ -15,7 +15,7 @@ import mazestormer.maze.MazeListener;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.util.LongPoint;
-import mazestormer.util.MapUtils;
+import mazestormer.util.CoordUtils;
 
 import org.apache.batik.dom.svg.SVGOMTransform;
 import org.w3c.dom.Element;
@@ -98,7 +98,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	}
 
 	private void setOrigin(Pose origin) {
-		setPosition(MapUtils.toMapCoordinates(origin.getLocation()));
+		setPosition(CoordUtils.toMapCoordinates(origin.getLocation()));
 		setRotationAngle(-origin.getHeading());
 		update();
 	}

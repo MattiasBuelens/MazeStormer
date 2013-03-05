@@ -1,6 +1,9 @@
 package mazestormer.controller;
 
+import java.io.IOException;
+
 import lejos.robotics.navigation.Pose;
+import mazestormer.game.GameRunner;
 import mazestormer.player.Game;
 import mazestormer.player.GameListener;
 import mazestormer.player.Player;
@@ -11,6 +14,7 @@ public class GameSetUpController extends SubController implements
 		IGameSetUpController {
 
 	private Game game;
+	private GameRunner runner;
 	private final IGameController gameController;
 
 	public GameSetUpController(MainController mainController,
@@ -43,6 +47,20 @@ public class GameSetUpController extends SubController implements
 		postEvent(new PlayerEvent(PlayerEvent.EventType.PLAYER_RENAMED, player));
 	}
 
+	private void createGame(String gameID) throws IOException {
+		final Player localPlayer = getMainController().getPlayer();
+
+		game = new Game(gameID, localPlayer);
+		game.addGameListener(gl);
+
+		runner = new GameRunner(localPlayer, game) {
+			@Override
+			protected void log(String message) {
+				logTo(localPlayer.getPlayerID(), message);
+			}
+		};
+	}
+
 	@Override
 	public void joinGame(String gameID) {
 		if (!isReady()) {
@@ -51,8 +69,9 @@ public class GameSetUpController extends SubController implements
 		}
 
 		try {
-			game = new Game(gameID, getMainController().getPlayer());
-			game.addGameListener(this.gl);
+			// Create game
+			createGame(gameID);
+			// Join game
 			game.join(new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {

@@ -179,6 +179,9 @@ public class ExplorerRunner extends
 		// Reset state
 		getMaze().clear();
 		setExplored(false);
+	}
+
+	private void stopSubroutines() {
 		// Stop subroutines
 		navigator.stop();
 		lineFinder.stop();
@@ -260,6 +263,11 @@ public class ExplorerRunner extends
 		// Skip barcodes when traveling to checkpoint or goal
 		if (!isExplored() && currentTile.hasBarcode()) {
 			log("Performing barcode action for " + currentTile.getPosition());
+			// Pause navigator
+			// Note: Cannot interrupt report state
+			if (navigator.getState() != NavigatorState.REPORT) {
+				navigator.pause();
+			}
 			// Resume when action is done
 			bindTransition(
 					barcodeScanner.performAction(currentTile.getBarcode()),
@@ -594,10 +602,13 @@ public class ExplorerRunner extends
 	}
 
 	/**
-	 * Pop the next tile from the queue. Internal use only.
+	 * Skip the next tile in the queue. Internal use only.
 	 */
-	public Tile pollTile() {
-		return queue.pollFirst();
+	public void skipNextTile() {
+		// Remove
+		queue.pollFirst();
+		// Reset
+		nextTile = queue.peekFirst();
 	}
 
 	/**
@@ -624,6 +635,7 @@ public class ExplorerRunner extends
 		log("Exploration started.");
 		// Reset
 		reset();
+		stopSubroutines();
 		// Initialize
 		transition(ExplorerState.INIT);
 	}
@@ -631,6 +643,8 @@ public class ExplorerRunner extends
 	@Override
 	public void stateStopped() {
 		log("Exploration stopped.");
+		// Stop
+		stopSubroutines();
 	}
 
 	@Override

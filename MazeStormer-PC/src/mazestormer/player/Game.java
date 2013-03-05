@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.game.GameRunner;
 import mazestormer.rabbitmq.ConnectionMode;
+import mazestormer.util.CoordUtils;
 import peno.htttp.Callback;
 import peno.htttp.Client;
 import peno.htttp.Handler;
@@ -18,7 +18,6 @@ public class Game {
 	private final Player localPlayer;
 
 	private final Client client;
-	private final GameRunner runner;
 
 	private final GameHandler handler;
 	private final List<GameListener> gls = new ArrayList<GameListener>();
@@ -31,7 +30,6 @@ public class Game {
 		this.handler = new GameHandler();
 		this.client = new Client(ConnectionMode.LOCAL.newConnection(),
 				this.handler, id, localPlayer.getPlayerID());
-		this.runner = new GameRunner(localPlayer, this);
 	}
 
 	public void addGameListener(GameListener gl) {
@@ -97,6 +95,29 @@ public class Game {
 		}
 	}
 
+	public void objectFound() {
+		try {
+			client.foundObject();
+		} catch (IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Could not report object found");
+			e.printStackTrace();
+		}
+	}
+
+	public void updatePosition(Pose pose) {
+		try {
+			// Convert pose
+			pose = CoordUtils.toMapCoordinates(pose);
+			// Publish
+			client.updatePosition(pose.getX(), pose.getY(), pose.getHeading());
+		} catch (IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Could not report position update");
+			e.printStackTrace();
+		}
+	}
+
 	public void terminate() {
 		client.shutdown();
 	}
@@ -141,7 +162,14 @@ public class Game {
 		@Override
 		public void playerPosition(String playerID, double x, double y,
 				double angle) {
+			// Ignore local position updates
+			if (playerID.equals(client.getPlayerID()))
+				return;
+
+			// Parse pose and convert
 			Pose p = new Pose((float) x, (float) y, (float) angle);
+			p = CoordUtils.toRobotCoordinates(p);
+			// Publish
 			for (GameListener gl : gls) {
 				gl.onPositionUpdate(playerID, p);
 			}
@@ -154,16 +182,6 @@ public class Game {
 			}
 		}
 
-	}
-
-	public void objectFound() {
-		try {
-			client.foundObject();
-		} catch (IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
-			System.err.println("Could not report object found");
-			e.printStackTrace();
-		}
 	}
 
 }

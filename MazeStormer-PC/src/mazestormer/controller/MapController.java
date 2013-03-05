@@ -13,7 +13,6 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.maze.Maze;
 import mazestormer.player.Player;
-import mazestormer.robot.MoveEvent;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
 import mazestormer.ui.map.MazeLayer;
@@ -22,7 +21,7 @@ import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
-import mazestormer.util.MapUtils;
+import mazestormer.util.CoordUtils;
 
 import org.w3c.dom.svg.SVGDocument;
 
@@ -46,11 +45,11 @@ public class MapController extends SubController implements IMapController {
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MapController-%d").build();
 
-	private static final long defaultUpdateInterval = 1000 / 25;
+	private static final long defaultUpdateFPS = 25;
 
 	public MapController(MainController mainController, Player player) {
 		super(mainController);
-		setUpdateInterval(defaultUpdateInterval);
+		setUpdateFPS(defaultUpdateFPS);
 
 		this.player = player;
 
@@ -116,7 +115,7 @@ public class MapController extends SubController implements IMapController {
 
 	@Override
 	public Pose getRobotPose() {
-		return MapUtils.toMapCoordinates(getPlayer().getRobot().getPoseProvider().getPose());
+		return CoordUtils.toMapCoordinates(getPlayer().getRobot().getPoseProvider().getPose());
 	}
 
 	private void updateRobotPose() {
@@ -167,6 +166,7 @@ public class MapController extends SubController implements IMapController {
 	private void cancelUpdater() {
 		if (updateHandle != null) {
 			updateHandle.cancel(false);
+			updateHandle = null;
 		}
 	}
 
@@ -196,23 +196,26 @@ public class MapController extends SubController implements IMapController {
 	public void updateRobotPoseOnConnect(ConnectEvent e) {
 		if (e.isConnected()) {
 			// Set initial pose
-			invokeUpdateRobotPose();
+			//invokeUpdateRobotPose();
+			
+			// Start updating
+			scheduleUpdater();
 		} else {
-			// Stop updating pose
+			// Stop updating
 			cancelUpdater();
 		}
 	}
 
-	@Subscribe
-	public void updateRobotPoseOnMove(MoveEvent e) {
-		if (e.getEventType() == MoveEvent.EventType.STARTED) {
-			// Start updating while moving
-			scheduleUpdater();
-		} else {
-			// Stop updating when move ended
-			cancelUpdater();
-		}
-	}
+//	@Subscribe
+//	public void updateRobotPoseOnMove(MoveEvent e) {
+//		if (e.getEventType() == MoveEvent.EventType.STARTED) {
+//			// Start updating while moving
+//			scheduleUpdater();
+//		} else {
+//			// Stop updating when move ended
+//			cancelUpdater();
+//		}
+//	}
 
 	private class UpdateTask implements Runnable {
 		@Override

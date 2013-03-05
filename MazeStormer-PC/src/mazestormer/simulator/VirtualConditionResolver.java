@@ -3,15 +3,17 @@ package mazestormer.simulator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public abstract class VirtualConditionResolver<C extends Condition, V> {
 
@@ -19,13 +21,16 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 	private AtomicBoolean isTerminated = new AtomicBoolean(false);
 
 	private final Set<Future> futures = new CopyOnWriteArraySet<Future>();
-	private final ExecutorService executor;
+
+	private final ScheduledExecutorService executor;
+	private ScheduledFuture<?> task;
+	private final static long updateFrequency = 50; // ms
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder()
 			.setNameFormat("VirtualConditionResolver-%d").build();
 
 	public VirtualConditionResolver() {
-		executor = Executors.newSingleThreadExecutor(factory);
+		executor = Executors.newSingleThreadScheduledExecutor(factory);
 	}
 
 	public ConditionFuture add(C condition) {
@@ -50,8 +55,11 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 
 	protected void start() {
 		isRunning.set(true);
-		// Start resolving
-		executor.execute(new Runner());
+		// Start checking
+		if (task == null) {
+			task = executor.scheduleAtFixedRate(new Runner(), 0,
+					updateFrequency, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	protected void stop() {
@@ -61,6 +69,11 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 			future.cancel(true);
 		}
 		futures.clear();
+		// Stop checking
+		if (task != null) {
+			task.cancel(false);
+			task = null;
+		}
 	}
 
 	protected boolean isRunning() {
@@ -87,20 +100,21 @@ public abstract class VirtualConditionResolver<C extends Condition, V> {
 
 		@Override
 		public void run() {
-			while (isRunning()) {
-				V value = getValue();
+			if (!isRunning())
+				return;
 
-				// Update all futures
-				Iterator<Future> it = futures.iterator();
-				while (it.hasNext()) {
-					Future future = it.next();
-					future.check(value);
-				}
+			V value = getValue();
 
-				// Stop if no more futures to check
-				if (futures.isEmpty()) {
-					stop();
-				}
+			// Update all futures
+			Iterator<Future> it = futures.iterator();
+			while (it.hasNext()) {
+				Future future = it.next();
+				future.check(value);
+			}
+
+			// Stop if no more futures to check
+			if (futures.isEmpty()) {
+				stop();
 			}
 		}
 

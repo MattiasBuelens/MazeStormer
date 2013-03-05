@@ -264,7 +264,7 @@ public class VirtualPilot implements Pilot {
 			waitComplete();
 	}
 
-	protected synchronized void movementStart(MoveType moveType, float distance, float angle, float radius) {
+	protected void movementStart(MoveType moveType, float distance, float angle, float radius) {
 		boolean wasMoving = isMoving();
 		if (wasMoving)
 			movementStop(true);
@@ -289,7 +289,7 @@ public class VirtualPilot implements Pilot {
 		}
 	}
 
-	protected synchronized void movementStart(MoveType moveType, float distance, float angle) {
+	protected void movementStart(MoveType moveType, float distance, float angle) {
 		movementStart(moveType, distance, angle, 0);
 	}
 

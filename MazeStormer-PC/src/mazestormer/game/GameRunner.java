@@ -1,12 +1,23 @@
 package mazestormer.game;
 
 import java.util.EnumSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
+import lejos.robotics.navigation.Move;
+import lejos.robotics.navigation.MoveListener;
+import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.Tile;
 import mazestormer.player.Game;
 import mazestormer.player.GameListener;
 import mazestormer.player.Player;
@@ -14,20 +25,45 @@ import mazestormer.robot.ControllableRobot;
 
 public class GameRunner implements GameListener {
 
+	/**
+	 * The frequency of position updates.
+	 */
+	private static final long updateFrequency = 2000; // in ms
+
 	private final Player player;
 	private final Game game;
 	private final ExplorerRunner explorerRunner;
+
+	private final PositionReporter positionReporter;
+	private final PositionPublisher positionPublisher;
+	private final ScheduledExecutorService positionExecutor = Executors
+			.newSingleThreadScheduledExecutor(factory);
+
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("GameRunner-%d").build();
 
 	private int objectNumber;
 
 	public GameRunner(Player player, Game game) {
 		this.player = player;
-		this.explorerRunner = new ExplorerRunner(player);
+		this.explorerRunner = new ExplorerRunner(player) {
+			@Override
+			protected void log(String message) {
+				GameRunner.this.log(message);
+			}
+		};
 		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(
 				this));
 
 		this.game = game;
 		game.addGameListener(this);
+
+		this.positionReporter = new PositionReporter();
+		this.positionPublisher = new PositionPublisher();
+	}
+
+	protected void log(String message) {
+		System.out.println(message);
 	}
 
 	private ControllableRobot getRobot() {
@@ -39,27 +75,53 @@ public class GameRunner implements GameListener {
 	}
 
 	public void setWallsOnNextTile() {
+		log("Object on next tile, set walls");
+
 		// Set all unknown edges to walls
-		EnumSet<Orientation> unknownSides = explorerRunner.getNextTile()
-				.getUnknownSides();
-		for (Orientation or : unknownSides) {
-			explorerRunner.getNextTile().setEdge(or, EdgeType.WALL);
+		Tile nextTile = explorerRunner.getNextTile();
+		EnumSet<Orientation> unknownSides = nextTile.getUnknownSides();
+		for (Orientation side : unknownSides) {
+			explorerRunner.getMaze().setEdge(nextTile.getPosition(), side,
+					EdgeType.WALL);
 		}
 	}
 
 	public void objectFound() {
+		log("Report own object found");
 		// Report object found
 		game.objectFound();
+		// Done
+		stopGame();
 	}
 
 	public void afterObjectBarcode() {
-		// Remove next tile from queue
-		explorerRunner.pollTile();
-
+		log("Object found, go to next tile");
+		// Skip next tile
+		explorerRunner.skipNextTile();
 		// Create new path
 		explorerRunner.createPath();
+		// Object found action resolves after this
+	}
 
-		// TODO Let barcode action resolve its future
+	public boolean isRunning() {
+		return explorerRunner.isRunning();
+	}
+
+	private void stopGame() {
+		// Stop
+		explorerRunner.stop();
+		// Stop pilot
+		getRobot().getPilot().stop();
+		// Stop reporting
+		stopPositionReport();
+	}
+
+	private void startPositionReport() {
+		getRobot().getPilot().addMoveListener(positionReporter);
+	}
+
+	private void stopPositionReport() {
+		getRobot().getPilot().removeMoveListener(positionReporter);
 	}
 
 	@Override
@@ -68,24 +130,32 @@ public class GameRunner implements GameListener {
 
 	@Override
 	public void onGameLeft() {
+		// Stop
+		onGameStopped();
 	}
 
 	@Override
 	public void onGameStarted(int playerNumber) {
+		// Start
 		objectNumber = playerNumber;
 		explorerRunner.start();
+		// Start reporting
+		startPositionReport();
 	}
 
 	@Override
 	public void onGamePaused() {
+		// Pause
 		explorerRunner.pause();
+		// Stop pilot
 		getRobot().getPilot().stop();
+		// Stop reporting
+		stopPositionReport();
 	}
 
 	@Override
 	public void onGameStopped() {
-		explorerRunner.stop();
-		getRobot().getPilot().stop();
+		stopGame();
 	}
 
 	@Override
@@ -102,6 +172,40 @@ public class GameRunner implements GameListener {
 
 	@Override
 	public void onPositionUpdate(String playerID, Pose pose) {
+	}
+
+	private class PositionReporter implements MoveListener {
+
+		private ScheduledFuture<?> task;
+
+		@Override
+		public void moveStarted(Move event, MoveProvider mp) {
+			if (task == null) {
+				// Start publishing
+				task = positionExecutor.scheduleWithFixedDelay(
+						positionPublisher, 0, updateFrequency,
+						TimeUnit.MILLISECONDS);
+			}
+		}
+
+		@Override
+		public void moveStopped(Move event, MoveProvider mp) {
+			if (task != null) {
+				// Stop publishing
+				task.cancel(false);
+				task = null;
+			}
+		}
+
+	}
+
+	private class PositionPublisher implements Runnable {
+
+		@Override
+		public void run() {
+			game.updatePosition(getRobot().getPoseProvider().getPose());
+		}
+
 	}
 
 }

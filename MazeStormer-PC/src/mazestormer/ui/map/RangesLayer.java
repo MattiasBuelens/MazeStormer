@@ -12,7 +12,7 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.detect.RangeFeatureDetectEvent;
-import mazestormer.util.MapUtils;
+import mazestormer.util.CoordUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGCircleElement;
@@ -56,7 +56,7 @@ public class RangesLayer extends MapLayer {
 			Point2D robotPoint = robotPose.pointAt(reading.getRange(),
 					reading.getAngle() + robotPose.getHeading());
 			// Convert to map coordinates
-			Point2D mapPoint = MapUtils.toMapCoordinates(robotPoint);
+			Point2D mapPoint = CoordUtils.toMapCoordinates(robotPoint);
 			// Create point element and store
 			Element pointElement = createPoint(mapPoint.getX(), mapPoint.getY());
 			newPoints.add(pointElement);

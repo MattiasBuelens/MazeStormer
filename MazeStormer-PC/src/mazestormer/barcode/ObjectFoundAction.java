@@ -8,6 +8,7 @@ import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.state.State;
+import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.AbstractFuture;
 import mazestormer.util.Future;
@@ -59,19 +60,25 @@ public class ObjectFoundAction extends
 	public Future<?> performAction(Player player) {
 		this.player = player;
 
+		// Stop if still running
+		stop();
+
+		// Resolve when finished
+		FinishFuture future = new FinishFuture();
+		addStateListener(future);
+
 		// Start from the initial state
 		start();
 		transition(ObjectFoundState.INITIAL);
 
-		// Return a never resolving future
-		return new AbstractFuture<Void>();
+		return future;
 	}
 
 	/**
 	 * States
 	 */
 
-	protected void intitial() {
+	protected void initial() {
 		getGameRunner().setWallsOnNextTile();
 
 		// Determine owner
@@ -115,8 +122,9 @@ public class ObjectFoundAction extends
 	}
 
 	protected void done() {
-		// Finished
+		// Prepare game runner
 		getGameRunner().afterObjectBarcode();
+		// Finished
 		finish();
 	}
 
@@ -125,7 +133,7 @@ public class ObjectFoundAction extends
 		INITIAL {
 			@Override
 			public void execute(ObjectFoundAction objectFoundAction) {
-				objectFoundAction.intitial();
+				objectFoundAction.initial();
 			}
 
 		},
@@ -177,6 +185,44 @@ public class ObjectFoundAction extends
 			}
 
 		};
+	}
+
+	private class FinishFuture extends AbstractFuture<Void> implements
+			StateListener<ObjectFoundState> {
+
+		@Override
+		public void stateStarted() {
+		}
+
+		@Override
+		public void stateStopped() {
+			// Failed
+			cancel();
+		}
+
+		@Override
+		public void stateFinished() {
+			// Success
+			if (getGameRunner().isRunning()) {
+				resolve(null);
+			} else {
+				cancel();
+			}
+		}
+
+		@Override
+		public void statePaused(ObjectFoundState currentState,
+				boolean onTransition) {
+		}
+
+		@Override
+		public void stateResumed(ObjectFoundState currentState) {
+		}
+
+		@Override
+		public void stateTransitioned(ObjectFoundState nextState) {
+		}
+
 	}
 
 }
