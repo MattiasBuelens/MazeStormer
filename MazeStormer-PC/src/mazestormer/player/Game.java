@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.util.CoordUtils;
 import peno.htttp.Callback;
 import peno.htttp.Client;
 import peno.htttp.Handler;
+
+import com.rabbitmq.client.Connection;
 
 public class Game {
 
@@ -22,14 +23,14 @@ public class Game {
 	private final GameHandler handler;
 	private final List<GameListener> gls = new ArrayList<GameListener>();
 
-	public Game(String id, Player localPlayer) throws IOException,
-			IllegalStateException {
+	public Game(Connection connection, String id, Player localPlayer)
+			throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
 
 		this.handler = new GameHandler();
-		this.client = new Client(ConnectionMode.LOCAL.newConnection(),
-				this.handler, id, localPlayer.getPlayerID());
+		this.client = new Client(connection, this.handler, id,
+				localPlayer.getPlayerID());
 	}
 
 	public void addGameListener(GameListener gl) {

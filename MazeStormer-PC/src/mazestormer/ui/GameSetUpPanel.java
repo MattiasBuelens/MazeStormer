@@ -3,18 +3,21 @@ package mazestormer.ui;
 import java.awt.event.ActionEvent;
 import java.beans.Beans;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.GameSetUpEvent;
 import mazestormer.controller.IGameSetUpController;
+import mazestormer.rabbitmq.ConnectionMode;
 import net.miginfocom.swing.MigLayout;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
@@ -26,24 +29,29 @@ public class GameSetUpPanel extends ViewPanel {
 	private static final long serialVersionUID = 1521591580799849697L;
 
 	private final IGameSetUpController controller;
+
 	private final JButton rename = new JButton();
 	private final JButton join = new JButton();
 	private final JButton start = new JButton();
 	private final JButton leave = new JButton();
-	private final JTextField playerID = new JTextField();
-	private final JTextField gameID = new JTextField();
-
 	private final Action renameAction = new RenameAction();
 	private final Action joinAction = new JoinAction();
 	private final Action startAction = new StartAction();
 	private final Action leaveAction = new LeaveAction();
 
+	private ComboBoxModel<ConnectionMode> serverModel;
+	private final JComboBox<ConnectionMode> server = new JComboBox<ConnectionMode>();
+	private final JTextField playerID = new JTextField();
+	private final JTextField gameID = new JTextField();
+
 	public GameSetUpPanel(IGameSetUpController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Team Treasure Trek", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new MigLayout("", "[][100px:n,grow][fill]", "[][][]"));
+		setBorder(new TitledBorder(null, "Team Treasure Trek",
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setLayout(new MigLayout("", "[][100px:n,grow][fill]", "[][][][]"));
 
+		createServer();
 		createPlayerID();
 		createJoinGame();
 		createButtons();
@@ -57,20 +65,32 @@ public class GameSetUpPanel extends ViewPanel {
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
 
+		serverModel.setSelectedItem(ConnectionMode.LOCAL);
 		playerID.setText(controller.getPlayerID());
+	}
+
+	private void createServer() {
+		serverModel = new DefaultComboBoxModel<ConnectionMode>(
+				ConnectionMode.values());
+
+		JLabel lblServer = new JLabel("Server");
+		add(lblServer, "cell 0 0");
+
+		server.setModel(serverModel);
+		add(server, "cell 1 0 2 1,grow");
 	}
 
 	private void createPlayerID() {
 		JLabel lblName = new JLabel("Player name");
-		add(lblName, "cell 0 0");
+		add(lblName, "cell 0 1");
 
-		add(playerID, "cell 1 0,grow");
+		add(playerID, "cell 1 1,grow");
 
 		rename.setToolTipText("Set player name");
 		rename.setAction(renameAction);
 		rename.setText("");
 		rename.setIcon(new GoNextIcon(24, 24));
-		add(rename, "cell 2 0");
+		add(rename, "cell 2 1");
 	}
 
 	private String getPlayerID() {
@@ -79,15 +99,15 @@ public class GameSetUpPanel extends ViewPanel {
 
 	private void createJoinGame() {
 		JLabel lblLow = new JLabel("Join game");
-		add(lblLow, "cell 0 1");
+		add(lblLow, "cell 0 2");
 
-		add(gameID, "cell 1 1,grow");
+		add(gameID, "cell 1 2,grow");
 
 		join.setToolTipText("Join the game");
 		join.setAction(joinAction);
 		join.setText("");
 		join.setIcon(new ListAllIcon(24, 24));
-		add(join, "cell 2 1");
+		add(join, "cell 2 2");
 	}
 
 	private String getGameID() {
@@ -99,13 +119,13 @@ public class GameSetUpPanel extends ViewPanel {
 		start.setAction(startAction);
 		start.setText("");
 		start.setIcon(new GoNextIcon(24, 24));
-		add(start, "cell 1 2,alignx right");
+		add(start, "cell 1 3,alignx right");
 
 		leave.setToolTipText("Leave the game");
 		leave.setAction(leaveAction);
 		leave.setText("");
 		leave.setIcon(new SystemLogOutIcon(24, 24));
-		add(leave, "cell 2 2");
+		add(leave, "cell 2 3");
 	}
 
 	private void enableGameButtons(boolean request) {
@@ -136,9 +156,11 @@ public class GameSetUpPanel extends ViewPanel {
 	}
 
 	private void showNotReady() {
-		JOptionPane.showMessageDialog(null,
-				"You have to select a robot type and/or source maze\n before you could create or join a game.",
-				"Setup", 1);
+		JOptionPane
+				.showMessageDialog(
+						null,
+						"You have to select a robot type and/or source maze\n before you could create or join a game.",
+						"Setup", 1);
 	}
 
 	private void setPlayerID() {
@@ -148,9 +170,10 @@ public class GameSetUpPanel extends ViewPanel {
 	}
 
 	private void joinGame() {
+		ConnectionMode mode = (ConnectionMode) serverModel.getSelectedItem();
 		String id = getGameID();
 		if (!id.isEmpty())
-			controller.joinGame(id);
+			controller.joinGame(mode, id);
 	}
 
 	private void startGame() {

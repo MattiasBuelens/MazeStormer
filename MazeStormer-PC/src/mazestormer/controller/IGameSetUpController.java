@@ -1,5 +1,6 @@
 package mazestormer.controller;
 
+import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.util.EventSource;
 
 public interface IGameSetUpController extends EventSource {
@@ -8,7 +9,7 @@ public interface IGameSetUpController extends EventSource {
 
 	public void setPlayerID(String playerID);
 
-	public void joinGame(String gameID);
+	public void joinGame(ConnectionMode connectionMode, String gameID);
 
 	public void startGame();
 

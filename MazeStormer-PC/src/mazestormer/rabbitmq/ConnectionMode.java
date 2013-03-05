@@ -14,6 +14,11 @@ public enum ConnectionMode {
 			factory.setHost("localhost");
 			return factory;
 		}
+
+		@Override
+		public String toString() {
+			return "Localhost";
+		}
 	},
 	PENO {
 		@Override
@@ -26,6 +31,11 @@ public enum ConnectionMode {
 			factory.setHost(PenoConfig.HOST_NAME);
 			factory.setPort(PenoConfig.PORT);
 			return factory;
+		}
+
+		@Override
+		public String toString() {
+			return "P&O";
 		}
 	};
 

@@ -2,17 +2,21 @@ package mazestormer.controller;
 
 import java.io.IOException;
 
+import com.rabbitmq.client.Connection;
+
 import lejos.robotics.navigation.Pose;
 import mazestormer.game.GameRunner;
 import mazestormer.player.Game;
 import mazestormer.player.GameListener;
 import mazestormer.player.Player;
+import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.simulator.VirtualRobot;
 import peno.htttp.Callback;
 
 public class GameSetUpController extends SubController implements
 		IGameSetUpController {
 
+	private Connection connection;
 	private Game game;
 	private GameRunner runner;
 	private final IGameController gameController;
@@ -47,10 +51,13 @@ public class GameSetUpController extends SubController implements
 		postEvent(new PlayerEvent(PlayerEvent.EventType.PLAYER_RENAMED, player));
 	}
 
-	private void createGame(String gameID) throws IOException {
+	private void createGame(ConnectionMode connectionMode, String gameID)
+			throws IOException {
 		final Player localPlayer = getMainController().getPlayer();
 
-		game = new Game(gameID, localPlayer);
+		connection = connectionMode.newConnection();
+
+		game = new Game(connection, gameID, localPlayer);
 		game.addGameListener(gl);
 
 		runner = new GameRunner(localPlayer, game) {
@@ -62,7 +69,7 @@ public class GameSetUpController extends SubController implements
 	}
 
 	@Override
-	public void joinGame(String gameID) {
+	public void joinGame(ConnectionMode connectionMode, String gameID) {
 		if (!isReady()) {
 			onNotReady();
 			return;
@@ -70,7 +77,7 @@ public class GameSetUpController extends SubController implements
 
 		try {
 			// Create game
-			createGame(gameID);
+			createGame(connectionMode, gameID);
 			// Join game
 			game.join(new Callback<Void>() {
 				@Override
@@ -93,6 +100,7 @@ public class GameSetUpController extends SubController implements
 			if (game == null) {
 				throw new Exception("Not connected.");
 			}
+			// Leave game
 			game.leave(new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
@@ -103,6 +111,10 @@ public class GameSetUpController extends SubController implements
 					logToAll("Error when leaving: " + t.getMessage());
 				}
 			});
+			// Close connection
+			if (connection != null) {
+				connection.close();
+			}
 		} catch (Exception e) {
 			logToAll("Error when leaving: " + e.getMessage());
 		}
