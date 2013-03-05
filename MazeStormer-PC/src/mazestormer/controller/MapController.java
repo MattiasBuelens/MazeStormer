@@ -38,12 +38,14 @@ public class MapController extends SubController implements IMapController {
 	private MazeLayer sourceMazeLayer;
 	private RangesLayer rangesLayer;
 
-	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(factory);
+	private ScheduledExecutorService executor = Executors
+			.newSingleThreadScheduledExecutor(factory);
 	private Runnable updateTask = new UpdateTask();
 	private ScheduledFuture<?> updateHandle;
 	private long updateInterval;
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MapController-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("MapController-%d").build();
 
 	private static final long defaultUpdateFPS = 25;
 
@@ -55,6 +57,8 @@ public class MapController extends SubController implements IMapController {
 
 		createMap();
 		createLayers();
+
+		scheduleUpdater();
 	}
 
 	private void createMap() {
@@ -115,11 +119,18 @@ public class MapController extends SubController implements IMapController {
 
 	@Override
 	public Pose getRobotPose() {
-		return CoordUtils.toMapCoordinates(getPlayer().getRobot().getPoseProvider().getPose());
+		// Not connected yet
+		if (getPlayer().getRobot() == null)
+			return null;
+
+		return CoordUtils.toMapCoordinates(getPlayer().getRobot()
+				.getPoseProvider().getPose());
 	}
 
 	private void updateRobotPose() {
 		Pose pose = getRobotPose();
+		if (pose == null)
+			return;
 
 		if (robotLayer != null) {
 			robotLayer.setPosition(pose.getLocation());
@@ -160,7 +171,8 @@ public class MapController extends SubController implements IMapController {
 		// Cancel if still running
 		cancelUpdater();
 		// Reschedule updater
-		updateHandle = executor.scheduleAtFixedRate(updateTask, 0, getUpdateInterval(), TimeUnit.MILLISECONDS);
+		updateHandle = executor.scheduleAtFixedRate(updateTask, 0,
+				getUpdateInterval(), TimeUnit.MILLISECONDS);
 	}
 
 	private void cancelUpdater() {
@@ -192,30 +204,30 @@ public class MapController extends SubController implements IMapController {
 		}
 	}
 
-	@Subscribe
-	public void updateRobotPoseOnConnect(ConnectEvent e) {
-		if (e.isConnected()) {
-			// Set initial pose
-			//invokeUpdateRobotPose();
-			
-			// Start updating
-			scheduleUpdater();
-		} else {
-			// Stop updating
-			cancelUpdater();
-		}
-	}
+	// @Subscribe
+	// public void updateRobotPoseOnConnect(ConnectEvent e) {
+	// if (e.isConnected()) {
+	// // Set initial pose
+	// //invokeUpdateRobotPose();
+	//
+	// // Start updating
+	// scheduleUpdater();
+	// } else {
+	// // Stop updating
+	// cancelUpdater();
+	// }
+	// }
 
-//	@Subscribe
-//	public void updateRobotPoseOnMove(MoveEvent e) {
-//		if (e.getEventType() == MoveEvent.EventType.STARTED) {
-//			// Start updating while moving
-//			scheduleUpdater();
-//		} else {
-//			// Stop updating when move ended
-//			cancelUpdater();
-//		}
-//	}
+	// @Subscribe
+	// public void updateRobotPoseOnMove(MoveEvent e) {
+	// if (e.getEventType() == MoveEvent.EventType.STARTED) {
+	// // Start updating while moving
+	// scheduleUpdater();
+	// } else {
+	// // Stop updating when move ended
+	// cancelUpdater();
+	// }
+	// }
 
 	private class UpdateTask implements Runnable {
 		@Override

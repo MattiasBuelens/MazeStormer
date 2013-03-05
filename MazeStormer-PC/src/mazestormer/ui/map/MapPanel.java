@@ -28,6 +28,7 @@ import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerHandler;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 
+import org.apache.batik.bridge.UpdateManager;
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
@@ -184,7 +185,8 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	}
 
 	private void addLayerMenuItem(final MapLayer layer) {
-		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(layer.getName());
+		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(
+				layer.getName());
 		menuItem.setSelected(layer.isVisible());
 		menuItem.addItemListener(new ItemListener() {
 			@Override
@@ -315,11 +317,15 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	@Override
 	public void requestDOMChange(Runnable request) {
-		canvas.getUpdateManager().getUpdateRunnableQueue().invokeLater(request);
+		UpdateManager updateManager = canvas.getUpdateManager();
+		if (updateManager != null) {
+			updateManager.getUpdateRunnableQueue().invokeLater(request);
+		}
 	}
 
 	@Override
-	public void layerPropertyChanged(MapLayer layer, String propertyName, Object propertyValue) {
+	public void layerPropertyChanged(MapLayer layer, String propertyName,
+			Object propertyValue) {
 		if (propertyName.equals("isVisible")) {
 			JMenuItem menuItem = layerMenuItems.get(layer);
 			if (menuItem != null) {
