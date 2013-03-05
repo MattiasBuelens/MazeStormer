@@ -1,0 +1,6 @@
+4 4
+
+DeadEnd.W	Straight.W.01	Corner.E	DeadEnd.N
+Corner.N	Straight.W	T.E		Straight.N.02
+Straight.S.04	Corner.N	T.S		Corner.S
+DeadEnd.S	Corner.W	Straight.E.06	DeadEnd.E
