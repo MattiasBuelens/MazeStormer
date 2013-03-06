@@ -204,35 +204,19 @@ public class MapController extends SubController implements IMapController {
 		}
 	}
 
-	// @Subscribe
-	// public void updateRobotPoseOnConnect(ConnectEvent e) {
-	// if (e.isConnected()) {
-	// // Set initial pose
-	// //invokeUpdateRobotPose();
-	//
-	// // Start updating
-	// scheduleUpdater();
-	// } else {
-	// // Stop updating
-	// cancelUpdater();
-	// }
-	// }
-
-	// @Subscribe
-	// public void updateRobotPoseOnMove(MoveEvent e) {
-	// if (e.getEventType() == MoveEvent.EventType.STARTED) {
-	// // Start updating while moving
-	// scheduleUpdater();
-	// } else {
-	// // Stop updating when move ended
-	// cancelUpdater();
-	// }
-	// }
-
 	private class UpdateTask implements Runnable {
 		@Override
 		public void run() {
 			invokeUpdateRobotPose();
+		}
+	}
+
+	@Subscribe
+	public void onPlayerEvent(PlayerEvent e) {
+		if (e.getEventType() == PlayerEvent.EventType.PLAYER_REMOVED
+				&& e.getPlayer().equals(getPlayer())) {
+			// Shutdown
+			executor.shutdown();
 		}
 	}
 

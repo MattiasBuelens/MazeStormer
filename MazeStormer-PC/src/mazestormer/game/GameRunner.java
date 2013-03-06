@@ -135,9 +135,14 @@ public class GameRunner implements GameListener {
 	}
 
 	@Override
-	public void onGameStarted(int playerNumber) {
-		// Start
+	public void onGameRolled(int playerNumber) {
+		// Store object number
 		objectNumber = playerNumber;
+	}
+
+	@Override
+	public void onGameStarted() {
+		// Start
 		explorerRunner.start();
 		// Start reporting
 		startPositionReport();

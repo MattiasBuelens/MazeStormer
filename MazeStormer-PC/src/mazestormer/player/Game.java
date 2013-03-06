@@ -126,9 +126,16 @@ public class Game {
 	private class GameHandler implements Handler {
 
 		@Override
+		public void gameRolled(int playerNumber) {
+			for (GameListener gl : gls) {
+				gl.onGameRolled(playerNumber);
+			}
+		}
+
+		@Override
 		public void gameStarted() {
 			for (GameListener gl : gls) {
-				gl.onGameStarted(client.getPlayerNumber());
+				gl.onGameStarted();
 			}
 		}
 

@@ -20,14 +20,18 @@ public class WaitFuture<V> extends AbstractFuture<V> implements
 
 	@Override
 	public void futureResolved(Future<? extends V> future) {
-		if (timer != null)
+		if (timer != null) {
 			timer.cancel();
+			timer = null;
+		}
 	}
 
 	@Override
 	public void futureCancelled(Future<? extends V> future) {
-		if (timer != null)
+		if (timer != null) {
 			timer.cancel();
+			timer = null;
+		}
 	}
 
 }

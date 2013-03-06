@@ -197,8 +197,13 @@ public class GameSetUpController extends SubController implements
 		}
 
 		@Override
-		public void onGameStarted(int playerNumber) {
-			logToAll("Game started, player number: " + playerNumber);
+		public void onGameRolled(int playerNumber) {
+			logToAll("Player number rolled: " + playerNumber);
+		}
+
+		@Override
+		public void onGameStarted() {
+			logToAll("Game started");
 		}
 
 		@Override

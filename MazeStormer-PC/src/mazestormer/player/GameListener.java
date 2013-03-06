@@ -8,7 +8,9 @@ public interface GameListener {
 
 	public void onGameLeft();
 
-	public void onGameStarted(int playerNumber);
+	public void onGameRolled(int playerNumber);
+
+	public void onGameStarted();
 
 	public void onGamePaused();
 
