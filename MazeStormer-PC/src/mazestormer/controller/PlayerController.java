@@ -1,12 +1,14 @@
 package mazestormer.controller;
 
+import com.google.common.eventbus.Subscribe;
+
 import mazestormer.player.Player;
 
 public class PlayerController extends SubController implements IPlayerController {
 
 	private Player player;
-	private IMapController map;
-	private ILogController log;
+	private MapController map;
+	private LogController log;
 
 	public PlayerController(MainController mainController, Player player) {
 		super(mainController);
@@ -32,6 +34,27 @@ public class PlayerController extends SubController implements IPlayerController
 			this.log = new LogController(this.getMainController(), getPlayer());
 		}
 		return this.log;
+	}
+
+	public void terminate() {
+		if (this.map != null) {
+			this.map.terminate();
+		}
+		if (this.log != null) {
+			this.log.terminate();
+		}
+	}
+
+	@Subscribe
+	public void onPlayerEvent(PlayerEvent e) {
+		switch (e.getEventType()) {
+		case PLAYER_REMOVED:
+			if (e.getPlayer().equals(getPlayer())) {
+				terminate();
+			}
+		default:
+			break;
+		}
 	}
 
 }

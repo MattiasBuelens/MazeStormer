@@ -13,16 +13,14 @@ import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.simulator.VirtualRobot;
 import peno.htttp.Callback;
 
-public class GameSetUpController extends SubController implements
-		IGameSetUpController {
+public class GameSetUpController extends SubController implements IGameSetUpController {
 
 	private Connection connection;
 	private Game game;
 	private GameRunner runner;
 	private final IGameController gameController;
 
-	public GameSetUpController(MainController mainController,
-			IGameController gameController) {
+	public GameSetUpController(MainController mainController, IGameController gameController) {
 		super(mainController);
 		this.gameController = gameController;
 	}
@@ -51,8 +49,7 @@ public class GameSetUpController extends SubController implements
 		postEvent(new PlayerEvent(PlayerEvent.EventType.PLAYER_RENAMED, player));
 	}
 
-	private void createGame(ConnectionMode connectionMode, String gameID)
-			throws IOException {
+	private void createGame(ConnectionMode connectionMode, String gameID) throws IOException {
 		final Player localPlayer = getMainController().getPlayer();
 
 		connection = connectionMode.newConnection();
@@ -121,17 +118,17 @@ public class GameSetUpController extends SubController implements
 	}
 
 	@Override
-	public void startGame() {
+	public void setReady(final boolean isReady) {
 		if (game == null) {
 			logToAll("Error when readying: not connected.");
 			return;
 		}
 
 		try {
-			game.setReady(true, new Callback<Void>() {
+			game.setReady(isReady, new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					logToAll("Ready");
+					logToAll(isReady ? "Ready" : "Not ready");
 				}
 
 				@Override
@@ -141,6 +138,48 @@ public class GameSetUpController extends SubController implements
 			});
 		} catch (Exception e) {
 			logToAll("Error when readying: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public void startGame() {
+		if (game == null) {
+			logToAll("Error when starting: not connected.");
+			return;
+		}
+
+		try {
+			game.start();
+		} catch (IllegalStateException | IOException e) {
+			logToAll("Error when starting: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public void pauseGame() {
+		if (game == null) {
+			logToAll("Error when pausing: not connected.");
+			return;
+		}
+
+		try {
+			game.pause();
+		} catch (IllegalStateException | IOException e) {
+			logToAll("Error when pausing: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public void stopGame() {
+		if (game == null) {
+			logToAll("Error when stopping: not connected.");
+			return;
+		}
+
+		try {
+			game.stop();
+		} catch (IllegalStateException | IOException e) {
+			logToAll("Error when stopping: " + e.getMessage());
 		}
 	}
 
@@ -235,8 +274,7 @@ public class GameSetUpController extends SubController implements
 
 		@Override
 		public void onPositionUpdate(String playerID, Pose pose) {
-			((Player) getGameController().getPlayer(playerID)).getRobot()
-					.getPoseProvider().setPose(pose);
+			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider().setPose(pose);
 		}
 
 	};

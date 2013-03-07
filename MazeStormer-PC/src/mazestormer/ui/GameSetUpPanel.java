@@ -1,6 +1,9 @@
 package mazestormer.ui;
 
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.Beans;
 
 import javax.swing.AbstractAction;
@@ -8,9 +11,11 @@ import javax.swing.Action;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
@@ -22,6 +27,9 @@ import net.miginfocom.swing.MigLayout;
 import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.ListAllIcon;
+import com.javarichclient.icon.tango.actions.MediaPlaybackPauseIcon;
+import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
+import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 import com.javarichclient.icon.tango.actions.SystemLogOutIcon;
 
 public class GameSetUpPanel extends ViewPanel {
@@ -32,12 +40,17 @@ public class GameSetUpPanel extends ViewPanel {
 
 	private final JButton rename = new JButton();
 	private final JButton join = new JButton();
-	private final JButton start = new JButton();
 	private final JButton leave = new JButton();
+	private final JButton start = new JButton();
+	private final JButton pause = new JButton();
+	private final JButton stop = new JButton();
 	private final Action renameAction = new RenameAction();
 	private final Action joinAction = new JoinAction();
-	private final Action startAction = new StartAction();
 	private final Action leaveAction = new LeaveAction();
+	private final Action startAction = new StartAction();
+	private final Action pauseAction = new PauseAction();
+	private final Action stopAction = new StopAction();
+	private final JCheckBox ready = new JCheckBox();
 
 	private ComboBoxModel<ConnectionMode> serverModel;
 	private final JComboBox<ConnectionMode> server = new JComboBox<ConnectionMode>();
@@ -47,16 +60,15 @@ public class GameSetUpPanel extends ViewPanel {
 	public GameSetUpPanel(IGameSetUpController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Team Treasure Trek",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new MigLayout("", "[][100px:n,grow][fill]", "[][][][]"));
+		setBorder(new TitledBorder(null, "Team Treasure Trek", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setLayout(new MigLayout("", "[][100px:n,grow][fill]", "[][][][][]"));
 
 		createServer();
 		createPlayerID();
 		createJoinGame();
 		createButtons();
 
-		enableGameButtons(true);
+		enableGameButtons(false, false);
 
 		if (!Beans.isDesignTime())
 			registerController();
@@ -70,8 +82,7 @@ public class GameSetUpPanel extends ViewPanel {
 	}
 
 	private void createServer() {
-		serverModel = new DefaultComboBoxModel<ConnectionMode>(
-				ConnectionMode.values());
+		serverModel = new DefaultComboBoxModel<ConnectionMode>(ConnectionMode.values());
 
 		JLabel lblServer = new JLabel("Server");
 		add(lblServer, "cell 0 0");
@@ -86,7 +97,6 @@ public class GameSetUpPanel extends ViewPanel {
 
 		add(playerID, "cell 1 1,grow");
 
-		rename.setToolTipText("Set player name");
 		rename.setAction(renameAction);
 		rename.setText("");
 		rename.setIcon(new GoNextIcon(24, 24));
@@ -103,7 +113,6 @@ public class GameSetUpPanel extends ViewPanel {
 
 		add(gameID, "cell 1 2,grow");
 
-		join.setToolTipText("Join the game");
 		join.setAction(joinAction);
 		join.setText("");
 		join.setIcon(new ListAllIcon(24, 24));
@@ -115,37 +124,67 @@ public class GameSetUpPanel extends ViewPanel {
 	}
 
 	private void createButtons() {
-		start.setToolTipText("Start the game");
-		start.setAction(startAction);
-		start.setText("");
-		start.setIcon(new GoNextIcon(24, 24));
-		add(start, "cell 1 3,alignx right");
+		ready.setText("Ready");
+		ready.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean isEnabled = (e.getStateChange() == ItemEvent.SELECTED);
+				setReady(isEnabled);
+			}
+		});
+		add(ready, "cell 0 3");
 
-		leave.setToolTipText("Leave the game");
 		leave.setAction(leaveAction);
 		leave.setText("");
 		leave.setIcon(new SystemLogOutIcon(24, 24));
 		add(leave, "cell 2 3");
+
+		JPanel buttons = new JPanel();
+		add(buttons, "cell 0 4 3 1,grow");
+		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+		start.setAction(startAction);
+		start.setText("");
+		start.setIcon(new MediaPlaybackStartIcon(32, 32));
+		buttons.add(start, "cell 0 0");
+
+		pause.setAction(pauseAction);
+		pause.setText("");
+		pause.setIcon(new MediaPlaybackPauseIcon(32, 32));
+		buttons.add(pause, "cell 0 1");
+
+		stop.setAction(stopAction);
+		stop.setText("");
+		stop.setIcon(new MediaPlaybackStopIcon(32, 32));
+		buttons.add(stop, "cell 0 2");
 	}
 
-	private void enableGameButtons(boolean request) {
-		rename.setEnabled(request);
-		join.setEnabled(request);
-		start.setEnabled(!request);
-		leave.setEnabled(!request);
+	private void enableGameButtons(boolean isJoined, boolean isPlaying) {
+		rename.setEnabled(!isJoined);
+		join.setEnabled(!isJoined);
+		leave.setEnabled(isJoined);
+
+		// TODO Implement events to report playing state
+		ready.setEnabled(isJoined);
+		start.setEnabled(isJoined);// && !isPlaying);
+		pause.setEnabled(isJoined);// && isPlaying);
+		stop.setEnabled(isJoined);// && isPlaying);
 	}
 
 	@Subscribe
 	public void onGameEvent(GameSetUpEvent e) {
 		switch (e.getEventType()) {
 		case JOINED:
-			enableGameButtons(false);
+			// Clear ready state
+			ready.setSelected(false);
+			// Enable buttons
+			enableGameButtons(true, true); // TODO Pass playing state
 			break;
 		case LEFT:
-			enableGameButtons(true);
+			enableGameButtons(false, false);
 			break;
 		case DISCONNECTED:
-			enableGameButtons(true);
+			enableGameButtons(false, false);
 			break;
 		case NOT_READY:
 			showNotReady();
@@ -156,11 +195,9 @@ public class GameSetUpPanel extends ViewPanel {
 	}
 
 	private void showNotReady() {
-		JOptionPane
-				.showMessageDialog(
-						null,
-						"You have to select a robot type and/or source maze\n before you could create or join a game.",
-						"Setup", 1);
+		JOptionPane.showMessageDialog(null,
+				"You have to select a robot type and/or source maze\n before you could create or join a game.",
+				"Setup", 1);
 	}
 
 	private void setPlayerID() {
@@ -176,8 +213,20 @@ public class GameSetUpPanel extends ViewPanel {
 			controller.joinGame(mode, id);
 	}
 
+	private void setReady(boolean isReady) {
+		controller.setReady(isReady);
+	}
+
 	private void startGame() {
 		controller.startGame();
+	}
+
+	private void pauseGame() {
+		controller.pauseGame();
+	}
+
+	private void stopGame() {
+		controller.stopGame();
 	}
 
 	private void leaveGame() {
@@ -203,8 +252,8 @@ public class GameSetUpPanel extends ViewPanel {
 		private static final long serialVersionUID = 1L;
 
 		public JoinAction() {
-			putValue(NAME, "Join selected game");
-			putValue(SHORT_DESCRIPTION, "Join selected game");
+			putValue(NAME, "Join game");
+			putValue(SHORT_DESCRIPTION, "Join the game");
 		}
 
 		@Override
@@ -214,12 +263,26 @@ public class GameSetUpPanel extends ViewPanel {
 
 	}
 
+	private class LeaveAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public LeaveAction() {
+			putValue(NAME, "Leave game");
+			putValue(SHORT_DESCRIPTION, "Leave the game");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			leaveGame();
+		}
+	}
+
 	private class StartAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
 		public StartAction() {
-			putValue(NAME, "Start selected game");
-			putValue(SHORT_DESCRIPTION, "Start selected game");
+			putValue(NAME, "Start game");
+			putValue(SHORT_DESCRIPTION, "Start the game");
 		}
 
 		@Override
@@ -229,18 +292,34 @@ public class GameSetUpPanel extends ViewPanel {
 
 	}
 
-	private class LeaveAction extends AbstractAction {
+	private class PauseAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
-		public LeaveAction() {
-			putValue(NAME, "Leave current game");
-			putValue(SHORT_DESCRIPTION, "Leave current game");
+		public PauseAction() {
+			putValue(NAME, "Pause game");
+			putValue(SHORT_DESCRIPTION, "Pause the game");
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			leaveGame();
-
+		public void actionPerformed(ActionEvent arg0) {
+			pauseGame();
 		}
+
 	}
+
+	private class StopAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+
+		public StopAction() {
+			putValue(NAME, "Stop game");
+			putValue(SHORT_DESCRIPTION, "Stop the game");
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			stopGame();
+		}
+
+	}
+
 }

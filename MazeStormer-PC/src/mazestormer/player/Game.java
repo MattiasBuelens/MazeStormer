@@ -23,14 +23,12 @@ public class Game {
 	private final GameHandler handler;
 	private final List<GameListener> gls = new ArrayList<GameListener>();
 
-	public Game(Connection connection, String id, Player localPlayer)
-			throws IOException, IllegalStateException {
+	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
 
 		this.handler = new GameHandler();
-		this.client = new Client(connection, this.handler, id,
-				localPlayer.getPlayerID());
+		this.client = new Client(connection, this.handler, id, localPlayer.getPlayerID());
 	}
 
 	public void addGameListener(GameListener gl) {
@@ -94,6 +92,18 @@ public class Game {
 		} catch (Exception e) {
 			callback.onFailure(e);
 		}
+	}
+
+	public void start() throws IllegalStateException, IOException {
+		client.start();
+	}
+
+	public void pause() throws IllegalStateException, IOException {
+		client.pause();
+	}
+
+	public void stop() throws IllegalStateException, IOException {
+		client.stop();
 	}
 
 	public void objectFound() {
@@ -168,8 +178,7 @@ public class Game {
 		}
 
 		@Override
-		public void playerPosition(String playerID, double x, double y,
-				double angle) {
+		public void playerPosition(String playerID, double x, double y, double angle) {
 			// Ignore local position updates
 			if (playerID.equals(client.getPlayerID()))
 				return;

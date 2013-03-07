@@ -11,8 +11,14 @@ public interface IGameSetUpController extends EventSource {
 
 	public void joinGame(ConnectionMode connectionMode, String gameID);
 
+	public void leaveGame();
+
+	public void setReady(boolean isReady);
+
 	public void startGame();
 
-	public void leaveGame();
+	public void pauseGame();
+
+	public void stopGame();
 
 }

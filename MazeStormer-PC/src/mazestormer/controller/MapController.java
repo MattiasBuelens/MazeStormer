@@ -38,14 +38,12 @@ public class MapController extends SubController implements IMapController {
 	private MazeLayer sourceMazeLayer;
 	private RangesLayer rangesLayer;
 
-	private ScheduledExecutorService executor = Executors
-			.newSingleThreadScheduledExecutor(factory);
+	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(factory);
 	private Runnable updateTask = new UpdateTask();
 	private ScheduledFuture<?> updateHandle;
 	private long updateInterval;
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("MapController-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MapController-%d").build();
 
 	private static final long defaultUpdateFPS = 25;
 
@@ -123,8 +121,7 @@ public class MapController extends SubController implements IMapController {
 		if (getPlayer().getRobot() == null)
 			return null;
 
-		return CoordUtils.toMapCoordinates(getPlayer().getRobot()
-				.getPoseProvider().getPose());
+		return CoordUtils.toMapCoordinates(getPlayer().getRobot().getPoseProvider().getPose());
 	}
 
 	private void updateRobotPose() {
@@ -171,8 +168,7 @@ public class MapController extends SubController implements IMapController {
 		// Cancel if still running
 		cancelUpdater();
 		// Reschedule updater
-		updateHandle = executor.scheduleAtFixedRate(updateTask, 0,
-				getUpdateInterval(), TimeUnit.MILLISECONDS);
+		updateHandle = executor.scheduleAtFixedRate(updateTask, 0, getUpdateInterval(), TimeUnit.MILLISECONDS);
 	}
 
 	private void cancelUpdater() {
@@ -211,13 +207,9 @@ public class MapController extends SubController implements IMapController {
 		}
 	}
 
-	@Subscribe
-	public void onPlayerEvent(PlayerEvent e) {
-		if (e.getEventType() == PlayerEvent.EventType.PLAYER_REMOVED
-				&& e.getPlayer().equals(getPlayer())) {
-			// Shutdown
-			executor.shutdown();
-		}
+	public void terminate() {
+		// Shutdown executor
+		executor.shutdown();
 	}
 
 }

@@ -23,7 +23,7 @@ public class Player implements IPlayer {
 	public Player() {
 
 	}
-	
+
 	public Player(String playerID, Robot robot) {
 		setPlayerID(playerID);
 		setRobot(robot);
