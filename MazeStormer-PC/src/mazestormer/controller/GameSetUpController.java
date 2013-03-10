@@ -2,8 +2,6 @@ package mazestormer.controller;
 
 import java.io.IOException;
 
-import com.rabbitmq.client.Connection;
-
 import lejos.robotics.navigation.Pose;
 import mazestormer.game.GameRunner;
 import mazestormer.player.Game;
@@ -12,6 +10,8 @@ import mazestormer.player.Player;
 import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.simulator.VirtualRobot;
 import peno.htttp.Callback;
+
+import com.rabbitmq.client.Connection;
 
 public class GameSetUpController extends SubController implements IGameSetUpController {
 
@@ -274,7 +274,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		@Override
 		public void onPositionUpdate(String playerID, Pose pose) {
-			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider().setPose(pose);
+			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider()
+					.setPose(pose);
 		}
 
 	};

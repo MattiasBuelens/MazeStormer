@@ -129,10 +129,6 @@ public class Game {
 		}
 	}
 
-	public void terminate() {
-		client.shutdown();
-	}
-
 	private class GameHandler implements Handler {
 
 		@Override
