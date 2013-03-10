@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.rabbitmq.ConnectionMode;
+import mazestormer.game.ConnectionMode;
 import mazestormer.util.EventSource;
 
 public interface IGameSetUpController extends EventSource {

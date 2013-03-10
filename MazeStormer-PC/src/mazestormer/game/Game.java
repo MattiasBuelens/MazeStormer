@@ -1,4 +1,4 @@
-package mazestormer.player;
+package mazestormer.game;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.player.Player;
 import mazestormer.util.CoordUtils;
 import peno.htttp.Callback;
 import peno.htttp.Client;

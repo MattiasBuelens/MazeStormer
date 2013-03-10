@@ -18,8 +18,6 @@ import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
-import mazestormer.player.Game;
-import mazestormer.player.GameListener;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 

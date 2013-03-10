@@ -1,4 +1,4 @@
-package mazestormer.player;
+package mazestormer.game;
 
 import lejos.robotics.navigation.Pose;
 

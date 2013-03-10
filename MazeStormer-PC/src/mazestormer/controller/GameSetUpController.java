@@ -3,11 +3,11 @@ package mazestormer.controller;
 import java.io.IOException;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.game.ConnectionMode;
+import mazestormer.game.Game;
+import mazestormer.game.GameListener;
 import mazestormer.game.GameRunner;
-import mazestormer.player.Game;
-import mazestormer.player.GameListener;
 import mazestormer.player.Player;
-import mazestormer.rabbitmq.ConnectionMode;
 import mazestormer.simulator.VirtualRobot;
 import peno.htttp.Callback;
 

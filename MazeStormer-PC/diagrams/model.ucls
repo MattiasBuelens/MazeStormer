@@ -56,8 +56,8 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.player.Game" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/player/Game.java" binary="false">    
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.Game" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/game/Game.java" binary="false">    
     <position height="-1" width="-1" x="378" y="147"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      

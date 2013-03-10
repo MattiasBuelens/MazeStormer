@@ -21,7 +21,7 @@ import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.GameSetUpEvent;
 import mazestormer.controller.IGameSetUpController;
-import mazestormer.rabbitmq.ConnectionMode;
+import mazestormer.game.ConnectionMode;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
