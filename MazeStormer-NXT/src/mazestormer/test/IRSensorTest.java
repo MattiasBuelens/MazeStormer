@@ -27,8 +27,8 @@ public class IRSensorTest {
 
 			@Override
 			public void buttonPressed(Button b) {
-				StringBuilder sb = new StringBuilder("");
 				for (int i = 1; i <= 5; i++) {
+					StringBuilder sb = new StringBuilder("");
 					LCD.clear(i - 1);
 					sb.append("Dir: ");
 					sb.append(i);
