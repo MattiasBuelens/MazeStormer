@@ -16,7 +16,7 @@ public class IRSensorTest {
 
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-
+		new IRSensorTest();
 	}
 
 	public IRSensorTest() {
