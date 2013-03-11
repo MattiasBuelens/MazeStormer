@@ -1,6 +1,7 @@
 package mazestormer.maze;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import lejos.geom.Point;
@@ -53,12 +54,13 @@ public class PathFinder {
 	 */
 	public List<Waypoint> findPath(Tile startTile, Tile goalTile) {
 		// Get path of tiles
-		Tile[] tiles = maze.getMesh().findTilePath(startTile, goalTile);
+		List<Tile> tiles = maze.getMesh().findTilePath(startTile, goalTile);
 		// Get path of way points
-		// Note: loop starts at *second* tile
-		List<Waypoint> waypoints = new ArrayList<Waypoint>();
-		for (int i = 1, len = tiles.length; i < len; i++) {
-			waypoints.add(toWaypoint(tiles[i]));
+		// Note: iteration starts at *second* tile (index 1)
+		List<Waypoint> waypoints = new ArrayList<Waypoint>(tiles.size() - 1);
+		Iterator<Tile> it = tiles.listIterator(1);
+		while (it.hasNext()) {
+			waypoints.add(toWaypoint(it.next()));
 		}
 		return waypoints;
 	}
@@ -72,8 +74,7 @@ public class PathFinder {
 	 */
 	public Waypoint toWaypoint(Tile tile) {
 		// Get center of tile
-		Point tilePosition = tile.getPosition().toPoint()
-				.add(new Point(0.5f, 0.5f));
+		Point tilePosition = tile.getPosition().toPoint().add(new Point(0.5f, 0.5f));
 		// Get absolute position
 		Point absolutePosition = maze.toAbsolute(maze.fromTile(tilePosition));
 		// Create way point

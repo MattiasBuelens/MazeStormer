@@ -2,7 +2,6 @@ package mazestormer.explore;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,9 +39,9 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 
 import com.google.common.primitives.Floats;
+import com.google.common.primitives.Longs;
 
-public class ExplorerRunner extends
-		StateMachine<ExplorerRunner, ExplorerRunner.ExplorerState> implements
+public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.ExplorerState> implements
 		StateListener<ExplorerRunner.ExplorerState>, NavigatorListener {
 
 	/*
@@ -97,8 +96,7 @@ public class ExplorerRunner extends
 		addStateListener(this);
 
 		// Navigator
-		this.navigator = new Navigator(getRobot().getPilot(), getRobot()
-				.getPoseProvider());
+		this.navigator = new Navigator(getRobot().getPilot(), getRobot().getPoseProvider());
 		navigator.addNavigatorListener(this);
 		navigator.pauseAt(Navigator.NavigatorState.TRAVEL);
 
@@ -269,9 +267,7 @@ public class ExplorerRunner extends
 				navigator.pause();
 			}
 			// Resume when action is done
-			bindTransition(
-					barcodeScanner.performAction(currentTile.getBarcode()),
-					ExplorerState.NAVIGATE);
+			bindTransition(barcodeScanner.performAction(currentTile.getBarcode()), ExplorerState.NAVIGATE);
 		} else {
 			// No action, just continue
 			transition(ExplorerState.NAVIGATE);
@@ -295,8 +291,7 @@ public class ExplorerRunner extends
 			// Travel off barcode
 			double clearDistance = getBarcodeClearingDistance();
 			log("Travel off barcode: " + clearDistance);
-			bindTransition(getRobot().getPilot().travelComplete(clearDistance),
-					ExplorerState.BEFORE_TRAVEL);
+			bindTransition(getRobot().getPilot().travelComplete(clearDistance), ExplorerState.BEFORE_TRAVEL);
 		} else {
 			// No barcode
 			transition(ExplorerState.BEFORE_TRAVEL);
@@ -399,8 +394,7 @@ public class ExplorerRunner extends
 		// Clean up to prevent barcode scanner from resetting the new speed
 		barcodeScanner.stop();
 		// Start traveling at high speed
-		getRobot().getPilot().setTravelSpeed(
-				BarcodeSpeed.HIGH.getBarcodeSpeedValue());
+		getRobot().getPilot().setTravelSpeed(BarcodeSpeed.HIGH.getBarcodeSpeedValue());
 
 		// Traverse new path
 		transition(ExplorerState.NEXT_CYCLE);
@@ -437,16 +431,13 @@ public class ExplorerRunner extends
 	 */
 	private void scanAndUpdate(Tile tile) {
 		// Read from scanner
-		RangeFeature feature = getRobot().getRangeDetector().scan(
-				getScanAngles(tile));
+		RangeFeature feature = getRobot().getRangeDetector().scan(getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
 			Orientation orientation;
 			for (RangeReading reading : feature.getRangeReadings()) {
-				orientation = angleToOrientation(reading.getAngle()
-						+ getMaze().toRelative(getPose().getHeading()));
-				getMaze().setEdge(tile.getPosition(), orientation,
-						EdgeType.WALL);
+				orientation = angleToOrientation(reading.getAngle() + getMaze().toRelative(getPose().getHeading()));
+				getMaze().setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
 		// Replace unknown edges with openings
@@ -499,8 +490,7 @@ public class ExplorerRunner extends
 		Waypoint nextWaypoint = navigator.getCurrentTarget();
 
 		// Get traveling line
-		Line line = new Line(currentWaypoint.x, currentWaypoint.y,
-				nextWaypoint.x, nextWaypoint.y);
+		Line line = new Line(currentWaypoint.x, currentWaypoint.y, nextWaypoint.x, nextWaypoint.y);
 		float angle = currentWaypoint.angleTo(nextWaypoint);
 
 		// Get target position to clear barcode
@@ -677,8 +667,7 @@ public class ExplorerRunner extends
 	}
 
 	@Override
-	public void navigatorPaused(NavigatorState currentState, Pose pose,
-			boolean onTransition) {
+	public void navigatorPaused(NavigatorState currentState, Pose pose, boolean onTransition) {
 		// Only respond to pauses on transitions
 		if (!onTransition)
 			return;
@@ -708,8 +697,7 @@ public class ExplorerRunner extends
 		transition(ExplorerState.NEXT_CYCLE);
 	}
 
-	private class LineFinderListener extends
-			AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(ExplorerState.AFTER_LINE_ADJUST);
@@ -732,26 +720,34 @@ public class ExplorerRunner extends
 	 * Compares tiles based on their Manhattan distance to a given reference
 	 * tile.
 	 */
-	public static class ClosestTileComparator implements Comparator<Tile> {
+	public class ClosestTileComparator implements Comparator<Tile> {
 
-		private final Point2D referencePosition;
+		private final Tile referenceTile;
 
 		public ClosestTileComparator(Tile referenceTile) {
-			this.referencePosition = referenceTile.getPosition();
+			this.referenceTile = referenceTile;
 		}
 
 		@Override
 		public int compare(Tile left, Tile right) {
-			double leftDistance = manhattanDistance(referencePosition,
-					left.getPosition());
-			double rightDistance = manhattanDistance(referencePosition,
-					right.getPosition());
-			return Double.compare(leftDistance, rightDistance);
+			int leftDistance = shortestPathLength(referenceTile, left);
+			int rightDistance = shortestPathLength(referenceTile, right);
+			return Integer.compare(leftDistance, rightDistance);
 		}
 
-		public static double manhattanDistance(Point2D left, Point2D right) {
-			return Math.abs(left.getX() - right.getX())
-					+ Math.abs(left.getY() - right.getY());
+		public int shortestPathLength(Tile startTile, Tile endTile) {
+			return pathFinder.findPath(startTile, endTile).size();
+		}
+
+		@Deprecated
+		public int compareManhattan(Tile left, Tile right) {
+			long leftDistance = manhattanDistance(referenceTile, left);
+			long rightDistance = manhattanDistance(referenceTile, right);
+			return Longs.compare(leftDistance, rightDistance);
+		}
+
+		public long manhattanDistance(Tile start, Tile end) {
+			return Math.abs(start.getX() - end.getX()) + Math.abs(start.getY() - end.getY());
 		}
 
 	}
