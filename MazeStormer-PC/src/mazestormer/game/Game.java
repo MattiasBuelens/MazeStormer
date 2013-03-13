@@ -95,10 +95,6 @@ public class Game {
 		}
 	}
 
-	public void start() throws IllegalStateException, IOException {
-		client.start();
-	}
-
 	public void pause() throws IllegalStateException, IOException {
 		client.pause();
 	}
@@ -172,6 +168,12 @@ public class Game {
 			for (GameListener gl : gls) {
 				gl.onPlayerLeft(playerID);
 			}
+		}
+
+		@Override
+		public void playerReady(String playerID, boolean isReady) {
+			// TODO Auto-generated method stub
+
 		}
 
 		@Override

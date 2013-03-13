@@ -41,13 +41,11 @@ public class GameSetUpPanel extends ViewPanel {
 	private final JButton rename = new JButton();
 	private final JButton join = new JButton();
 	private final JButton leave = new JButton();
-	private final JButton start = new JButton();
 	private final JButton pause = new JButton();
 	private final JButton stop = new JButton();
 	private final Action renameAction = new RenameAction();
 	private final Action joinAction = new JoinAction();
 	private final Action leaveAction = new LeaveAction();
-	private final Action startAction = new StartAction();
 	private final Action pauseAction = new PauseAction();
 	private final Action stopAction = new StopAction();
 	private final JCheckBox ready = new JCheckBox();
@@ -143,20 +141,15 @@ public class GameSetUpPanel extends ViewPanel {
 		add(buttons, "cell 0 4 3 1,grow");
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		start.setAction(startAction);
-		start.setText("");
-		start.setIcon(new MediaPlaybackStartIcon(32, 32));
-		buttons.add(start, "cell 0 0");
-
 		pause.setAction(pauseAction);
 		pause.setText("");
 		pause.setIcon(new MediaPlaybackPauseIcon(32, 32));
-		buttons.add(pause, "cell 0 1");
+		buttons.add(pause, "cell 0 0");
 
 		stop.setAction(stopAction);
 		stop.setText("");
 		stop.setIcon(new MediaPlaybackStopIcon(32, 32));
-		buttons.add(stop, "cell 0 2");
+		buttons.add(stop, "cell 0 1");
 	}
 
 	private void enableGameButtons(boolean isJoined, boolean isPlaying) {
@@ -166,7 +159,6 @@ public class GameSetUpPanel extends ViewPanel {
 
 		// TODO Implement events to report playing state
 		ready.setEnabled(isJoined);
-		start.setEnabled(isJoined);// && !isPlaying);
 		pause.setEnabled(isJoined);// && isPlaying);
 		stop.setEnabled(isJoined);// && isPlaying);
 	}
@@ -215,10 +207,6 @@ public class GameSetUpPanel extends ViewPanel {
 
 	private void setReady(boolean isReady) {
 		controller.setReady(isReady);
-	}
-
-	private void startGame() {
-		controller.startGame();
 	}
 
 	private void pauseGame() {
@@ -275,21 +263,6 @@ public class GameSetUpPanel extends ViewPanel {
 		public void actionPerformed(ActionEvent e) {
 			leaveGame();
 		}
-	}
-
-	private class StartAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public StartAction() {
-			putValue(NAME, "Start game");
-			putValue(SHORT_DESCRIPTION, "Start the game");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			startGame();
-		}
-
 	}
 
 	private class PauseAction extends AbstractAction {

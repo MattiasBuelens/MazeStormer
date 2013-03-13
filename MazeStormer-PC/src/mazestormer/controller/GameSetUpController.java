@@ -142,20 +142,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	@Override
-	public void startGame() {
-		if (game == null) {
-			logToAll("Error when starting: not connected.");
-			return;
-		}
-
-		try {
-			game.start();
-		} catch (IllegalStateException | IOException e) {
-			logToAll("Error when starting: " + e.getMessage());
-		}
-	}
-
-	@Override
 	public void pauseGame() {
 		if (game == null) {
 			logToAll("Error when pausing: not connected.");
