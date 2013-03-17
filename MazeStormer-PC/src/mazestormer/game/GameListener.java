@@ -19,6 +19,8 @@ public interface GameListener {
 	public void onPlayerJoined(String playerID);
 
 	public void onPlayerLeft(String playerID);
+	
+	public void onPlayerReady(String playerID, boolean isReady);
 
 	public void onObjectFound(String playerID);
 

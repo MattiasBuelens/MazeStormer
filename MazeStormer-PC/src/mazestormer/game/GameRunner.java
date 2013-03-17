@@ -170,6 +170,10 @@ public class GameRunner implements GameListener {
 	}
 
 	@Override
+	public void onPlayerReady(String playerID, boolean isReady) {
+	}
+
+	@Override
 	public void onObjectFound(String playerID) {
 	}
 

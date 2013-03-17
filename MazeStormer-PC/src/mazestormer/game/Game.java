@@ -181,8 +181,9 @@ public class Game {
 
 		@Override
 		public void playerReady(String playerID, boolean isReady) {
-			// TODO Auto-generated method stub
-
+			for (GameListener gl : gls) {
+				gl.onPlayerReady(playerID, isReady);
+			}
 		}
 
 		/*

@@ -128,7 +128,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			game.setReady(isReady, new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					logToAll(isReady ? "Ready" : "Not ready");
 				}
 
 				@Override
@@ -254,14 +253,18 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		}
 
 		@Override
+		public void onPlayerReady(String playerID, boolean isReady) {
+			logTo(playerID, isReady ? "Ready" : "Not ready");
+		}
+
+		@Override
 		public void onObjectFound(String playerID) {
 			logTo(playerID, "Player " + playerID + " found their object");
 		}
 
 		@Override
 		public void onPositionUpdate(String playerID, Pose pose) {
-			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider()
-					.setPose(pose);
+			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider().setPose(pose);
 		}
 
 	};
