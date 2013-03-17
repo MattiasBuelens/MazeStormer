@@ -9,8 +9,9 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.player.Player;
 import mazestormer.util.CoordUtils;
 import peno.htttp.Callback;
-import peno.htttp.Client;
-import peno.htttp.Handler;
+import peno.htttp.DisconnectReason;
+import peno.htttp.PlayerClient;
+import peno.htttp.PlayerHandler;
 
 import com.rabbitmq.client.Connection;
 
@@ -19,17 +20,17 @@ public class Game {
 	private final String id;
 	private final Player localPlayer;
 
-	private final Client client;
+	private final PlayerClient client;
 
-	private final GameHandler handler;
+	private final Handler handler;
 	private final List<GameListener> gls = new ArrayList<GameListener>();
 
 	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
 
-		this.handler = new GameHandler();
-		this.client = new Client(connection, this.handler, id, localPlayer.getPlayerID());
+		this.handler = new Handler();
+		this.client = new PlayerClient(connection, this.handler, id, localPlayer.getPlayerID());
 	}
 
 	public void addGameListener(GameListener gl) {
@@ -126,7 +127,7 @@ public class Game {
 		}
 	}
 
-	private class GameHandler implements Handler {
+	private class Handler implements PlayerHandler {
 
 		@Override
 		public void gameRolled(int playerNumber) {
@@ -157,6 +158,11 @@ public class Game {
 		}
 
 		@Override
+		public void playerJoining(String playerID) {
+			// TODO Perhaps add GameListener.onPlayerJoining() ?
+		}
+
+		@Override
 		public void playerJoined(String playerID) {
 			for (GameListener gl : gls) {
 				gl.onPlayerJoined(playerID);
@@ -164,9 +170,12 @@ public class Game {
 		}
 
 		@Override
-		public void playerLeft(String playerID) {
-			for (GameListener gl : gls) {
-				gl.onPlayerLeft(playerID);
+		public void playerDisconnected(String playerID, DisconnectReason reason) {
+			// TODO Perhaps add GameListener.onPlayerTimeout() ?
+			if (reason == DisconnectReason.LEAVE || reason == DisconnectReason.TIMEOUT) {
+				for (GameListener gl : gls) {
+					gl.onPlayerLeft(playerID);
+				}
 			}
 		}
 
@@ -176,23 +185,26 @@ public class Game {
 
 		}
 
-		@Override
-		public void playerPosition(String playerID, double x, double y, double angle) {
-			// Ignore local position updates
-			if (playerID.equals(client.getPlayerID()))
-				return;
+		/*
+		 * TODO Set up a spectator to receive position updates.
+		 */
+//		@Override
+//		public void playerPosition(String playerID, int playerNumber, double x, double y, double angle) {
+//			// Ignore local position updates
+//			if (playerID.equals(client.getPlayerID()))
+//				return;
+//
+//			// Parse pose and convert
+//			Pose p = new Pose((float) x, (float) y, (float) angle);
+//			p = CoordUtils.toRobotCoordinates(p);
+//			// Publish
+//			for (GameListener gl : gls) {
+//				gl.onPositionUpdate(playerID, p);
+//			}
+//		}
 
-			// Parse pose and convert
-			Pose p = new Pose((float) x, (float) y, (float) angle);
-			p = CoordUtils.toRobotCoordinates(p);
-			// Publish
-			for (GameListener gl : gls) {
-				gl.onPositionUpdate(playerID, p);
-			}
-		}
-
 		@Override
-		public void playerFoundObject(String playerID) {
+		public void playerFoundObject(String playerID, int playerNumber) {
 			for (GameListener gl : gls) {
 				gl.onObjectFound(playerID);
 			}
