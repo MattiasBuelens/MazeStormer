@@ -1,10 +1,10 @@
 package mazestormer.connect;
 
 import static com.google.common.base.Preconditions.checkState;
-import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.simulator.VirtualRobot;
+import mazestormer.world.World;
 
 public class VirtualConnector implements Connector {
 
@@ -26,11 +26,11 @@ public class VirtualConnector implements Connector {
 		if (isConnected())
 			return;
 
-		robot = createRobot(context.getSourceMaze());
+		robot = createRobot(context.getWorld());
 	}
 
-	private static ControllableRobot createRobot(Maze loadedMaze) {
-		ControllableRobot robot = new VirtualRobot(loadedMaze);
+	private static ControllableRobot createRobot(World world) {
+		ControllableRobot robot = new VirtualRobot(world);
 		// Set default speeds
 		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(ControllableRobot.travelSpeed);

@@ -100,57 +100,60 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		this.pauseState = pauseState;
 	}
 
-//	/**
-//	 * Fork this state machine and join when another machine reaches a given
-//	 * state.
-//	 * 
-//	 * <p>
-//	 * This state machine is paused immediately and is resumed when the other
-//	 * machine transitions to the given join state. If the other machine doesn't
-//	 * reach the given state before stopping or finishing, this machine remains
-//	 * paused.
-//	 * </p>
-//	 * 
-//	 * <p>
-//	 * The returned future indicates the result of the join.
-//	 * </p>
-//	 * 
-//	 * @param joiner
-//	 *            The other state machine to join.
-//	 * @param joinState
-//	 *            The state at which to join the other state machine.
-//	 */
-//	public <T extends State<?, T>> Future<Boolean> forkJoin(final StateMachine<?, T> joiner, final T joinState) {
-//		// Resume when join state reached
-//		final StateFuture<T> joinFuture = new StateFuture<T>(joinState);
-//		joinFuture.addFutureListener(new FutureListener<Boolean>() {
-//			@Override
-//			public void futureResolved(Future<? extends Boolean> future) {
-//				try {
-//					if (future.get().booleanValue()) {
-//						// Joined, resume parent
-//						resume();
-//					}
-//					// Clean up
-//					joiner.removeStateListener(joinFuture);
-//				} catch (InterruptedException | ExecutionException cannotHappen) {
-//				}
-//			}
-//
-//			@Override
-//			public void futureCancelled(Future<? extends Boolean> future) {
-//			}
-//		});
-//
-//		// Listen to child
-//		joiner.addStateListener(joinFuture);
-//		// Pause child when in join state
-//		joiner.pauseAt(joinState);
-//		// Pause parent
-//		pause();
-//
-//		return joinFuture;
-//	}
+	// /**
+	// * Fork this state machine and join when another machine reaches a given
+	// * state.
+	// *
+	// * <p>
+	// * This state machine is paused immediately and is resumed when the other
+	// * machine transitions to the given join state. If the other machine
+	// doesn't
+	// * reach the given state before stopping or finishing, this machine
+	// remains
+	// * paused.
+	// * </p>
+	// *
+	// * <p>
+	// * The returned future indicates the result of the join.
+	// * </p>
+	// *
+	// * @param joiner
+	// * The other state machine to join.
+	// * @param joinState
+	// * The state at which to join the other state machine.
+	// */
+	// public <T extends State<?, T>> Future<Boolean> forkJoin(final
+	// StateMachine<?, T> joiner, final T joinState) {
+	// // Resume when join state reached
+	// final StateFuture<T> joinFuture = new StateFuture<T>(joinState);
+	// joinFuture.addFutureListener(new FutureListener<Boolean>() {
+	// @Override
+	// public void futureResolved(Future<? extends Boolean> future) {
+	// try {
+	// if (future.get().booleanValue()) {
+	// // Joined, resume parent
+	// resume();
+	// }
+	// // Clean up
+	// joiner.removeStateListener(joinFuture);
+	// } catch (InterruptedException | ExecutionException cannotHappen) {
+	// }
+	// }
+	//
+	// @Override
+	// public void futureCancelled(Future<? extends Boolean> future) {
+	// }
+	// });
+	//
+	// // Listen to child
+	// joiner.addStateListener(joinFuture);
+	// // Pause child when in join state
+	// joiner.pauseAt(joinState);
+	// // Pause parent
+	// pause();
+	//
+	// return joinFuture;
+	// }
 
 	/**
 	 * Add a state listener that is informed of state machine events.
@@ -271,7 +274,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 * Execute the given state.
 	 * 
 	 * @param state
-	 * 			The state to execute.
+	 *            The state to execute.
 	 */
 	private void execute(S state) {
 		// Clean up
@@ -282,9 +285,9 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 
 	/**
 	 * Register a transition binding for the current state.
-	 *  
+	 * 
 	 * @param binding
-	 * 			The new binding.
+	 *            The new binding.
 	 */
 	private void addBinding(Future<?> binding) {
 		synchronized (transitionBindings) {

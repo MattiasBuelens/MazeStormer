@@ -24,6 +24,7 @@ import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
 import mazestormer.util.EventSource;
+import mazestormer.world.World;
 
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -60,7 +61,7 @@ public class MainController implements IMainController {
 	private final ConnectionContext connectionContext = new ConnectionContext();
 	private Connector connector;
 
-	private Maze sourceMaze;
+	private World world = new World();
 
 	private Player personalPlayer;
 	public static final String defaultPlayerName = "Brons";
@@ -100,7 +101,7 @@ public class MainController implements IMainController {
 		connectionProvider = new ConnectionProvider();
 		// TODO Configure device name in GUI?
 		connectionContext.setDeviceName("brons");
-		connectionContext.setSourceMaze(getSourceMaze());
+		connectionContext.setWorld(getWorld());
 
 		// View
 		view = createView();
@@ -389,11 +390,8 @@ public class MainController implements IMainController {
 		getPlayer().setMaze(maze);
 	}
 
-	public Maze getSourceMaze() {
-		if (sourceMaze == null) {
-			sourceMaze = new Maze();
-		}
-		return sourceMaze;
+	public World getWorld() {
+		return world;
 	}
 
 	/*
@@ -407,7 +405,7 @@ public class MainController implements IMainController {
 	private void createPersonalPlayer() {
 		personalPlayer = new Player();
 		personalPlayer.setPlayerID(defaultPlayerName);
-		gameControl().addPlayer(personalPlayer);
+		getWorld().addPlayer(personalPlayer);
 	}
 
 }

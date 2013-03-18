@@ -15,6 +15,7 @@ import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.collision.CollisionObserver;
 import mazestormer.simulator.collision.VirtualCollisionDetector;
+import mazestormer.world.World;
 
 public class VirtualRobot implements ControllableRobot {
 
@@ -28,16 +29,19 @@ public class VirtualRobot implements ControllableRobot {
 	private final CollisionObserver collisionObserver;
 	private final VirtualConditionResolvers conditionResolvers;
 
-	private final Maze maze;
+	private final World world;
 
-	public VirtualRobot(Maze maze) {
-		this.maze = maze;
+	public VirtualRobot(World world) {
+		this.world = world;
 
-		this.collisionDetector = new VirtualCollisionDetector(maze,
-				getPoseProvider());
+		this.collisionDetector = new VirtualCollisionDetector(getMaze(), getPoseProvider());
 		this.collisionObserver = new CollisionObserver(this);
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
+	}
+
+	private Maze getMaze() {
+		return world.getMaze();
 	}
 
 	@Override
@@ -51,7 +55,7 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new VirtualLightSensor(maze, getPoseProvider());
+			light = new VirtualLightSensor(getMaze(), getPoseProvider());
 		}
 		return light;
 	}
@@ -59,7 +63,7 @@ public class VirtualRobot implements ControllableRobot {
 	// @Override
 	protected RangeScanner getRangeScanner() {
 		if (scanner == null) {
-			scanner = new VirtualRangeScanner(maze, getPoseProvider());
+			scanner = new VirtualRangeScanner(getMaze(), getPoseProvider());
 		}
 		return scanner;
 	}
@@ -67,8 +71,7 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
-			detector = new RangeScannerFeatureDetector(getRangeScanner(),
-					sensorMaxDistance, new Point(0f, 0f));
+			detector = new RangeScannerFeatureDetector(getRangeScanner(), sensorMaxDistance, new Point(0f, 0f));
 			detector.setPoseProvider(getPoseProvider());
 		}
 		return detector;

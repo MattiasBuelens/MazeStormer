@@ -74,7 +74,7 @@ public class MapController extends SubController implements IMapController {
 		addLayer(robotLayer);
 
 		if (getMainController().getPlayer() == getPlayer()) {
-			Maze sourceMaze = getMainController().getSourceMaze();
+			Maze sourceMaze = getMainController().getWorld().getMaze();
 			sourceMazeLayer = new MazeLayer("Source maze", sourceMaze);
 			sourceMazeLayer.setZIndex(1);
 			sourceMazeLayer.setOpacity(0.5f);

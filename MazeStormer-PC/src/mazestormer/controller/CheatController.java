@@ -29,7 +29,7 @@ public class CheatController extends SubController implements ICheatController {
 	}
 
 	private Maze getSourceMaze() {
-		return getMainController().getSourceMaze();
+		return getMainController().getWorld().getMaze();
 	}
 
 	@Override

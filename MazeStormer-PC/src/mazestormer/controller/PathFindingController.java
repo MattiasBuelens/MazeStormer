@@ -39,7 +39,7 @@ public class PathFindingController extends SubController implements
 	}
 
 	private Maze getSourceMaze() {
-		return getMainController().getSourceMaze();
+		return getMainController().getWorld().getMaze();
 	}
 
 	private void setMaze(Maze maze) {

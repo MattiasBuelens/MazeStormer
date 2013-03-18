@@ -1,13 +1,12 @@
 package mazestormer.connect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import mazestormer.maze.Maze;
+import mazestormer.world.World;
 
 public class ConnectionContext {
 
 	private String deviceName;
-	private Maze sourceMaze;
+	private World world;
 
 	public String getDeviceName() {
 		return deviceName;
@@ -17,12 +16,12 @@ public class ConnectionContext {
 		this.deviceName = checkNotNull(deviceName);
 	}
 
-	public Maze getSourceMaze() {
-		return sourceMaze;
+	public World getWorld() {
+		return world;
 	}
 
-	public void setSourceMaze(Maze sourceMaze) {
-		this.sourceMaze = checkNotNull(sourceMaze);
+	public void setWorld(World world) {
+		this.world = checkNotNull(world);
 	}
 
 }

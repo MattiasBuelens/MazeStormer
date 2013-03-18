@@ -101,7 +101,7 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void loadMaze(String mazeFilePath) {
-		Maze maze = getMainController().getSourceMaze();
+		Maze maze = getMainController().getWorld().getMaze();
 		CharSequence contents;
 		try {
 			contents = FileUtils.load(mazeFilePath);

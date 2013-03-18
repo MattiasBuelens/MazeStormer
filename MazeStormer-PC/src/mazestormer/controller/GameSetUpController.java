@@ -180,7 +180,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		 * an empty space.
 		 */
 		if (getMainController().getPlayer().getRobot() instanceof VirtualRobot
-				&& getMainController().getSourceMaze().getNumberOfTiles() == 0) {
+				&& getMainController().getWorld().getMaze().getNumberOfTiles() == 0) {
 			return false;
 		}
 
