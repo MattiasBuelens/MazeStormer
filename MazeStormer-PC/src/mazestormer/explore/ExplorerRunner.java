@@ -20,6 +20,7 @@ import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.BarcodeRunner;
 import mazestormer.barcode.BarcodeRunnerListener;
 import mazestormer.barcode.BarcodeSpeed;
+import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinderRunner;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
@@ -49,6 +50,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 	 */
 	private final Navigator navigator;
 	private final LineFinderRunner lineFinder;
+	private final LineAdjuster lineAdjuster;
 	private final BarcodeRunner barcodeScanner;
 
 	/*
@@ -110,6 +112,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 				ExplorerRunner.this.log(message);
 			}
 		};
+		
+		lineAdjuster = new LineAdjuster(player, lineFinder);
 		lineFinder.addStateListener(new LineFinderListener());
 
 		// Barcode scanner
