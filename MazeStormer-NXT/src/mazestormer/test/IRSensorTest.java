@@ -27,15 +27,16 @@ public class IRSensorTest {
 
 			@Override
 			public void buttonPressed(Button b) {
+				LCD.clearDisplay();
 				for (int i = 1; i <= 5; i++) {
 					StringBuilder sb = new StringBuilder("");
-					LCD.clear(i - 1);
-					sb.append("Dir: ");
+					sb.append("S:");
 					sb.append(i);
-					sb.append(" - Val: ");
+					sb.append("-V:");
 					sb.append(ir.getSensorValue(i));
 					LCD.drawString(sb.toString(), 0, i - 1);
 				}
+				LCD.drawString(Float.toString(ir.getAngle()), 0, 5);
 			}
 
 			@Override
