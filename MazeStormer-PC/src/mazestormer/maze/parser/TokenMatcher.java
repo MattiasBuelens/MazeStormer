@@ -10,12 +10,14 @@ public enum TokenMatcher {
 	/**
 	 * New line.
 	 * 
-	 * <p>Matches a sequence of:
+	 * <p>
+	 * Matches a sequence of:
 	 * <ol>
 	 * <li>Zero or more spaces.</li>
 	 * <li>Optionally: a carriage return.</li>
 	 * <li>A new-line character.</li>
-	 * </ol></p>
+	 * </ol>
+	 * </p>
 	 */
 	NEWLINE("\\s*\\r?\\n") {
 		@Override
@@ -27,11 +29,13 @@ public enum TokenMatcher {
 	/**
 	 * End of file.
 	 * 
-	 * <p>Matches a sequence of:
+	 * <p>
+	 * Matches a sequence of:
 	 * <ol>
 	 * <li>Zero or more spaces.</li>
 	 * <li>The end of the input.</li>
-	 * </ol></p>
+	 * </ol>
+	 * </p>
 	 */
 	EOF("\\s*$") {
 		@Override
@@ -43,12 +47,14 @@ public enum TokenMatcher {
 	/**
 	 * Dimension.
 	 * 
-	 * <p>Matches a sequence of:
+	 * <p>
+	 * Matches a sequence of:
 	 * <ol>
 	 * <li>Preceded by one or more spaces or the start of the input.</li>
 	 * <li>Optionally: a numerical sequence, denoting the value.</li>
 	 * <li>Followed by a space or the end of the input.</li>
-	 * </ol></p>
+	 * </ol>
+	 * </p>
 	 */
 	DIMENSION("(?:(?<=\\s+|^)|\\s+)(\\d+)(?=\\s|$)") {
 		@Override
@@ -60,16 +66,30 @@ public enum TokenMatcher {
 	/**
 	 * Tile.
 	 * 
-	 * <p>Matches a sequence of:
+	 * <p>
+	 * Matches a sequence of:
 	 * <ol>
 	 * <li>Preceded by one or more spaces or the start of the input.</li>
 	 * <li>An alphabetical sequence, denoting the tile type.</li>
 	 * <li>Optionally: an alphabetical sequence, denoting the orientation.</li>
-	 * <li>Optionally: two digits, denoting the barcode.</li>
+	 * <li>Optionally:
+	 * <ul>
+	 * <li>a barcode, denoted by two digits.</li>
+	 * <li>an object, denoted by a literal {@code V}.</li>
+	 * <li>a starting position consisting of:
+	 * <ol>
+	 * <li>a literal {@code S};</li>
+	 * <li>one digit from 0 through 3, denoting the player number;</li>
+	 * <li>one letter for the orientation.</li>
+	 * </ol>
+	 * </li>
+	 * </ul>
+	 * </li>
 	 * <li>Followed by a space or the end of the input.</li>
-	 * </ol></p>
+	 * </ol>
+	 * </p>
 	 */
-	TILE("(?:(?<=\\s+|^)|\\s+)([a-z]+)(?:\\.([a-z]+))?(?:\\.(\\d+))?(?=\\s|$)") {
+	TILE("(?:(?<=\\s+|^)|\\s+)([a-z]+)(?:\\.([a-z]+))?(?:\\.(?:(\\d{2})|V|S(\\d)([a-z])))?(?=\\s|$)") {
 		@Override
 		public Token parse(MatchResult result) throws ParseException {
 			int nbGroups = result.groupCount();
@@ -84,12 +104,15 @@ public enum TokenMatcher {
 	/**
 	 * Comment.
 	 * 
-	 * <p>Matches a sequence of:
+	 * <p>
+	 * Matches a sequence of:
 	 * <ol>
 	 * <li>Zero or more spaces.</li>
 	 * <li>A hash symbol.</li>
-	 * <li>Zero or more characters, differing from a carriage return or a new-line.</li>
-	 * </ol></p>
+	 * <li>Zero or more characters, differing from a carriage return or a
+	 * new-line.</li>
+	 * </ol>
+	 * </p>
 	 */
 	COMMENT("\\s*#([^\\r\\n]*)") {
 		@Override
@@ -112,8 +135,8 @@ public enum TokenMatcher {
 	 * Get a pattern matcher for the given input.
 	 * 
 	 * @param input
-	 * 			The input to match on.
-	 * @return	A pattern matcher for this token matcher.
+	 *            The input to match on.
+	 * @return A pattern matcher for this token matcher.
 	 */
 	public Matcher matcher(CharSequence input) {
 		return pattern.matcher(input);
@@ -123,9 +146,9 @@ public enum TokenMatcher {
 	 * Parse a token from a pattern match result.
 	 * 
 	 * @param result
-	 * 			The pattern match result.
+	 *            The pattern match result.
 	 * 
-	 * @return	The constructed token.
+	 * @return The constructed token.
 	 */
 	public abstract Token parse(MatchResult result) throws ParseException;
 

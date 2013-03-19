@@ -17,8 +17,7 @@ public enum TileType {
 		@Override
 		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
-			return EnumSet.of(orientation.rotateClockwise(),
-					orientation.rotateCounterClockwise());
+			return EnumSet.of(orientation.rotateClockwise(), orientation.rotateCounterClockwise());
 		}
 
 		@Override
@@ -62,8 +61,7 @@ public enum TileType {
 		@Override
 		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
-			return EnumSet
-					.of(orientation, orientation.rotateCounterClockwise());
+			return EnumSet.of(orientation, orientation.rotateCounterClockwise());
 		}
 
 		@Override
@@ -116,8 +114,7 @@ public enum TileType {
 		@Override
 		public EnumSet<Orientation> getWalls(Orientation orientation) {
 			checkNotNull(orientation);
-			return EnumSet.of(orientation, orientation.rotateClockwise(),
-					orientation.rotateCounterClockwise());
+			return EnumSet.of(orientation, orientation.rotateClockwise(), orientation.rotateCounterClockwise());
 		}
 
 		@Override
@@ -126,8 +123,7 @@ public enum TileType {
 			if (walls.size() != 3)
 				return null;
 			// Get openings
-			EnumSet<Orientation> openings = EnumSet.complementOf(EnumSet
-					.copyOf(walls));
+			EnumSet<Orientation> openings = EnumSet.complementOf(EnumSet.copyOf(walls));
 			Iterator<Orientation> it = openings.iterator();
 			// Get opposite side of opening
 			Orientation direction = it.next().rotateClockwise(2);
@@ -155,6 +151,49 @@ public enum TileType {
 		public TileShape matches(Set<Orientation> walls) {
 			return walls.isEmpty() ? new TileShape(this, null) : null;
 		}
+	},
+
+	/**
+	 * A fully closed section.
+	 * 
+	 * All directions are closed regardless of the orientation.
+	 */
+	CLOSED("Closed") {
+
+		@Override
+		public EnumSet<Orientation> getWalls(Orientation orientation) {
+			return EnumSet.allOf(Orientation.class);
+		}
+
+		@Override
+		public boolean hasOrientation() {
+			return false;
+		}
+
+		@Override
+		public TileShape matches(Set<Orientation> walls) {
+			return walls.equals(getWalls(null)) ? new TileShape(this, null) : null;
+		}
+
+	},
+
+	/**
+	 * A seesaw.
+	 * 
+	 * The direction specifies the side from which to enter.
+	 */
+	SEESAW("Seesaw") {
+
+		@Override
+		public EnumSet<Orientation> getWalls(Orientation orientation) {
+			return STRAIGHT.getWalls(orientation);
+		}
+
+		@Override
+		public TileShape matches(Set<Orientation> walls) {
+			return STRAIGHT.matches(walls);
+		}
+
 	};
 
 	private final String name;
