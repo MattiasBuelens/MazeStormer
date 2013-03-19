@@ -8,10 +8,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import peno.htttp.DisconnectReason;
+
 import mazestormer.controller.PlayerEvent.EventType;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.IPlayer;
 import mazestormer.player.Player;
+import mazestormer.world.WorldListener;
 
 public class GameController extends SubController implements IGameController {
 
@@ -19,6 +22,7 @@ public class GameController extends SubController implements IGameController {
 
 	public GameController(MainController mainController) {
 		super(mainController);
+		getMainController().getWorld().addListener(new Listener());
 	}
 
 	@Override
@@ -37,27 +41,10 @@ public class GameController extends SubController implements IGameController {
 	}
 
 	@Override
-	public void addPlayer(String playerID) {
-		checkNotNull(playerID);
-		if (getPlayer(playerID) == null) {
-			addPlayer(new Player(playerID, new ObservableRobot()));
-		}
-	}
-
-	@Override
 	public void addPlayer(Player p) {
 		checkNotNull(p);
 		this.pcs.put(p, new PlayerController(this.getMainController(), p));
 		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, p));
-	}
-
-	@Override
-	public void removePlayer(String playerID) {
-		checkNotNull(playerID);
-		Player player = (Player) getPlayer(playerID);
-		if (player != null) {
-			removePlayer(player);
-		}
 	}
 
 	@Override
@@ -109,6 +96,19 @@ public class GameController extends SubController implements IGameController {
 	public void logToAll(String message) {
 		for (IPlayer p : this.pcs.keySet()) {
 			((Player) p).getLogger().info(message);
+		}
+	}
+	
+	private class Listener implements WorldListener {
+
+		@Override
+		public void playerAdded(Player player) {
+			addPlayer(player);
+		}
+
+		@Override
+		public void playerRemoved(Player player) {
+			removePlayer(player);
 		}
 	}
 }

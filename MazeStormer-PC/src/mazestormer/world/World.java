@@ -1,10 +1,8 @@
 package mazestormer.world;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import mazestormer.maze.Maze;
@@ -14,8 +12,7 @@ public class World {
 
 	private final Maze maze = new Maze();
 	private final Set<Player> players = new HashSet<Player>();
-
-	private final List<WorldListener> listeners = new ArrayList<WorldListener>();
+	private final Set<WorldListener> listeners = new HashSet<WorldListener>();
 
 	public Maze getMaze() {
 		return maze;

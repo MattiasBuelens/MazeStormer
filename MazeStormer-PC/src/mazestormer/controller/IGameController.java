@@ -20,11 +20,7 @@ public interface IGameController extends EventSource {
 
 	public boolean isPersonalPlayer(String playerID);
 
-	public void addPlayer(String playerID);
-
 	public void addPlayer(Player p);
-
-	public void removePlayer(String playerID);
 
 	public void removePlayer(Player p);
 

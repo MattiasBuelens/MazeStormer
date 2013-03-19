@@ -9,6 +9,7 @@ import mazestormer.game.GameListener;
 import mazestormer.game.GameRunner;
 import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
+import mazestormer.world.WorldSimulator;
 import peno.htttp.Callback;
 
 import com.rabbitmq.client.Connection;
@@ -17,6 +18,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	private Connection connection;
 	private Game game;
+	private WorldSimulator worldSimulator;
 	private GameRunner runner;
 	private final IGameController gameController;
 
@@ -54,8 +56,10 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		connection = connectionMode.newConnection();
 
-		game = new Game(connection, gameID, localPlayer);
+		game = new Game(connection, gameID, localPlayer, getMainController().getWorld());
 		game.addGameListener(gl);
+		
+		worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getMainController().getWorld());
 
 		runner = new GameRunner(localPlayer, game) {
 			@Override
@@ -197,6 +201,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private GameListener gl = new GameListener() {
+		
+		// TODO: to sim
 
 		@Override
 		public void onGameJoined() {
@@ -238,18 +244,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		@Override
 		public void onGameStopped() {
 			logToAll("Game stopped");
-		}
-
-		@Override
-		public void onPlayerJoined(String playerID) {
-			getGameController().addPlayer(playerID);
-			logToAll("Player " + playerID + " joined");
-		}
-
-		@Override
-		public void onPlayerLeft(String playerID) {
-			getGameController().removePlayer(playerID);
-			logToAll("Player " + playerID + " left");
 		}
 
 		@Override

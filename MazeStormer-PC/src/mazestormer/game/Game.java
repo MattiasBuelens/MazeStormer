@@ -8,6 +8,7 @@ import java.util.Set;
 import lejos.robotics.navigation.Pose;
 import mazestormer.player.Player;
 import mazestormer.util.CoordUtils;
+import mazestormer.world.World;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
@@ -19,15 +20,18 @@ public class Game {
 
 	private final String id;
 	private final Player localPlayer;
+	private final World world;
 
 	private final PlayerClient client;
 
 	private final Handler handler;
 	private final List<GameListener> gls = new ArrayList<GameListener>();
 
-	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
+	public Game(Connection connection, String id, Player localPlayer, World world)
+			throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
+		this.world = world;
 
 		this.handler = new Handler();
 		this.client = new PlayerClient(connection, this.handler, id, localPlayer.getPlayerID());
@@ -43,6 +47,10 @@ public class Game {
 
 	public String getId() {
 		return id;
+	}
+	
+	public World getWorld() {
+		return this.world;
 	}
 
 	public Set<String> getPlayers() {
@@ -158,28 +166,6 @@ public class Game {
 		}
 
 		@Override
-		public void playerJoining(String playerID) {
-			// TODO Perhaps add GameListener.onPlayerJoining() ?
-		}
-
-		@Override
-		public void playerJoined(String playerID) {
-			for (GameListener gl : gls) {
-				gl.onPlayerJoined(playerID);
-			}
-		}
-
-		@Override
-		public void playerDisconnected(String playerID, DisconnectReason reason) {
-			// TODO Perhaps add GameListener.onPlayerTimeout() ?
-			if (reason == DisconnectReason.LEAVE || reason == DisconnectReason.TIMEOUT) {
-				for (GameListener gl : gls) {
-					gl.onPlayerLeft(playerID);
-				}
-			}
-		}
-
-		@Override
 		public void playerReady(String playerID, boolean isReady) {
 			for (GameListener gl : gls) {
 				gl.onPlayerReady(playerID, isReady);
@@ -211,6 +197,19 @@ public class Game {
 			}
 		}
 
-	}
+		@Override
+		public void playerJoining(String playerID) {
+			// left empty
+		}
 
+		@Override
+		public void playerJoined(String playerID) {
+			// left empty
+		}
+
+		@Override
+		public void playerDisconnected(String playerID, DisconnectReason reason) {
+			// left empty
+		}
+	}
 }
