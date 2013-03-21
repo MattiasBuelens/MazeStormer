@@ -112,7 +112,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 				ExplorerRunner.this.log(message);
 			}
 		};
-		
+
 		lineAdjuster = new LineAdjuster(player, lineFinder);
 		lineFinder.addStateListener(new LineFinderListener());
 
@@ -438,9 +438,9 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		RangeFeature feature = getRobot().getRangeDetector().scan(getScanAngles(tile));
 		// Place walls
 		if (feature != null) {
-			Orientation orientation;
+			float relativeHeading = getMaze().toRelative(getPose().getHeading());
 			for (RangeReading reading : feature.getRangeReadings()) {
-				orientation = angleToOrientation(reading.getAngle() + getMaze().toRelative(getPose().getHeading()));
+				Orientation orientation = angleToOrientation(reading.getAngle() + relativeHeading);
 				getMaze().setEdge(tile.getPosition(), orientation, EdgeType.WALL);
 			}
 		}
@@ -474,8 +474,8 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		float heading = getPose().getHeading();
 
 		for (Orientation direction : tile.getUnknownSides()) {
-			// Get angle relative to positive X (east) direction
-			float angle = Orientation.EAST.angleTo(direction);
+			// Get absolute angle relative to positive X (east) direction
+			float angle = getMaze().toAbsolute(Orientation.EAST.angleTo(direction));
 			list.add(normalize(angle - heading));
 		}
 

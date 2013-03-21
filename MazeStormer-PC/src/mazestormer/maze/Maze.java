@@ -2,6 +2,8 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -30,7 +32,9 @@ public class Maze extends AbstractEventSource {
 	private final float tileSize;
 	private final float edgeSize;
 	private final float barLength;
+
 	private Pose origin = new Pose();
+	private AffineTransform relativeToAbsolute = new AffineTransform();
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
 	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
@@ -100,6 +104,12 @@ public class Maze extends AbstractEventSource {
 	 */
 	public void setOrigin(Pose origin) {
 		this.origin = origin;
+
+		// Create transformation
+		relativeToAbsolute = new AffineTransform();
+		relativeToAbsolute.translate(origin.getX(), origin.getY());
+		relativeToAbsolute.rotate(Math.toRadians(origin.getHeading()));
+
 		fireMazeOriginChanged();
 	}
 
@@ -325,8 +335,9 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Point toAbsolute(Point relativePosition) {
 		checkNotNull(relativePosition);
-		// TODO Shouldn't this take the absolute heading into account?
-		return relativePosition.add(getOrigin().getLocation());
+		Point absolutePosition = new Point(0, 0);
+		relativeToAbsolute.transform(relativePosition, absolutePosition);
+		return absolutePosition;
 	}
 
 	/**
@@ -364,8 +375,12 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Point toRelative(Point absolutePosition) {
 		checkNotNull(absolutePosition);
-		// TODO Shouldn't this take the absolute heading into account?
-		return absolutePosition.subtract(getOrigin().getLocation());
+		Point relativePosition = new Point(0, 0);
+		try {
+			relativeToAbsolute.inverseTransform(absolutePosition, relativePosition);
+		} catch (NoninvertibleTransformException cannotHappen) {
+		}
+		return relativePosition;
 	}
 
 	/**
@@ -563,13 +578,14 @@ public class Maze extends AbstractEventSource {
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
 		// Center on tile
 		Point centerPosition = tilePosition.toPoint().add(new Point(0.5f, 0.5f));
-		// Transform to absolute coordinates
-		Point position = toAbsolute(fromTile(centerPosition));
-		float angle = toAbsolute(orientation.getAngle());
+		Point position = fromTile(centerPosition);
+		float angle = orientation.getAngle();
 		// Create and set pose
 		Pose pose = new Pose();
 		pose.setLocation(position);
 		pose.setHeading(angle);
+		// Transform to absolute coordinates
+		pose = toAbsolute(pose);
 		setStartPose(playerNumber, pose);
 	}
 
