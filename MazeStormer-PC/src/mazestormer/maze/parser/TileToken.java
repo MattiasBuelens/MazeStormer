@@ -70,6 +70,9 @@ public class TileToken implements Token {
 					break;
 				}
 			}
+			if (option == null) {
+				throw new ParseException("Invalid option: " + optionString, 0);
+			}
 		}
 
 		return new TileToken(type, orientation, option);

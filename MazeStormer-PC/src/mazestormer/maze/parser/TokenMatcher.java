@@ -72,24 +72,13 @@ public enum TokenMatcher {
 	 * <li>Preceded by one or more spaces or the start of the input.</li>
 	 * <li>An alphabetical sequence, denoting the tile type.</li>
 	 * <li>Optionally: an alphabetical sequence, denoting the orientation.</li>
-	 * <li>Optionally:
-	 * <ul>
-	 * <li>a barcode, denoted by two digits.</li>
-	 * <li>an object, denoted by a literal {@code V}.</li>
-	 * <li>a starting position consisting of:
-	 * <ol>
-	 * <li>a literal {@code S};</li>
-	 * <li>one digit from 0 through 3, denoting the player number;</li>
-	 * <li>one letter for the orientation.</li>
-	 * </ol>
-	 * </li>
-	 * </ul>
-	 * </li>
+	 * <li>Optionally: an alphanumerical sequence, denoting the option. See
+	 * {@link OptionMatcher}.</li>
 	 * <li>Followed by a space or the end of the input.</li>
 	 * </ol>
 	 * </p>
 	 */
-	TILE("(?:(?<=\\s+|^)|\\s+)([a-z]+)(?:\\.([a-z]+))?(?:\\.(?:(\\d{2}|V|S\\d[a-z])))?(?=\\s|$)") {
+	TILE("(?:(?<=\\s+|^)|\\s+)([a-z]+)(?:\\.([a-z]+))?(?:\\.(\\w+))?(?=\\s|$)") {
 		@Override
 		public Token parse(MatchResult result) throws ParseException {
 			int nbGroups = result.groupCount();

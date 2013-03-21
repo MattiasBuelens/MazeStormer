@@ -10,7 +10,11 @@ import mazestormer.maze.Orientation;
 public enum OptionMatcher {
 
 	/**
-	 * Barcode option.
+	 * Barcode.
+	 * 
+	 * <p>
+	 * Matches a sequence of digits.
+	 * </p>
 	 */
 	BARCODE("^(\\d+)$") {
 		@Override
@@ -26,7 +30,11 @@ public enum OptionMatcher {
 	},
 
 	/**
-	 * Object option.
+	 * Object.
+	 * 
+	 * <p>
+	 * Matches a single literal {@code V}.
+	 * </p>
 	 */
 	OBJECT("^V$") {
 		@Override
@@ -36,7 +44,16 @@ public enum OptionMatcher {
 	},
 
 	/**
-	 * Start position option.
+	 * Start position.
+	 * 
+	 * <p>
+	 * Matches a sequence of:
+	 * <ol>
+	 * <li>a literal {@code S};</li>
+	 * <li>one digit from 0 through 3, denoting the player number;</li>
+	 * <li>one letter for the orientation.</li>
+	 * </ol>
+	 * </p>
 	 */
 	START_POSITION("^S(\\d)([A-Z])$") {
 		@Override
