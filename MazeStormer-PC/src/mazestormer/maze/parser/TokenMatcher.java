@@ -93,10 +93,6 @@ public enum TokenMatcher {
 		@Override
 		public Token parse(MatchResult result) throws ParseException {
 			int nbGroups = result.groupCount();
-			for(int i = 1; i <= nbGroups; ++i) {
-				System.out.println(i+":"+result.group(i));
-			}
-
 			String typeString = result.group(1);
 			String orientationString = nbGroups > 1 ? result.group(2) : null;
 			String optionString = nbGroups > 2 ? result.group(3) : null;
