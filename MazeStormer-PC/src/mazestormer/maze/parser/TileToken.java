@@ -3,6 +3,7 @@ package mazestormer.maze.parser;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.text.ParseException;
+import java.util.regex.Matcher;
 
 import mazestormer.maze.Orientation;
 import mazestormer.maze.TileType;
@@ -11,12 +12,12 @@ public class TileToken implements Token {
 
 	private final TileType type;
 	private final Orientation orientation;
-	private final byte barcode;
+	private final Option option;
 
-	private TileToken(TileType type, Orientation orientation, byte barcode) {
+	private TileToken(TileType type, Orientation orientation, Option option) {
 		this.type = checkNotNull(type);
 		this.orientation = orientation;
-		this.barcode = barcode;
+		this.option = option;
 	}
 
 	public TileType getType() {
@@ -27,27 +28,28 @@ public class TileToken implements Token {
 		return orientation;
 	}
 
-	public byte getBarcode() {
-		return barcode;
+	public Option getOption() {
+		return option;
 	}
 
 	/**
 	 * Parse a tile token.
 	 * 
 	 * @param typeName
-	 * 			The name of the tile type.
+	 *            The name of the tile type.
 	 * @param orientationName
-	 * 			The short name of the tile's orientation.
-	 * @param barcodeString
-	 * 			The string representation of the barcode.
+	 *            The short name of the tile's orientation.
+	 * @param optionString
+	 *            The additional option: a barcode string, an object or a start
+	 *            position.
 	 * 
-	 * @return	The parsed tile token.
-	 * @throws	ParseException
+	 * @return The parsed tile token.
+	 * @throws ParseException
 	 */
-	public static TileToken parse(String typeName, String orientationName, String barcodeString) throws ParseException {
+	public static TileToken parse(String typeName, String orientationName, String optionString) throws ParseException {
 		TileType type = TileType.byName(typeName);
 		Orientation orientation = null;
-		byte barcode = 0;
+		Option option = null;
 
 		if (type == null) {
 			throw new ParseException("Invalid tile type:" + typeName, 0);
@@ -60,22 +62,24 @@ public class TileToken implements Token {
 			}
 		}
 
-		if (type.supportsBarcode()) {
-			try {
-				barcode = Byte.parseByte(barcodeString, 10);
-			} catch (NumberFormatException e) {
-				throw new ParseException("Invalid barcode: " + barcodeString, 0);
+		if (optionString != null) {
+			for (OptionMatcher optionMatcher : OptionMatcher.values()) {
+				Matcher matcher = optionMatcher.matcher(optionString);
+				if (matcher.matches()) {
+					option = optionMatcher.parse(matcher.toMatchResult());
+					break;
+				}
 			}
 		}
 
-		return new TileToken(type, orientation, barcode);
+		return new TileToken(type, orientation, option);
 	}
 
 //	/**
 //	 * Construct a tile token from a given tile.
 //	 * 
 //	 * @param tile
-//	 * 			The tile.
+//	 *            The tile.
 //	 * 
 //	 * @return The tile token, or null if an invalid tile was given.
 //	 */
@@ -108,4 +112,5 @@ public class TileToken implements Token {
 //		}
 //		return null;
 //	}
+
 }

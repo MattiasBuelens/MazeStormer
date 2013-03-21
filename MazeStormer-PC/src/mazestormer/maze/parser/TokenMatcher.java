@@ -89,15 +89,19 @@ public enum TokenMatcher {
 	 * </ol>
 	 * </p>
 	 */
-	TILE("(?:(?<=\\s+|^)|\\s+)([a-z]+)(?:\\.([a-z]+))?(?:\\.(?:(\\d{2})|V|S(\\d)([a-z])))?(?=\\s|$)") {
+	TILE("(?:(?<=\\s+|^)|\\s+)([a-z]+)(?:\\.([a-z]+))?(?:\\.(?:(\\d{2}|V|S\\d[a-z])))?(?=\\s|$)") {
 		@Override
 		public Token parse(MatchResult result) throws ParseException {
 			int nbGroups = result.groupCount();
+			for(int i = 1; i <= nbGroups; ++i) {
+				System.out.println(i+":"+result.group(i));
+			}
+
 			String typeString = result.group(1);
 			String orientationString = nbGroups > 1 ? result.group(2) : null;
-			String barcodeString = nbGroups > 2 ? result.group(3) : null;
+			String optionString = nbGroups > 2 ? result.group(3) : null;
 
-			return TileToken.parse(typeString, orientationString, barcodeString);
+			return TileToken.parse(typeString, orientationString, optionString);
 		}
 	},
 

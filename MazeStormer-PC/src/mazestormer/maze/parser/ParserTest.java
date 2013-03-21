@@ -1,16 +1,20 @@
 package mazestormer.maze.parser;
 
-import static mazestormer.maze.Orientation.*;
-import static org.junit.Assert.*;
+import static mazestormer.maze.Orientation.EAST;
+import static mazestormer.maze.Orientation.NORTH;
+import static mazestormer.maze.Orientation.SOUTH;
+import static mazestormer.maze.Orientation.WEST;
+import static org.junit.Assert.assertEquals;
 
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.EnumSet;
 
+import lejos.geom.Point;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
-import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
 import org.junit.Test;
@@ -18,15 +22,6 @@ import org.junit.Test;
 import com.google.common.collect.Sets;
 
 public class ParserTest {
-
-	@Test
-	public void startPosition() throws ParseException {
-		String source = "1 1\nStraight.N.S1E";
-		Maze maze = parse(source);
-
-		Tile tile = maze.getTileAt(new LongPoint(0, 0));
-		fail();
-	}
 
 	@Test
 	public void empty() throws ParseException {
@@ -170,6 +165,30 @@ public class ParserTest {
 	@Test(expected = ParseException.class)
 	public void tooManyColumns() throws ParseException {
 		parse("1 2\nCorner.N Corner.E\nCorner.W Corner.S");
+	}
+
+	@Test(expected = ParseException.class)
+	public void barcodeUnsupported() throws ParseException {
+		parse("1 1\nCorner.N.01");
+	}
+
+	@Test
+	public void startPosition() throws ParseException {
+		String source = "2 2\nStraight.N.S2E DeadEnd.N.S3S\nCorner.W.S0N Corner.S.S1W";
+		Maze maze = parse(source);
+
+		// Player 0 in bottom left facing north
+		assertEquals(maze.getStartPose(0).getLocation(), new Point(20, 20));
+		assertEquals(maze.getStartPose(0).getHeading(), 90d, 0.1d);
+		// Player 1 in bottom right facing west
+		assertEquals(maze.getStartPose(1).getLocation(), new Point(60, 20));
+		assertEquals(maze.getStartPose(1).getHeading(), 180d, 0.1d);
+		// Player 2 in top left facing east
+		assertEquals(maze.getStartPose(2).getLocation(), new Point(20, 60));
+		assertEquals(maze.getStartPose(2).getHeading(), 0d, 0.1d);
+		// Player 3 in top right facing south
+		assertEquals(maze.getStartPose(3).getLocation(), new Point(60, 60));
+		assertEquals(maze.getStartPose(3).getHeading(), -90d, 0.1d);
 	}
 
 	/**

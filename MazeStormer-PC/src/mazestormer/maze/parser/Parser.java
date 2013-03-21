@@ -61,13 +61,12 @@ public class Parser {
 						token.getOrientation())) {
 					maze.setEdge(position, orientation, EdgeType.WALL);
 				}
-				for (Orientation orientation : token.getType().getOpenings(
-						token.getOrientation())) {
+				for (Orientation orientation : token.getType().getOpenings(token.getOrientation())) {
 					maze.setEdge(position, orientation, EdgeType.OPEN);
 				}
-				// Set barcode
-				if (token.getType().supportsBarcode() && token.getBarcode() != 0) {
-					maze.setBarcode(position, token.getBarcode());
+				// Set option
+				if (token.getOption() != null) {
+					token.getOption().apply(maze, position, token);
 				}
 			}
 		}

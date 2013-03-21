@@ -39,6 +39,7 @@ public class Maze extends AbstractEventSource {
 
 	private final Mesh mesh;
 	private Map<Target, Tile> targets = new EnumMap<Target, Tile>(Target.class);
+	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
 
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
@@ -108,7 +109,7 @@ public class Maze extends AbstractEventSource {
 	public Mesh getMesh() {
 		return mesh;
 	}
-	
+
 	public int getNumberOfTiles() {
 		return tiles.values().size();
 	}
@@ -217,8 +218,7 @@ public class Maze extends AbstractEventSource {
 	 * @param type
 	 *            The edge type.
 	 */
-	public void setEdge(LongPoint tilePosition, Orientation orientation,
-			Edge.EdgeType type) {
+	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type) {
 		Tile tile = getTileAt(tilePosition);
 		Edge edge = tile.getEdgeAt(orientation);
 		edge.setType(type);
@@ -244,8 +244,7 @@ public class Maze extends AbstractEventSource {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, Barcode barcode)
-			throws IllegalStateException {
+	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
 		// Set barcode
 		Tile tile = getTileAt(position);
 		tile.setBarcode(barcode);
@@ -254,8 +253,7 @@ public class Maze extends AbstractEventSource {
 		fireTileChanged(tile);
 	}
 
-	public void setBarcode(LongPoint position, byte barcode)
-			throws IllegalStateException {
+	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException {
 		setBarcode(position, new Barcode(barcode));
 	}
 
@@ -265,6 +263,7 @@ public class Maze extends AbstractEventSource {
 	public void clear() {
 		tiles.clear();
 		lines.clear();
+		targets.clear();
 		fireMazeCleared();
 	}
 
@@ -326,6 +325,7 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Point toAbsolute(Point relativePosition) {
 		checkNotNull(relativePosition);
+		// TODO Shouldn't this take the absolute heading into account?
 		return relativePosition.add(getOrigin().getLocation());
 	}
 
@@ -364,6 +364,7 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Point toRelative(Point absolutePosition) {
 		checkNotNull(absolutePosition);
+		// TODO Shouldn't this take the absolute heading into account?
 		return absolutePosition.subtract(getOrigin().getLocation());
 	}
 
@@ -466,8 +467,7 @@ public class Maze extends AbstractEventSource {
 		p2 = p2.add(shift);
 
 		// Return bounding box
-		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX()
-				- p1.getX(), p2.getY() - p1.getY());
+		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX() - p1.getX(), p2.getY() - p1.getY());
 	}
 
 	private void updateEdgeLine(Edge edge) {
@@ -528,11 +528,9 @@ public class Maze extends AbstractEventSource {
 			// Add bar
 			float barWidth = width * barLength;
 			if (isVertical) {
-				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint
-						.getY(), 1, barWidth));
+				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint.getY(), 1, barWidth));
 			} else {
-				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint
-						.getY(), barWidth, 1));
+				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint.getY(), barWidth, 1));
 			}
 			// Move to next bar
 			barPoint = direction.shift(barPoint, barWidth);
@@ -552,6 +550,27 @@ public class Maze extends AbstractEventSource {
 
 	public enum Target {
 		GOAL, CHECKPOINT
+	}
+
+	public Pose getStartPose(int playerNumber) {
+		return startPoses.get(playerNumber);
+	}
+
+	public void setStartPose(int playerNumber, Pose pose) {
+		startPoses.put(playerNumber, checkNotNull(pose));
+	}
+
+	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
+		// Center on tile
+		Point centerPosition = tilePosition.toPoint().add(new Point(0.5f, 0.5f));
+		// Transform to absolute coordinates
+		Point position = toAbsolute(fromTile(centerPosition));
+		float angle = toAbsolute(orientation.getAngle());
+		// Create and set pose
+		Pose pose = new Pose();
+		pose.setLocation(position);
+		pose.setHeading(angle);
+		setStartPose(playerNumber, pose);
 	}
 
 }

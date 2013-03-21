@@ -58,14 +58,25 @@ public enum Orientation {
 	}
 
 	/**
-	 * Get the angle from this orientation to the given other orientation.
+	 * Get the angle of this orientation, in degrees.
+	 * 
+	 * <p>
+	 * The angle is measured counterclockwise from the positive X-axis.
+	 * </p>
+	 */
+	public float getAngle() {
+		return (float) Math.toDegrees(getDelta().angle());
+	}
+
+	/**
+	 * Get the angle from this orientation to the given other orientation, in
+	 * degrees.
 	 * 
 	 * @param other
 	 *            The other orientation.
 	 */
 	public float angleTo(Orientation other) {
-		float radians = other.getDelta().angle() - getDelta().angle();
-		return (float) Math.toDegrees(radians);
+		return other.getAngle() - getAngle();
 	}
 
 	/**
