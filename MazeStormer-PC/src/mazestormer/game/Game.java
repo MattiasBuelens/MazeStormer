@@ -12,6 +12,7 @@ import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
 import peno.htttp.PlayerHandler;
+import peno.htttp.Tile;
 
 import com.rabbitmq.client.Connection;
 
@@ -209,6 +210,18 @@ public class Game {
 			for (GameListener gl : gls) {
 				gl.onObjectFound(playerID);
 			}
+		}
+
+		@Override
+		public void teamConnected(String partnerID) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void teamTilesReceived(List<Tile> tiles) {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}
