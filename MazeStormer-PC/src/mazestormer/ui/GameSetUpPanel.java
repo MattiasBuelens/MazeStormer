@@ -28,7 +28,6 @@ import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.ListAllIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackPauseIcon;
-import com.javarichclient.icon.tango.actions.MediaPlaybackStartIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 import com.javarichclient.icon.tango.actions.SystemLogOutIcon;
 

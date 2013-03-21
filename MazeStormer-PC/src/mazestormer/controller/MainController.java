@@ -240,7 +240,7 @@ public class MainController implements IMainController {
 	@Override
 	public IGameSetUpController gameSetUpControl() {
 		if (gameSetUpControl == null) {
-			gameSetUpControl = new GameSetUpController(this, gameControl());
+			gameSetUpControl = new GameSetUpController(this);
 		}
 		return gameSetUpControl;
 	}

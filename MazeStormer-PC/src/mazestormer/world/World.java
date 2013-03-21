@@ -1,9 +1,11 @@
 package mazestormer.world;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import mazestormer.maze.Maze;
 import mazestormer.player.Player;
@@ -11,37 +13,44 @@ import mazestormer.player.Player;
 public class World {
 
 	private final Maze maze = new Maze();
-	private final Set<Player> players = new HashSet<Player>();
-	private final Set<WorldListener> listeners = new HashSet<WorldListener>();
+	private final Map<String, Player> players = new HashMap<String, Player>();
+	private final List<WorldListener> listeners = new ArrayList<WorldListener>();
 
 	public Maze getMaze() {
 		return maze;
 	}
 
 	public Collection<Player> getPlayers() {
-		return Collections.unmodifiableSet(players);
+		return Collections.unmodifiableCollection(players.values());
 	}
 
 	public Player getPlayer(String playerID) {
-		for (Player player : players) {
-			if (player.getPlayerID().equals(playerID)) {
-				return player;
-			}
-		}
-		return null;
+		return players.get(playerID);
 	}
 
 	public void addPlayer(Player player) {
-		players.add(player);
+		players.put(player.getPlayerID(), player);
 		for (WorldListener listener : listeners) {
 			listener.playerAdded(player);
 		}
 	}
 
 	public void removePlayer(Player player) {
-		players.remove(player);
+		players.remove(player.getPlayerID());
 		for (WorldListener listener : listeners) {
 			listener.playerRemoved(player);
+		}
+	}
+
+	public void renamePlayer(Player player, String newPlayerID) {
+		// Remove old name
+		players.remove(player.getPlayerID());
+		// Set and add with new name
+		player.setPlayerID(newPlayerID);
+		players.put(newPlayerID, player);
+
+		for (WorldListener listener : listeners) {
+			listener.playerRenamed(player);
 		}
 	}
 

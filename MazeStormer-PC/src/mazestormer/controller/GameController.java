@@ -1,17 +1,11 @@
 package mazestormer.controller;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import peno.htttp.DisconnectReason;
-
 import mazestormer.controller.PlayerEvent.EventType;
-import mazestormer.observable.ObservableRobot;
 import mazestormer.player.IPlayer;
 import mazestormer.player.Player;
 import mazestormer.world.WorldListener;
@@ -36,79 +30,41 @@ public class GameController extends SubController implements IGameController {
 	}
 
 	@Override
-	public boolean isPersonalPlayer(String playerID) {
-		return getMainController().getPlayer().getPlayerID().equals(playerID);
-	}
-
-	@Override
-	public void addPlayer(Player p) {
-		checkNotNull(p);
-		this.pcs.put(p, new PlayerController(this.getMainController(), p));
-		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, p));
-	}
-
-	@Override
-	public void removePlayer(Player p) {
-		checkNotNull(p);
-		this.pcs.remove(p);
-		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, p));
-	}
-
-	@Override
-	public void removeOtherPlayers() {
-		Iterator<Map.Entry<IPlayer, IPlayerController>> it = this.pcs
-				.entrySet().iterator();
-
-		while (it.hasNext()) {
-			Map.Entry<IPlayer, IPlayerController> entry = it.next();
-			Player player = (Player) entry.getKey();
-			if (!isPersonalPlayer(player.getPlayerID())) {
-				postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, player));
-				it.remove();
-			}
-		}
-	}
-
-	@Override
-	public IPlayer getPlayer(String playerID) {
-		for (IPlayer p : this.pcs.keySet()) {
-			if (p.getPlayerID().equals(playerID)) {
-				return p;
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public Collection<IPlayerController> getPlayerControllers() {
 		return Collections.unmodifiableCollection(pcs.values());
 	}
 
-	@Override
-	public void logTo(String playerID, String message) {
-		for (IPlayer p : this.pcs.keySet()) {
-			if (p.getPlayerID().equals(playerID))
-				((Player) p).getLogger().info(message);
-		}
+	private void onPlayerAdded(Player p) {
+		this.pcs.put(p, new PlayerController(this.getMainController(), p));
+		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, p));
 	}
 
-	@Override
-	public void logToAll(String message) {
-		for (IPlayer p : this.pcs.keySet()) {
-			((Player) p).getLogger().info(message);
-		}
+	private void onPlayerRemoved(Player p) {
+		this.pcs.remove(p);
+		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, p));
 	}
-	
+
+	private void onPlayerRenamed(Player p) {
+		postEvent(new PlayerEvent(EventType.PLAYER_RENAMED, p));
+	}
+
 	private class Listener implements WorldListener {
 
 		@Override
 		public void playerAdded(Player player) {
-			addPlayer(player);
+			onPlayerAdded(player);
 		}
 
 		@Override
 		public void playerRemoved(Player player) {
-			removePlayer(player);
+			onPlayerRemoved(player);
 		}
+
+		@Override
+		public void playerRenamed(Player player) {
+			onPlayerRenamed(player);
+		}
+
 	}
+
 }

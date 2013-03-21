@@ -9,6 +9,7 @@ import mazestormer.game.GameListener;
 import mazestormer.game.GameRunner;
 import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
+import mazestormer.world.World;
 import peno.htttp.Callback;
 
 import com.rabbitmq.client.Connection;
@@ -20,23 +21,27 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	// TODO @Matthias: Add WorldSimulator to index FFS!
 	// private WorldSimulator worldSimulator;
 	private GameRunner runner;
-	private final IGameController gameController;
 
-	public GameSetUpController(MainController mainController, IGameController gameController) {
+	public GameSetUpController(MainController mainController) {
 		super(mainController);
-		this.gameController = gameController;
 	}
 
-	private IGameController getGameController() {
-		return this.gameController;
+	private World getWorld() {
+		return getMainController().getWorld();
 	}
 
 	private void logToAll(String message) {
-		getGameController().logToAll(message);
+		for (Player player : getWorld().getPlayers()) {
+			logTo(player, message);
+		}
 	}
 
 	private void logTo(String playerID, String message) {
-		getGameController().logTo(playerID, message);
+		logTo(getWorld().getPlayer(playerID), message);
+	}
+
+	private void logTo(Player player, String message) {
+		player.getLogger().info(message);
 	}
 
 	@Override
@@ -45,10 +50,9 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	@Override
-	public void setPlayerID(String playerID) {
+	public void setPlayerID(String newPlayerID) {
 		Player player = getMainController().getPlayer();
-		player.setPlayerID(playerID);
-		postEvent(new PlayerEvent(PlayerEvent.EventType.PLAYER_RENAMED, player));
+		getMainController().getWorld().renamePlayer(player, newPlayerID);
 	}
 
 	private void createGame(ConnectionMode connectionMode, String gameID) throws IOException {
@@ -59,12 +63,13 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		game = new Game(connection, gameID, localPlayer, getMainController().getWorld());
 		game.addGameListener(gl);
 
-		// worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getMainController().getWorld());
+		// TODO Uncomment when WorldSimulator is added
+		// worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getWorld());
 
 		runner = new GameRunner(localPlayer, game) {
 			@Override
 			protected void log(String message) {
-				logTo(localPlayer.getPlayerID(), message);
+				logTo(localPlayer, message);
 			}
 		};
 	}
@@ -202,17 +207,16 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	private GameListener gl = new GameListener() {
 
-		// TODO: to sim
+		// TODO: Move to simulator
 
 		@Override
 		public void onGameJoined() {
-			// Add all non-local players
-			for (String playerID : game.getPlayers()) {
-				if (!getGameController().isPersonalPlayer(playerID)) {
-					// TODO
-					// getGameController().addPlayer(playerID);
-				}
-			}
+			// TODO Add all non-local players in simulator
+			// for (String playerID : game.getPlayers()) {
+			// if (!getGameController().isPersonalPlayer(playerID)) {
+			// getGameController().addPlayer(playerID);
+			// }
+			// }
 			// Log
 			logToAll("Joined");
 			postState(GameSetUpEvent.EventType.JOINED);
@@ -220,8 +224,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		@Override
 		public void onGameLeft() {
-			// Remove all non-local players
-			getGameController().removeOtherPlayers();
+			// TODO Remove all non-local players on simulator disconnect
+			// getGameController().removeOtherPlayers();
 			// Log
 			logToAll("Left");
 			postState(GameSetUpEvent.EventType.LEFT);
@@ -259,7 +263,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		@Override
 		public void onPositionUpdate(String playerID, Pose pose) {
-			((Player) getGameController().getPlayer(playerID)).getRobot().getPoseProvider().setPose(pose);
+			// TODO Handle position updates in simulator
+			getWorld().getPlayer(playerID).getRobot().getPoseProvider().setPose(pose);
 		}
 
 	};
