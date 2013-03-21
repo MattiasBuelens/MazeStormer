@@ -20,6 +20,15 @@ import com.google.common.collect.Sets;
 public class ParserTest {
 
 	@Test
+	public void startPosition() throws ParseException {
+		String source = "1 1\nStraight.N.S1E";
+		Maze maze = parse(source);
+
+		Tile tile = maze.getTileAt(new LongPoint(0, 0));
+		fail();
+	}
+
+	@Test
 	public void empty() throws ParseException {
 		final Orientation[] expectedEdges = new Orientation[] {};
 
@@ -178,12 +187,11 @@ public class ParserTest {
 	 * orientations.
 	 */
 	private void checkWalls(Tile tile, Orientation... expectedEdges) {
-		EnumSet<Orientation> expectedEdgesSet = Sets.newEnumSet(
-				Arrays.asList(expectedEdges), Orientation.class);
+		EnumSet<Orientation> expectedEdgesSet = Sets.newEnumSet(Arrays.asList(expectedEdges), Orientation.class);
 		for (Orientation orientation : Orientation.values()) {
 			boolean expectWall = expectedEdgesSet.contains(orientation);
-			String message = (expectWall ? "Expected" : "Unexpected") + " "
-					+ orientation + " wall at " + tile.getPosition();
+			String message = (expectWall ? "Expected" : "Unexpected") + " " + orientation + " wall at "
+					+ tile.getPosition();
 			boolean isWall = tile.getEdgeAt(orientation).getType() == EdgeType.WALL;
 			assertEquals(message, expectWall, isWall);
 		}

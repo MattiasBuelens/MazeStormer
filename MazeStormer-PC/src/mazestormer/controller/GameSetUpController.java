@@ -9,7 +9,6 @@ import mazestormer.game.GameListener;
 import mazestormer.game.GameRunner;
 import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
-import mazestormer.world.WorldSimulator;
 import peno.htttp.Callback;
 
 import com.rabbitmq.client.Connection;
@@ -18,7 +17,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	private Connection connection;
 	private Game game;
-	private WorldSimulator worldSimulator;
+	// TODO @Matthias: Add WorldSimulator to index FFS!
+	// private WorldSimulator worldSimulator;
 	private GameRunner runner;
 	private final IGameController gameController;
 
@@ -58,8 +58,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		game = new Game(connection, gameID, localPlayer, getMainController().getWorld());
 		game.addGameListener(gl);
-		
-		worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getMainController().getWorld());
+
+		// worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getMainController().getWorld());
 
 		runner = new GameRunner(localPlayer, game) {
 			@Override
@@ -201,7 +201,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private GameListener gl = new GameListener() {
-		
+
 		// TODO: to sim
 
 		@Override
@@ -209,7 +209,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			// Add all non-local players
 			for (String playerID : game.getPlayers()) {
 				if (!getGameController().isPersonalPlayer(playerID)) {
-					getGameController().addPlayer(playerID);
+					// TODO
+					// getGameController().addPlayer(playerID);
 				}
 			}
 			// Log

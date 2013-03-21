@@ -34,11 +34,9 @@ public class GameRunner implements GameListener {
 
 	private final PositionReporter positionReporter;
 	private final PositionPublisher positionPublisher;
-	private final ScheduledExecutorService positionExecutor = Executors
-			.newSingleThreadScheduledExecutor(factory);
+	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("GameRunner-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
 
 	private int objectNumber;
 
@@ -50,8 +48,7 @@ public class GameRunner implements GameListener {
 				GameRunner.this.log(message);
 			}
 		};
-		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(
-				this));
+		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(this));
 
 		this.game = game;
 		game.addGameListener(this);
@@ -79,8 +76,7 @@ public class GameRunner implements GameListener {
 		Tile nextTile = explorerRunner.getNextTile();
 		EnumSet<Orientation> unknownSides = nextTile.getUnknownSides();
 		for (Orientation side : unknownSides) {
-			explorerRunner.getMaze().setEdge(nextTile.getPosition(), side,
-					EdgeType.WALL);
+			explorerRunner.getMaze().setEdge(nextTile.getPosition(), side, EdgeType.WALL);
 		}
 	}
 
@@ -162,14 +158,6 @@ public class GameRunner implements GameListener {
 	}
 
 	@Override
-	public void onPlayerJoined(String playerID) {
-	}
-
-	@Override
-	public void onPlayerLeft(String playerID) {
-	}
-
-	@Override
 	public void onPlayerReady(String playerID, boolean isReady) {
 	}
 
@@ -189,8 +177,7 @@ public class GameRunner implements GameListener {
 		public void moveStarted(Move event, MoveProvider mp) {
 			if (task == null) {
 				// Start publishing
-				task = positionExecutor.scheduleWithFixedDelay(
-						positionPublisher, 0, updateFrequency,
+				task = positionExecutor.scheduleWithFixedDelay(positionPublisher, 0, updateFrequency,
 						TimeUnit.MILLISECONDS);
 			}
 		}

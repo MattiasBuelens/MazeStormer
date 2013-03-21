@@ -13,6 +13,7 @@ import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
 import peno.htttp.PlayerHandler;
+import peno.htttp.Tile;
 
 import com.rabbitmq.client.Connection;
 
@@ -27,8 +28,8 @@ public class Game {
 	private final Handler handler;
 	private final List<GameListener> gls = new ArrayList<GameListener>();
 
-	public Game(Connection connection, String id, Player localPlayer, World world)
-			throws IOException, IllegalStateException {
+	public Game(Connection connection, String id, Player localPlayer, World world) throws IOException,
+			IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
 		this.world = world;
@@ -48,7 +49,7 @@ public class Game {
 	public String getId() {
 		return id;
 	}
-	
+
 	public World getWorld() {
 		return this.world;
 	}
@@ -166,6 +167,19 @@ public class Game {
 		}
 
 		@Override
+		public void playerJoining(String playerID) {
+			// TODO Perhaps add GameListener.onPlayerJoining() ?
+		}
+
+		@Override
+		public void playerJoined(String playerID) {
+		}
+
+		@Override
+		public void playerDisconnected(String playerID, DisconnectReason reason) {
+		}
+
+		@Override
 		public void playerReady(String playerID, boolean isReady) {
 			for (GameListener gl : gls) {
 				gl.onPlayerReady(playerID, isReady);
@@ -175,20 +189,21 @@ public class Game {
 		/*
 		 * TODO Set up a spectator to receive position updates.
 		 */
-//		@Override
-//		public void playerPosition(String playerID, int playerNumber, double x, double y, double angle) {
-//			// Ignore local position updates
-//			if (playerID.equals(client.getPlayerID()))
-//				return;
-//
-//			// Parse pose and convert
-//			Pose p = new Pose((float) x, (float) y, (float) angle);
-//			p = CoordUtils.toRobotCoordinates(p);
-//			// Publish
-//			for (GameListener gl : gls) {
-//				gl.onPositionUpdate(playerID, p);
-//			}
-//		}
+		// @Override
+		// public void playerPosition(String playerID, int playerNumber, double
+		// x, double y, double angle) {
+		// // Ignore local position updates
+		// if (playerID.equals(client.getPlayerID()))
+		// return;
+		//
+		// // Parse pose and convert
+		// Pose p = new Pose((float) x, (float) y, (float) angle);
+		// p = CoordUtils.toRobotCoordinates(p);
+		// // Publish
+		// for (GameListener gl : gls) {
+		// gl.onPositionUpdate(playerID, p);
+		// }
+		// }
 
 		@Override
 		public void playerFoundObject(String playerID, int playerNumber) {
@@ -198,18 +213,17 @@ public class Game {
 		}
 
 		@Override
-		public void playerJoining(String playerID) {
-			// left empty
+		public void teamConnected(String partnerID) {
+			// TODO Auto-generated method stub
+
 		}
 
 		@Override
-		public void playerJoined(String playerID) {
-			// left empty
+		public void teamTilesReceived(List<Tile> tiles) {
+			// TODO Auto-generated method stub
+
 		}
 
-		@Override
-		public void playerDisconnected(String playerID, DisconnectReason reason) {
-			// left empty
-		}
 	}
+
 }
