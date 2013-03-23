@@ -136,6 +136,9 @@ public class GameRunner implements GameListener {
 
 	@Override
 	public void onGameStarted() {
+		// Reset player pose
+		// TODO Do not reset when resuming from paused game?
+		getRobot().getPoseProvider().setPose(new Pose());
 		// Start
 		explorerRunner.start();
 		// Start reporting

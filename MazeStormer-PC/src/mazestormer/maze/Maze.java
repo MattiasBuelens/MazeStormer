@@ -2,7 +2,6 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -34,7 +33,7 @@ public class Maze extends AbstractEventSource {
 	private final float barLength;
 
 	private Pose origin = new Pose();
-	private AffineTransform relativeToAbsolute = new AffineTransform();
+	private PoseTransform originTransform = new PoseTransform(origin);
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
 	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
@@ -104,11 +103,7 @@ public class Maze extends AbstractEventSource {
 	 */
 	public void setOrigin(Pose origin) {
 		this.origin = origin;
-
-		// Create transformation
-		relativeToAbsolute = new AffineTransform();
-		relativeToAbsolute.translate(origin.getX(), origin.getY());
-		relativeToAbsolute.rotate(Math.toRadians(origin.getHeading()));
+		this.originTransform = new PoseTransform(origin);
 
 		fireMazeOriginChanged();
 	}
@@ -335,9 +330,7 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Point toAbsolute(Point relativePosition) {
 		checkNotNull(relativePosition);
-		Point absolutePosition = new Point(0, 0);
-		relativeToAbsolute.transform(relativePosition, absolutePosition);
-		return absolutePosition;
+		return originTransform.transform(relativePosition);
 	}
 
 	/**
@@ -348,7 +341,7 @@ public class Maze extends AbstractEventSource {
 	 *            The relative heading.
 	 */
 	public float toAbsolute(float relativeHeading) {
-		return normalizeHeading(relativeHeading + getOrigin().getHeading());
+		return originTransform.transform(relativeHeading);
 	}
 
 	/**
@@ -360,10 +353,7 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Pose toAbsolute(Pose relativePose) {
 		checkNotNull(relativePose);
-		Pose pose = new Pose();
-		pose.setLocation(toAbsolute(relativePose.getLocation()));
-		pose.setHeading(toAbsolute(relativePose.getHeading()));
-		return pose;
+		return originTransform.transform(relativePose);
 	}
 
 	/**
@@ -375,12 +365,11 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Point toRelative(Point absolutePosition) {
 		checkNotNull(absolutePosition);
-		Point relativePosition = new Point(0, 0);
 		try {
-			relativeToAbsolute.inverseTransform(absolutePosition, relativePosition);
+			return originTransform.inverseTransform(absolutePosition);
 		} catch (NoninvertibleTransformException cannotHappen) {
+			return null;
 		}
-		return relativePosition;
 	}
 
 	/**
@@ -391,7 +380,7 @@ public class Maze extends AbstractEventSource {
 	 *            The absolute heading.
 	 */
 	public float toRelative(float absoluteHeading) {
-		return normalizeHeading(absoluteHeading - getOrigin().getHeading());
+		return originTransform.inverseTransform(absoluteHeading);
 	}
 
 	/**
@@ -403,10 +392,11 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Pose toRelative(Pose absolutePose) {
 		checkNotNull(absolutePose);
-		Pose pose = new Pose();
-		pose.setLocation(toRelative(absolutePose.getLocation()));
-		pose.setHeading(toRelative(absolutePose.getHeading()));
-		return pose;
+		try {
+			return originTransform.inverseTransform(absolutePose);
+		} catch (NoninvertibleTransformException cannotHappen) {
+			return null;
+		}
 	}
 
 	/**
@@ -431,20 +421,6 @@ public class Maze extends AbstractEventSource {
 	 */
 	public Point fromTile(Point tilePosition) {
 		return tilePosition.multiply(getTileSize());
-	}
-
-	/**
-	 * Normalize a given heading to ensure it is between -180 and +180 degrees.
-	 * 
-	 * @param heading
-	 *            The heading.
-	 */
-	private float normalizeHeading(float heading) {
-		while (heading < 180)
-			heading += 360;
-		while (heading > 180)
-			heading -= 360;
-		return heading;
 	}
 
 	/**

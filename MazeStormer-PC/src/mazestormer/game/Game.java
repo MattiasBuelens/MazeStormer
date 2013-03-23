@@ -7,7 +7,6 @@ import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.player.Player;
-import mazestormer.util.CoordUtils;
 import mazestormer.world.World;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
@@ -125,8 +124,6 @@ public class Game {
 
 	public void updatePosition(Pose pose) {
 		try {
-			// Convert pose
-			pose = CoordUtils.toMapCoordinates(pose);
 			// Publish
 			client.updatePosition(pose.getX(), pose.getY(), pose.getHeading());
 		} catch (IllegalStateException | IOException e) {
@@ -185,25 +182,6 @@ public class Game {
 				gl.onPlayerReady(playerID, isReady);
 			}
 		}
-
-		/*
-		 * TODO Set up a spectator to receive position updates.
-		 */
-		// @Override
-		// public void playerPosition(String playerID, int playerNumber, double
-		// x, double y, double angle) {
-		// // Ignore local position updates
-		// if (playerID.equals(client.getPlayerID()))
-		// return;
-		//
-		// // Parse pose and convert
-		// Pose p = new Pose((float) x, (float) y, (float) angle);
-		// p = CoordUtils.toRobotCoordinates(p);
-		// // Publish
-		// for (GameListener gl : gls) {
-		// gl.onPositionUpdate(playerID, p);
-		// }
-		// }
 
 		@Override
 		public void playerFoundObject(String playerID, int playerNumber) {
