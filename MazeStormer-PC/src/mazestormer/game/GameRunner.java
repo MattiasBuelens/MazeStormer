@@ -129,9 +129,9 @@ public class GameRunner implements GameListener {
 	}
 
 	@Override
-	public void onGameRolled(int playerNumber) {
+	public void onGameRolled(int playerNumber, int objectNumber) {
 		// Store object number
-		objectNumber = playerNumber;
+		this.objectNumber = objectNumber;
 	}
 
 	@Override
@@ -166,10 +166,6 @@ public class GameRunner implements GameListener {
 
 	@Override
 	public void onObjectFound(String playerID) {
-	}
-
-	@Override
-	public void onPositionUpdate(String playerID, Pose pose) {
 	}
 
 	private class PositionReporter implements MoveListener {

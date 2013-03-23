@@ -2,7 +2,6 @@ package mazestormer.controller;
 
 import java.io.IOException;
 
-import lejos.robotics.navigation.Pose;
 import mazestormer.game.ConnectionMode;
 import mazestormer.game.Game;
 import mazestormer.game.GameListener;
@@ -10,6 +9,7 @@ import mazestormer.game.GameRunner;
 import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.world.World;
+import mazestormer.world.WorldSimulator;
 import peno.htttp.Callback;
 
 import com.rabbitmq.client.Connection;
@@ -18,8 +18,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	private Connection connection;
 	private Game game;
-	// TODO @Matthias: Add WorldSimulator to index FFS!
-	// private WorldSimulator worldSimulator;
+	private WorldSimulator worldSimulator;
 	private GameRunner runner;
 
 	public GameSetUpController(MainController mainController) {
@@ -34,6 +33,10 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		for (Player player : getWorld().getPlayers()) {
 			logTo(player, message);
 		}
+	}
+
+	private void logToLocal(String message) {
+		logTo(getMainController().getPlayer(), message);
 	}
 
 	private void logTo(String playerID, String message) {
@@ -63,8 +66,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		game = new Game(connection, gameID, localPlayer, getMainController().getWorld());
 		game.addGameListener(gl);
 
-		// TODO Uncomment when WorldSimulator is added
-		// worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getWorld());
+		worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getWorld());
 
 		runner = new GameRunner(localPlayer, game) {
 			@Override
@@ -117,6 +119,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 					logToAll("Error when leaving: " + t.getMessage());
 				}
 			});
+			// Stop simulator
+			worldSimulator.terminate();
 			// Close connection
 			if (connection != null) {
 				connection.close();
@@ -207,33 +211,24 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	private GameListener gl = new GameListener() {
 
-		// TODO: Move to simulator
-
 		@Override
 		public void onGameJoined() {
-			// TODO Add all non-local players in simulator
-			// for (String playerID : game.getPlayers()) {
-			// if (!getGameController().isPersonalPlayer(playerID)) {
-			// getGameController().addPlayer(playerID);
-			// }
-			// }
 			// Log
-			logToAll("Joined");
+			logToLocal("Joined");
 			postState(GameSetUpEvent.EventType.JOINED);
 		}
 
 		@Override
 		public void onGameLeft() {
-			// TODO Remove all non-local players on simulator disconnect
-			// getGameController().removeOtherPlayers();
 			// Log
-			logToAll("Left");
+			logToLocal("Left");
 			postState(GameSetUpEvent.EventType.LEFT);
 		}
 
 		@Override
-		public void onGameRolled(int playerNumber) {
-			logToAll("Player number rolled: " + playerNumber);
+		public void onGameRolled(int playerNumber, int objectNumber) {
+			logToLocal("Player number rolled: " + playerNumber);
+			logToLocal("Object number rolled: " + objectNumber);
 		}
 
 		@Override
@@ -259,12 +254,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		@Override
 		public void onObjectFound(String playerID) {
 			logTo(playerID, "Player " + playerID + " found their object");
-		}
-
-		@Override
-		public void onPositionUpdate(String playerID, Pose pose) {
-			// TODO Handle position updates in simulator
-			getWorld().getPlayer(playerID).getRobot().getPoseProvider().setPose(pose);
 		}
 
 	};

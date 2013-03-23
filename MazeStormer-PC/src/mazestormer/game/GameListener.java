@@ -8,7 +8,7 @@ public interface GameListener {
 
 	public void onGameLeft();
 
-	public void onGameRolled(int playerNumber);
+	public void onGameRolled(int playerNumber, int objectNumber);
 
 	public void onGameStarted();
 
@@ -21,8 +21,5 @@ public interface GameListener {
 
 	//
 	public void onObjectFound(String playerID);
-
-	// spectator
-	public void onPositionUpdate(String playerID, Pose pose);
 
 }

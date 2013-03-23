@@ -6,7 +6,6 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Maze.Target;
 import mazestormer.player.Player;
-import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Robot;
 import mazestormer.util.Future;
 import mazestormer.util.ImmediateFuture;
