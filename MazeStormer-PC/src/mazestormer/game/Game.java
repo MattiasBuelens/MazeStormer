@@ -164,6 +164,13 @@ public class Game {
 		}
 
 		@Override
+		public void gameWon(int teamNumber) {
+			for (GameListener gl : gls) {
+				gl.onGameWon(teamNumber);
+			}
+		}
+
+		@Override
 		public void playerJoining(String playerID) {
 			// TODO Perhaps add GameListener.onPlayerJoining() ?
 		}
@@ -200,6 +207,12 @@ public class Game {
 		public void teamTilesReceived(List<Tile> tiles) {
 			// TODO Auto-generated method stub
 
+		}
+
+		@Override
+		public void teamPosition(double x, double y, double angle) {
+			// TODO Auto-generated method stub
+			
 		}
 
 	}
