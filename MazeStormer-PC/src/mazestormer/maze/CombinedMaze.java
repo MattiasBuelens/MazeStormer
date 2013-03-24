@@ -13,7 +13,7 @@ import mazestormer.util.LongPoint;
  * the mazes together and translate coördinates.
  *
  */
-public class MazeCombiner {
+public class CombinedMaze {
 	
 	private final Maze ownExploredMaze;
 	private Map<Barcode, LongPoint> ownBarcodeMapping;
@@ -28,7 +28,7 @@ public class MazeCombiner {
 	
 	private AffineTransform affineTransformation;
 		
-	public MazeCombiner(Maze ownMaze){
+	public CombinedMaze(Maze ownMaze){
 		this.ownExploredMaze = ownMaze;
 		this.teamMatesExploredMaze = null;
 		this.affineTransformation = null;
