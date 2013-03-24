@@ -18,10 +18,9 @@ import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
-import mazestormer.util.AbstractEventSource;
 import mazestormer.util.LongPoint;
 
-public class Maze extends AbstractEventSource {
+public class Maze implements IMaze {
 
 	private static final float defaultTileSize = 40f;
 	private static final float defaultEdgeSize = 2f;
@@ -537,10 +536,6 @@ public class Maze extends AbstractEventSource {
 		checkNotNull(target);
 		checkNotNull(tile);
 		targets.put(target, tile);
-	}
-
-	public enum Target {
-		GOAL, CHECKPOINT
 	}
 
 	public Pose getStartPose(int playerNumber) {

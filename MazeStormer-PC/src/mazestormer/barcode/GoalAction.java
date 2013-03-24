@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Maze;
-import mazestormer.maze.Maze.Target;
 import mazestormer.player.Player;
 import mazestormer.robot.Robot;
 import mazestormer.util.Future;
@@ -25,7 +24,7 @@ public class GoalAction implements IAction {
 		// Get tile underneath robot
 		Point relativePosition = maze.toRelative(pose.getLocation());
 		Point tilePosition = maze.toTile(relativePosition);
-		maze.setTarget(Target.GOAL, maze.getTileAt(tilePosition));
+		maze.setTarget(mazestormer.maze.IMaze.Target.GOAL, maze.getTileAt(tilePosition));
 
 		return new ImmediateFuture<Void>(null);
 	}
