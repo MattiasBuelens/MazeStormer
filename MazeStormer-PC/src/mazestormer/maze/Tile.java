@@ -15,10 +15,23 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
-			Orientation.class);
-	private Barcode barcode;
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
+
+	/*
+	 * Exploration
+	 */
 	private boolean isExplored = false;
+
+	/*
+	 * Barcode
+	 */
+	private Barcode barcode;
+
+	/*
+	 * Seesaw
+	 */
+	private Barcode seesawBarcode;
+	private boolean seesawOpen = false;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -62,6 +75,14 @@ public class Tile {
 		getEdgeAt(direction).setType(type);
 	}
 
+	public boolean isExplored() {
+		return isExplored;
+	}
+
+	public void setExplored() {
+		isExplored = true;
+	}
+
 	public boolean hasBarcode() {
 		return getBarcode() != null;
 	}
@@ -72,21 +93,32 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException(
-					"Tile type does not support barcodes.");
+			throw new IllegalStateException("Tile type does not support barcodes.");
 		this.barcode = barcode;
+	}
+
+	public boolean isSeesaw() {
+		return getSeesawBarcode() != null;
+	}
+
+	public Barcode getSeesawBarcode() {
+		return seesawBarcode;
+	}
+
+	public void setSeesawBarcode(Barcode seesawBarcode) {
+		this.seesawBarcode = seesawBarcode;
+	}
+
+	public boolean isSeesawOpen() {
+		return seesawOpen;
+	}
+
+	public void setSeesawOpen(boolean seesawOpen) {
+		this.seesawOpen = seesawOpen;
 	}
 
 	public TileShape getShape() {
 		return TileShape.get(getClosedSides());
-	}
-
-	public boolean isExplored() {
-		return isExplored;
-	}
-
-	public void setExplored() {
-		isExplored = true;
 	}
 
 	private EnumSet<Orientation> getSidesByType(EdgeType type) {

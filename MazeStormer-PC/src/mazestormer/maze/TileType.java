@@ -191,7 +191,8 @@ public enum TileType {
 
 		@Override
 		public TileShape matches(Set<Orientation> walls) {
-			return STRAIGHT.matches(walls);
+			// Not supported
+			return null;
 		}
 
 	};
