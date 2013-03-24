@@ -5,6 +5,8 @@ import static mazestormer.maze.Orientation.NORTH;
 import static mazestormer.maze.Orientation.SOUTH;
 import static mazestormer.maze.Orientation.WEST;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -189,6 +191,38 @@ public class ParserTest {
 		// Player 3 in top right facing south
 		assertEquals(maze.getStartPose(3).getLocation(), new Point(60, 60));
 		assertEquals(maze.getStartPose(3).getHeading(), -90d, 0.1d);
+	}
+
+	@Test
+	public void seesaw() throws ParseException {
+		String source = "4 1\nStraight.E.11 Seesaw.W Seesaw.E Straight.E.13";
+		Maze maze = parse(source);
+
+		// (0, 0) Barcode 11
+		Tile tile00 = maze.getTileAt(new LongPoint(0, 0));
+		checkWalls(tile00, NORTH, SOUTH);
+		assertTrue(tile00.hasBarcode());
+		assertEquals(tile00.getBarcode().getValue(), 11);
+
+		// (1, 0) Seesaw at side 11, open
+		Tile tile10 = maze.getTileAt(new LongPoint(1, 0));
+		checkWalls(tile10, NORTH, SOUTH);
+		assertTrue(tile10.isSeesaw());
+		assertTrue(tile10.isSeesawOpen());
+		assertEquals(tile10.getSeesawBarcode().getValue(), 11);
+
+		// (2, 0) Seesaw at side 13, closed
+		Tile tile20 = maze.getTileAt(new LongPoint(2, 0));
+		checkWalls(tile20, NORTH, SOUTH);
+		assertTrue(tile20.isSeesaw());
+		assertFalse(tile20.isSeesawOpen());
+		assertEquals(tile20.getSeesawBarcode().getValue(), 13);
+
+		// (3, 0) Barcode 13
+		Tile tile30 = maze.getTileAt(new LongPoint(3, 0));
+		checkWalls(tile30, NORTH, SOUTH);
+		assertTrue(tile30.hasBarcode());
+		assertEquals(tile30.getBarcode().getValue(), 13);
 	}
 
 	/**
