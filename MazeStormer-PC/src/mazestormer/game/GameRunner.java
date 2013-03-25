@@ -13,13 +13,16 @@ import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Edge.EdgeType;
+import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.util.LongPoint;
 
 public class GameRunner implements GameListener {
 
@@ -34,9 +37,11 @@ public class GameRunner implements GameListener {
 
 	private final PositionReporter positionReporter;
 	private final PositionPublisher positionPublisher;
-	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
+	private final ScheduledExecutorService positionExecutor = Executors
+			.newSingleThreadScheduledExecutor(factory);
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("GameRunner-%d").build();
 
 	private int objectNumber;
 
@@ -48,7 +53,8 @@ public class GameRunner implements GameListener {
 				GameRunner.this.log(message);
 			}
 		};
-		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(this));
+		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(
+				this));
 
 		this.game = game;
 		game.addGameListener(this);
@@ -76,8 +82,42 @@ public class GameRunner implements GameListener {
 		Tile nextTile = explorerRunner.getNextTile();
 		EnumSet<Orientation> unknownSides = nextTile.getUnknownSides();
 		for (Orientation side : unknownSides) {
-			explorerRunner.getMaze().setEdge(nextTile.getPosition(), side, EdgeType.WALL);
+			explorerRunner.getMaze().setEdge(nextTile.getPosition(), side,
+					EdgeType.WALL);
 		}
+	}
+
+	public void setSeesawWalls() {
+		log("Seesaw on next tiles, set seesaw & barcode");
+		
+		// Set all unknown edges to walls or open
+		Tile currentTile = explorerRunner.getCurrentTile();
+		Barcode seesawBarcode = currentTile.getBarcode();
+		Tile nextTile = explorerRunner.getNextTile();
+		
+		Orientation orientation = currentTile.orientationTo(nextTile);
+		
+		Maze maze = player.getMaze();
+		
+		LongPoint nextTilePosition = nextTile.getPosition();
+		
+		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
+		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
+		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
+		
+		nextTilePosition = orientation.shift(nextTilePosition);
+		
+		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
+		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
+		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
+		
+		nextTilePosition = orientation.shift(nextTilePosition);
+		
+		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
+		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
+		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
+		maze.setBarcode(nextTilePosition, otherBarcode);
 	}
 
 	public void objectFound() {
@@ -86,6 +126,15 @@ public class GameRunner implements GameListener {
 		game.objectFound();
 		// Done
 		stopGame();
+	}
+	
+	public void onSeesaw(int barcode) {
+		log("The seesaw is currently opened, onwards!");
+		game.lockSeesaw(barcode);
+	}
+	
+	public void offSeesaw() {
+		game.unlockSeesaw();
 	}
 
 	public void afterObjectBarcode() {
@@ -182,7 +231,8 @@ public class GameRunner implements GameListener {
 		public void moveStarted(Move event, MoveProvider mp) {
 			if (task == null) {
 				// Start publishing
-				task = positionExecutor.scheduleWithFixedDelay(positionPublisher, 0, updateFrequency,
+				task = positionExecutor.scheduleWithFixedDelay(
+						positionPublisher, 0, updateFrequency,
 						TimeUnit.MILLISECONDS);
 			}
 		}

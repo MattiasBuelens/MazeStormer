@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.barcode.Barcode;
 import mazestormer.maze.PoseTransform;
+import mazestormer.maze.Tile;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
 import peno.htttp.DisconnectReason;
@@ -25,8 +27,8 @@ public class WorldSimulator {
 
 	private final Map<Integer, PoseTransform> playerTransforms = new HashMap<Integer, PoseTransform>();
 
-	public WorldSimulator(Connection connection, String id, Player localPlayer, World world) throws IOException,
-			IllegalStateException {
+	public WorldSimulator(Connection connection, String id, Player localPlayer,
+			World world) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
 		this.world = world;
@@ -125,7 +127,8 @@ public class WorldSimulator {
 				return;
 
 			// TODO Perhaps add GameListener.onPlayerTimeout() ?
-			if (reason == DisconnectReason.LEAVE || reason == DisconnectReason.TIMEOUT) {
+			if (reason == DisconnectReason.LEAVE
+					|| reason == DisconnectReason.TIMEOUT) {
 				getWorld().removePlayer(getWorld().getPlayer(playerID));
 			}
 		}
@@ -143,8 +146,8 @@ public class WorldSimulator {
 		}
 
 		@Override
-		public void playerUpdate(String playerID, int playerNumber, double x, double y, double angle,
-				boolean foundObject) {
+		public void playerUpdate(String playerID, int playerNumber, double x,
+				double y, double angle, boolean foundObject) {
 			// Ignore local player
 			if (isLocalPlayer(playerID))
 				return;
@@ -153,18 +156,26 @@ public class WorldSimulator {
 			// Transform
 			pose = transformPlayerPose(playerNumber, pose);
 			// Set pose
-			getWorld().getPlayer(playerID).getRobot().getPoseProvider().setPose(pose);
+			getWorld().getPlayer(playerID).getRobot().getPoseProvider()
+					.setPose(pose);
 		}
 
 		@Override
 		public void lockedSeesaw(String playerID, int playerNumber, int barcode) {
-			// TODO Auto-generated method stub
+			// Deze methode mag leeg blijven, keitof!
 
 		}
 
 		@Override
-		public void unlockedSeesaw(String playerID, int playerNumber, int barcode) {
-			// TODO Auto-generated method stub
+		public void unlockedSeesaw(String playerID, int playerNumber,
+				int barcode) {
+			Tile seesawTile = getWorld().getMaze().getSeesawTile(
+					new Barcode((byte) barcode));
+			seesawTile.flipSeesaw();
+			Barcode otherBarcode = seesawTile.getOtherSeesawBarcode();
+			Tile otherSeesawTile = getWorld().getMaze().getSeesawTile(
+					otherBarcode);
+			otherSeesawTile.flipSeesaw();
 
 		}
 

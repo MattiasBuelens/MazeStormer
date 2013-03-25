@@ -1,10 +1,24 @@
 package mazestormer.barcode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import mazestormer.game.GameRunner;
 
 public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 
 	private static IAction[] actions = new IAction[40];
+	
+	private static Map<Barcode, Barcode> barcodeMapping = new HashMap<>();
+	
+	static {
+		barcodeMapping.put(new Barcode((byte) 11), new Barcode((byte) 13));
+		barcodeMapping.put(new Barcode((byte) 13), new Barcode((byte) 11));
+		barcodeMapping.put(new Barcode((byte) 15), new Barcode((byte) 17));
+		barcodeMapping.put(new Barcode((byte) 17), new Barcode((byte) 15));
+		barcodeMapping.put(new Barcode((byte) 19), new Barcode((byte) 21));
+		barcodeMapping.put(new Barcode((byte) 21), new Barcode((byte) 19));
+	}
 
 	public TeamTreasureTrekBarcodeMapping(GameRunner gameRunner) {
 		createActions(gameRunner);
@@ -19,12 +33,12 @@ public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 		actions[5] = new ObjectFoundAction(1, 1, gameRunner);
 		actions[6] = new ObjectFoundAction(2, 1, gameRunner);
 		actions[7] = new ObjectFoundAction(3, 1, gameRunner);
-		actions[11] = new SeesawAction();
-		actions[13] = new SeesawAction();
-		actions[15] = new SeesawAction();
-		actions[17] = new SeesawAction();
-		actions[19] = new SeesawAction();
-		actions[21] = new SeesawAction();
+		actions[11] = new SeesawAction(gameRunner, 11);
+		actions[13] = new SeesawAction(gameRunner, 13);
+		actions[15] = new SeesawAction(gameRunner, 15);
+		actions[17] = new SeesawAction(gameRunner, 17);
+		actions[19] = new SeesawAction(gameRunner, 19);
+		actions[21] = new SeesawAction(gameRunner, 21);
 	}
 
 	@Override
@@ -34,6 +48,10 @@ public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 		} else {
 			return null;
 		}
+	}
+	
+	public static Barcode getOtherSeesawBarcode(Barcode barcode) {
+		return barcodeMapping.get(barcode);
 	}
 
 }

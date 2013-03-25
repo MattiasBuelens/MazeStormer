@@ -32,6 +32,7 @@ public class Tile {
 	 */
 	private Barcode seesawBarcode;
 	private boolean seesawOpen = false;
+	private Barcode otherSeesawBarcode;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -96,6 +97,15 @@ public class Tile {
 			throw new IllegalStateException("Tile type does not support barcodes.");
 		this.barcode = barcode;
 	}
+	
+	public Orientation orientationTo(Tile otherTile) {
+		for(Orientation orientation : Orientation.values()) {
+			LongPoint neighborPosition = orientation.shift(this.getPosition());
+			if(otherTile.getPosition().equals(neighborPosition))
+				return orientation;
+		}
+		return null;
+	}
 
 	public boolean isSeesaw() {
 		return getSeesawBarcode() != null;
@@ -109,12 +119,29 @@ public class Tile {
 		this.seesawBarcode = seesawBarcode;
 	}
 
+	/**
+	 * Deze methode alleen opvragen in de wereldsimulator, dus in de sourceMaze,
+	 * fysiek moet gebruik gemaakt worden van de ir-sensor en sophie's bal.
+	 * Virtueel moet dit onrechtstreeks wel naar hier komen via een VirtualIRSensor.
+	 */
 	public boolean isSeesawOpen() {
 		return seesawOpen;
 	}
 
 	public void setSeesawOpen(boolean seesawOpen) {
 		this.seesawOpen = seesawOpen;
+	}
+	
+	public void flipSeesaw() {
+		setSeesawOpen(!isSeesawOpen());
+	}
+	
+	public Barcode getOtherSeesawBarcode() {
+		return this.otherSeesawBarcode;
+	}
+	
+	public void setOtherSeesawBarcode(Barcode barcode) {
+		this.otherSeesawBarcode = barcode;
 	}
 
 	public TileShape getShape() {
