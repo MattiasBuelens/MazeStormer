@@ -157,8 +157,8 @@ public class VirtualIRSensor implements IRSensor {
 		
 		// SEESAW DETECTION
 		// @note: tile creation possible, not really a problem
-		for(int i = 1; i < DetectionLength.SEESAW.getTransX(); i++) {
-			Tile tileToCheck = getMaze().getTileAt(new Point(currentTile.getX()+x*i, currentTile.getY()+y*i));
+		for(int i = 1; i < DetectionLength.SEESAW.getTransY(); i++) {
+			Tile tileToCheck = getMaze().getTileAt(new Point(currentTile.getX(), currentTile.getY()+y*i));
 			if (tileToCheck.isSeesaw() && !tileToCheck.isSeesawOpen()){
 				return 0f;
 			}
