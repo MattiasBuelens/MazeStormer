@@ -262,12 +262,13 @@ public class Maze implements IMaze {
 
 	@Override
 	public void setExplored(LongPoint position) {
-		// Set explored
 		Tile tile = getTileAt(position);
-		tile.setExplored();
-
-		// Fire tile explored event
-		fireTileExplored(tile);
+		if (!tile.isExplored()) {
+			// Set explored
+			tile.setExplored();
+			// Fire tile explored event
+			fireTileExplored(tile);
+		}
 	}
 
 	/**
