@@ -191,6 +191,15 @@ public class ParserTest {
 		assertEquals(maze.getStartPose(3).getHeading(), -90d, 0.1d);
 	}
 
+	@Test
+	public void singleTile() throws ParseException {
+		String source = "Straight.E.37";
+		Tile tile = Parser.parseTile(source);
+
+		checkWalls(tile, NORTH, SOUTH);
+		assertEquals(tile.getBarcode().getValue(), 37);
+	}
+
 	/**
 	 * Parse the given source into a new maze.
 	 */

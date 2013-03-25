@@ -7,6 +7,7 @@ import java.text.ParseException;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.Tile;
 import mazestormer.util.LongPoint;
 
 public class Parser {
@@ -57,8 +58,7 @@ public class Parser {
 				// Get position
 				LongPoint position = new LongPoint(x, y);
 				// Set edges
-				for (Orientation orientation : token.getType().getWalls(
-						token.getOrientation())) {
+				for (Orientation orientation : token.getType().getWalls(token.getOrientation())) {
 					maze.setEdge(position, orientation, EdgeType.WALL);
 				}
 				for (Orientation orientation : token.getType().getOpenings(token.getOrientation())) {
@@ -74,4 +74,35 @@ public class Parser {
 		// Ensure end of file
 		tokenizer.getEOFToken();
 	}
+
+	/**
+	 * Parse a single tile token.
+	 * 
+	 * @param tileToken
+	 *            The tile token to parse.
+	 * 
+	 * @throws ParseException
+	 *             If the token was invalid.
+	 */
+	public static Tile parseTile(String tileToken) throws ParseException {
+		Tokenizer tokenizer = new Tokenizer(tileToken);
+		// Create tile
+		LongPoint position = new LongPoint(0, 0);
+		Tile tile = new Tile(position);
+		// Parse
+		TileToken token = tokenizer.getTileToken(false);
+		// Set edges
+		for (Orientation orientation : token.getType().getWalls(token.getOrientation())) {
+			tile.setEdge(orientation, EdgeType.WALL);
+		}
+		for (Orientation orientation : token.getType().getOpenings(token.getOrientation())) {
+			tile.setEdge(orientation, EdgeType.OPEN);
+		}
+		// Set option
+		if (token.getOption() != null) {
+			token.getOption().apply(tile, token);
+		}
+		return tile;
+	}
+
 }
