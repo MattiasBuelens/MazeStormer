@@ -246,4 +246,19 @@ public class Game {
 
 	}
 
+	public void sendTile(Tile tile) {
+		// TODO Maze coordinate specification?
+		long x = tile.getX();
+		long y = tile.getY();
+		String token = Parser.stringify(tile);
+		peno.htttp.Tile sendTile = new peno.htttp.Tile(x, y, token);
+
+		try {
+			client.sendTiles(sendTile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }

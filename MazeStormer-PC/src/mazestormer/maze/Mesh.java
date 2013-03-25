@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.AstarSearchAlgorithm;
 import lejos.robotics.pathfinding.Node;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
-public class Mesh implements MazeListener {
+public class Mesh extends AbstractMazeListener {
 
 	private final Maze maze;
 
@@ -90,20 +89,8 @@ public class Mesh implements MazeListener {
 	}
 
 	@Override
-	public void tileChanged(Tile tile) {
-	}
-
-	@Override
-	public void tileExplored(Tile tile) {
-	}
-
-	@Override
 	public void edgeChanged(Edge edge) {
 		edgeUpdate(edge);
-	}
-
-	@Override
-	public void mazeOriginChanged(Pose origin) {
 	}
 
 	@Override

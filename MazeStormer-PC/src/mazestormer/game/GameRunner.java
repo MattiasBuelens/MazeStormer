@@ -15,6 +15,7 @@ import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Edge.EdgeType;
+import mazestormer.maze.AbstractMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
@@ -248,6 +249,15 @@ public class GameRunner implements GameListener {
 		@Override
 		public void run() {
 			game.updatePosition(getRobot().getPoseProvider().getPose());
+		}
+
+	}
+
+	private class TileReporter extends AbstractMazeListener {
+
+		@Override
+		public void tileExplored(Tile tile) {
+			game.sendTile(tile);
 		}
 
 	}

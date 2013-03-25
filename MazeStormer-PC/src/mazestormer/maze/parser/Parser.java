@@ -184,4 +184,9 @@ public class Parser {
 
 	}
 
+	public static String stringify(Tile tile) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
