@@ -24,6 +24,10 @@ public class World {
 	public Collection<? extends AbsolutePlayer> getPlayers() {
 		return Collections.unmodifiableCollection(players.values());
 	}
+	
+	public AbsolutePlayer getLocalPlayer() {
+		return null; // TODO
+	}
 
 	public AbsolutePlayer getPlayer(String playerID) {
 		return players.get(playerID);
