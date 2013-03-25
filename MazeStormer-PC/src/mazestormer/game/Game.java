@@ -1,18 +1,21 @@
 package mazestormer.game;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.maze.CombinedMaze;
+import mazestormer.maze.Tile;
+import mazestormer.maze.parser.Parser;
 import mazestormer.player.Player;
 import mazestormer.world.World;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
 import peno.htttp.PlayerHandler;
-import peno.htttp.Tile;
 
 import com.rabbitmq.client.Connection;
 
@@ -222,13 +225,15 @@ public class Game {
 		}
 
 		@Override
-		public void teamTilesReceived(List<Tile> tiles) {
-			for(Tile tile : tiles){
-				//TODO:
-				// parse htttp-tiles naar mazestormer-tiles
-				// laat combinedMaze ze in de juiste mazes steken met addTeamMateTile(Tile othersSentTile)
+		public void teamTilesReceived(List<peno.htttp.Tile> tiles) {
+			for(peno.htttp.Tile tile : tiles){
+				try {
+					// parse htttp-tiles naar mazestormer-tiles
+					Tile parsedTile = Parser.parseTile(tile.getToken());
+					// laat combinedMaze ze in de juiste mazes steken
+					((CombinedMaze) localPlayer.getMaze()).addTeamMateTile(parsedTile);
+				} catch (ParseException e) { e.printStackTrace(); }
 			}
-
 		}
 
 		@Override

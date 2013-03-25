@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
@@ -13,7 +14,7 @@ public class RelativePlayer implements Player {
 	private String playerID;
 
 	private Robot robot;
-	private Maze maze;
+	private IMaze maze;
 
 	/*
 	 * Logging
@@ -54,14 +55,14 @@ public class RelativePlayer implements Player {
 	}
 
 	@Override
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		if (this.maze == null) {
 			this.maze = new Maze();
 		}
 		return this.maze;
 	}
 
-	public void setMaze(Maze maze) {
+	public void setMaze(IMaze maze) {
 		checkNotNull(maze);
 		this.maze = maze;
 	}

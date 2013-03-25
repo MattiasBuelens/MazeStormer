@@ -13,10 +13,10 @@ import lejos.robotics.navigation.Waypoint;
  */
 public class PathFinder {
 
-	protected final Maze maze;
+	protected final IMaze maze;
 
-	public PathFinder(Maze maze) {
-		this.maze = maze;
+	public PathFinder(IMaze iMaze) {
+		this.maze = iMaze;
 	}
 
 	/**

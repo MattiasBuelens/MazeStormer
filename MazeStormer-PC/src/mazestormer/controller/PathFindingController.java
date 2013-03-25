@@ -8,6 +8,7 @@ import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import mazestormer.line.LineFinderRunner;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
@@ -34,7 +35,7 @@ public class PathFindingController extends SubController implements
 		return getMainController().getControllableRobot();
 	}
 
-	private Maze getMaze() {
+	private IMaze getMaze() {
 		return getMainController().getMaze();
 	}
 
@@ -152,7 +153,7 @@ public class PathFindingController extends SubController implements
 		 * 
 		 * @param robot
 		 *            The robot who must follow a tile sequence.
-		 * @param maze
+		 * @param iMaze
 		 *            The maze the robot is positioned in.
 		 * @param goal
 		 *            The target tile.
@@ -161,7 +162,7 @@ public class PathFindingController extends SubController implements
 		 * @param reposition
 		 *            Whether to reposition the robot before navigating.
 		 */
-		public TileSequenceRunner(ControllableRobot robot, Maze maze,
+		public TileSequenceRunner(ControllableRobot robot, IMaze iMaze,
 				Tile goal, boolean singleStep, boolean reposition) {
 			this.robot = checkNotNull(robot);
 			addStateListener(this);
@@ -176,7 +177,7 @@ public class PathFindingController extends SubController implements
 			navigator.addNavigatorListener(this);
 
 			// Path finder
-			this.pathFinder = new PathFinder(maze);
+			this.pathFinder = new PathFinder(iMaze);
 
 			// Line finder
 			this.lineFinder = new LineFinderRunner(getRobot()) {

@@ -23,8 +23,8 @@ import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinderRunner;
 import mazestormer.maze.Edge.EdgeType;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.IMaze.Target;
-import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
@@ -133,7 +133,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		return (ControllableRobot) player.getRobot();
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return player.getMaze();
 	}
 

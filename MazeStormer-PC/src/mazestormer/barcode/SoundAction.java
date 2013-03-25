@@ -1,7 +1,7 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
@@ -14,7 +14,7 @@ public class SoundAction implements IAction {
 		checkNotNull(player);
 		ControllableRobot robot = (ControllableRobot) player.getRobot();
 		checkNotNull(robot);
-		Maze maze = player.getMaze();
+		IMaze maze = player.getMaze();
 		checkNotNull(maze);
 		
 		robot.getSoundPlayer().playSound();

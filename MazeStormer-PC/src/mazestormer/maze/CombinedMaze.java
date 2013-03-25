@@ -54,7 +54,7 @@ public class CombinedMaze implements IMaze {
 	 * @param othersTile
 	 *            A tile in the others coordinate system.
 	 */
-	private void addTeamMateTile(Tile othersSentTile) {
+	public void addTeamMateTile(Tile othersSentTile) {
 		LongPoint position = othersSentTile.getPosition();
 		// get the corresponding tile in the teamMatesExploredMaze
 		Tile othersMazeTile = teamMatesExploredMaze.getTileAt(position);

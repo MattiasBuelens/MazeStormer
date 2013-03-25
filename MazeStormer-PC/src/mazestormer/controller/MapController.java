@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.Player;
 import mazestormer.ui.map.MapDocument;
@@ -81,7 +82,7 @@ public class MapController extends SubController implements IMapController {
 			addLayer(sourceMazeLayer);
 		}
 
-		Maze maze = getPlayer().getMaze();
+		IMaze maze = getPlayer().getMaze();
 		mazeLayer = new MazeLayer("Discovered maze", maze);
 		mazeLayer.setZIndex(2);
 		addLayer(mazeLayer);

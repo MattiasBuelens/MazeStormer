@@ -10,12 +10,12 @@ import java.util.Map;
 import lejos.geom.Line;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.Edge;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.MazeListener;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
-import mazestormer.util.LongPoint;
 import mazestormer.util.CoordUtils;
+import mazestormer.util.LongPoint;
 
 import org.apache.batik.dom.svg.SVGOMTransform;
 import org.w3c.dom.Element;
@@ -38,7 +38,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private final double edgeStrokeWidth;
 	private static final int edgeDashSize = 4;
 
-	private final Maze maze;
+	private final IMaze maze;
 	private int zIndex = 0;
 
 	private SVGGElement mazeElement;
@@ -46,15 +46,15 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private SVGGElement edgesGroup;
 	private Map<LongPoint, TileElement> tiles = new HashMap<LongPoint, TileElement>();
 
-	public MazeLayer(String name, Maze maze) {
+	public MazeLayer(String name, IMaze maze2) {
 		super(name);
-		this.maze = maze;
-		maze.addListener(this);
+		this.maze = maze2;
+		maze2.addListener(this);
 
-		this.edgeStrokeWidth = maze.getEdgeSize() / maze.getTileSize();
+		this.edgeStrokeWidth = maze2.getEdgeSize() / maze2.getTileSize();
 
-		setScale(maze.getTileSize());
-		setOrigin(maze.getOrigin());
+		setScale(maze2.getTileSize());
+		setOrigin(maze2.getOrigin());
 		setRotationCenter(0, 0);
 	}
 
@@ -77,7 +77,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		return mazeElement;
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return maze;
 	}
 

@@ -16,6 +16,7 @@ import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
@@ -382,7 +383,7 @@ public class MainController implements IMainController {
 	 * Maze
 	 */
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return getPlayer().getMaze();
 	}
 

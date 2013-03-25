@@ -2,7 +2,7 @@ package mazestormer.player;
 
 import java.util.logging.Logger;
 
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.robot.Robot;
 
 public interface Player extends PlayerIdentifier {
@@ -11,7 +11,7 @@ public interface Player extends PlayerIdentifier {
 
 	public Robot getRobot();
 
-	public Maze getMaze();
+	public IMaze getMaze();
 
 	public Logger getLogger();
 

@@ -7,8 +7,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
@@ -17,12 +15,14 @@ import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Edge.EdgeType;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class GameRunner implements GameListener {
 
@@ -93,7 +93,7 @@ public class GameRunner implements GameListener {
 
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
-		Maze maze = player.getMaze();
+		IMaze maze = player.getMaze();
 
 		LongPoint nextTilePosition = nextTile.getPosition();
 

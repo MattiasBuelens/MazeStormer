@@ -1,11 +1,8 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import mazestormer.barcode.ObjectFoundAction.ObjectFoundState;
-import mazestormer.explore.ExplorerRunner;
 import mazestormer.game.GameRunner;
-import mazestormer.line.LineAdjuster;
-import mazestormer.line.LineFinderRunner;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
@@ -94,7 +91,7 @@ public class SeesawAction extends
 		checkNotNull(player);
 		Robot robot = player.getRobot();
 		checkNotNull(robot);
-		Maze maze = player.getMaze();
+		IMaze maze = player.getMaze();
 		checkNotNull(maze);
 		// 1) rijd vooruit tot aan een bruin-zwart overgang (van de barcode aan
 		// de andere kant van de wip)
@@ -117,7 +114,7 @@ public class SeesawAction extends
 		checkNotNull(player);
 		Robot robot = player.getRobot();
 		checkNotNull(robot);
-		Maze maze = player.getMaze();
+		IMaze maze = player.getMaze();
 		checkNotNull(maze);
 		// 1) informatie over wip aan het ontdekte doolhof toevoegen
 		// 2) 180° omdraaien
