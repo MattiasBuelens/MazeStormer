@@ -4,9 +4,15 @@ import mazestormer.robot.IRSensor;
 import mazestormer.world.World;
 
 public class VirtualIRSensor implements IRSensor {
+	
+	private World world;
 
 	public VirtualIRSensor(World world) {
-		// TODO Auto-generated constructor stub
+		this.world = world;
+	}
+	
+	public World getWorld() {
+		return this.world;
 	}
 
 	@Override
