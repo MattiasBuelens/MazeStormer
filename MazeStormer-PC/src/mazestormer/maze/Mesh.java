@@ -76,11 +76,11 @@ public class Mesh implements MazeListener {
 	@Deprecated
 	public void printNodeMap() {
 		for (Tile tile : this.nodeMap.keySet()) {
-			System.out.println("Tile X: " + tile.getX() + "\t" + " Y: " + tile.getY() + "\t" + " | Borders: " + tile.getClosedSides().size()
-					+ " | Openings: " + tile.getOpenSides().size());
+			System.out.println("Tile X: " + tile.getX() + "\t" + " Y: " + tile.getY() + "\t" + " | Borders: "
+					+ tile.getClosedSides().size() + " | Openings: " + tile.getOpenSides().size());
 			Node node = this.nodeMap.get(tile);
-			System.out.println("Node X: " + node.x + "\t" + " Y: " + node.y + "\t" + " | Borders: " + (4 - node.getNeighbors().size())
-					+ " | Openings: " + node.getNeighbors().size());
+			System.out.println("Node X: " + node.x + "\t" + " Y: " + node.y + "\t" + " | Borders: "
+					+ (4 - node.getNeighbors().size()) + " | Openings: " + node.getNeighbors().size());
 		}
 	}
 
@@ -91,6 +91,10 @@ public class Mesh implements MazeListener {
 
 	@Override
 	public void tileChanged(Tile tile) {
+	}
+
+	@Override
+	public void tileExplored(Tile tile) {
 	}
 
 	@Override

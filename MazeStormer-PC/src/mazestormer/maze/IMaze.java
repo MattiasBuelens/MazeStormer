@@ -95,8 +95,7 @@ public interface IMaze {
 	 * @param type
 	 *            The edge type.
 	 */
-	public void setEdge(LongPoint tilePosition, Orientation orientation,
-			Edge.EdgeType type);
+	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type);
 
 	/**
 	 * Set the barcode of a tile.
@@ -109,11 +108,17 @@ public interface IMaze {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, Barcode barcode)
-			throws IllegalStateException;
+	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException;
 
-	public void setBarcode(LongPoint position, byte barcode)
-			throws IllegalStateException;
+	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException;
+
+	/**
+	 * Set a tile as explored.
+	 * 
+	 * @param position
+	 *            The tile position.
+	 */
+	public void setExplored(LongPoint position);
 
 	/**
 	 * Clear this maze, removing all tiles and edges.
@@ -246,7 +251,6 @@ public interface IMaze {
 
 	public void setStartPose(int playerNumber, Pose pose);
 
-	public void setStartPose(int playerNumber, LongPoint tilePosition,
-			Orientation orientation);
+	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation);
 
 }

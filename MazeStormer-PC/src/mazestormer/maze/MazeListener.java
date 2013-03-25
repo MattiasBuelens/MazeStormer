@@ -24,6 +24,14 @@ public interface MazeListener {
 	 */
 	void tileChanged(Tile tile);
 
+	/**
+	 * Invoked when a tile on the maze has been fully explored.
+	 * 
+	 * @param tile
+	 *            The explored tile.
+	 */
+	void tileExplored(Tile tile);
+
 	/*
 	 * Edges
 	 */

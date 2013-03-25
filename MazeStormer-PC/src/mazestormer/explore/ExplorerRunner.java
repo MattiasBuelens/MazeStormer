@@ -221,7 +221,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		if (!currentTile.isExplored()) {
 			log("Scan for edges at " + currentTile.getPosition());
 			scanAndUpdate(currentTile);
-			currentTile.setExplored();
+			getMaze().setExplored(currentTile.getPosition());
 		}
 
 		// Create new paths to all neighbors
@@ -424,10 +424,10 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		for (Orientation orientation : tile.getUnknownSides()) {
 			getMaze().setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
 		}
-		// Mark as explored
-		tile.setExplored();
 		// Set barcode
 		getMaze().setBarcode(tile.getPosition(), barcode);
+		// Mark as explored
+		getMaze().setExplored(tile.getPosition());
 	}
 
 	/**
