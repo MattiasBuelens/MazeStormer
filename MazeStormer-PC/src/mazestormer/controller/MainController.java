@@ -17,7 +17,7 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.Maze;
-import mazestormer.player.Player;
+import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
 import mazestormer.simulator.VirtualRobot;
@@ -63,7 +63,7 @@ public class MainController implements IMainController {
 
 	private World world = new World();
 
-	private Player personalPlayer;
+	private RelativePlayer personalPlayer;
 	public static final String defaultPlayerName = "Brons";
 
 	/*
@@ -398,12 +398,12 @@ public class MainController implements IMainController {
 	 * Player
 	 */
 
-	public Player getPlayer() {
+	public RelativePlayer getPlayer() {
 		return personalPlayer;
 	}
 
 	private void createPersonalPlayer() {
-		personalPlayer = new Player();
+		personalPlayer = new RelativePlayer();
 		personalPlayer.setPlayerID(defaultPlayerName);
 		getWorld().addPlayer(personalPlayer);
 	}

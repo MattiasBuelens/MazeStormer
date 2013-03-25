@@ -6,13 +6,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import mazestormer.controller.PlayerEvent.EventType;
-import mazestormer.player.IPlayer;
+import mazestormer.player.PlayerIdentifier;
 import mazestormer.player.Player;
 import mazestormer.world.WorldListener;
 
 public class GameController extends SubController implements IGameController {
 
-	private Map<IPlayer, IPlayerController> pcs = new LinkedHashMap<IPlayer, IPlayerController>();
+	private Map<PlayerIdentifier, IPlayerController> pcs = new LinkedHashMap<PlayerIdentifier, IPlayerController>();
 
 	public GameController(MainController mainController) {
 		super(mainController);
@@ -20,7 +20,7 @@ public class GameController extends SubController implements IGameController {
 	}
 
 	@Override
-	public IPlayerController getPlayerController(IPlayer player) {
+	public IPlayerController getPlayerController(PlayerIdentifier player) {
 		return pcs.get(player);
 	}
 

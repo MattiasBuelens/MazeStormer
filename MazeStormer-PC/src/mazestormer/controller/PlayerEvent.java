@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.player.IPlayer;
+import mazestormer.player.PlayerIdentifier;
 
 public class PlayerEvent {
 
@@ -9,9 +9,9 @@ public class PlayerEvent {
 	}
 
 	private final EventType eventType;
-	private final IPlayer player;
+	private final PlayerIdentifier player;
 
-	public PlayerEvent(EventType type, IPlayer player) {
+	public PlayerEvent(EventType type, PlayerIdentifier player) {
 		this.eventType = type;
 		this.player = player;
 	}
@@ -20,7 +20,7 @@ public class PlayerEvent {
 		return eventType;
 	}
 
-	public IPlayer getPlayer() {
+	public PlayerIdentifier getPlayer() {
 		return player;
 	}
 

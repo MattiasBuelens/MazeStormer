@@ -1,16 +1,16 @@
 package mazestormer.ui.map.event;
 
-import mazestormer.player.IPlayer;
+import mazestormer.player.PlayerIdentifier;
 
 public abstract class MapEvent {
 
-	private IPlayer player;
+	private PlayerIdentifier player;
 
-	protected MapEvent(IPlayer player) {
+	protected MapEvent(PlayerIdentifier player) {
 		this.player = player;
 	}
 
-	public IPlayer getPlayer() {
+	public PlayerIdentifier getPlayer() {
 		return this.player;
 	}
 

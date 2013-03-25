@@ -11,7 +11,7 @@ import javax.swing.border.TitledBorder;
 import mazestormer.controller.IGameController;
 import mazestormer.controller.IPlayerController;
 import mazestormer.controller.PlayerEvent;
-import mazestormer.player.IPlayer;
+import mazestormer.player.PlayerIdentifier;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -22,7 +22,7 @@ public class GameTabPanel extends ViewPanel {
 	private final IGameController controller;
 
 	private JTabbedPane tabbedPane;
-	private Map<IPlayer, PlayerTabPanel> playerPanels = new HashMap<IPlayer, PlayerTabPanel>();
+	private Map<PlayerIdentifier, PlayerTabPanel> playerPanels = new HashMap<PlayerIdentifier, PlayerTabPanel>();
 
 	public GameTabPanel(IGameController controller) {
 		this.controller = controller;
@@ -51,7 +51,7 @@ public class GameTabPanel extends ViewPanel {
 		validate();
 	}
 
-	private void addPlayerTab(IPlayer player) {
+	private void addPlayerTab(PlayerIdentifier player) {
 		addPlayerTab(controller.getPlayerController(player));
 	}
 
@@ -61,7 +61,7 @@ public class GameTabPanel extends ViewPanel {
 		this.tabbedPane.addTab(pc.getPlayer().getPlayerID(), panel);
 	}
 
-	private void removePlayerTab(IPlayer player) {
+	private void removePlayerTab(PlayerIdentifier player) {
 		PlayerTabPanel panel = playerPanels.get(player);
 		if (panel != null) {
 			this.tabbedPane.remove(panel);
@@ -69,7 +69,7 @@ public class GameTabPanel extends ViewPanel {
 		}
 	}
 
-	private void renamePlayerTab(IPlayer player) {
+	private void renamePlayerTab(PlayerIdentifier player) {
 		PlayerTabPanel panel = playerPanels.get(player);
 		if (panel != null) {
 			int index = this.tabbedPane.indexOfComponent(panel);

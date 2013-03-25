@@ -20,7 +20,7 @@ import javax.swing.JToolBar;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.controller.IMapController;
-import mazestormer.player.IPlayer;
+import mazestormer.player.PlayerIdentifier;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapChangeEvent;
@@ -38,7 +38,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	private static final long serialVersionUID = 1L;
 
-	private final IPlayer player;
+	private final PlayerIdentifier player;
 
 	private boolean isFollowing;
 
@@ -59,7 +59,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	public static final double zoomFactor = 1.5d;
 
-	public MapPanel(IMapController controller, IPlayer player) {
+	public MapPanel(IMapController controller, PlayerIdentifier player) {
 		this.controller = controller;
 		this.player = player;
 

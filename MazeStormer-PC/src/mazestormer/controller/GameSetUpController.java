@@ -54,8 +54,9 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	@Override
 	public void setPlayerID(String newPlayerID) {
-		Player player = getMainController().getPlayer();
-		getMainController().getWorld().renamePlayer(player, newPlayerID);
+		// TODO
+		// Player player = getMainController().getPlayer();
+		// getMainController().getWorld().renamePlayer(player, newPlayerID);
 	}
 
 	private void createGame(ConnectionMode connectionMode, String gameID) throws IOException {

@@ -2,7 +2,6 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -364,11 +363,7 @@ public class Maze implements IMaze {
 	 */
 	public Point toRelative(Point absolutePosition) {
 		checkNotNull(absolutePosition);
-		try {
-			return originTransform.inverseTransform(absolutePosition);
-		} catch (NoninvertibleTransformException cannotHappen) {
-			return null;
-		}
+		return originTransform.inverseTransform(absolutePosition);
 	}
 
 	/**
@@ -391,11 +386,7 @@ public class Maze implements IMaze {
 	 */
 	public Pose toRelative(Pose absolutePose) {
 		checkNotNull(absolutePose);
-		try {
-			return originTransform.inverseTransform(absolutePose);
-		} catch (NoninvertibleTransformException cannotHappen) {
-			return null;
-		}
+		return originTransform.inverseTransform(absolutePose);
 	}
 
 	/**

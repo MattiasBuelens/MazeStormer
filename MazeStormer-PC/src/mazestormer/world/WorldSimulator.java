@@ -1,13 +1,15 @@
 package mazestormer.world;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.PoseTransform;
 import mazestormer.observable.ObservableRobot;
+import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
+import mazestormer.player.RelativePlayer;
 import peno.htttp.DisconnectReason;
 import peno.htttp.SpectatorClient;
 import peno.htttp.SpectatorHandler;
@@ -23,7 +25,7 @@ public class WorldSimulator {
 	private final Player localPlayer;
 	private final String id;
 
-	private final Map<Integer, PoseTransform> playerTransforms = new HashMap<Integer, PoseTransform>();
+	private final Set<Integer> transformedPlayers = new HashSet<Integer>();
 
 	public WorldSimulator(Connection connection, String id, Player localPlayer, World world) throws IOException,
 			IllegalStateException {
@@ -38,40 +40,35 @@ public class WorldSimulator {
 	}
 
 	public String getId() {
-		return this.id;
+		return id;
 	}
 
 	public World getWorld() {
-		return this.world;
+		return world;
 	}
 
 	public Player getLocalPlayer() {
-		return this.localPlayer;
+		return localPlayer;
 	}
 
 	private boolean isLocalPlayer(String playerID) {
 		return getLocalPlayer().getPlayerID().equals(playerID);
 	}
 
-	private Pose transformPlayerPose(int playerNumber, Pose pose) {
-		return getPlayerTransform(playerNumber).transform(pose);
-	}
+	private void setupPlayerTransform(AbsolutePlayer player, int playerNumber) {
+		// Ignore if already set
+		if (transformedPlayers.contains(playerNumber))
+			return;
 
-	private PoseTransform getPlayerTransform(int playerNumber) {
-		// Look up cached transformation
-		PoseTransform transform = playerTransforms.get(playerNumber);
-		if (transform == null) {
-			// Create transformation from start pose
-			Pose startPose = getWorld().getMaze().getStartPose(playerNumber);
-			transform = new PoseTransform(startPose);
-			// Store transformation for reuse
-			playerTransforms.put(playerNumber, transform);
-		}
-		return transform;
+		// Create transformation from start pose
+		Pose startPose = getWorld().getMaze().getStartPose(playerNumber);
+		player.setTransform(new PoseTransform(startPose));
+		// Set as transformed
+		transformedPlayers.add(playerNumber);
 	}
 
 	private void clearPlayerTransforms() {
-		playerTransforms.clear();
+		transformedPlayers.clear();
 	}
 
 	public void terminate() {
@@ -96,7 +93,7 @@ public class WorldSimulator {
 
 		@Override
 		public void gamePaused() {
-			// left empty
+			// left emptyf
 		}
 
 		@Override
@@ -115,7 +112,9 @@ public class WorldSimulator {
 			if (isLocalPlayer(playerID))
 				return;
 
-			getWorld().addPlayer(new Player(playerID, new ObservableRobot()));
+			// Store player
+			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot());
+			getWorld().addPlayer(new AbsolutePlayer(relativePlayer));
 		}
 
 		@Override
@@ -150,10 +149,13 @@ public class WorldSimulator {
 				return;
 
 			Pose pose = new Pose((float) x, (float) y, (float) angle);
-			// Transform
-			pose = transformPlayerPose(playerNumber, pose);
-			// Set pose
-			getWorld().getPlayer(playerID).getRobot().getPoseProvider().setPose(pose);
+
+			// Setup transformation if not set yet
+			AbsolutePlayer player = getWorld().getPlayer(playerID);
+			setupPlayerTransform(player, playerNumber);
+
+			// Set relative pose
+			player.setRelativePose(pose);
 		}
 
 		@Override

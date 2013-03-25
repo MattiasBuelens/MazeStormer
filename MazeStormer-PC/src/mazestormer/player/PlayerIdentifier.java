@@ -1,6 +1,6 @@
 package mazestormer.player;
 
-public interface IPlayer {
+public interface PlayerIdentifier {
 
 	public String getPlayerID();
 
