@@ -3,7 +3,7 @@ package mazestormer.maze.parser;
 import java.text.ParseException;
 
 import mazestormer.barcode.Barcode;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Tile;
 import mazestormer.util.LongPoint;
 
@@ -20,7 +20,7 @@ public class BarcodeOption implements Option {
 	}
 
 	@Override
-	public void apply(Maze maze, LongPoint tilePosition, TileToken token) throws ParseException {
+	public void apply(IMaze maze, LongPoint tilePosition, TileToken token) throws ParseException {
 		if (token.getType().supportsBarcode()) {
 			maze.setBarcode(tilePosition, getBarcode());
 		} else {

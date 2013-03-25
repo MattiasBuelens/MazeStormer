@@ -200,6 +200,7 @@ public class ParserTest {
 		assertEquals(tile.getBarcode().getValue(), 37);
 	}
 
+	@Test
 	public void seesaw() throws ParseException {
 		String source = "4 1\nStraight.E.11 Seesaw.W Seesaw.E Straight.E.13";
 		Maze maze = parse(source);
@@ -229,6 +230,26 @@ public class ParserTest {
 		checkWalls(tile30, NORTH, SOUTH);
 		assertTrue(tile30.hasBarcode());
 		assertEquals(tile30.getBarcode().getValue(), 13);
+	}
+
+	@Test
+	public void stringifyBarcode() throws ParseException {
+		String expected = "Straight.E.37";
+		Maze maze = parse("1 1\n" + expected);
+		String actual = Parser.stringify(maze, new LongPoint(0, 0));
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void stringifySeesaw() throws ParseException {
+		String source = "4 1\nStraight.E.11 Seesaw.W Seesaw.E Straight.E.13";
+		Maze maze = parse(source);
+
+		assertEquals("Straight.E.11", Parser.stringify(maze, new LongPoint(0, 0)));
+		assertEquals("Seesaw.W", Parser.stringify(maze, new LongPoint(1, 0)));
+		assertEquals("Seesaw.E", Parser.stringify(maze, new LongPoint(2, 0)));
+		assertEquals("Straight.E.13", Parser.stringify(maze, new LongPoint(3, 0)));
 	}
 
 	/**
