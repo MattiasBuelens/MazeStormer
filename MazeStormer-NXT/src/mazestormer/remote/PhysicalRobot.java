@@ -15,6 +15,7 @@ import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RotatingRangeScanner;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
 
@@ -24,6 +25,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 	private PhysicalPilot pilot;
 	private PhysicalLightSensor light;
 	private PhysicalRangeScanner scanner;
+	private PhysicalIRSensor ir;
 	private PhysicalSoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
 
@@ -56,6 +58,11 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 	}
 
 	@Override
+	public IRSensor getIRSensor() {
+		return ir;
+	}
+
+	@Override
 	public PoseProvider getPoseProvider() {
 		if (poseProvider == null) {
 			poseProvider = new OdometryPoseProvider(getPilot());
@@ -84,6 +91,9 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		RangeScanner headScanner = new RotatingRangeScanner(headMotor,
 				ultrasonicSensor, gearRatio);
 		scanner = new PhysicalRangeScanner(comm, headScanner);
+
+		// Infrared
+		ir = new PhysicalIRSensor(comm, SensorPort.S3);
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(comm);
@@ -118,5 +128,4 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 			terminate();
 		}
 	}
-
 }

@@ -78,6 +78,11 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	 * Get the range feature detector of this robot.
 	 */
 	public RangeFeatureDetector getRangeDetector();
+	
+	/**
+	 * Get the infrared sensor of this robot.
+	 */
+	public IRSensor getIRSensor();
 
 	/**
 	 * Get the sound player of this robot.

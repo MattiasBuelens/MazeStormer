@@ -7,14 +7,14 @@ import mazestormer.command.CommandReplier;
 import mazestormer.command.CommandType;
 import mazestormer.command.IRReadCommand;
 import mazestormer.report.ReportType;
+import mazestormer.robot.IRSensor;
 
-public class PhysicalIRSensor extends IRSeekerV2 {
+public class PhysicalIRSensor extends IRSeekerV2 implements IRSensor {
 
 	private final NXTCommunicator communicator;
 
-	public PhysicalIRSensor(NXTCommunicator communicator, SensorPort port,
-			Mode mode) {
-		super(port, mode);
+	public PhysicalIRSensor(NXTCommunicator communicator, SensorPort port) {
+		super(port, Mode.AC);
 		this.communicator = communicator;
 		setup();
 	}
@@ -28,6 +28,11 @@ public class PhysicalIRSensor extends IRSeekerV2 {
 		// Add and store message listener
 		// messageListeners.add(listener);
 		communicator.addListener(listener);
+	}
+
+	@Override
+	public boolean hasReading() {
+		return !Float.isNaN(getAngle());
 	}
 
 	/**

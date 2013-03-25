@@ -9,6 +9,7 @@ import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
 
@@ -27,6 +28,7 @@ public class PhysicalRobot extends PhysicalComponent implements
 
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
+	private IRSensor irSensor;
 
 	private SoundPlayer soundPlayer;
 
@@ -56,6 +58,14 @@ public class PhysicalRobot extends PhysicalComponent implements
 			scanner = new PhysicalRangeScanner(getCommunicator());
 		}
 		return scanner;
+	}
+	
+	@Override
+	public IRSensor getIRSensor() {
+		if (irSensor == null) {
+			irSensor = new PhysicalIRSensor(getCommunicator());
+		}
+		return irSensor;
 	}
 
 	@Override

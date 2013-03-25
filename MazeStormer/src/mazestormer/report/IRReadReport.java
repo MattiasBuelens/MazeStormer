@@ -19,14 +19,6 @@ public class IRReadReport extends RequestReport<float[]> {
 		setValue(values);
 	}
 
-	public float getAngle() {
-		return this.values[0];
-	}
-
-	public int getSensorValue(int id) {
-		return (int) this.values[id];
-	}
-
 	@Override
 	public float[] getValue() {
 		return values;

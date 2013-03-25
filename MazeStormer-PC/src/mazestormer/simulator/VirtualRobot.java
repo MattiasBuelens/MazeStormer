@@ -11,6 +11,7 @@ import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.maze.Maze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.collision.CollisionObserver;
@@ -23,6 +24,7 @@ public class VirtualRobot implements ControllableRobot {
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
+	private VirtualIRSensor ir;
 	private SoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
 	private final VirtualCollisionDetector collisionDetector;
@@ -34,7 +36,8 @@ public class VirtualRobot implements ControllableRobot {
 	public VirtualRobot(World world) {
 		this.world = world;
 
-		this.collisionDetector = new VirtualCollisionDetector(getMaze(), getPoseProvider());
+		this.collisionDetector = new VirtualCollisionDetector(getMaze(),
+				getPoseProvider());
 		this.collisionObserver = new CollisionObserver(this);
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
@@ -71,10 +74,19 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
-			detector = new RangeScannerFeatureDetector(getRangeScanner(), sensorMaxDistance, new Point(0f, 0f));
+			detector = new RangeScannerFeatureDetector(getRangeScanner(),
+					sensorMaxDistance, new Point(0f, 0f));
 			detector.setPoseProvider(getPoseProvider());
 		}
 		return detector;
+	}
+
+	@Override
+	public IRSensor getIRSensor() {
+		if (ir == null) {
+			ir = new VirtualIRSensor(world);
+		}
+		return ir;
 	}
 
 	@Override
