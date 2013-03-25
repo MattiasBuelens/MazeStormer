@@ -55,8 +55,9 @@ public class CombinedMaze implements IMaze {
 	 *            A tile in the others coordinate system.
 	 */
 	private void addTeamMateTile(Tile othersSentTile) {
+		LongPoint position = othersSentTile.getPosition();
 		// get the corresponding tile in the teamMatesExploredMaze
-		Tile othersMazeTile = teamMatesExploredMaze.getTileAt(othersSentTile.getPosition());
+		Tile othersMazeTile = teamMatesExploredMaze.getTileAt(position);
 		
 		//make it a copy of the sentTile
 		othersMazeTile = othersSentTile.getCopy();
@@ -64,6 +65,23 @@ public class CombinedMaze implements IMaze {
 		
 		if(affineTransformation != null) {
 			addTeamMateTileToTotalMaze(othersSentTile);
+		}
+		else if(othersSentTile.hasBarcode()){
+			Barcode barcode = othersSentTile.getBarcode();
+			
+			teamMatesBarcodeMapping.put(barcode, position);
+			
+			//check op barcode en eventueel: voeg mazes samen
+			if (ownBarcodeMapping.containsKey(barcode)) {
+				if (twoCommonBarcodes[0] == null)
+					twoCommonBarcodes[0] = barcode;
+				else if (twoCommonBarcodes[1] == null) {
+					twoCommonBarcodes[1] = barcode;
+					calculatePointTransformation();
+					// using the transformation, put all tiles of the othersExploredMaze in the totalExploredMaze
+					mergeTotalAndOthersExploredMaze();
+				}
+			}
 		}
 	}
 	
