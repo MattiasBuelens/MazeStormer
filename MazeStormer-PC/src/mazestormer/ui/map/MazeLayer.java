@@ -91,8 +91,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		for (LongPoint tilePosition : edge.getTouching()) {
 			TileElement tileElement = tiles.get(tilePosition);
 			if (tileElement != null) {
-				tileElement.setEdge(edge.getOrientationFrom(tilePosition),
-						edge.getType());
+				tileElement.setEdge(edge.getOrientationFrom(tilePosition), edge.getType());
 			}
 		}
 	}
@@ -121,6 +120,10 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 				tiles.get(tile.getPosition()).update();
 			}
 		});
+	}
+
+	@Override
+	public void tileExplored(Tile tile) {
 	}
 
 	@Override
@@ -161,8 +164,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		this.zIndex = zIndex;
 	}
 
-	private void tilePosition(SVGTransformable element, double tileX,
-			double tileY) {
+	private void tilePosition(SVGTransformable element, double tileX, double tileY) {
 		// tileX runs from left to right
 		double x = tileX;
 
@@ -186,8 +188,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private class TileElement {
 
 		private final Tile tile;
-		private final EnumMap<Orientation, EdgeElement> edges = new EnumMap<Orientation, EdgeElement>(
-				Orientation.class);
+		private final EnumMap<Orientation, EdgeElement> edges = new EnumMap<Orientation, EdgeElement>(Orientation.class);
 
 		private final SVGGElement tileGroup;
 		private final SVGRectElement rect;
@@ -249,8 +250,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			if (type == Edge.EdgeType.WALL) {
 				edgesGroup.appendChild(edgeElement.get());
 			} else {
-				edgesGroup.insertBefore(edgeElement.get(),
-						edgesGroup.getFirstChild());
+				edgesGroup.insertBefore(edgeElement.get(), edgesGroup.getFirstChild());
 			}
 		}
 
@@ -283,8 +283,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 				barRect.setAttribute(SVG_Y_ATTRIBUTE, (1d - bar.getY() - bar.getHeight()) + "");
 				barRect.setAttribute(SVG_WIDTH_ATTRIBUTE, bar.getWidth() + "");
 				barRect.setAttribute(SVG_HEIGHT_ATTRIBUTE, bar.getHeight() + "");
-				barRect.setAttribute(SVG_FILL_ATTRIBUTE,
-						isBlack ? CSS_BLACK_VALUE : CSS_WHITE_VALUE);
+				barRect.setAttribute(SVG_FILL_ATTRIBUTE, isBlack ? CSS_BLACK_VALUE : CSS_WHITE_VALUE);
 				barGroup.appendChild(barRect);
 				isBlack = !isBlack;
 			}
@@ -357,9 +356,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			// Stroke color
 			line.setAttribute(SVG_STROKE_ATTRIBUTE, color);
 			// Dashes
-			line.setAttribute(SVG_STROKE_DASHARRAY_ATTRIBUTE,
-					dashed ? (edgeDashSize * edgeStrokeWidth) + ""
-							: SVG_NONE_VALUE);
+			line.setAttribute(SVG_STROKE_DASHARRAY_ATTRIBUTE, dashed ? (edgeDashSize * edgeStrokeWidth) + ""
+					: SVG_NONE_VALUE);
 		}
 
 		private void setPoints() {
