@@ -79,6 +79,17 @@ public enum CommandType implements MessageType<Command> {
 			return new LightCalibrateCommand(this);
 		}
 	},
+	
+	/*
+	 * IR sensor
+	 */
+
+	IR_READ {
+		@Override
+		public Command build() {
+			return new IRReadCommand(this);
+		}
+	},
 
 	/*
 	 * Range scanner
