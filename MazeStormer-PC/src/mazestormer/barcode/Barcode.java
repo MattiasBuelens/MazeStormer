@@ -33,16 +33,16 @@ public class Barcode {
 	}
 
 	/**
-	 * Get the number of bars in a barcode, without leading and terminating black
-	 * bars.
+	 * Get the number of bars in a barcode, without leading and terminating
+	 * black bars.
 	 */
 	public static int getNbValueBars() {
 		return nbBars;
 	}
 
 	/**
-	 * Get the number of bars in a barcode, with leading and terminating
-	 * black bars.
+	 * Get the number of bars in a barcode, with leading and terminating black
+	 * bars.
 	 */
 	public static int getNbBars() {
 		return getNbValueBars() + 2;
@@ -93,13 +93,18 @@ public class Barcode {
 
 		return widths;
 	}
-	
+
 	@Override
 	public boolean equals(Object other) {
-		if(!(other instanceof Barcode))
+		if (!(other instanceof Barcode))
 			return false;
 		Barcode otherBarcode = (Barcode) other;
 		return otherBarcode.getValue() == getValue();
+	}
+
+	@Override
+	public int hashCode() {
+		return getValue();
 	}
 
 }
