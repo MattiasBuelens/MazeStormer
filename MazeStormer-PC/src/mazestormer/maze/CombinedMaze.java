@@ -60,7 +60,7 @@ public class CombinedMaze implements IMaze {
 		Tile othersMazeTile = teamMatesExploredMaze.getTileAt(position);
 		
 		//make it a copy of the sentTile
-		othersMazeTile = othersSentTile.getCopy();
+		othersMazeTile.updateTile(othersSentTile.getCopy());
 		
 		
 		if(affineTransformation != null) {
@@ -93,7 +93,7 @@ public class CombinedMaze implements IMaze {
 			Tile totalMazeTile = getCorrespondingTileFromOtherToTotal(othersSentTile);
 			
 			// make it the rotation of the othersSentTile
-			totalMazeTile = othersSentTile.getCopyRotatedClockwise(-rotationsFromOwnToOther);
+			totalMazeTile.updateTile(othersSentTile.getCopyRotatedClockwise(-rotationsFromOwnToOther));
 	}
 
 	/**
@@ -172,6 +172,7 @@ public class CombinedMaze implements IMaze {
 	 * @param ownTile
 	 *            A tile in own coördinates
 	 */
+	@SuppressWarnings("unused")
 	private Tile getCorrespondingTileFromOwnToOther(Tile ownTile) {
 		// van ownTile naar ownLongPoint
 		LongPoint ownPosition = ownTile.getPosition();
@@ -189,6 +190,7 @@ public class CombinedMaze implements IMaze {
 	 * @param othersTile
 	 *            A tile that has coördinates in the teammates system.
 	 */
+	@SuppressWarnings("unused")
 	private Tile getCorrespondingTileFromOtherToOwn(Tile othersTile) {
 		// van othersTile naar othersLongPoint
 		LongPoint othersPosition = othersTile.getPosition();

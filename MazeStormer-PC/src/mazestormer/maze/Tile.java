@@ -15,7 +15,8 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
+			Orientation.class);
 
 	/*
 	 * Exploration
@@ -94,14 +95,15 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException("Tile type does not support barcodes.");
+			throw new IllegalStateException(
+					"Tile type does not support barcodes.");
 		this.barcode = barcode;
 	}
-	
+
 	public Orientation orientationTo(Tile otherTile) {
-		for(Orientation orientation : Orientation.values()) {
+		for (Orientation orientation : Orientation.values()) {
 			LongPoint neighborPosition = orientation.shift(this.getPosition());
-			if(otherTile.getPosition().equals(neighborPosition))
+			if (otherTile.getPosition().equals(neighborPosition))
 				return orientation;
 		}
 		return null;
@@ -122,7 +124,8 @@ public class Tile {
 	/**
 	 * Deze methode alleen opvragen in de wereldsimulator, dus in de sourceMaze,
 	 * fysiek moet gebruik gemaakt worden van de ir-sensor en sophie's bal.
-	 * Virtueel moet dit onrechtstreeks wel naar hier komen via een VirtualIRSensor.
+	 * Virtueel moet dit onrechtstreeks wel naar hier komen via een
+	 * VirtualIRSensor.
 	 */
 	public boolean isSeesawOpen() {
 		return seesawOpen;
@@ -131,15 +134,15 @@ public class Tile {
 	public void setSeesawOpen(boolean seesawOpen) {
 		this.seesawOpen = seesawOpen;
 	}
-	
+
 	public void flipSeesaw() {
 		setSeesawOpen(!isSeesawOpen());
 	}
-	
+
 	public Barcode getOtherSeesawBarcode() {
 		return this.otherSeesawBarcode;
 	}
-	
+
 	public void setOtherSeesawBarcode(Barcode barcode) {
 		this.otherSeesawBarcode = barcode;
 	}
@@ -171,47 +174,74 @@ public class Tile {
 	public EnumSet<Orientation> getUnknownSides() {
 		return getSidesByType(EdgeType.UNKNOWN);
 	}
-	
-	//TODO: maak methode om een geroteerde kopie van deze tegel terug te geven
-	
+
+	// TODO: maak methode om een geroteerde kopie van deze tegel terug te geven
+
 	/**
-	 * Returns a copy of this tile that was rotated n*90° counterclockwise, where n is the given number of rotations.
+	 * Returns a copy of this tile that was rotated n*90° counterclockwise,
+	 * where n is the given number of rotations.
 	 * 
 	 * @param amount
-	 * 			The amount of times there should be rotated.
+	 *            The amount of times there should be rotated.
 	 */
 	public Tile getCopyRotatedClockwise(int amount) {
-		//create a copy of this tile
+		// create a copy of this tile
 		Tile tile = this.getCopy();
-		
-		//rotate the edges
-		for(Orientation orientation : Orientation.values()) {
-			tile.setEdge(orientation, this.getEdgeAt(orientation.rotateCounterClockwise(amount)).getType());
+
+		// rotate the edges
+		for (Orientation orientation : Orientation.values()) {
+			tile.setEdge(orientation,
+					this.getEdgeAt(orientation.rotateCounterClockwise(amount))
+							.getType());
 		}
 		return tile;
 	}
-	
+
 	/**
 	 * Returns a new tile that has the same location, barcode and edges.
+	 * 
 	 * @return
 	 */
 	public Tile getCopy() {
-		//create tile at right position
+		// create tile at right position
 		Tile tile = new Tile(this.getPosition());
-		
-		if(this.hasBarcode()){
+
+		if (this.hasBarcode()) {
 			// set the barcode to an identical barcode
 			tile.setBarcode(new Barcode(this.getBarcode().getValue()));
 		}
-		
+
 		// set the types of the edges
-		for(Orientation orientation : Orientation.values()) {
+		for (Orientation orientation : Orientation.values()) {
 			tile.setEdge(orientation, this.getEdgeAt(orientation).getType());
 		}
 		
-		if(this.isExplored) tile.setExplored();
-		
+		// set the explored-flag
+		if (this.isExplored)
+			tile.setExplored();
+
 		return tile;
+	}
+
+	public void updateTile(Tile otherTile) {
+		if (otherTile.hasBarcode()) {
+			// set the barcode to an identical barcode
+			this.setBarcode(new Barcode(this.getBarcode().getValue()));
+		}
+
+		// set the types of the edges
+		for (Orientation orientation : Orientation.values()) {
+			this.setEdge(orientation, otherTile.getEdgeAt(orientation)
+					.getType());
+		}
+
+		// set the explored-flag
+		if (otherTile.isExplored) {
+			this.setExplored();
+		} else {
+			this.isExplored = false;
+		}
+
 	}
 
 }
