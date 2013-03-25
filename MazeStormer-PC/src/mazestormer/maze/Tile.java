@@ -112,5 +112,47 @@ public class Tile {
 	public EnumSet<Orientation> getUnknownSides() {
 		return getSidesByType(EdgeType.UNKNOWN);
 	}
+	
+	//TODO: maak methode om een geroteerde kopie van deze tegel terug te geven
+	
+	/**
+	 * Returns a copy of this tile that was rotated n*90° counterclockwise, where n is the given number of rotations.
+	 * 
+	 * @param amount
+	 * 			The amount of times there should be rotated.
+	 */
+	public Tile getCopyRotatedClockwise(int amount) {
+		//create a copy of this tile
+		Tile tile = this.getCopy();
+		
+		//rotate the edges
+		for(Orientation orientation : Orientation.values()) {
+			tile.setEdge(orientation, this.getEdgeAt(orientation.rotateCounterClockwise(amount)).getType());
+		}
+		return tile;
+	}
+	
+	/**
+	 * Returns a new tile that has the same location, barcode and edges.
+	 * @return
+	 */
+	public Tile getCopy() {
+		//create tile at right position
+		Tile tile = new Tile(this.getPosition());
+		
+		if(this.hasBarcode()){
+			// set the barcode to an identical barcode
+			tile.setBarcode(new Barcode(this.getBarcode().getValue()));
+		}
+		
+		// set the types of the edges
+		for(Orientation orientation : Orientation.values()) {
+			tile.setEdge(orientation, this.getEdgeAt(orientation).getType());
+		}
+		
+		if(this.isExplored) tile.setExplored();
+		
+		return tile;
+	}
 
 }
