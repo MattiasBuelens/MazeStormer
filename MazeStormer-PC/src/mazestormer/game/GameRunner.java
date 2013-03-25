@@ -161,6 +161,12 @@ public class GameRunner implements GameListener {
 	}
 
 	@Override
+	public void onGameWon(int teamNumber) {
+		// Not really needed, since it will be stopped later on
+		// onGameStopped();
+	}
+
+	@Override
 	public void onPlayerReady(String playerID, boolean isReady) {
 	}
 

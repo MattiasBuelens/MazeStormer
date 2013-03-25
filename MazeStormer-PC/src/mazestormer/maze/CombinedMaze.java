@@ -1,3 +1,4 @@
+package mazestormer.maze;
 import java.awt.geom.AffineTransform;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -5,8 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import mazestormer.barcode.Barcode;
-import mazestormer.maze.Maze;
-import mazestormer.maze.Tile;
 import mazestormer.util.LongPoint;
 
 /**
@@ -14,7 +13,7 @@ import mazestormer.util.LongPoint;
  * the mazes together and translate coördinates.
  *
  */
-public class MazeManager {
+public class CombinedMaze {
 	
 	private final Maze ownExploredMaze;
 	private Map<Barcode, LongPoint> ownBarcodeMapping;
@@ -29,7 +28,7 @@ public class MazeManager {
 	
 	private AffineTransform affineTransformation;
 		
-	public MazeManager(Maze ownMaze){
+	public CombinedMaze(Maze ownMaze){
 		this.ownExploredMaze = ownMaze;
 		this.teamMatesExploredMaze = null;
 		this.affineTransformation = null;
@@ -58,6 +57,7 @@ public class MazeManager {
 				else if(commonBarcodes[1] == null){
 					commonBarcodes[1] = barcode;
 					calculatePointTransformation();
+					//using the transformation, put all ...
 				}
 			}
 		}

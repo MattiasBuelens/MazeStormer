@@ -100,6 +100,11 @@ public class WorldSimulator {
 		}
 
 		@Override
+		public void gameWon(int teamNumber) {
+			// left empty
+		}
+
+		@Override
 		public void playerJoining(String playerID) {
 			// left empty
 		}
@@ -154,14 +159,15 @@ public class WorldSimulator {
 		@Override
 		public void lockedSeesaw(String playerID, int playerNumber, int barcode) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void unlockedSeesaw(String playerID, int playerNumber, int barcode) {
 			// TODO Auto-generated method stub
-			
+
 		}
+
 	}
 
 }

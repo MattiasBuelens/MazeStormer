@@ -1,7 +1,5 @@
 package mazestormer.game;
 
-import lejos.robotics.navigation.Pose;
-
 public interface GameListener {
 
 	public void onGameJoined();
@@ -16,7 +14,9 @@ public interface GameListener {
 
 	public void onGameStopped();
 
-	//->
+	public void onGameWon(int teamNumber);
+
+	// ->
 	public void onPlayerReady(String playerID, boolean isReady);
 
 	//

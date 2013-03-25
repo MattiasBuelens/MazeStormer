@@ -247,6 +247,11 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		}
 
 		@Override
+		public void onGameWon(int teamNumber) {
+			logToAll("Game won by team #" + teamNumber);
+		}
+
+		@Override
 		public void onPlayerReady(String playerID, boolean isReady) {
 			logTo(playerID, isReady ? "Ready" : "Not ready");
 		}
