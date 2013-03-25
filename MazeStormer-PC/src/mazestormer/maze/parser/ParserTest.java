@@ -196,9 +196,10 @@ public class ParserTest {
 	@Test
 	public void singleTile() throws ParseException {
 		String source = "Straight.E.37";
-		Tile tile = Parser.parseTile(source);
+		Tile tile = Parser.parseTile(0, 0, source);
 
 		checkWalls(tile, NORTH, SOUTH);
+		assertEquals(new LongPoint(0, 0), tile.getPosition());
 		assertEquals(tile.getBarcode().getValue(), 37);
 	}
 

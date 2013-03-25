@@ -93,16 +93,20 @@ public class Parser {
 	/**
 	 * Parse a single tile token.
 	 * 
+	 * @param x
+	 *            The X-position of the tile.
+	 * @param y
+	 *            The Y-position of the tile.
 	 * @param tileToken
 	 *            The tile token to parse.
 	 * 
 	 * @throws ParseException
 	 *             If the token was invalid.
 	 */
-	public static Tile parseTile(String tileToken) throws ParseException {
+	public static Tile parseTile(long x, long y, String tileToken) throws ParseException {
 		Tokenizer tokenizer = new Tokenizer(tileToken);
 		// Create tile
-		LongPoint position = new LongPoint(0, 0);
+		LongPoint position = new LongPoint(x, y);
 		Tile tile = new Tile(position);
 		// Parse
 		TileToken token = tokenizer.getTileToken(false);

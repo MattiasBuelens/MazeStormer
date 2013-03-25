@@ -124,7 +124,7 @@ public class Game {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void lockSeesaw(int barcode) {
 		try {
 			client.lockSeesaw(barcode);
@@ -133,7 +133,7 @@ public class Game {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void unlockSeesaw() {
 		try {
 			client.unlockSeesaw();
@@ -226,20 +226,22 @@ public class Game {
 
 		@Override
 		public void teamTilesReceived(List<peno.htttp.Tile> tiles) {
-			for(peno.htttp.Tile tile : tiles){
+			for (peno.htttp.Tile tile : tiles) {
 				try {
 					// parse htttp-tiles naar mazestormer-tiles
-					Tile parsedTile = Parser.parseTile(tile.getToken());
+					Tile parsedTile = Parser.parseTile(tile.getX(), tile.getY(), tile.getToken());
 					// laat combinedMaze ze in de juiste mazes steken
 					((CombinedMaze) localPlayer.getMaze()).addTeamMateTile(parsedTile);
-				} catch (ParseException e) { e.printStackTrace(); }
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
 		@Override
 		public void teamPosition(double x, double y, double angle) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 	}
