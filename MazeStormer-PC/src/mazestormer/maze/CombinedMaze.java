@@ -350,6 +350,16 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
+	public Tile getBarcodeTile(Barcode barcode) {
+		return getTotalExploredMaze().getBarcodeTile(barcode);
+	}
+
+	@Override
+	public Tile getBarcodeTile(byte barcode) {
+		return getTotalExploredMaze().getBarcodeTile(barcode);
+	}
+
+	@Override
 	public void setExplored(LongPoint position) {
 		getTotalExploredMaze().setExplored(position);
 		ownExploredMaze.setExplored(position);

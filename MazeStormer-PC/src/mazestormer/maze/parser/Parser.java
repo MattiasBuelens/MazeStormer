@@ -8,15 +8,16 @@ import java.util.List;
 
 import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
 import mazestormer.util.LongPoint;
 
 public class Parser {
 
-	private final Maze maze;
+	private final IMaze maze;
 	private final List<PositionedToken> seesawTokens = new ArrayList<PositionedToken>();
 
 	/**
@@ -25,14 +26,14 @@ public class Parser {
 	 * @param maze
 	 *            The output maze.
 	 */
-	public Parser(Maze maze) {
+	public Parser(IMaze maze) {
 		this.maze = checkNotNull(maze);
 	}
 
 	/**
 	 * Get the output maze.
 	 */
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return maze;
 	}
 
@@ -46,7 +47,7 @@ public class Parser {
 	 *             If the source was invalid.
 	 */
 	public void parse(CharSequence source) throws ParseException {
-		Maze maze = getMaze();
+		IMaze maze = getMaze();
 		Tokenizer tokenizer = new Tokenizer(source);
 
 		// Reset state
@@ -128,7 +129,7 @@ public class Parser {
 	 * Link seesaws to barcodes.
 	 */
 	private void linkSeesaws() {
-		Maze maze = getMaze();
+		IMaze maze = getMaze();
 
 		// Set seesaw barcodes
 		for (PositionedToken token : seesawTokens) {
@@ -184,9 +185,32 @@ public class Parser {
 
 	}
 
-	public static String stringify(Tile tile) {
-		// TODO Auto-generated method stub
-		return null;
+	public static String stringify(IMaze maze, LongPoint position) {
+		StringBuilder token = new StringBuilder();
+		Tile tile = maze.getTileAt(position);
+
+		if (tile.isSeesaw()) {
+			// Get orientation towards barcode tile
+			Tile barcodeTile = maze.getBarcodeTile(tile.getSeesawBarcode());
+			Orientation orientation = tile.orientationTo(barcodeTile);
+			// Write seesaw token
+			token.append(TileType.SEESAW.getName());
+			token.append('.').append(orientation.getShortName());
+		} else {
+			// Write shape
+			TileShape shape = tile.getShape();
+			token.append(shape.getType().getName());
+			if (shape.getType().hasOrientation()) {
+				token.append('.').append(shape.getOrientation().getShortName());
+			}
+		}
+		if (tile.hasBarcode()) {
+			// Write barcode
+			int barcode = tile.getBarcode().getValue();
+			String barcodeString = String.format("%02d", barcode);
+			token.append('.').append(barcodeString);
+		}
+		return token.toString();
 	}
 
 }

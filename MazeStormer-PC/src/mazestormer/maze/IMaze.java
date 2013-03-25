@@ -112,6 +112,10 @@ public interface IMaze {
 
 	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException;
 
+	public Tile getBarcodeTile(Barcode barcode);
+
+	public Tile getBarcodeTile(byte barcode);
+
 	/**
 	 * Set a tile as explored.
 	 * 

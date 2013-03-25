@@ -250,7 +250,7 @@ public class Game {
 		// TODO Maze coordinate specification?
 		long x = tile.getX();
 		long y = tile.getY();
-		String token = Parser.stringify(tile);
+		String token = Parser.stringify(localPlayer.getMaze(), tile.getPosition());
 		peno.htttp.Tile sendTile = new peno.htttp.Tile(x, y, token);
 
 		try {

@@ -261,6 +261,24 @@ public class Maze implements IMaze {
 	}
 
 	@Override
+	public Tile getBarcodeTile(Barcode barcode) {
+		checkNotNull(barcode);
+
+		for (Tile tile : tiles.values()) {
+			if (tile.getBarcode().equals(barcode)) {
+				return tile;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public Tile getBarcodeTile(byte barcode) {
+		return getBarcodeTile(new Barcode(barcode));
+	}
+
+	@Override
 	public void setExplored(LongPoint position) {
 		Tile tile = getTileAt(position);
 		if (!tile.isExplored()) {
