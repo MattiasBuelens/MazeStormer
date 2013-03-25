@@ -121,6 +121,24 @@ public class Game {
 			e.printStackTrace();
 		}
 	}
+	
+	public void lockSeesaw(int barcode) {
+		try {
+			client.lockSeesaw(barcode);
+		} catch (IllegalStateException | IOException e) {
+			System.err.println("Could not report seesaw-lock");
+			e.printStackTrace();
+		}
+	}
+	
+	public void unlockSeesaw() {
+		try {
+			client.unlockSeesaw();
+		} catch (IllegalStateException | IOException e) {
+			System.err.println("Could not report seesaw-unlock");
+			e.printStackTrace();
+		}
+	}
 
 	public void updatePosition(Pose pose) {
 		try {

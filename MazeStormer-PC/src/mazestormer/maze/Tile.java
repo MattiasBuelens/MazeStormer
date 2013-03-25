@@ -15,10 +15,24 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
-			Orientation.class);
-	private Barcode barcode;
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
+
+	/*
+	 * Exploration
+	 */
 	private boolean isExplored = false;
+
+	/*
+	 * Barcode
+	 */
+	private Barcode barcode;
+
+	/*
+	 * Seesaw
+	 */
+	private Barcode seesawBarcode;
+	private boolean seesawOpen = false;
+	private Barcode otherSeesawBarcode;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -62,6 +76,14 @@ public class Tile {
 		getEdgeAt(direction).setType(type);
 	}
 
+	public boolean isExplored() {
+		return isExplored;
+	}
+
+	public void setExplored() {
+		isExplored = true;
+	}
+
 	public boolean hasBarcode() {
 		return getBarcode() != null;
 	}
@@ -72,21 +94,58 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException(
-					"Tile type does not support barcodes.");
+			throw new IllegalStateException("Tile type does not support barcodes.");
 		this.barcode = barcode;
+	}
+	
+	public Orientation orientationTo(Tile otherTile) {
+		for(Orientation orientation : Orientation.values()) {
+			LongPoint neighborPosition = orientation.shift(this.getPosition());
+			if(otherTile.getPosition().equals(neighborPosition))
+				return orientation;
+		}
+		return null;
+	}
+
+	public boolean isSeesaw() {
+		return getSeesawBarcode() != null;
+	}
+
+	public Barcode getSeesawBarcode() {
+		return seesawBarcode;
+	}
+
+	public void setSeesawBarcode(Barcode seesawBarcode) {
+		this.seesawBarcode = seesawBarcode;
+	}
+
+	/**
+	 * Deze methode alleen opvragen in de wereldsimulator, dus in de sourceMaze,
+	 * fysiek moet gebruik gemaakt worden van de ir-sensor en sophie's bal.
+	 * Virtueel moet dit onrechtstreeks wel naar hier komen via een VirtualIRSensor.
+	 */
+	public boolean isSeesawOpen() {
+		return seesawOpen;
+	}
+
+	public void setSeesawOpen(boolean seesawOpen) {
+		this.seesawOpen = seesawOpen;
+	}
+	
+	public void flipSeesaw() {
+		setSeesawOpen(!isSeesawOpen());
+	}
+	
+	public Barcode getOtherSeesawBarcode() {
+		return this.otherSeesawBarcode;
+	}
+	
+	public void setOtherSeesawBarcode(Barcode barcode) {
+		this.otherSeesawBarcode = barcode;
 	}
 
 	public TileShape getShape() {
 		return TileShape.get(getClosedSides());
-	}
-
-	public boolean isExplored() {
-		return isExplored;
-	}
-
-	public void setExplored() {
-		isExplored = true;
 	}
 
 	private EnumSet<Orientation> getSidesByType(EdgeType type) {

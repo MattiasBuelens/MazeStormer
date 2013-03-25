@@ -93,5 +93,13 @@ public class Barcode {
 
 		return widths;
 	}
+	
+	@Override
+	public boolean equals(Object other) {
+		if(!(other instanceof Barcode))
+			return false;
+		Barcode otherBarcode = (Barcode) other;
+		return otherBarcode.getValue() == getValue();
+	}
 
 }
