@@ -40,6 +40,17 @@ public enum ReportType implements MessageType<Report<?>> {
 			return new LightReadReport(this);
 		}
 	},
+	
+	/*
+	 * IR sensor
+	 */
+
+	IR_VALUE {
+		@Override
+		public Report<float[]> build() {
+			return new IRReadReport(this);
+		}
+	},
 
 	/*
 	 * Light sensor
