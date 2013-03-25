@@ -33,6 +33,7 @@ public class Tile {
 	private Barcode seesawBarcode;
 	private boolean seesawOpen = false;
 	private Barcode otherSeesawBarcode;
+	private boolean ignoreFlag = false;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -142,6 +143,14 @@ public class Tile {
 	
 	public void setOtherSeesawBarcode(Barcode barcode) {
 		this.otherSeesawBarcode = barcode;
+	}
+	
+	public void setIgnoreFlag(boolean flag) {
+		this.ignoreFlag = flag; 
+	}
+	
+	public boolean getIgnoreFlag() {
+		return this.ignoreFlag;
 	}
 
 	public TileShape getShape() {

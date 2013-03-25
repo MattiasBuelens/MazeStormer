@@ -104,12 +104,14 @@ public class GameRunner implements GameListener {
 		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
 		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
 		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
+		maze.getTileAt(nextTilePosition).setIgnoreFlag(true);
 		
 		nextTilePosition = orientation.shift(nextTilePosition);
 		
 		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
 		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
 		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
+		maze.getTileAt(nextTilePosition).setIgnoreFlag(true);
 		
 		nextTilePosition = orientation.shift(nextTilePosition);
 		

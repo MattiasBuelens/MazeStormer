@@ -1,16 +1,13 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import mazestormer.barcode.ObjectFoundAction.ObjectFoundState;
-import mazestormer.explore.ExplorerRunner;
 import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinderRunner;
-import mazestormer.maze.Maze;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.Robot;
+import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
@@ -77,52 +74,42 @@ public class SeesawAction extends
 	}
 	
 	protected void findLine() {
-		// TODO
-	}
+		LineFinderRunner lineFinder = new LineFinderRunner(getControllableRobot()) {
+			@Override
+			protected void log(String message) {
+				// log indien nodig
+			}
+		};
 
-	/**
-	 * @pre robot staat voor de wip aan de neergelaten kant, hij kijkt naar de
-	 *      wip
-	 * @post robot staat op een tegel achter de tegel achter de wip, in het
-	 *       midden, en kijkt weg van de wip (tegel achter de wip bevat een
-	 *       andere barcode). alle informatie over de gepasseerde tegels staat
-	 *       in de observedMaze. de eerste tegel, de tegels van de wip en de
-	 *       tegel na de wip staan niet meer in de queue
-	 * @param player
-	 */
-	private void ridableAction(Player player) {
-		checkNotNull(player);
-		Robot robot = player.getRobot();
-		checkNotNull(robot);
-		Maze maze = player.getMaze();
-		checkNotNull(maze);
-		// 1) rijd vooruit tot aan een bruin-zwart overgang (van de barcode aan
-		// de andere kant van de wip)
-		// 2) informatie over wip aan het ontdekte doolhof toevoegen
-		// 3) rijd vooruit tot 20 cm over een witte lijn (= eerste bruin-wit
-		// overgang)
-		// 4) verwijder eventueel tegels uit de queue
+		@SuppressWarnings("unused")
+		LineAdjuster lineAdjuster = new LineAdjuster(player, lineFinder);
+		lineFinder.addStateListener(new LineFinderListener());
 	}
-
-	/**
-	 * @pre robot staat voor de wip aan de opgelaten kant, hij kijkt naar de wip
-	 * @post robot staan op de tegel voor de tegel voor de wip, in het midden,
-	 *       en kijkt weg van de wip (tegel voor de wip bevat de barcode) alle
-	 *       informatie over de tegel voor de wip, de tegels van de wip en de
-	 *       tegel achter de wip is toegevoegd aan de observedMaze. geen van die
-	 *       tegels staat nog in de queue
-	 * @param player
-	 */
-	private void notRidableAction(Player player) {
-		checkNotNull(player);
-		Robot robot = player.getRobot();
-		checkNotNull(robot);
-		Maze maze = player.getMaze();
-		checkNotNull(maze);
-		// 1) informatie over wip aan het ontdekte doolhof toevoegen
-		// 2) 180° omdraaien
-		// 3) rijd vooruit tot 20 cm over een witte lijn
-		// 4) verwijder eventueel tegels uit de queue
+	
+	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
+		@Override
+		public void stateFinished() {
+			transition(SeesawState.RESUME_EXPLORING);
+		}
+	}
+	
+	protected void waitAndScan() {
+		boolean seesawOpen = false;
+		//TODO vraag aan IRSensor (matthias)
+		if(seesawOpen)
+			transition(SeesawState.ONWARDS);
+		else {
+			try {
+				Thread.sleep(5000);
+				transition(SeesawState.WAIT_AND_SCAN);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	protected void resumeExploring() {
+		stop(); // stops this seesaw action
 	}
 
 	public enum SeesawState implements
@@ -159,7 +146,25 @@ public class SeesawAction extends
 				input.findLine();
 			}
 			
-		}
+		},
+		
+		WAIT_AND_SCAN {
+
+			@Override
+			public void execute(SeesawAction input) {
+				input.waitAndScan();
+			}
+			
+		},
+		
+		RESUME_EXPLORING {
+
+			@Override
+			public void execute(SeesawAction input) {
+				input.resumeExploring();
+			}
+			
+		};
 
 	}
 

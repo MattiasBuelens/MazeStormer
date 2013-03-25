@@ -739,8 +739,15 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 			return Integer.compare(leftDistance, rightDistance);
 		}
 
+		// TODO optimaliseren!
 		public int shortestPathLength(Tile startTile, Tile endTile) {
-			return pathFinder.findPath(startTile, endTile).size();
+			List<Waypoint> path = pathFinder.findPath(startTile, endTile);
+			Maze maze = player.getMaze();
+			for(Waypoint wp : path) {
+				if(maze.getTileAt(wp.getPose().getLocation()).getIgnoreFlag())
+					return Integer.MAX_VALUE;
+			}
+			return path.size();
 		}
 
 		@Deprecated
