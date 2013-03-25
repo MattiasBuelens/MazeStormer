@@ -223,7 +223,11 @@ public class Game {
 
 		@Override
 		public void teamTilesReceived(List<Tile> tiles) {
-			// TODO Auto-generated method stub
+			for(Tile tile : tiles){
+				//TODO:
+				// parse htttp-tiles naar mazestormer-tiles
+				// laat combinedMaze ze in de juiste mazes steken met addTeamMateTile(Tile othersSentTile)
+			}
 
 		}
 

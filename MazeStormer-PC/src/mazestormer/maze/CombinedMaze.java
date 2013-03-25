@@ -1,84 +1,118 @@
 package mazestormer.maze;
-import java.awt.geom.AffineTransform;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import lejos.geom.Line;
+import lejos.geom.Point;
+import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
 /**
- * A class that contains the observed maze of the player that uses it, as well as the observed maze of his teammate. Contains methods to puzzle
- * the mazes together and translate coördinates.
- *
+ * A class that contains the observed maze of the player that uses it, as well
+ * as the observed maze of his teammate. Contains methods to puzzle the mazes
+ * together and translate coördinates.
+ * 
  */
-public class CombinedMaze {
-	
+public class CombinedMaze implements IMaze {
+
 	private final Maze ownExploredMaze;
 	private Map<Barcode, LongPoint> ownBarcodeMapping;
-	
-	private Maze teamMatesExploredMaze; //coordinates in others relative system
-	//TODO: misschien loont het om ook dit doolhof in eigen coordinaten op te slaan, maar dan klopt het niet meer met zijn eigen player (dubbel bijhouden?)
+
+	private Maze teamMatesExploredMaze; // coordinates in others relative system
+
 	private Map<Barcode, LongPoint> teamMatesBarcodeMapping;
-	
-	private Maze totalExploredMaze; //coordinates in own relative system
-	
-	private Barcode[] commonBarcodes = {null, null};
-	
-	private AffineTransform affineTransformation;
-		
-	public CombinedMaze(Maze ownMaze){
+
+	private Maze totalExploredMaze; // coordinates in own relative system
+
+	private Barcode[] twoCommonBarcodes = { null, null };
+
+	private AffineTransform affineTransformation = null;
+	private int rotationsFromOwnToOther;
+
+ 	public CombinedMaze(Maze ownMaze) {
 		this.ownExploredMaze = ownMaze;
+		this.totalExploredMaze = null;
+		// TODO verbetering: lijn hierboven: totalExploredMaze initialiseren op een kopie
+		// van ownExploredMaze
 		this.teamMatesExploredMaze = null;
 		this.affineTransformation = null;
 	}
-	
+
 	/**
-	 * Method that should be called when the own player has discovered a new tile.
-	 * @param tile Tile that was discovered, with location in coordinates from the own relative system.
+	 * Put a copy of the given tile in the teamMatesExploredMaze (or updates it if it was
+	 * already present) and creates/updates the corresponding tile in the
+	 * totalExploredMaze (if it wasn't already present).
+	 * 
+	 * @param othersTile
+	 *            A tile in the others coordinate system.
 	 */
-	public void ownPlayerDiscoveredTile(Tile tile){
-		LongPoint position = tile.getPosition();
-		Barcode barcode;
+	private void addTeamMateTile(Tile othersSentTile) {
+		LongPoint position = othersSentTile.getPosition();
+		// get the corresponding tile in the teamMatesExploredMaze
+		Tile othersMazeTile = teamMatesExploredMaze.getTileAt(position);
 		
-		//add tile to own explored maze
-		//add tile to total explored maze, if not yet present
+		//make it a copy of the sentTile
+		othersMazeTile = othersSentTile.getCopy();
 		
-		if(tile.hasBarcode()){
-			barcode = tile.getBarcode();
+		
+		if(affineTransformation != null) {
+			addTeamMateTileToTotalMaze(othersSentTile);
+		}
+		else if(othersSentTile.hasBarcode()){
+			Barcode barcode = othersSentTile.getBarcode();
 			
-			//add barcode and location to ownBarcodeMapping
-			ownBarcodeMapping.put(barcode, position);
+			teamMatesBarcodeMapping.put(barcode, position);
 			
-			//act depending on the number of yet identified common barcodes
-			if(teamMatesBarcodeMapping.containsKey(barcode)){
-				if(commonBarcodes[0] == null) commonBarcodes[0] = barcode;
-				else if(commonBarcodes[1] == null){
-					commonBarcodes[1] = barcode;
+			//check op barcode en eventueel: voeg mazes samen
+			if (ownBarcodeMapping.containsKey(barcode)) {
+				if (twoCommonBarcodes[0] == null)
+					twoCommonBarcodes[0] = barcode;
+				else if (twoCommonBarcodes[1] == null) {
+					twoCommonBarcodes[1] = barcode;
 					calculatePointTransformation();
-					//using the transformation, put all ...
+					// using the transformation, put all tiles of the othersExploredMaze in the totalExploredMaze
+					mergeTotalAndOthersExploredMaze();
 				}
 			}
 		}
 	}
 	
-	//TODO: methode voor als de teamgenoot een tegel die hij heeft ontdekt doorstuurt (oppassen voor coordinaten)
-	
 	/**
-	 * Calculates an affine tranformation that transforms the coordinates of a point in the own system to coordinates in the others system. Saves
-	 * this transformation to affineTransformation.
+	 * Creates/updates the corresponding tile in the totalExploredMaze.
 	 */
-	// TODO: controleren of het niet juist omgekeerd is...
+	private void addTeamMateTileToTotalMaze(Tile othersSentTile) {
+			// get the corresponding tile in the totalExploredMaze
+			Tile totalMazeTile = getCorrespondingTileFromOtherToTotal(othersSentTile);
+			
+			// make it the rotation of the othersSentTile
+			totalMazeTile = othersSentTile.getCopyRotatedClockwise(-rotationsFromOwnToOther);
+	}
+
+	/**
+	 * Calculates an affine tranformation that transforms the coordinates of a
+	 * point in the own system to coordinates in the others system. Saves this
+	 * transformation to affineTransformation.
+	 */
+	// TODO test: controleren of het niet juist omgekeerd is...
 	private void calculatePointTransformation() {
-		// genereer met behulp van de twee gemeenschappelijke barcodes vier LongPoints, die elk een tegel voorstellen in coördinaten van het
-		// eigen assenstelsel of dat van je teamgenoot (TP is kort voor TilePosition)
-		// Voor nauwkeurigste berekening: neem koppel barcodes met grootste afstand ertussen. Nauwkeurigheid is echter niet belangrijk: straks
-		// afronden naar veelvoud van pi/2.
-		LongPoint ownFirstTP = ownBarcodeMapping.get(commonBarcodes[0]);
-		LongPoint ownSecondTP = ownBarcodeMapping.get(commonBarcodes[1]);
-		LongPoint othersFirstTP = teamMatesBarcodeMapping.get(commonBarcodes[0]);
-		LongPoint othersSecondTP = teamMatesBarcodeMapping.get(commonBarcodes[1]);
+		// genereer met behulp van de twee gemeenschappelijke barcodes vier
+		// LongPoints, die elk een tegel voorstellen in coördinaten van het
+		// eigen assenstelsel of dat van je teamgenoot (TP is kort voor
+		// TilePosition)
+		LongPoint ownFirstTP = ownBarcodeMapping.get(twoCommonBarcodes[0]);
+		LongPoint ownSecondTP = ownBarcodeMapping.get(twoCommonBarcodes[1]);
+		LongPoint othersFirstTP = teamMatesBarcodeMapping
+				.get(twoCommonBarcodes[0]);
+		LongPoint othersSecondTP = teamMatesBarcodeMapping
+				.get(twoCommonBarcodes[1]);
 
 		// bereken rotatie van ander assenstelsel in eigen assenstelsel
 		// \alpha_{X'} = \alpha_{21} - \alpha'_{21}
@@ -86,15 +120,19 @@ public class CombinedMaze {
 				(ownSecondTP.getX() - ownFirstTP.getX()))
 				- Math.atan2((othersSecondTP.getY() - othersFirstTP.getY()),
 						(othersSecondTP.getX() - othersFirstTP.getX()));
-
+		
+		rotationsFromOwnToOther = (int) (rotation / Math.PI * 2);
+		
 		// rond af naar veelvoud van pi/2
-		rotation = Math.PI / 2 * (double) ((int) (rotation / Math.PI * 2));
-
-		// bereken cosinus en sinus (behoren beide tot {-1, 0, 1}, maar AffineTransform vraag doubles als input voor zijn constuctor)
+		rotation = Math.PI / 2 * (double) (rotationsFromOwnToOther);
+		
+		// bereken cosinus en sinus (behoren beide tot {-1, 0, 1}, maar
+		// AffineTransform vraag doubles als input voor zijn constuctor)
 		double cosineRotation = Math.cos(rotation);
 		double sineRotation = Math.sin(rotation);
 
-		// bereken aan de hand van deze rotatie de coördinaten van de oorsprong van het assenstelsel van je teamgenoot in je eigen assenstelsel
+		// bereken aan de hand van deze rotatie de coördinaten van de oorsprong
+		// van het assenstelsel van je teamgenoot in je eigen assenstelsel
 		// x_{O'} = x_1 - x'_1*cos(\alpha_{X'}) + y'_1*sin(\alpha_{X'})
 		// y_{O'} = y_1 - x'_1*sin(\alpha_{X'}) - y'_1*cos(\alpha_{X'})
 		double biasX = ownFirstTP.getX() - othersFirstTP.getX()
@@ -108,44 +146,84 @@ public class CombinedMaze {
 		// [ y ] [ sin(\alpha_{X'}) cos(\alpha_{X'}) ] [ y' ] [ y_{O'} ]
 		double[] flatMatrix = { cosineRotation, sineRotation, -sineRotation,
 				cosineRotation, biasX, biasY };
-		// TODO: betere implementatie: eerst de identieke AffineTransform opstellen, daarna roteren en verschuiven
+		// TODO verbetering: eerst de identieke AffineTransform opstellen, daarna roteren en verschuiven
 
 		// stel de affine transformatie op en sla ze op
 		this.affineTransformation = new AffineTransform(flatMatrix);
 	}
 	
+	private void mergeTotalAndOthersExploredMaze() {
+		for(Tile tile : teamMatesExploredMaze.getTiles()){
+			addTeamMateTileToTotalMaze(tile);
+		}
+	}
+
 	/**
-	 * Returns a new tile that has coördinates in the others system.
+	 * Returns the affineTransform, which is null if it not yet calcultated.
+	 */
+	private AffineTransform getPointTransform() {
+		return affineTransformation;
+	}
+
+	/**
+	 * Returns the corresponding tile in the others explored maze (has
+	 * coördinates in the others system).
 	 * 
 	 * @param ownTile
 	 *            A tile in own coördinates
 	 */
-	private Tile translateTileFromOwnToOther(Tile ownTile) {
-		return ownTile;
+	private Tile getCorrespondingTileFromOwnToOther(Tile ownTile) {
 		// van ownTile naar ownLongPoint
-		// TODO: implementeren
+		LongPoint ownPosition = ownTile.getPosition();
 		// affineTransform toepassen
-		// TODO: implementeren
+		LongPoint othersPosition = null;
+		getPointTransform().transform(ownPosition, othersPosition);
 		// van othersLongPoint naar othersTile
-		// TODO: implementeren
+		return teamMatesExploredMaze.getTileAt(othersPosition);
 	}
 
 	/**
-	 * Returns a new tile that has coördinates in the own system.
+	 * Returns the corresponding tile in the own explored maze (has coördinates
+	 * in the own system).
 	 * 
 	 * @param othersTile
 	 *            A tile that has coördinates in the teammates system.
 	 */
-	private Tile translateTileFromOtherToOwn(Tile othersTile) {
-		return othersTile;
+	private Tile getCorrespondingTileFromOtherToOwn(Tile othersTile) {
 		// van othersTile naar othersLongPoint
-		// TODO: implementeren
+		LongPoint othersPosition = othersTile.getPosition();
 		// inverse affineTransform toepassen
-		// TODO: implementeren
+		LongPoint ownPosition = null;
+		try {
+			getPointTransform().inverseTransform(othersPosition, ownPosition);
+		} catch (NoninvertibleTransformException e) {
+			e.printStackTrace();
+		}
 		// van ownLongPoint naar ownTile
-		// TODO: implementeren
+		return ownExploredMaze.getTileAt(ownPosition);
 	}
 	
+	/**
+	 * Returns the corresponding tile in the total explored maze (has coördinates
+	 * in the own system).
+	 * 
+	 * @param othersTile
+	 *            A tile that has coördinates in the teammates system.
+	 */
+	private Tile getCorrespondingTileFromOtherToTotal(Tile othersTile) {
+		// van othersTile naar othersLongPoint
+		LongPoint othersPosition = othersTile.getPosition();
+		// inverse affineTransform toepassen
+		LongPoint ownPosition = null;
+		try {
+			getPointTransform().inverseTransform(othersPosition, ownPosition);
+		} catch (NoninvertibleTransformException e) {
+			e.printStackTrace();
+		}
+		// van ownLongPoint naar ownTile
+		return totalExploredMaze.getTileAt(ownPosition);
+	}
+
 	public Maze getOwnExploredMaze() {
 		return ownExploredMaze;
 	}
@@ -157,74 +235,224 @@ public class CombinedMaze {
 	public Maze getTotalExploredMaze() {
 		return totalExploredMaze;
 	}
-	
-	//TODO: methodes maken om tegels te vertalen (tussen eigen en ander assenstelsel)
-	
-	//DEPRECATED:
-	
-	/**
-	 * Returns an array of two barcodemappings. The first is from the own player, the second belongs to his teammate. Both mappings contain two
-	 * key-value-pairs, corresponding to two barcodes both robots have found (common barcodes).
-	 */
-	private Map<Barcode, LongPoint>[] findTwoCommonBarcodes() {
-		// genereer mappings van de gevonden barcodes naar hun tegelcoördinaten in het relatieve assenstelsel adhv de geëxploreerde doolhoven
-		Map<Barcode, LongPoint> ownBarcodeMapping = getBarcodeToTilePositionMapping(ownExploredMaze);
-		Map<Barcode, LongPoint> othersBarcodeMapping = getBarcodeToTilePositionMapping(teamMatesExploredMaze);
 
-		// bepaal de gemeenschappelijke barcodes
-		Barcode[] commonBarcodesArray = getTwoCommonBarcodes(ownBarcodeMapping, othersBarcodeMapping);
-		if(commonBarcodesArray != null){
-			Barcode firstCommonBarcode = commonBarcodesArray[0];
-			Barcode secondCommonBarcode = commonBarcodesArray[1];
-		}
-		else{
-			//TODO: Wat te doen in dit geval?
-		}
-		
-
-		// genereer aan de hand van de gemeenschappelijke barcodes de twee nodige mappings.
-		Map<Barcode, LongPoint> firstBarcodeMapping = new Hashtable<Barcode, LongPoint>();
-		Map<Barcode, LongPoint> secondBarcodeMapping = new Hashtable<Barcode, LongPoint>();
-		
-		
-		// TODO: dit implementeren
-
-		return null;
+	@Override
+	public float getTileSize() {
+		return getTotalExploredMaze().getTileSize();
 	}
 
-	/**
-	 * Generates a mapping from barcodes to tile-positions from a given (explored) maze
-	 */
-	private Map<Barcode, LongPoint> getBarcodeToTilePositionMapping(Maze maze) {
-		Iterator<Tile> it = maze.getTiles().iterator();
-		Map<Barcode, LongPoint> mapping = new Hashtable<Barcode, LongPoint>();
-
-		while(it.hasNext()){
-			Tile tile = it.next();
-			if(tile.hasBarcode()) mapping.put(tile.getBarcode(), tile.getPosition());			
-		}
-
-		return mapping;
+	@Override
+	public float getEdgeSize() {
+		return getTotalExploredMaze().getEdgeSize();
 	}
-	
-	/**
-	 * Returns an array of two barcodes that both occur in the given barcodemappings. If there ar no two common barcodes, this method returns null.
-	 */
-	private Barcode[] getTwoCommonBarcodes( Map<Barcode, LongPoint> ownBarcodeMapping, Map<Barcode, LongPoint> othersBarcodeMapping) {
-		Set<Barcode> ownBarcodes = ownBarcodeMapping.keySet();
-		Set<Barcode> othersBarcodes = othersBarcodeMapping.keySet();
-		Set<Barcode> commonBarcodes = ownBarcodes;
-		
-		commonBarcodes.retainAll(othersBarcodes);
-		// TODO: Dit kan efficiënter! Er zijn maar twee gemeenschappelijke barcodes nodig.
-		
-		Iterator<Barcode> it = commonBarcodes.iterator();
-		Barcode[] commonBarcodesArray = new Barcode[2];
-		if(it.hasNext()) commonBarcodesArray[0] = it.next();
-		else return null;
-		if(it.hasNext()) commonBarcodesArray[1] = it.next();
-		else return null;
-		
-		return commonBarcodesArray;
+
+	@Override
+	public float getBarLength() {
+		return getTotalExploredMaze().getBarLength();
+	}
+
+	@Override
+	public Pose getOrigin() {
+		return getTotalExploredMaze().getOrigin();
+	}
+
+	@Override
+	public void setOrigin(Pose origin) {
+		getTotalExploredMaze().setOrigin(origin);
+		ownExploredMaze.setOrigin(origin);
+
+	}
+
+	@Override
+	public Mesh getMesh() {
+		return getTotalExploredMaze().getMesh();
+	}
+
+	@Override
+	public int getNumberOfTiles() {
+		return getTotalExploredMaze().getNumberOfTiles();
+	}
+
+	@Override
+	public Tile getTileAt(LongPoint tilePosition) {
+		return getTotalExploredMaze().getTileAt(tilePosition);
+	}
+
+	@Override
+	public long getMinX() {
+		return getTotalExploredMaze().getMinX();
+	}
+
+	@Override
+	public long getMaxX() {
+		return getTotalExploredMaze().getMaxX();
+	}
+
+	@Override
+	public long getMinY() {
+		return getTotalExploredMaze().getMinY();
+	}
+
+	@Override
+	public long getMaxY() {
+		return getTotalExploredMaze().getMaxY();
+	}
+
+	@Override
+	public Tile getTileAt(Point2D tilePosition) {
+		return getTotalExploredMaze().getTileAt(tilePosition);
+	}
+
+	@Override
+	public Tile getNeighbor(Tile tile, Orientation direction) {
+		return getTotalExploredMaze().getNeighbor(tile, direction);
+	}
+
+	@Override
+	public Tile getOrCreateNeighbor(Tile tile, Orientation direction) {
+		return getTotalExploredMaze().getOrCreateNeighbor(tile, direction);
+	}
+
+	@Override
+	public Collection<Tile> getTiles() {
+		return getTotalExploredMaze().getTiles();
+	}
+
+	@Override
+	public void setEdge(LongPoint tilePosition, Orientation orientation,
+			EdgeType type) {
+		getTotalExploredMaze().setEdge(tilePosition, orientation, type);
+		ownExploredMaze.setEdge(tilePosition, orientation, type);
+	}
+
+	@Override
+	public void setBarcode(LongPoint position, Barcode barcode)
+			throws IllegalStateException {
+		getTotalExploredMaze().setBarcode(position, barcode);
+		ownExploredMaze.setBarcode(position, barcode);
+		ownBarcodeMapping.put(barcode, position);
+
+		if (teamMatesBarcodeMapping.containsKey(barcode)) {
+			if (twoCommonBarcodes[0] == null)
+				twoCommonBarcodes[0] = barcode;
+			else if (twoCommonBarcodes[1] == null) {
+				twoCommonBarcodes[1] = barcode;
+				calculatePointTransformation();
+				// using the transformation, put all tiles of the othersExploredMaze in the totalExploredMaze
+				mergeTotalAndOthersExploredMaze();
+			}
+		}
+	}
+
+	@Override
+	public void setBarcode(LongPoint position, byte barcode)
+			throws IllegalStateException {
+		getTotalExploredMaze().setBarcode(position, barcode);
+		ownExploredMaze.setBarcode(position, barcode);
+		// uses setBarcode(LongPoint position, Barcode barcode), so no need to
+		// add it to the mapping
+	}
+
+	@Override
+	public void clear() {
+		getTotalExploredMaze().clear();
+		ownExploredMaze.clear();
+		teamMatesExploredMaze.clear();
+	}
+
+	@Override
+	public void addListener(MazeListener listener) {
+		ownExploredMaze.addListener(listener);
+	}
+
+	@Override
+	public void removeListener(MazeListener listener) {
+		ownExploredMaze.removeListener(listener);
+	}
+
+	@Override
+	public Point toAbsolute(Point relativePosition) {
+		return ownExploredMaze.toAbsolute(relativePosition);
+	}
+
+	@Override
+	public float toAbsolute(float relativeHeading) {
+		return ownExploredMaze.toAbsolute(relativeHeading);
+	}
+
+	@Override
+	public Pose toAbsolute(Pose relativePose) {
+		return ownExploredMaze.toAbsolute(relativePose);
+	}
+
+	@Override
+	public Point toRelative(Point absolutePosition) {
+		return ownExploredMaze.toRelative(absolutePosition);
+	}
+
+	@Override
+	public float toRelative(float absoluteHeading) {
+		return ownExploredMaze.toRelative(absoluteHeading);
+	}
+
+	@Override
+	public Pose toRelative(Pose absolutePose) {
+		return ownExploredMaze.toRelative(absolutePose);
+	}
+
+	@Override
+	public Point toTile(Point relativePosition) {
+		return ownExploredMaze.toTile(relativePosition);
+	}
+
+	@Override
+	public Point fromTile(Point tilePosition) {
+		return ownExploredMaze.fromTile(tilePosition);
+	}
+
+	@Override
+	public Collection<Line> getEdgeLines() {
+		return getTotalExploredMaze().getEdgeLines();
+	}
+
+	@Override
+	public Line getEdgeLine(Edge edge) {
+		return getTotalExploredMaze().getEdgeLine(edge);
+	}
+
+	@Override
+	public Rectangle2D getEdgeBounds(Edge edge) {
+		return getTotalExploredMaze().getEdgeBounds(edge);
+	}
+
+	@Override
+	public List<Rectangle2D> getBarcodeBars(Tile tile) {
+		return getTotalExploredMaze().getBarcodeBars(tile);
+	}
+
+	@Override
+	public Tile getTarget(Target target) {
+		return ownExploredMaze.getTarget(target);
+	}
+
+	@Override
+	public void setTarget(Target target, Tile tile) {
+		ownExploredMaze.setTarget(target, tile);
+	}
+
+	@Override
+	public Pose getStartPose(int playerNumber) {
+		return ownExploredMaze.getStartPose(playerNumber);
+	}
+
+	@Override
+	public void setStartPose(int playerNumber, Pose pose) {
+		ownExploredMaze.setStartPose(playerNumber, pose);
+	}
+
+	@Override
+	public void setStartPose(int playerNumber, LongPoint tilePosition,
+			Orientation orientation) {
+		ownExploredMaze.setStartPose(playerNumber, tilePosition, orientation);
 	}
 }
