@@ -45,7 +45,6 @@ public class VirtualIRSensor implements IRSensor {
 	
 	private float getDetectedRobotAngle() {
 		
-		// TODO: relativeBearing fails
 		// TODO: heading vs x-axis?
 		// TODO: edge == null?
 		
@@ -76,7 +75,7 @@ public class VirtualIRSensor implements IRSensor {
 			if (getWorld().getLocalPlayer() != ap) {
 				Pose otherPose = ap.getRobot().getPoseProvider().getPose();
 				Float angleDiff = currentPose.relativeBearing(otherPose.getLocation());
-				if (-180 <= angleDiff && angleDiff <= 180) {
+				if (-90 <= angleDiff && angleDiff <= 90) {
 					Tile otherTile = getTileAt(otherPose);
 					
 					if (currentTile == otherTile) {
@@ -118,7 +117,7 @@ public class VirtualIRSensor implements IRSensor {
 									break;
 								}
 							}
-							target = (tileToCheck.getX()-otherTile.getX()==0);
+							target = (tileToCheck.getX()-otherTile.getX() == 0);
 						}
 					} else {
 						for(int i = 1; i < DetectionLength.ROBOT.getTransY() && !target; i++) {
@@ -132,7 +131,7 @@ public class VirtualIRSensor implements IRSensor {
 									break;
 								}
 							}
-							target = (tileToCheck.getY()-otherTile.getY()==0);
+							target = (tileToCheck.getY()-otherTile.getY() == 0);
 						}
 					}
 					
@@ -198,7 +197,4 @@ public class VirtualIRSensor implements IRSensor {
 			return this.transY;
 		}
 	}
-	
-	
-
 }
