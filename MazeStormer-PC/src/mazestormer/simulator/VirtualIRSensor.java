@@ -141,18 +141,6 @@ public class VirtualIRSensor implements IRSensor {
 				}	
 			}
 		}
-	
-		if (detectedRobotAngles.size() != 0) {
-			// Selecting the closest angle difference
-			float bestAngle = 180;
-			for (Float f : detectedRobotAngles) {
-				if (Math.abs(bestAngle) > Math.abs(f)) {
-					bestAngle = f;
-				}
-			}
-			// Detected robot has higher priority than a seesaw
-			return bestAngle;
-		}
 		
 		// SEESAW DETECTION
 		// @note: tile creation possible, not really a problem
@@ -161,6 +149,18 @@ public class VirtualIRSensor implements IRSensor {
 			if (tileToCheck.isSeesaw() && !tileToCheck.isSeesawOpen()){
 				return 0f;
 			}
+		}
+		
+		if (detectedRobotAngles.size() != 0) {
+			// Selecting the closest angle difference
+			float bestAngle = 180;
+			for (Float f : detectedRobotAngles) {
+				if (Math.abs(bestAngle) > Math.abs(f)) {
+					bestAngle = f;
+				}
+			}
+			// Detected robot has lower priority than a seesaw
+			return bestAngle;
 		}
 		
 		return Float.NaN;
