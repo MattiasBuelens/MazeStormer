@@ -62,7 +62,7 @@ public class MainController implements IMainController {
 	private final ConnectionContext connectionContext = new ConnectionContext();
 	private Connector connector;
 
-	private World world = new World();
+	private final World world;
 
 	private RelativePlayer personalPlayer;
 	public static final String defaultPlayerName = "Brons";
@@ -98,6 +98,11 @@ public class MainController implements IMainController {
 		// Register on event bus
 		getEventBus().register(this);
 
+		// Player and world
+		this.personalPlayer = new RelativePlayer(defaultPlayerName, null);
+		this.world = new World(personalPlayer);
+		gameControl().addPlayer(personalPlayer);
+
 		// Connection
 		connectionProvider = new ConnectionProvider();
 		// TODO Configure device name in GUI?
@@ -107,8 +112,6 @@ public class MainController implements IMainController {
 		// View
 		view = createView();
 		view.registerEventBus(getEventBus());
-
-		createPersonalPlayer();
 
 		// Post initialized
 		postEvent(new InitializeEvent());
@@ -401,12 +404,6 @@ public class MainController implements IMainController {
 
 	public RelativePlayer getPlayer() {
 		return personalPlayer;
-	}
-
-	private void createPersonalPlayer() {
-		personalPlayer = new RelativePlayer(defaultPlayerName, null);
-		gameControl().addPlayer(personalPlayer);
-		getWorld().addPlayer(personalPlayer);
 	}
 
 }
