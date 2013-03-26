@@ -47,7 +47,10 @@ public class VirtualIRSensor implements IRSensor {
 	private float getDetectedRobotAngle() {
 		
 		// TODO: heading vs x-axis?
-		// TODO: edge == null?
+		
+		/*
+		 * Iteratie 3: werken met lijnen en rechthoeken, intersecties, offset, range
+		 */
 		
 		List<Float> detectedRobotAngles = new ArrayList<Float>();
 		
