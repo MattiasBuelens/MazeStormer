@@ -292,18 +292,25 @@ public class ParserTest {
 		assertEquals(parsedTile.getBarcode().getValue(), (byte) 11);
 	}
 	
-//	@Test
-//	public void parseTileSeesaw() throws ParseException {
+	@Test
+	public void parseTileSeesaw() throws ParseException {
+		String source = "1 4\nStraight.N.11\nSeesaw.N\nSeesaw.S\nStraight.N.13";
+		Maze maze = parse(source);
+//		Tile barcodeTile = Parser.parseTile(80, 80, "Straight.N.11");
 //		Tile parsedTile = Parser.parseTile(80, 120, "Seesaw.S");
-//		
-//		assertEquals(parsedTile.getEdgeAt(NORTH).getType(), EdgeType.OPEN);
-//		assertEquals(parsedTile.getEdgeAt(SOUTH).getType(), EdgeType.OPEN);
-//		assertEquals(parsedTile.getEdgeAt(EAST).getType(), EdgeType.WALL);
-//		assertEquals(parsedTile.getEdgeAt(WEST).getType(), EdgeType.WALL);
-//		
-//		assertEquals(parsedTile.getX(), 80);
-//		assertEquals(parsedTile.getY(), 120);
-//		
-//		assertEquals(parsedTile.getBarcode().getValue(), (byte) 11);
-//	}
+		Tile barcodeTile = maze.getTileAt(new LongPoint(0,0));
+		Tile northernSeesawTile = maze.getTileAt(new LongPoint(0,2));
+		Tile southernSeesawTile = maze.getTileAt(new LongPoint(0,1));
+				
+		assertEquals(southernSeesawTile.getEdgeAt(NORTH).getType(), EdgeType.OPEN);
+		assertEquals(southernSeesawTile.getEdgeAt(SOUTH).getType(), EdgeType.OPEN);
+		assertEquals(southernSeesawTile.getEdgeAt(WEST).getType(), EdgeType.WALL);
+		assertEquals(southernSeesawTile.getEdgeAt(EAST).getType(), EdgeType.WALL);
+		
+		assertFalse(southernSeesawTile.isSeesawOpen());
+		assertTrue(northernSeesawTile.isSeesawOpen());
+		
+		assertEquals(southernSeesawTile.getSeesawBarcode().getValue(), (byte) 13);
+		assertEquals(northernSeesawTile.getSeesawBarcode().getValue(), (byte) 11);
+	}
 }
