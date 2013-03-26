@@ -13,13 +13,16 @@ import java.util.concurrent.TimeUnit;
 import mazestormer.controller.PlayerEvent.EventType;
 import mazestormer.player.Player;
 import mazestormer.player.PlayerIdentifier;
-import mazestormer.world.WorldListener;
+import mazestormer.player.PlayerListener;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class GameController extends SubController implements IGameController {
 
 	private Map<PlayerIdentifier, IPlayerController> pcs = new LinkedHashMap<PlayerIdentifier, IPlayerController>();
+	private final Listener listener = new Listener();
+
+	private final WorldController worldController;
 
 	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(factory);
 	private Runnable updateTask = new UpdateTask();
@@ -30,11 +33,16 @@ public class GameController extends SubController implements IGameController {
 
 	public GameController(MainController mainController) {
 		super(mainController);
-		// TODO Move this to a WorldController
-		getMainController().getWorld().addListener(new Listener());
+
+		worldController = new WorldController(mainController, mainController.getWorld());
 
 		setUpdateFPS(defaultUpdateFPS);
 		scheduleUpdater();
+	}
+
+	@Override
+	public IWorldController getWorldController() {
+		return worldController;
 	}
 
 	/*
@@ -56,41 +64,29 @@ public class GameController extends SubController implements IGameController {
 		return Collections.unmodifiableCollection(pcs.values());
 	}
 
-	// TODO Add an addPlayerController / removePlayerController
-
-	// TODO Move this to a WorldController
-	private void onPlayerAdded(Player p) {
-		this.pcs.put(p, new PlayerController(this.getMainController(), p));
-		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, p));
+	@Override
+	public void addPlayer(Player player) {
+		player.addPlayerListener(listener);
+		this.pcs.put(player, new PlayerController(this.getMainController(), player));
+		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, player));
 	}
 
-	// TODO Move this to a WorldController
-	private void onPlayerRemoved(Player p) {
-		this.pcs.remove(p);
-		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, p));
+	@Override
+	public void removePlayer(Player player) {
+		player.removePlayerListener(listener);
+		this.pcs.remove(player);
+		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, player));
 	}
 
-	// TODO Move this to a WorldController
-	private void onPlayerRenamed(Player p) {
-		postEvent(new PlayerEvent(EventType.PLAYER_RENAMED, p));
+	private void renamePlayer(Player player) {
+		postEvent(new PlayerEvent(EventType.PLAYER_RENAMED, player));
 	}
 
-	// TODO Move this to a WorldController
-	private class Listener implements WorldListener {
+	private class Listener implements PlayerListener {
 
 		@Override
-		public void playerAdded(Player player) {
-			onPlayerAdded(player);
-		}
-
-		@Override
-		public void playerRemoved(Player player) {
-			onPlayerRemoved(player);
-		}
-
-		@Override
-		public void playerRenamed(Player player) {
-			onPlayerRenamed(player);
+		public void playerRenamed(Player player, String previousID, String newID) {
+			renamePlayer(player);
 		}
 
 	}
@@ -151,6 +147,7 @@ public class GameController extends SubController implements IGameController {
 				pc.map().updatePoses();
 			}
 			// Update world
+			getWorldController().map().updatePoses();
 		}
 
 	}

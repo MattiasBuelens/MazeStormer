@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
@@ -13,9 +15,18 @@ import mazestormer.player.RelativePlayer;
 
 public class World {
 
-	private final Maze maze = new Maze();
+	private final Maze maze;
+	private final Logger logger;
+
 	private final Map<String, AbsolutePlayer> players = new HashMap<String, AbsolutePlayer>();
 	private final List<WorldListener> listeners = new ArrayList<WorldListener>();
+
+	public World() {
+		maze = new Maze();
+
+		logger = Logger.getLogger(World.class.getSimpleName());
+		logger.setLevel(Level.ALL);
+	}
 
 	public Maze getMaze() {
 		return maze;
@@ -66,6 +77,10 @@ public class World {
 
 	public void removeListener(WorldListener listener) {
 		listeners.remove(listener);
+	}
+
+	public Logger getLogger() {
+		return logger;
 	}
 
 }

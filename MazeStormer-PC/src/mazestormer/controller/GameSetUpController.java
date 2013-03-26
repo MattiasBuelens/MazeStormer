@@ -30,6 +30,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private void logToAll(String message) {
+		getWorld().getLogger().info(message);
 		for (Player player : getWorld().getPlayers()) {
 			logTo(player, message);
 		}

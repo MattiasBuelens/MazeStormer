@@ -8,7 +8,7 @@ import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
 import mazestormer.robot.Robot;
 
-public class AbsolutePlayer implements Player {
+public class AbsolutePlayer extends Player {
 
 	private final RelativePlayer delegate;
 	private PoseTransform transform = new PoseTransform();
@@ -35,22 +35,27 @@ public class AbsolutePlayer implements Player {
 		this.transform = transform;
 	}
 
+	@Override
 	public String getPlayerID() {
 		return delegate().getPlayerID();
 	}
 
+	@Override
 	public void setPlayerID(String playerID) {
 		delegate().setPlayerID(playerID);
 	}
 
+	@Override
 	public Robot getRobot() {
 		return robot;
 	}
 
+	@Override
 	public IMaze getMaze() {
 		return delegate().getMaze();
 	}
 
+	@Override
 	public Logger getLogger() {
 		return delegate().getLogger();
 	}

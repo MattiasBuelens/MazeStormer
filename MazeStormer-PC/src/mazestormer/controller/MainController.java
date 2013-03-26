@@ -404,8 +404,8 @@ public class MainController implements IMainController {
 	}
 
 	private void createPersonalPlayer() {
-		personalPlayer = new RelativePlayer();
-		personalPlayer.setPlayerID(defaultPlayerName);
+		personalPlayer = new RelativePlayer(defaultPlayerName, null);
+		gameControl().addPlayer(personalPlayer);
 		getWorld().addPlayer(personalPlayer);
 	}
 

@@ -8,13 +8,13 @@ public class PlayerController extends SubController implements IPlayerController
 
 	private Player player;
 	private PlayerMapController map;
-	private LogController log;
+	private PlayerLogController log;
 
 	public PlayerController(MainController mainController, Player player) {
 		super(mainController);
 		this.player = player;
 		this.map = new PlayerMapController(this.getMainController(), getPlayer());
-		this.log = new LogController(this.getMainController(), getPlayer());
+		this.log = new PlayerLogController(this.getMainController(), getPlayer());
 	}
 
 	@Override

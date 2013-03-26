@@ -10,6 +10,7 @@ import javax.swing.border.TitledBorder;
 
 import mazestormer.controller.IGameController;
 import mazestormer.controller.IPlayerController;
+import mazestormer.controller.IWorldController;
 import mazestormer.controller.PlayerEvent;
 import mazestormer.player.PlayerIdentifier;
 
@@ -48,6 +49,7 @@ public class GameTabPanel extends ViewPanel {
 		for (IPlayerController pc : controller.getPlayerControllers()) {
 			addPlayerTab(pc);
 		}
+		addWorldTab(controller.getWorldController());
 		validate();
 	}
 
@@ -92,6 +94,11 @@ public class GameTabPanel extends ViewPanel {
 		default:
 			break;
 		}
+	}
+
+	private void addWorldTab(IWorldController wc) {
+		WorldTabPanel panel = new WorldTabPanel(wc);
+		this.tabbedPane.addTab("World", panel);
 	}
 
 }
