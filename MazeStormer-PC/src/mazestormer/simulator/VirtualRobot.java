@@ -42,6 +42,11 @@ public class VirtualRobot implements ControllableRobot {
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
 	}
+	
+	private World getWorld() {
+		return world;
+	}
+
 
 	private Maze getMaze() {
 		return world.getMaze();
@@ -58,7 +63,7 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new VirtualLightSensor(getMaze(), getPoseProvider());
+			light = new VirtualLightSensor(getWorld());
 		}
 		return light;
 	}
@@ -66,7 +71,7 @@ public class VirtualRobot implements ControllableRobot {
 	// @Override
 	protected RangeScanner getRangeScanner() {
 		if (scanner == null) {
-			scanner = new VirtualRangeScanner(getMaze(), getPoseProvider());
+			scanner = new VirtualRangeScanner(getWorld());
 		}
 		return scanner;
 	}

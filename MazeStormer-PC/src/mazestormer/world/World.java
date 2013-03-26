@@ -15,17 +15,22 @@ import mazestormer.player.RelativePlayer;
 
 public class World {
 
-	private final Maze maze;
+	private final AbsolutePlayer localPlayer;
+	private final Maze maze = new Maze();
 	private final Logger logger;
-
 	private final Map<String, AbsolutePlayer> players = new HashMap<String, AbsolutePlayer>();
 	private final List<WorldListener> listeners = new ArrayList<WorldListener>();
 
-	public World() {
-		maze = new Maze();
+	public World(AbsolutePlayer localPlayer) {
+		this.localPlayer = localPlayer;
+		addPlayer(localPlayer);
 
 		logger = Logger.getLogger(World.class.getSimpleName());
 		logger.setLevel(Level.ALL);
+	}
+
+	public World(RelativePlayer localPlayer) {
+		this(new AbsolutePlayer(localPlayer));
 	}
 
 	public Maze getMaze() {
@@ -34,6 +39,10 @@ public class World {
 
 	public Collection<? extends AbsolutePlayer> getPlayers() {
 		return Collections.unmodifiableCollection(players.values());
+	}
+
+	public AbsolutePlayer getLocalPlayer() {
+		return this.localPlayer;
 	}
 
 	public AbsolutePlayer getPlayer(String playerID) {
