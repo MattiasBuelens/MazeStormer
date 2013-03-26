@@ -49,7 +49,8 @@ public class MainController implements IMainController {
 		});
 	}
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MainController-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("MainController-%d").build();
 	/*
 	 * Events
 	 */
@@ -62,7 +63,7 @@ public class MainController implements IMainController {
 	private final ConnectionContext connectionContext = new ConnectionContext();
 	private Connector connector;
 
-	private World world = new World();
+	private final World world;
 
 	private RelativePlayer personalPlayer;
 	public static final String defaultPlayerName = "Brons";
@@ -108,7 +109,9 @@ public class MainController implements IMainController {
 		view = createView();
 		view.registerEventBus(getEventBus());
 
+		// Player and world
 		createPersonalPlayer();
+		this.world = new World(personalPlayer);
 
 		// Post initialized
 		postEvent(new InitializeEvent());
@@ -307,7 +310,8 @@ public class MainController implements IMainController {
 	 * Robot
 	 */
 
-	public ControllableRobot getControllableRobot() throws IllegalStateException {
+	public ControllableRobot getControllableRobot()
+			throws IllegalStateException {
 		checkState(isConnected());
 		ControllableRobot r = connector.getRobot();
 		getPlayer().setRobot(r);
@@ -317,7 +321,8 @@ public class MainController implements IMainController {
 	@Subscribe
 	public void registerPilotMoveListener(ConnectEvent e) {
 		if (e.isConnected()) {
-			getControllableRobot().getPilot().addMoveListener(new MovePublisher());
+			getControllableRobot().getPilot().addMoveListener(
+					new MovePublisher());
 		}
 	}
 
@@ -346,12 +351,14 @@ public class MainController implements IMainController {
 		 */
 		if (e.isConnected() && getControllableRobot() instanceof VirtualRobot) {
 			VirtualRobot vRobot = (VirtualRobot) getControllableRobot();
-			vRobot.getCollisionObserver().addCollisionListener(new CollisionListener() {
-				@Override
-				public void brutalCrashOccured() {
-					getPlayer().getLogger().severe("A collision occured, please retreat.");
-				}
-			});
+			vRobot.getCollisionObserver().addCollisionListener(
+					new CollisionListener() {
+						@Override
+						public void brutalCrashOccured() {
+							getPlayer().getLogger().severe(
+									"A collision occured, please retreat.");
+						}
+					});
 		}
 	}
 
@@ -406,7 +413,6 @@ public class MainController implements IMainController {
 	private void createPersonalPlayer() {
 		personalPlayer = new RelativePlayer();
 		personalPlayer.setPlayerID(defaultPlayerName);
-		getWorld().addPlayer(personalPlayer);
 	}
 
 }

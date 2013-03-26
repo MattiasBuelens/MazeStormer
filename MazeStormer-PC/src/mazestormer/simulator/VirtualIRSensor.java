@@ -46,8 +46,6 @@ public class VirtualIRSensor implements IRSensor {
 	
 	private float getDetectedRobotAngle() {
 		
-		// TODO: heading vs x-axis?
-		
 		/*
 		 * Iteratie 3: werken met lijnen en rechthoeken, intersecties, offset, range
 		 */
@@ -148,9 +146,14 @@ public class VirtualIRSensor implements IRSensor {
 		
 		// SEESAW DETECTION
 		// @note: tile creation possible, not really a problem
+		int seesaw_counter = 0;
 		for(int i = 1; i < DetectionLength.SEESAW.getTransY(); i++) {
 			Tile tileToCheck = getMaze().getTileAt(new Point(currentTile.getX(), currentTile.getY()+y*i));
-			if (tileToCheck.isSeesaw() && !tileToCheck.isSeesawOpen()){
+			
+			if (tileToCheck.isSeesaw()) {
+				seesaw_counter++;
+			}		
+			if (tileToCheck.isSeesaw() && !tileToCheck.isSeesawOpen() && seesaw_counter != 2){
 				return 0f;
 			}
 		}
@@ -183,7 +186,7 @@ public class VirtualIRSensor implements IRSensor {
 	
 	public enum DetectionLength {
 		
-		ROBOT(1,3), SEESAW(0,2);
+		ROBOT(1,2), SEESAW(0,2);
 		
 		private int transX;
 		private int transY;
