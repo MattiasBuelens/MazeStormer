@@ -22,10 +22,10 @@ public class PlayerMapController extends MapController implements IPlayerMapCont
 		addPlayer(player);
 
 		// Source maze
-		if (mainController.getPlayer().getPlayerID().equals(player.getPlayerID())) {
-			MazeLayer sourceLayer = addMaze(mainController.getWorld().getMaze(), "Source maze", 1);
-			sourceLayer.setOpacity(0.5f);
-		}
+//		if (mainController.getPlayer().getPlayerID().equals(player.getPlayerID())) {
+//			MazeLayer sourceLayer = addMaze(mainController.getWorld().getMaze(), "Source maze", 1);
+//			sourceLayer.setOpacity(0.5f);
+//		}
 
 		// Discovered maze
 		addMaze(player.getMaze(), "Discovered maze", 2);

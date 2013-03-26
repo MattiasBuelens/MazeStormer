@@ -8,6 +8,11 @@ public class WorldMapController extends MapController implements IWorldMapContro
 
 	public WorldMapController(MainController mainController, World world) {
 		super(mainController);
+
+		// Add and listen for players
+		for (Player player : world.getPlayers()) {
+			addPlayer(player);
+		}
 		world.addListener(new Listener());
 
 		// Source maze
