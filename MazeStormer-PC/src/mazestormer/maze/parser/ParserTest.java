@@ -1,9 +1,6 @@
 package mazestormer.maze.parser;
 
-import static mazestormer.maze.Orientation.EAST;
-import static mazestormer.maze.Orientation.NORTH;
-import static mazestormer.maze.Orientation.SOUTH;
-import static mazestormer.maze.Orientation.WEST;
+import static mazestormer.maze.Orientation.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -279,5 +276,34 @@ public class ParserTest {
 			assertEquals(message, expectWall, isWall);
 		}
 	}
-
+	
+	@Test
+	public void parseTileBarcode() throws ParseException {
+		Tile parsedTile = Parser.parseTile(80, 120, "Straight.N.11");
+		
+		assertEquals(parsedTile.getEdgeAt(NORTH).getType(), EdgeType.OPEN);
+		assertEquals(parsedTile.getEdgeAt(SOUTH).getType(), EdgeType.OPEN);
+		assertEquals(parsedTile.getEdgeAt(EAST).getType(), EdgeType.WALL);
+		assertEquals(parsedTile.getEdgeAt(WEST).getType(), EdgeType.WALL);
+		
+		assertEquals(parsedTile.getX(), 80);
+		assertEquals(parsedTile.getY(), 120);
+		
+		assertEquals(parsedTile.getBarcode().getValue(), (byte) 11);
+	}
+	
+//	@Test
+//	public void parseTileSeesaw() throws ParseException {
+//		Tile parsedTile = Parser.parseTile(80, 120, "Seesaw.S");
+//		
+//		assertEquals(parsedTile.getEdgeAt(NORTH).getType(), EdgeType.OPEN);
+//		assertEquals(parsedTile.getEdgeAt(SOUTH).getType(), EdgeType.OPEN);
+//		assertEquals(parsedTile.getEdgeAt(EAST).getType(), EdgeType.WALL);
+//		assertEquals(parsedTile.getEdgeAt(WEST).getType(), EdgeType.WALL);
+//		
+//		assertEquals(parsedTile.getX(), 80);
+//		assertEquals(parsedTile.getY(), 120);
+//		
+//		assertEquals(parsedTile.getBarcode().getValue(), (byte) 11);
+//	}
 }
