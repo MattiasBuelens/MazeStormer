@@ -36,7 +36,7 @@ public class VirtualRobot implements ControllableRobot {
 	public VirtualRobot(World world) {
 		this.world = world;
 
-		this.collisionDetector = new VirtualCollisionDetector(getMaze(), getPoseProvider());
+		this.collisionDetector = new VirtualCollisionDetector(world);
 		this.collisionObserver = new CollisionObserver(this);
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
