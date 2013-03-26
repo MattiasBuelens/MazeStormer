@@ -95,7 +95,7 @@ public class WorldSimulator {
 
 		@Override
 		public void gamePaused() {
-			// left emptyf
+			// left empty
 		}
 
 		@Override
@@ -169,18 +169,18 @@ public class WorldSimulator {
 
 		@Override
 		public void lockedSeesaw(String playerID, int playerNumber, int barcode) {
-			// Deze methode mag leeg blijven, keitof!
-
+			// Nothing to do here
 		}
 
 		@Override
 		public void unlockedSeesaw(String playerID, int playerNumber, int barcode) {
+			// Flip this seesaw
 			Tile seesawTile = getWorld().getMaze().getSeesawTile(new Barcode((byte) barcode));
 			seesawTile.flipSeesaw();
+			// Flip the other side of the seesaw
 			Barcode otherBarcode = seesawTile.getOtherSeesawBarcode();
 			Tile otherSeesawTile = getWorld().getMaze().getSeesawTile(otherBarcode);
 			otherSeesawTile.flipSeesaw();
-
 		}
 
 	}
