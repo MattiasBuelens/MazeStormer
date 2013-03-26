@@ -6,6 +6,7 @@ import java.util.List;
 import lejos.geom.Point;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.maze.Edge;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
@@ -109,11 +110,11 @@ public class VirtualIRSensor implements IRSensor {
 						for(int i = 1; i < DetectionLength.ROBOT.getTransX() && !target; i++) {
 							Tile tileToCheck = getMaze().getTileAt(new Point(currentTile.getX()+x*i, currentTile.getY()));
 							if (x == 1) {
-								if (tileToCheck.getEdgeAt(Orientation.WEST) == null) {
+								if (tileToCheck.getEdgeAt(Orientation.WEST).getType() != Edge.EdgeType.OPEN) {
 									break;
 								}
 							} else {
-								if (tileToCheck.getEdgeAt(Orientation.EAST) == null) {
+								if (tileToCheck.getEdgeAt(Orientation.EAST).getType() != Edge.EdgeType.OPEN) {
 									break;
 								}
 							}
@@ -123,11 +124,11 @@ public class VirtualIRSensor implements IRSensor {
 						for(int i = 1; i < DetectionLength.ROBOT.getTransY() && !target; i++) {
 							Tile tileToCheck = getMaze().getTileAt(new Point(currentTile.getX(), currentTile.getY()+y*i));
 							if (y == 1) {
-								if (tileToCheck.getEdgeAt(Orientation.SOUTH) == null) {
+								if (tileToCheck.getEdgeAt(Orientation.SOUTH).getType() != Edge.EdgeType.OPEN) {
 									break;
 								}
 							} else {
-								if (tileToCheck.getEdgeAt(Orientation.NORTH) == null) {
+								if (tileToCheck.getEdgeAt(Orientation.NORTH).getType() != Edge.EdgeType.OPEN) {
 									break;
 								}
 							}
