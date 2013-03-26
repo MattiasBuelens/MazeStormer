@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.game.GameRunner;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
+import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
@@ -13,6 +14,7 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.AbstractFuture;
 import mazestormer.util.Future;
+import mazestormer.world.World;
 
 public class SeesawAction extends
 		StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
@@ -55,24 +57,35 @@ public class SeesawAction extends
 		return getControllableRobot().getPilot();
 	}
 
+	private World getWorld() {
+		return getGameRunner().getGame().getWorld();
+	}
+
 	protected void initial() {
 		getGameRunner().setSeesawWalls();
+		System.out.println("wat");
 		transition(SeesawState.SCAN);
 	}
-	
+
 	protected void scan() {
-		boolean seesawOpen = false;
-		//TODO vraag aan IRSensor (matthias)
-		if(seesawOpen)
+		Tile barcodeTile = getWorld().getMaze().getBarcodeTile(
+				(byte) this.barcode);
+		System.out.println(barcodeTile.isSeesaw());
+		System.out.println(barcodeTile.isSeesawOpen());
+		boolean seesawOpen = barcodeTile.isSeesaw()
+				&& barcodeTile.isSeesawOpen();
+
+		// TODO vraag aan IRSensor (matthias)
+		if (seesawOpen)
 			transition(SeesawState.ONWARDS);
 	}
-	
+
 	protected void onwards() {
 		getGameRunner().onSeesaw(barcode);
 		bindTransition(getPilot().travelComplete(130), // TODO 130 juist?
 				SeesawState.FIND_LINE);
 	}
-	
+
 	protected void findLine() {
 		// TODO
 	}
@@ -126,13 +139,13 @@ public class SeesawAction extends
 			State<SeesawAction, SeesawAction.SeesawState> {
 
 		INITIAL {
-			
+
 			@Override
 			public void execute(SeesawAction input) {
 				input.initial();
 			}
 		},
-		
+
 		SCAN {
 
 			@Override
@@ -140,7 +153,7 @@ public class SeesawAction extends
 				input.scan();
 			}
 		},
-		
+
 		ONWARDS {
 
 			@Override
@@ -148,14 +161,14 @@ public class SeesawAction extends
 				input.onwards();
 			}
 		},
-		
+
 		FIND_LINE {
 
 			@Override
 			public void execute(SeesawAction input) {
 				input.findLine();
 			}
-			
+
 		}
 
 	}
@@ -184,8 +197,7 @@ public class SeesawAction extends
 		}
 
 		@Override
-		public void statePaused(SeesawState currentState,
-				boolean onTransition) {
+		public void statePaused(SeesawState currentState, boolean onTransition) {
 		}
 
 		@Override

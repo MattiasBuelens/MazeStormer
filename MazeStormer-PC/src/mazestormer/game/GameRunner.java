@@ -68,6 +68,10 @@ public class GameRunner implements GameListener {
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) player.getRobot();
 	}
+	
+	public Game getGame() {
+		return this.game;
+	}
 
 	public int getObjectNumber() {
 		return objectNumber;
