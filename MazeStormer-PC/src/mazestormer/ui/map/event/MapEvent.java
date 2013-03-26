@@ -1,17 +1,17 @@
 package mazestormer.ui.map.event;
 
-import mazestormer.player.PlayerIdentifier;
+import mazestormer.controller.IMapController;
 
 public abstract class MapEvent {
 
-	private PlayerIdentifier player;
+	private IMapController owner;
 
-	protected MapEvent(PlayerIdentifier player) {
-		this.player = player;
+	protected MapEvent(IMapController owner) {
+		this.owner = owner;
 	}
 
-	public PlayerIdentifier getPlayer() {
-		return this.player;
+	public IMapController getOwner() {
+		return owner;
 	}
 
 }

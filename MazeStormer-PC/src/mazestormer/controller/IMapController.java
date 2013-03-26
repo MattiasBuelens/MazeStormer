@@ -2,11 +2,10 @@ package mazestormer.controller;
 
 import java.util.Set;
 
-import org.w3c.dom.svg.SVGDocument;
-
-import lejos.robotics.navigation.Pose;
 import mazestormer.ui.map.MapLayer;
 import mazestormer.util.EventSource;
+
+import org.w3c.dom.svg.SVGDocument;
 
 public interface IMapController extends EventSource {
 
@@ -30,14 +29,6 @@ public interface IMapController extends EventSource {
 	 */
 	public void setLayerVisible(MapLayer layer, boolean isVisible);
 
-	/**
-	 * Get the robot's current pose, in map coordinates.
-	 */
-	public Pose getRobotPose();
-
-	/**
-	 * Clear the detected points on the map.
-	 */
-	public void clearRanges();
+	public void updatePoses();
 
 }

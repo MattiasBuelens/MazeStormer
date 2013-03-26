@@ -7,7 +7,7 @@ public interface IPlayerController extends EventSource {
 
 	public PlayerIdentifier getPlayer();
 
-	public IMapController map();
+	public IPlayerMapController map();
 
 	public ILogController log();
 

@@ -22,7 +22,7 @@ public interface IMainController {
 	
 	public ICheatController cheatControl();
 
-	public IMapController map();
+	public IPlayerMapController map();
 
 	public ILogController log();
 

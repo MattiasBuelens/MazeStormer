@@ -7,41 +7,37 @@ import mazestormer.player.Player;
 public class PlayerController extends SubController implements IPlayerController {
 
 	private Player player;
-	private MapController map;
+	private PlayerMapController map;
 	private LogController log;
 
 	public PlayerController(MainController mainController, Player player) {
 		super(mainController);
 		this.player = player;
+		this.map = new PlayerMapController(this.getMainController(), getPlayer());
+		this.log = new LogController(this.getMainController(), getPlayer());
 	}
 
 	@Override
 	public Player getPlayer() {
-		return this.player;
+		return player;
 	}
 
 	@Override
-	public IMapController map() {
-		if (this.map == null) {
-			this.map = new MapController(this.getMainController(), getPlayer());
-		}
-		return this.map;
+	public IPlayerMapController map() {
+		return map;
 	}
 
 	@Override
 	public ILogController log() {
-		if (this.log == null) {
-			this.log = new LogController(this.getMainController(), getPlayer());
-		}
-		return this.log;
+		return log;
 	}
 
 	public void terminate() {
-		if (this.map != null) {
-			this.map.terminate();
+		if (map != null) {
+			map.terminate();
 		}
-		if (this.log != null) {
-			this.log.terminate();
+		if (log != null) {
+			log.terminate();
 		}
 	}
 

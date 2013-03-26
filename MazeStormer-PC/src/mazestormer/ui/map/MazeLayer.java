@@ -46,15 +46,15 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private SVGGElement edgesGroup;
 	private Map<LongPoint, TileElement> tiles = new HashMap<LongPoint, TileElement>();
 
-	public MazeLayer(String name, IMaze maze2) {
+	public MazeLayer(String name, IMaze maze) {
 		super(name);
-		this.maze = maze2;
-		maze2.addListener(this);
+		this.maze = maze;
+		maze.addListener(this);
 
-		this.edgeStrokeWidth = maze2.getEdgeSize() / maze2.getTileSize();
+		this.edgeStrokeWidth = maze.getEdgeSize() / maze.getTileSize();
 
-		setScale(maze2.getTileSize());
-		setOrigin(maze2.getOrigin());
+		setScale(maze.getTileSize());
+		setOrigin(maze.getOrigin());
 		setRotationCenter(0, 0);
 	}
 

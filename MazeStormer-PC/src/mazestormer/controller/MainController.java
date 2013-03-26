@@ -213,7 +213,7 @@ public class MainController implements IMainController {
 	}
 
 	@Override
-	public IMapController map() {
+	public IPlayerMapController map() {
 		return gameControl().getPersonalPlayerController().map();
 	}
 

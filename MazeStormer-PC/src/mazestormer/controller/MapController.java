@@ -2,62 +2,33 @@ package mazestormer.controller;
 
 import java.awt.EventQueue;
 import java.awt.Rectangle;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.connect.ConnectEvent;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.player.Player;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
 import mazestormer.ui.map.MazeLayer;
-import mazestormer.ui.map.RangesLayer;
 import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapLayerAddEvent;
+import mazestormer.ui.map.event.MapLayerRemoveEvent;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 import mazestormer.util.CoordUtils;
 
 import org.w3c.dom.svg.SVGDocument;
 
-import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-public class MapController extends SubController implements IMapController {
-
-	private final Player player;
+public abstract class MapController extends SubController implements IMapController {
 
 	private MapDocument map;
-	private RobotLayer robotLayer;
-	private MazeLayer mazeLayer;
-	private MazeLayer sourceMazeLayer;
-	private RangesLayer rangesLayer;
+	private Map<Player, RobotLayer> robotLayers = new HashMap<Player, RobotLayer>();
 
-	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(factory);
-	private Runnable updateTask = new UpdateTask();
-	private ScheduledFuture<?> updateHandle;
-	private long updateInterval;
-
-	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MapController-%d").build();
-
-	private static final long defaultUpdateFPS = 25;
-
-	public MapController(MainController mainController, Player player) {
+	public MapController(MainController mainController) {
 		super(mainController);
-		setUpdateFPS(defaultUpdateFPS);
-
-		this.player = player;
-
 		createMap();
-		createLayers();
-
-		scheduleUpdater();
 	}
 
 	private void createMap() {
@@ -66,39 +37,44 @@ public class MapController extends SubController implements IMapController {
 		// TODO Make maze define the view rectangle
 		map.setViewRect(new Rectangle(-500, -500, 1000, 1000));
 
+		resetMap();
+	}
+
+	protected void resetMap() {
 		SVGDocument document = map.getDocument();
-		postEvent(new MapChangeEvent(document, getPlayer()));
+		postEvent(new MapChangeEvent(this, document));
 	}
 
-	private void createLayers() {
-		robotLayer = new RobotLayer("Robot");
-		addLayer(robotLayer);
-
-		if (getMainController().getPlayer() == getPlayer()) {
-			Maze sourceMaze = getMainController().getWorld().getMaze();
-			sourceMazeLayer = new MazeLayer("Source maze", sourceMaze);
-			sourceMazeLayer.setZIndex(1);
-			sourceMazeLayer.setOpacity(0.5f);
-			addLayer(sourceMazeLayer);
-		}
-
-		IMaze maze = getPlayer().getMaze();
-		mazeLayer = new MazeLayer("Discovered maze", maze);
-		mazeLayer.setZIndex(2);
-		addLayer(mazeLayer);
-
-		rangesLayer = new RangesLayer("Detected ranges");
-		addLayer(rangesLayer);
-	}
-
-	private void addLayer(MapLayer layer) {
+	protected void addLayer(MapLayer layer) {
 		layer.registerEventBus(getEventBus());
 		map.addLayer(layer);
-		postEvent(new MapLayerAddEvent(layer, getPlayer()));
+		postEvent(new MapLayerAddEvent(this, layer));
 	}
 
-	private Player getPlayer() {
-		return this.player;
+	protected void removeLayer(MapLayer layer) {
+		map.removeLayer(layer);
+		postEvent(new MapLayerRemoveEvent(this, layer));
+	}
+
+	protected void addPlayer(Player player) {
+		RobotLayer robotLayer = new RobotLayer("Robot " + player.getPlayerID());
+		robotLayers.put(player, robotLayer);
+		addLayer(robotLayer);
+	}
+
+	protected void removePlayer(Player player) {
+		RobotLayer robotLayer = robotLayers.get(player);
+		if (robotLayer != null) {
+			removeLayer(robotLayer);
+			robotLayers.remove(player);
+		}
+	}
+
+	protected MazeLayer addMaze(IMaze maze, String name, int zIndex) {
+		MazeLayer mazeLayer = new MazeLayer(name, maze);
+		mazeLayer.setZIndex(zIndex);
+		addLayer(mazeLayer);
+		return mazeLayer;
 	}
 
 	@Override
@@ -116,101 +92,39 @@ public class MapController extends SubController implements IMapController {
 		layer.setVisible(isVisible);
 	}
 
-	@Override
-	public Pose getRobotPose() {
+	protected Pose getMapPose(Player player) {
 		// Not connected yet
-		if (getPlayer().getRobot() == null)
+		if (player.getRobot() == null)
 			return null;
 
-		return CoordUtils.toMapCoordinates(getPlayer().getRobot().getPoseProvider().getPose());
+		return CoordUtils.toMapCoordinates(player.getRobot().getPoseProvider().getPose());
 	}
 
-	private void updateRobotPose() {
-		Pose pose = getRobotPose();
+	private void updatePose(Player player) {
+		Pose pose = getMapPose(player);
 		if (pose == null)
 			return;
 
-		if (robotLayer != null) {
-			robotLayer.setPosition(pose.getLocation());
-			robotLayer.setRotationAngle(pose.getHeading());
+		RobotLayer layer = robotLayers.get(player);
+		if (layer != null) {
+			layer.setPosition(pose.getLocation());
+			layer.setRotationAngle(pose.getHeading());
 		}
 
-		postEvent(new MapRobotPoseChangeEvent(pose, getPlayer()));
+		postEvent(new MapRobotPoseChangeEvent(this, player, pose));
 	}
 
-	private void invokeUpdateRobotPose() {
+	@Override
+	public void updatePoses() {
 		// Invoke Swing methods in AWT thread
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				updateRobotPose();
+				for (Player player : robotLayers.keySet()) {
+					updatePose(player);
+				}
 			}
 		});
-	}
-
-	private long getUpdateInterval() {
-		return updateInterval;
-	}
-
-	public void setUpdateInterval(long interval) {
-		interval = Math.abs(interval);
-		if (interval != this.updateInterval) {
-			this.updateInterval = interval;
-			// Reschedule with new delay
-			rescheduleUpdater();
-		}
-	}
-
-	public void setUpdateFPS(long fps) {
-		setUpdateInterval((long) (1000f / (float) fps));
-	}
-
-	private void scheduleUpdater() {
-		// Cancel if still running
-		cancelUpdater();
-		// Reschedule updater
-		updateHandle = executor.scheduleAtFixedRate(updateTask, 0, getUpdateInterval(), TimeUnit.MILLISECONDS);
-	}
-
-	private void cancelUpdater() {
-		if (updateHandle != null) {
-			updateHandle.cancel(false);
-			updateHandle = null;
-		}
-	}
-
-	private void rescheduleUpdater() {
-		// Schedule only if still running
-		if (updateHandle != null && !updateHandle.isDone()) {
-			scheduleUpdater();
-		}
-	}
-
-	@Override
-	public void clearRanges() {
-		rangesLayer.clear();
-	}
-
-	@Subscribe
-	public void clearMazeOnConnect(ConnectEvent e) {
-		if (e.isConnected()) {
-			// Clear detected maze
-			getPlayer().getMaze().clear();
-			// Clear detected ranges
-			clearRanges();
-		}
-	}
-
-	private class UpdateTask implements Runnable {
-		@Override
-		public void run() {
-			invokeUpdateRobotPose();
-		}
-	}
-
-	public void terminate() {
-		// Shutdown executor
-		executor.shutdown();
 	}
 
 }

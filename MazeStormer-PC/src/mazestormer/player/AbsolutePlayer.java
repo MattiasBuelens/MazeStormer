@@ -72,6 +72,10 @@ public class AbsolutePlayer implements Player {
 
 		@Override
 		public Pose getPose() {
+			if (delegate.getRobot() == null) {
+				return new Pose();
+			}
+
 			Pose relativePose = delegate.getRobot().getPoseProvider().getPose();
 			return transform.transform(relativePose);
 		}

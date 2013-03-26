@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -19,22 +20,22 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.controller.IMapController;
+import mazestormer.controller.IPlayerMapController;
 import mazestormer.player.PlayerIdentifier;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerHandler;
+import mazestormer.ui.map.event.MapLayerRemoveEvent;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 
 import org.apache.batik.bridge.UpdateManager;
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
-import javax.swing.JButton;
 
-public class MapPanel extends ViewPanel implements MapLayerHandler {
+public class PlayerMapPanel extends ViewPanel implements MapLayerHandler {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,7 +43,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	private boolean isFollowing;
 
-	private final IMapController controller;
+	private final IPlayerMapController controller;
 
 	private JToolBar actionBar;
 	private MapCanvas canvas;
@@ -59,7 +60,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	public static final double zoomFactor = 1.5d;
 
-	public MapPanel(IMapController controller, PlayerIdentifier player) {
+	public PlayerMapPanel(IPlayerMapController controller, PlayerIdentifier player) {
 		this.controller = controller;
 		this.player = player;
 
@@ -179,14 +180,13 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	@Subscribe
 	public void onMapChanged(MapChangeEvent event) {
-		if (event.getPlayer().equals(player)) {
+		if (event.getOwner().equals(controller)) {
 			setMap(event.getDocument());
 		}
 	}
 
 	private void addLayerMenuItem(final MapLayer layer) {
-		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(
-				layer.getName());
+		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(layer.getName());
 		menuItem.setSelected(layer.isVisible());
 		menuItem.addItemListener(new ItemListener() {
 			@Override
@@ -201,10 +201,26 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 		menuLayers.add(menuItem);
 	}
 
+	private void removeLayerMenuItem(final MapLayer layer) {
+		JMenuItem menuItem = layerMenuItems.get(layer);
+		if (menuItem != null) {
+			layer.setMapLayerHandler(null);
+			layerMenuItems.remove(layer);
+			menuLayers.remove(menuItem);
+		}
+	}
+
 	@Subscribe
 	public void onMapLayerAdded(MapLayerAddEvent event) {
-		if (event.getPlayer().equals(player)) {
+		if (event.getOwner().equals(controller)) {
 			addLayerMenuItem(event.getLayer());
+		}
+	}
+
+	@Subscribe
+	public void onMapLayerRemoved(MapLayerRemoveEvent event) {
+		if (event.getOwner().equals(controller)) {
+			removeLayerMenuItem(event.getLayer());
 		}
 	}
 
@@ -226,7 +242,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	@Subscribe
 	public void onMapRobotPoseChanged(MapRobotPoseChangeEvent event) {
-		if (event.getPlayer().equals(player)) {
+		if (event.getOwner().equals(controller) && event.getPlayer().equals(player)) {
 			updateRobotPose(event.getPose());
 		}
 	}
@@ -324,8 +340,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	}
 
 	@Override
-	public void layerPropertyChanged(MapLayer layer, String propertyName,
-			Object propertyValue) {
+	public void layerPropertyChanged(MapLayer layer, String propertyName, Object propertyValue) {
 		if (propertyName.equals("isVisible")) {
 			JMenuItem menuItem = layerMenuItems.get(layer);
 			if (menuItem != null) {
