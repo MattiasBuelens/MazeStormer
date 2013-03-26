@@ -45,7 +45,9 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private void logTo(Player player, String message) {
-		player.getLogger().info(message);
+		if (player != null) {
+			player.getLogger().info(message);
+		}
 	}
 
 	@Override

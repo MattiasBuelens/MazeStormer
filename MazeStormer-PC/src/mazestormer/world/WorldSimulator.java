@@ -104,6 +104,13 @@ public class WorldSimulator {
 		}
 
 		@Override
+		public void playerRolled(String playerID, int playerNumber) {
+			// Setup transformation if not set yet
+			AbsolutePlayer player = getWorld().getPlayer(playerID);
+			setupPlayerTransform(player, playerNumber);
+		}
+
+		@Override
 		public void playerJoining(String playerID) {
 			// left empty
 		}
@@ -146,18 +153,18 @@ public class WorldSimulator {
 		@Override
 		public void playerUpdate(String playerID, int playerNumber, double x, double y, double angle,
 				boolean foundObject) {
-			// Ignore local player
-			if (isLocalPlayer(playerID))
-				return;
-
-			Pose pose = new Pose((float) x, (float) y, (float) angle);
+			AbsolutePlayer player = getWorld().getPlayer(playerID);
 
 			// Setup transformation if not set yet
-			AbsolutePlayer player = getWorld().getPlayer(playerID);
-			setupPlayerTransform(player, playerNumber);
+			playerRolled(playerID, playerNumber);
 
-			// Set relative pose
-			player.setRelativePose(pose);
+			// Set pose of non-local player
+			if (!isLocalPlayer(playerID)) {
+				Pose pose = new Pose((float) x, (float) y, (float) angle);
+
+				// Set relative pose
+				player.setRelativePose(pose);
+			}
 		}
 
 		@Override

@@ -19,7 +19,7 @@ public class VirtualRangeScanner implements RangeScanner {
 	public VirtualRangeScanner(World world) {
 		this.world = world;
 	}
-	
+
 	private World getWorld() {
 		return this.world;
 	}
@@ -29,7 +29,7 @@ public class VirtualRangeScanner implements RangeScanner {
 	}
 
 	private IMaze getMaze() {
-		return getWorld().getLocalPlayer().getMaze();
+		return getWorld().getMaze();
 	}
 
 	public static final float getMaxDistance() {

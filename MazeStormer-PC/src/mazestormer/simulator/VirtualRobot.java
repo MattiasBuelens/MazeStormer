@@ -36,17 +36,15 @@ public class VirtualRobot implements ControllableRobot {
 	public VirtualRobot(World world) {
 		this.world = world;
 
-		this.collisionDetector = new VirtualCollisionDetector(getMaze(),
-				getPoseProvider());
+		this.collisionDetector = new VirtualCollisionDetector(getMaze(), getPoseProvider());
 		this.collisionObserver = new CollisionObserver(this);
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
 	}
-	
+
 	private World getWorld() {
 		return world;
 	}
-
 
 	private Maze getMaze() {
 		return world.getMaze();
@@ -79,9 +77,8 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
-			detector = new RangeScannerFeatureDetector(getRangeScanner(),
-					sensorMaxDistance, new Point(0f, 0f));
-			detector.setPoseProvider(getPoseProvider());
+			detector = new RangeScannerFeatureDetector(getRangeScanner(), sensorMaxDistance, new Point(0f, 0f));
+			detector.setPoseProvider(getWorld().getLocalPlayer().getRobot().getPoseProvider());
 		}
 		return detector;
 	}

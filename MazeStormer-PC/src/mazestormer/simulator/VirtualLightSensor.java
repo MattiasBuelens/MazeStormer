@@ -23,7 +23,7 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 	public VirtualLightSensor(World world) {
 		this.world = world;
 	}
-	
+
 	private World getWorld() {
 		return this.world;
 	}
@@ -33,7 +33,7 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 	}
 
 	private IMaze getMaze() {
-		return getWorld().getLocalPlayer().getMaze();
+		return getWorld().getMaze();
 	}
 
 	@Override
@@ -41,8 +41,7 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 		// Get absolute robot pose
 		Pose pose = getPoseProvider().getPose();
 		// Add sensor offset
-		Point position = pose.getLocation().pointAt(ControllableRobot.sensorOffset,
-				pose.getHeading());
+		Point position = pose.getLocation().pointAt(ControllableRobot.sensorOffset, pose.getHeading());
 
 		// Get tile underneath robot
 		Point relativePosition = getMaze().toRelative(position);
@@ -51,8 +50,7 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 
 		// Check if robot is on open side of tile
 		for (Orientation orientation : tile.getOpenSides()) {
-			if (getMaze().getEdgeBounds(tile.getEdgeAt(orientation)).contains(
-					relativePosition)) {
+			if (getMaze().getEdgeBounds(tile.getEdgeAt(orientation)).contains(relativePosition)) {
 				// On line
 				return WHITE_VALUE;
 			}
@@ -62,8 +60,7 @@ public class VirtualLightSensor extends AbstractCalibratedLightSensor {
 		if (tile.hasBarcode()) {
 			boolean isBlack = true;
 			// Get the position of the robot relative to the corner of the tile
-			Point relativeTilePosition = tilePosition.subtract(tile
-					.getPosition().toPoint());
+			Point relativeTilePosition = tilePosition.subtract(tile.getPosition().toPoint());
 			for (Rectangle2D bar : getMaze().getBarcodeBars(tile)) {
 				if (bar.contains(relativeTilePosition)) {
 					// On bar

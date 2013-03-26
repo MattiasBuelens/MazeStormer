@@ -362,23 +362,21 @@ public class MainController implements IMainController {
 	 * Robot pose
 	 */
 
-	private Pose getStartPose() {
-		// return new Pose(0f, 0f, 90f);
-		return new Pose(20f, 20f, 90f);
-	}
-
 	public Pose getPose() {
 		if (isConnected()) {
 			return getControllableRobot().getPoseProvider().getPose();
 		} else {
-			return getStartPose();
+			return new Pose();
 		}
 	}
 
 	@Subscribe
 	public void setupStartPose(ConnectEvent e) {
 		if (e.isConnected()) {
-			getControllableRobot().getPoseProvider().setPose(getStartPose());
+			float tileSize = getPlayer().getMaze().getTileSize();
+			Pose startPose = new Pose(-tileSize / 2, -tileSize / 2, 0);
+			getWorld().getMaze().setOrigin(startPose);
+			getPlayer().getMaze().setOrigin(startPose);
 		}
 	}
 
