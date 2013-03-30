@@ -113,8 +113,13 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 			}
 		};
 
-		lineAdjuster = new LineAdjuster(player, lineFinder);
-		lineFinder.addStateListener(new LineFinderListener());
+		this.lineAdjuster = new LineAdjuster(player, lineFinder) {
+			@Override
+			protected void log(String message) {
+				ExplorerRunner.this.log(message);
+			}
+		};
+		this.lineFinder.addStateListener(new LineFinderListener());
 
 		// Barcode scanner
 		this.barcodeScanner = new BarcodeRunner(player) {
