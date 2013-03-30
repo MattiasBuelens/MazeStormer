@@ -20,9 +20,7 @@ import javax.swing.JToolBar;
 import mazestormer.controller.IMapController;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
-import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapLayerAddEvent;
-import mazestormer.ui.map.event.MapLayerHandler;
 import mazestormer.ui.map.event.MapLayerRemoveEvent;
 
 import org.apache.batik.bridge.UpdateManager;
@@ -65,6 +63,9 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
+
+		// Register as handler
+		controller.setMapLayerHandler(this);
 
 		// Initialize map and layers
 		setMap(controller.getDocument());
@@ -138,13 +139,6 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 		canvas.setDocument(document);
 	}
 
-	@Subscribe
-	public void onMapChanged(MapChangeEvent event) {
-		if (event.getOwner().equals(controller)) {
-			setMap(event.getDocument());
-		}
-	}
-
 	private void addLayerMenuItem(final MapLayer layer) {
 		final JCheckBoxMenuItem menuItem = new JCheckBoxMenuItem(layer.getName());
 		menuItem.setSelected(layer.isVisible());
@@ -156,7 +150,6 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 			}
 		});
 
-		layer.setMapLayerHandler(this);
 		layerMenuItems.put(layer, menuItem);
 		menuLayers.add(menuItem);
 	}
@@ -164,7 +157,6 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	private void removeLayerMenuItem(final MapLayer layer) {
 		JMenuItem menuItem = layerMenuItems.get(layer);
 		if (menuItem != null) {
-			layer.setMapLayerHandler(null);
 			layerMenuItems.remove(layer);
 			menuLayers.remove(menuItem);
 		}

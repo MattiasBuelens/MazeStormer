@@ -4,9 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Comparator;
 
-import mazestormer.ui.map.event.MapLayerHandler;
-import mazestormer.util.AbstractEventSource;
-
 import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGStylableElement;
@@ -17,8 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
 
-public abstract class MapLayer extends AbstractEventSource implements
-		SVGConstants, CSSConstants {
+public abstract class MapLayer extends MapElement implements SVGConstants, CSSConstants {
 
 	private final String name;
 
@@ -26,6 +22,7 @@ public abstract class MapLayer extends AbstractEventSource implements
 	private boolean isVisible;
 
 	private Document document;
+	private MapLayerHandler mapLayerHandler;
 
 	public MapLayer(String name) {
 		this.name = name;
@@ -65,11 +62,19 @@ public abstract class MapLayer extends AbstractEventSource implements
 		update();
 	}
 
+	public MapLayerHandler getMapLayerHandler() {
+		return mapLayerHandler;
+	}
+
+	public void setMapLayerHandler(MapLayerHandler mapLayerHandler) {
+		this.mapLayerHandler = mapLayerHandler;
+		setMapHandler(mapLayerHandler);
+	}
+
 	protected void update() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
-			final String displayValue = isVisible() ? CSS_INLINE_VALUE
-					: CSS_NONE_VALUE;
+			final String displayValue = isVisible() ? CSS_INLINE_VALUE : CSS_NONE_VALUE;
 			final SVGStylableElement styleElement = (SVGStylableElement) element;
 
 			invokeDOMChange(new Runnable() {
@@ -79,14 +84,6 @@ public abstract class MapLayer extends AbstractEventSource implements
 					css.setProperty(CSS_DISPLAY_PROPERTY, displayValue, null);
 				}
 			});
-		}
-	}
-
-	protected void invokeDOMChange(Runnable request) {
-		if(getMapLayerHandler() == null) {
-			request.run();
-		} else {
-			getMapLayerHandler().requestDOMChange(request);
 		}
 	}
 
@@ -121,14 +118,4 @@ public abstract class MapLayer extends AbstractEventSource implements
 		}
 
 	}
-	
-	public void setMapLayerHandler(MapLayerHandler mapLayerHandler) {
-		this.mapLayerHandler = mapLayerHandler;
-	}
-	
-	private MapLayerHandler getMapLayerHandler() {
-		return this.mapLayerHandler;
-	}
-	
-	private MapLayerHandler mapLayerHandler;
 }

@@ -57,6 +57,16 @@ public class WorldSimulator {
 		return getLocalPlayer().getPlayerID().equals(playerID);
 	}
 
+	private synchronized AbsolutePlayer getOrAddPlayer(String playerID) {
+		AbsolutePlayer player = getWorld().getPlayer(playerID);
+		if (player == null) {
+			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot());
+			player = new AbsolutePlayer(relativePlayer);
+			getWorld().addPlayer(player);
+		}
+		return player;
+	}
+
 	private void setupPlayerTransform(AbsolutePlayer player, int playerNumber) {
 		// Ignore if already set
 		if (transformedPlayers.contains(playerNumber))
@@ -74,10 +84,12 @@ public class WorldSimulator {
 	}
 
 	public void terminate() {
-		// Reset state
-		clearPlayerTransforms();
 		// Stop spectating
 		client.stop();
+		// Reset state
+		clearPlayerTransforms();
+		// Reset world
+		getWorld().removeOtherPlayers();
 	}
 
 	private class Handler implements SpectatorHandler {
@@ -106,7 +118,7 @@ public class WorldSimulator {
 		@Override
 		public void playerRolled(String playerID, int playerNumber) {
 			// Setup transformation if not set yet
-			AbsolutePlayer player = getWorld().getPlayer(playerID);
+			AbsolutePlayer player = getOrAddPlayer(playerID);
 			setupPlayerTransform(player, playerNumber);
 		}
 
@@ -120,10 +132,8 @@ public class WorldSimulator {
 			// Ignore local player
 			if (isLocalPlayer(playerID))
 				return;
-
 			// Store player
-			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot());
-			getWorld().addPlayer(new AbsolutePlayer(relativePlayer));
+			getOrAddPlayer(playerID);
 		}
 
 		@Override
@@ -153,7 +163,7 @@ public class WorldSimulator {
 		@Override
 		public void playerUpdate(String playerID, int playerNumber, double x, double y, double angle,
 				boolean foundObject) {
-			AbsolutePlayer player = getWorld().getPlayer(playerID);
+			AbsolutePlayer player = getOrAddPlayer(playerID);
 
 			// Setup transformation if not set yet
 			playerRolled(playerID, playerNumber);

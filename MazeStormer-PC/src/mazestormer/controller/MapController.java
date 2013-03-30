@@ -9,11 +9,12 @@ import java.util.Set;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
+import mazestormer.robot.Robot;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;
+import mazestormer.ui.map.MapLayerHandler;
 import mazestormer.ui.map.MazeLayer;
 import mazestormer.ui.map.RobotLayer;
-import mazestormer.ui.map.event.MapChangeEvent;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerRemoveEvent;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
@@ -25,41 +26,36 @@ public abstract class MapController extends SubController implements IMapControl
 
 	private MapDocument map;
 	private Map<Player, RobotLayer> robotLayers = new HashMap<Player, RobotLayer>();
+	private MapLayerHandler mapLayerHandler;
 
 	public MapController(MainController mainController) {
 		super(mainController);
-		createMap();
-	}
 
-	private void createMap() {
+		// Create map
 		map = new MapDocument();
 
 		// TODO Make maze define the view rectangle
 		map.setViewRect(new Rectangle(-500, -500, 1000, 1000));
-
-		resetMap();
-	}
-
-	protected void resetMap() {
-		SVGDocument document = map.getDocument();
-		postEvent(new MapChangeEvent(this, document));
 	}
 
 	protected void addLayer(MapLayer layer) {
-		layer.registerEventBus(getEventBus());
 		map.addLayer(layer);
+		layer.setMapLayerHandler(getMapLayerHandler());
 		postEvent(new MapLayerAddEvent(this, layer));
 	}
 
 	protected void removeLayer(MapLayer layer) {
 		map.removeLayer(layer);
+		layer.setMapLayerHandler(null);
 		postEvent(new MapLayerRemoveEvent(this, layer));
 	}
 
 	protected void addPlayer(Player player) {
-		RobotLayer robotLayer = new RobotLayer("Robot " + player.getPlayerID());
-		robotLayers.put(player, robotLayer);
-		addLayer(robotLayer);
+		if (!robotLayers.containsKey(player)) {
+			RobotLayer robotLayer = new RobotLayer("Robot " + player.getPlayerID());
+			robotLayers.put(player, robotLayer);
+			addLayer(robotLayer);
+		}
 	}
 
 	protected void removePlayer(Player player) {
@@ -87,17 +83,29 @@ public abstract class MapController extends SubController implements IMapControl
 		return map.getLayers();
 	}
 
+	protected MapLayerHandler getMapLayerHandler() {
+		return mapLayerHandler;
+	}
+
+	@Override
+	public void setMapLayerHandler(MapLayerHandler handler) {
+		this.mapLayerHandler = handler;
+		// Set map handler
+		map.setMapHandler(handler);
+		// Set map layer handlers
+		for (MapLayer layer : map.getLayers()) {
+			layer.setMapLayerHandler(handler);
+		}
+	}
+
 	@Override
 	public void setLayerVisible(MapLayer layer, boolean isVisible) {
 		layer.setVisible(isVisible);
 	}
 
 	protected Pose getMapPose(Player player) {
-		// Not connected yet
-		if (player.getRobot() == null)
-			return null;
-
-		return CoordUtils.toMapCoordinates(player.getRobot().getPoseProvider().getPose());
+		Robot robot = player.getRobot();
+		return robot == null ? null : CoordUtils.toMapCoordinates(robot.getPoseProvider().getPose());
 	}
 
 	private void updatePose(Player player) {

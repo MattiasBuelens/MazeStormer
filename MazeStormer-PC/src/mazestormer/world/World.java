@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -55,6 +56,7 @@ public class World {
 
 	public void addPlayer(AbsolutePlayer player) {
 		players.put(player.getPlayerID(), player);
+		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerAdded(player);
 		}
@@ -62,8 +64,27 @@ public class World {
 
 	public void removePlayer(AbsolutePlayer player) {
 		players.remove(player.getPlayerID());
+		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerRemoved(player);
+		}
+	}
+
+	/**
+	 * Remove all non-local players.
+	 */
+	public void removeOtherPlayers() {
+		Iterator<AbsolutePlayer> it = players.values().iterator();
+		while (it.hasNext()) {
+			AbsolutePlayer player = it.next();
+			if (player != getLocalPlayer()) {
+				// Remove
+				it.remove();
+				// Call listeners
+				for (WorldListener listener : listeners) {
+					listener.playerRemoved(player);
+				}
+			}
 		}
 	}
 
@@ -74,7 +95,7 @@ public class World {
 		// Set and add with new name
 		player.setPlayerID(newPlayerID);
 		players.put(newPlayerID, player);
-
+		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerRenamed(player);
 		}

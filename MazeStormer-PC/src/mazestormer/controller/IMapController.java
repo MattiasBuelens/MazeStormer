@@ -3,6 +3,7 @@ package mazestormer.controller;
 import java.util.Set;
 
 import mazestormer.ui.map.MapLayer;
+import mazestormer.ui.map.MapLayerHandler;
 import mazestormer.util.EventSource;
 
 import org.w3c.dom.svg.SVGDocument;
@@ -13,6 +14,11 @@ public interface IMapController extends EventSource {
 	 * Get the map as a SVG document.
 	 */
 	public SVGDocument getDocument();
+
+	/**
+	 * Set the handler to use for map layer updates.
+	 */
+	public void setMapLayerHandler(MapLayerHandler handler);
 
 	/**
 	 * Get the map layers to display.

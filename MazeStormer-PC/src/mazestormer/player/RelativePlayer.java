@@ -7,44 +7,30 @@ import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
-public class RelativePlayer extends Player {
-
-	private Robot robot;
-	private IMaze maze;
-	private final Logger logger;
+public class RelativePlayer extends AbstractPlayer {
 
 	public RelativePlayer(String playerID, Robot robot) {
+		// Set player identifier
 		setPlayerID(playerID);
+		// Set robot
 		setRobot(robot);
+		// Set maze
+		setMaze(new Maze());
 
-		logger = Logger.getLogger(getPlayerID());
+		// Create logger
+		Logger logger = Logger.getLogger(getPlayerID());
 		logger.setLevel(Level.ALL);
+		setLogger(logger);
 	}
 
 	@Override
-	public Robot getRobot() {
-		return this.robot;
-	}
-
 	public void setRobot(Robot robot) {
-		this.robot = robot;
+		super.setRobot(robot);
 	}
 
 	@Override
-	public IMaze getMaze() {
-		if (this.maze == null) {
-			this.maze = new Maze();
-		}
-		return this.maze;
-	}
-
 	public void setMaze(IMaze maze) {
-		this.maze = maze;
-	}
-
-	@Override
-	public Logger getLogger() {
-		return logger;
+		super.setMaze(maze);
 	}
 
 }
