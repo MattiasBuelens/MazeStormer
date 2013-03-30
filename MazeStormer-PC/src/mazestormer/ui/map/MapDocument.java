@@ -36,14 +36,17 @@ public class MapDocument extends MapElement {
 	}
 
 	public void addLayer(MapLayer layer) {
-		if (layer instanceof RobotLayer) {
-			System.out.println("Add robot layer: " + layer.getName());
+		if (layers.containsKey(layer)) {
+			throw new IllegalArgumentException("Already added layer: " + layer.getName());
 		}
 		layers.put(layer, null);
 		invokeBuildLayers();
 	}
 
 	public void removeLayer(MapLayer layer) {
+		if (!layers.containsKey(layer)) {
+			throw new IllegalArgumentException("Already removed layer: " + layer.getName());
+		}
 		layers.remove(layer);
 		invokeBuildLayers();
 	}
