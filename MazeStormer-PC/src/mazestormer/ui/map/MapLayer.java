@@ -13,6 +13,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
+import org.w3c.dom.svg.SVGDescElement;
 
 public abstract class MapLayer extends MapElement implements SVGConstants, CSSConstants {
 
@@ -20,6 +21,9 @@ public abstract class MapLayer extends MapElement implements SVGConstants, CSSCo
 
 	private Element element;
 	private boolean isVisible;
+
+	private String tooltipText;
+	private SVGDescElement tooltip;
 
 	private Document document;
 	private MapLayerHandler mapLayerHandler;
@@ -62,6 +66,14 @@ public abstract class MapLayer extends MapElement implements SVGConstants, CSSCo
 		update();
 	}
 
+	public String getTooltipText() {
+		return tooltipText;
+	}
+
+	public void setTooltipText(String tooltipText) {
+		this.tooltipText = tooltipText;
+	}
+
 	public MapLayerHandler getMapLayerHandler() {
 		return mapLayerHandler;
 	}
@@ -72,6 +84,11 @@ public abstract class MapLayer extends MapElement implements SVGConstants, CSSCo
 	}
 
 	protected void update() {
+		updateVisibility();
+		updateTooltip();
+	}
+
+	private void updateVisibility() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
 			final String displayValue = isVisible() ? CSS_INLINE_VALUE : CSS_NONE_VALUE;
@@ -82,6 +99,31 @@ public abstract class MapLayer extends MapElement implements SVGConstants, CSSCo
 				public void run() {
 					CSSStyleDeclaration css = styleElement.getOverrideStyle();
 					css.setProperty(CSS_DISPLAY_PROPERTY, displayValue, null);
+				}
+			});
+		}
+	}
+
+	private void updateTooltip() {
+		final Element element = getElement();
+		if (element == null)
+			return;
+
+		// Remove tooltip
+		if (tooltip != null && tooltip.getParentNode() != null) {
+			tooltip.getParentNode().removeChild(tooltip);
+			tooltip = null;
+		}
+
+		// Set tooltip
+		final String text = getTooltipText();
+		if (text != null) {
+			invokeDOMChange(new Runnable() {
+				@Override
+				public void run() {
+					tooltip = (SVGDescElement) createElement(SVG_DESC_TAG);
+					tooltip.setTextContent(text);
+					element.appendChild(tooltip);
 				}
 			});
 		}

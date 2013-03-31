@@ -83,8 +83,9 @@ public class PlayerMapPanel extends MapPanel {
 	}
 
 	private JButton createClearRangesButton() {
-		JButton btnClearRanges = new JButton("Clear ranges");
+		JButton btnClearRanges = new JButton();
 		btnClearRanges.setAction(clearRangesAction);
+		btnClearRanges.setText("Clear ranges");
 		return btnClearRanges;
 	}
 
