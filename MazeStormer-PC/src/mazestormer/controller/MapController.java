@@ -103,23 +103,52 @@ public abstract class MapController extends SubController implements IMapControl
 		layer.setVisible(isVisible);
 	}
 
+	protected Pose getRobotPose(Player player) {
+		Robot robot = player.getRobot();
+		return robot == null ? new Pose() : robot.getPoseProvider().getPose();
+	}
+
 	protected Pose getMapPose(Player player) {
 		Robot robot = player.getRobot();
-		return robot == null ? null : CoordUtils.toMapCoordinates(robot.getPoseProvider().getPose());
+		return robot == null ? null : getMapPose(getRobotPose(player));
+	}
+
+	protected Pose getMapPose(Pose pose) {
+		return pose == null ? null : CoordUtils.toMapCoordinates(pose);
 	}
 
 	private void updatePose(Player player) {
-		Pose pose = getMapPose(player);
-		if (pose == null)
+		Pose robotPose = getRobotPose(player);
+		if (robotPose == null)
 			return;
+		Pose mapPose = getMapPose(robotPose);
 
+		// Update layer
 		RobotLayer layer = robotLayers.get(player);
 		if (layer != null) {
-			layer.setPosition(pose.getLocation());
-			layer.setRotationAngle(pose.getHeading());
+			// Transform
+			layer.setPosition(mapPose.getLocation());
+			layer.setRotationAngle(mapPose.getHeading());
+			// Tooltip
+			layer.setTooltipText(getTooltipText(player, robotPose));
 		}
 
-		postEvent(new MapRobotPoseChangeEvent(this, player, pose));
+		// Post changed map pose
+		postEvent(new MapRobotPoseChangeEvent(this, player, mapPose));
+	}
+
+	protected String getTooltipText(Player player, Pose pose) {
+		StringBuilder sb = new StringBuilder();
+		// Name
+		sb.append("<strong>").append(player.getPlayerID()).append("</strong>");
+		// Pose
+		String x = String.format("%.2f", pose.getX());
+		String y = String.format("%.2f", pose.getY());
+		String heading = String.format("%.2f", pose.getHeading());
+		sb.append("<br>X: ").append(x);
+		sb.append("<br>Y: ").append(y);
+		sb.append("<br>A: ").append(heading).append('°');
+		return sb.toString();
 	}
 
 	@Override

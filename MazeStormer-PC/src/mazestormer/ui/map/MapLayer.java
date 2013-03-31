@@ -109,24 +109,30 @@ public abstract class MapLayer extends MapElement implements SVGConstants, CSSCo
 		if (element == null)
 			return;
 
-		// Remove tooltip
-		if (tooltip != null && tooltip.getParentNode() != null) {
-			tooltip.getParentNode().removeChild(tooltip);
-			tooltip = null;
-		}
-
-		// Set tooltip
-		final String text = getTooltipText();
-		if (text != null) {
-			invokeDOMChange(new Runnable() {
-				@Override
-				public void run() {
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				// Create tooltip if needed
+				if (tooltip == null) {
 					tooltip = (SVGDescElement) createElement(SVG_DESC_TAG);
-					tooltip.setTextContent(text);
-					element.appendChild(tooltip);
 				}
-			});
-		}
+				final String text = getTooltipText();
+				if (text == null) {
+					// Remove tooltip
+					if (tooltip.getParentNode() != null) {
+						tooltip.getParentNode().removeChild(tooltip);
+					}
+					tooltip = null;
+				} else {
+					// Set tooltip text
+					tooltip.setTextContent(text);
+					// Add tooltip
+					if (tooltip.getParentNode() == null) {
+						element.appendChild(tooltip);
+					}
+				}
+			}
+		});
 	}
 
 	public Element build(AbstractDocument document) {
