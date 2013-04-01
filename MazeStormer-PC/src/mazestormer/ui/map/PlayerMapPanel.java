@@ -40,36 +40,40 @@ public class PlayerMapPanel extends MapPanel {
 		super(controller);
 		this.controller = controller;
 		this.player = player;
+
+		createActionButtons();
 	}
 
-	@Override
-	protected void createLeftActionButtons() {
-		super.createLeftActionButtons();
+	private void createActionButtons() {
+		// Append to left action bar
+		leftActionBar.add(createFollowButton());
+		leftActionBar.add(createGoButton());
 
+		// Add as first button on right action bar
+		rightActionBar.add(createClearRangesButton(), 0);
+	}
+
+	private JToggleButton createFollowButton() {
 		JToggleButton btnFollow = new JToggleButton("Follow robot");
 		btnFollow.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				setFollowing(e.getStateChange() == ItemEvent.SELECTED);
 			}
 		});
-		actionBar.add(btnFollow);
-		actionBar.add(createGoButton());
-	}
 
-	@Override
-	protected void createRightActionButtons() {
-		actionBar.add(createClearRangesButton());
-		super.createRightActionButtons();
+		return btnFollow;
 	}
 
 	private SplitButton createGoButton() {
 		JPopupMenu menuGo = new JPopupMenu();
 
-		JMenuItem menuGoRobot = new JMenuItem("Go to robot");
+		JMenuItem menuGoRobot = new JMenuItem();
 		menuGoRobot.setAction(goToRobotAction);
+		menuGoRobot.setText("Go to robot");
 		menuGo.add(menuGoRobot);
-		JMenuItem menuGoStart = new JMenuItem("Go to start");
+		JMenuItem menuGoStart = new JMenuItem();
 		menuGoStart.setAction(goToStartAction);
+		menuGoStart.setText("Go to start");
 		menuGo.add(menuGoStart);
 
 		SplitButton btnGo = new SplitButton();
@@ -127,7 +131,9 @@ public class PlayerMapPanel extends MapPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			Pose pose = controller.getRobotPose();
-			canvas.centerOn(pose.getX(), pose.getY(), 0);
+			if (pose != null) {
+				canvas.centerOn(pose.getX(), pose.getY(), 0);
+			}
 		}
 	}
 

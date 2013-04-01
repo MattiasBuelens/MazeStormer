@@ -11,9 +11,9 @@ import java.util.Map;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 
@@ -22,6 +22,7 @@ import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerRemoveEvent;
+import net.miginfocom.swing.MigLayout;
 
 import org.apache.batik.bridge.UpdateManager;
 import org.w3c.dom.svg.SVGDocument;
@@ -34,7 +35,9 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	private final IMapController controller;
 
-	protected JToolBar actionBar;
+	private JPanel actionBar;
+	protected JToolBar leftActionBar;
+	protected JToolBar rightActionBar;
 	protected MapCanvas canvas;
 
 	private final Action zoomInAction = new ZoomInAction();
@@ -80,23 +83,18 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	}
 
 	private void createActionBar() {
-		actionBar = new JToolBar();
-		actionBar.setFloatable(false);
+		actionBar = new JPanel();
+		actionBar.setLayout(new MigLayout("", "0[grow]0[fill]0", "0[fill]0"));
 
-		createLeftActionButtons();
+		leftActionBar = new JToolBar();
+		leftActionBar.setFloatable(false);
+		actionBar.add(leftActionBar, "cell 0 0,growx");
 
-		Component horizontalGlue = Box.createHorizontalGlue();
-		actionBar.add(horizontalGlue);
-
-		createRightActionButtons();
-	}
-
-	protected void createLeftActionButtons() {
-	}
-
-	protected void createRightActionButtons() {
-		actionBar.add(createZoomButton());
-		actionBar.add(createLayersButton());
+		rightActionBar = new JToolBar();
+		rightActionBar.setFloatable(false);
+		rightActionBar.add(createZoomButton());
+		rightActionBar.add(createLayersButton());
+		actionBar.add(rightActionBar, "cell 1 0");
 	}
 
 	private SplitButton createZoomButton() {

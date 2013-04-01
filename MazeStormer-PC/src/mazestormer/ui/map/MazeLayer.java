@@ -19,6 +19,7 @@ import mazestormer.util.LongPoint;
 
 import org.apache.batik.dom.svg.SVGOMTransform;
 import org.w3c.dom.Element;
+import org.w3c.dom.svg.SVGDescElement;
 import org.w3c.dom.svg.SVGGElement;
 import org.w3c.dom.svg.SVGLineElement;
 import org.w3c.dom.svg.SVGRectElement;
@@ -193,10 +194,12 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		private final SVGGElement tileGroup;
 		private final SVGRectElement rect;
 		private final BarcodeElement barcode;
+		private final SVGDescElement tooltip;
 
 		public TileElement(final Tile tile) {
 			this.tile = tile;
 
+			// Tile: rectangle and barcode
 			tileGroup = (SVGGElement) createElement(SVG_G_TAG);
 			tilePosition(tileGroup, tile.getPosition());
 
@@ -209,9 +212,15 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			barcode = new BarcodeElement(tile);
 			tileGroup.appendChild(barcode.get());
 
+			// Edges
 			for (Orientation orientation : Orientation.values()) {
 				setEdge(orientation, tile.getEdgeAt(orientation).getType());
 			}
+			
+			// Tooltip
+			tooltip = (SVGDescElement) createElement(SVG_DESC_TAG);
+			tileGroup.appendChild(tooltip);
+			updateTooltip();
 		}
 
 		public Element get() {
@@ -225,6 +234,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		public void update() {
 			// Update barcode
 			barcode.update();
+			// Update tooltip
+			updateTooltip();
 		}
 
 		private void setEdge(Orientation orientation, Edge.EdgeType type) {
@@ -253,6 +264,19 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 				edgesGroup.insertBefore(edgeElement.get(), edgesGroup.getFirstChild());
 			}
 		}
+		
+		private void updateTooltip() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("<strong>Tile</strong>");
+			// Position
+			sb.append("<br>X: ").append(tile.getX());
+			sb.append("<br>Y: ").append(tile.getY());
+			// Barcode
+			if(tile.hasBarcode()) {
+				sb.append("<br>Barcode: ").append(tile.getBarcode().getValue());
+			}
+			tooltip.setTextContent(sb.toString());
+		}
 
 	}
 
@@ -264,6 +288,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		public BarcodeElement(final Tile tile) {
 			this.tile = tile;
 			barGroup = (SVGGElement) createElement(SVG_G_TAG);
+
 			update();
 		}
 
