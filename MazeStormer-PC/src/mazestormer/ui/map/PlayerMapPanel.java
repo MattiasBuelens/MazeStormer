@@ -56,6 +56,7 @@ public class PlayerMapPanel extends MapPanel {
 	private JToggleButton createFollowButton() {
 		JToggleButton btnFollow = new JToggleButton("Follow robot");
 		btnFollow.addItemListener(new ItemListener() {
+			@Override
 			public void itemStateChanged(ItemEvent e) {
 				setFollowing(e.getStateChange() == ItemEvent.SELECTED);
 			}

@@ -102,7 +102,7 @@ public class ExplorerControlPanel extends ViewPanel {
 		lineAdjust.setLayout(new MigLayout("", "[][grow 60][grow]", "[]"));
 		
 		final JSpinner spinLineAdjust = new JSpinner();
-		this.lineAdjustIntervalModel = new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1));
+		this.lineAdjustIntervalModel = new SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1));
 		spinLineAdjust.setModel(lineAdjustIntervalModel);
 		lineAdjust.add(spinLineAdjust, "cell 1 0,growx");
 

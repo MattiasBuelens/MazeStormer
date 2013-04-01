@@ -3,15 +3,12 @@ package mazestormer.barcode;
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.game.GameRunner;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.Robot;
 import mazestormer.state.State;
-import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
-import mazestormer.util.AbstractFuture;
 import mazestormer.util.Future;
 
 public class SeesawAction extends
@@ -160,40 +157,11 @@ public class SeesawAction extends
 
 	}
 
-	private class FinishFuture extends AbstractFuture<Void> implements
-			StateListener<SeesawState> {
+	private class FinishFuture extends StateMachine.FinishFuture<SeesawState> {
 
 		@Override
-		public void stateStarted() {
-		}
-
-		@Override
-		public void stateStopped() {
-			// Failed
-			cancel();
-		}
-
-		@Override
-		public void stateFinished() {
-			// Success
-			if (getGameRunner().isRunning()) {
-				resolve(null);
-			} else {
-				cancel();
-			}
-		}
-
-		@Override
-		public void statePaused(SeesawState currentState,
-				boolean onTransition) {
-		}
-
-		@Override
-		public void stateResumed(SeesawState currentState) {
-		}
-
-		@Override
-		public void stateTransitioned(SeesawState nextState) {
+		public boolean isFinished() {
+			return getGameRunner().isRunning();
 		}
 
 	}

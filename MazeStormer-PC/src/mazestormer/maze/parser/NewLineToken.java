@@ -1,6 +1,6 @@
 package mazestormer.maze.parser;
 
-public class NewLineToken implements Token {
+public final class NewLineToken implements Token {
 
 	private static final NewLineToken instance = new NewLineToken();
 

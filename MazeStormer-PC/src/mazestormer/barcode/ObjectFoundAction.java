@@ -8,9 +8,7 @@ import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.state.State;
-import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
-import mazestormer.util.AbstractFuture;
 import mazestormer.util.Future;
 
 public class ObjectFoundAction extends
@@ -187,40 +185,11 @@ public class ObjectFoundAction extends
 		};
 	}
 
-	private class FinishFuture extends AbstractFuture<Void> implements
-			StateListener<ObjectFoundState> {
+	private class FinishFuture extends StateMachine.FinishFuture<ObjectFoundState> {
 
 		@Override
-		public void stateStarted() {
-		}
-
-		@Override
-		public void stateStopped() {
-			// Failed
-			cancel();
-		}
-
-		@Override
-		public void stateFinished() {
-			// Success
-			if (getGameRunner().isRunning()) {
-				resolve(null);
-			} else {
-				cancel();
-			}
-		}
-
-		@Override
-		public void statePaused(ObjectFoundState currentState,
-				boolean onTransition) {
-		}
-
-		@Override
-		public void stateResumed(ObjectFoundState currentState) {
-		}
-
-		@Override
-		public void stateTransitioned(ObjectFoundState nextState) {
+		public boolean isFinished() {
+			return getGameRunner().isRunning();
 		}
 
 	}

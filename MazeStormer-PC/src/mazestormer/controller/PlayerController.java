@@ -43,13 +43,10 @@ public class PlayerController extends SubController implements IPlayerController
 
 	@Subscribe
 	public void onPlayerEvent(PlayerEvent e) {
-		switch (e.getEventType()) {
-		case PLAYER_REMOVED:
+		if (e.getEventType() == PlayerEvent.EventType.PLAYER_REMOVED) {
 			if (e.getPlayer().equals(getPlayer())) {
 				terminate();
 			}
-		default:
-			break;
 		}
 	}
 

@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 
 import lejos.robotics.navigation.Pose;
 
-public class CoordUtils {
+public final class CoordUtils {
 
 	private CoordUtils() {
 	}
