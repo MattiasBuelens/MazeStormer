@@ -6,7 +6,7 @@ import java.util.List;
 import lejos.nxt.SensorPort;
 import lejos.nxt.SensorPortListener;
 
-public class SensorPortListeners implements SensorPortListener {
+public final class SensorPortListeners implements SensorPortListener {
 
 	private final SensorPort port;
 	private List<SensorPortListener> listeners = new ArrayList<SensorPortListener>();
