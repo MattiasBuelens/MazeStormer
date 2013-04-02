@@ -70,7 +70,7 @@ public class CombinedMaze implements IMaze {
 
 			teamMatesBarcodeMapping.put(barcode, position);
 
-			// check op barcode en eventueel: voeg mazes samen
+			// check op barcode en indien genoeg barcodes gevonden: voeg mazes samen
 			if (ownBarcodeMapping.containsKey(barcode)) {
 				if (twoCommonBarcodes[0] == null)
 					twoCommonBarcodes[0] = barcode;
@@ -186,7 +186,6 @@ public class CombinedMaze implements IMaze {
 	 * @param othersTile
 	 *            A tile that has coördinates in the teammates system.
 	 */
-	@SuppressWarnings("unused")
 	private Tile getCorrespondingTileFromOtherToOwn(Tile othersTile) {
 		// van othersTile naar othersLongPoint
 		LongPoint othersPosition = othersTile.getPosition();
@@ -209,17 +208,7 @@ public class CombinedMaze implements IMaze {
 	 *            A tile that has coördinates in the teammates system.
 	 */
 	private Tile getCorrespondingTileFromOtherToTotal(Tile othersTile) {
-		// van othersTile naar othersLongPoint
-		LongPoint othersPosition = othersTile.getPosition();
-		// inverse affineTransform toepassen
-		LongPoint ownPosition = null;
-		try {
-			getPointTransform().inverseTransform(othersPosition, ownPosition);
-		} catch (NoninvertibleTransformException e) {
-			e.printStackTrace();
-		}
-		// van ownLongPoint naar ownTile
-		return totalExploredMaze.getTileAt(ownPosition);
+		return getCorrespondingTileFromOtherToOwn(othersTile);
 	}
 
 	public Maze getOwnExploredMaze() {
