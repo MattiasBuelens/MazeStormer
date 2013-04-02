@@ -189,12 +189,12 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void updateTile(Tile tile) {
-		updateTile(tile.getPosition(), 0, tile);
+	public void importTile(Tile tile) {
+		importTile(tile.getPosition(), 0, tile);
 	}
 
 	@Override
-	public void updateTile(LongPoint tilePosition, int nbRotations, Tile tile) {
+	public void importTile(LongPoint tilePosition, int nbRotations, Tile tile) {
 		// Edges
 		for (Orientation orientation : Orientation.values()) {
 			// Get edge type
@@ -222,14 +222,14 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void updateTiles(Tile... tiles) {
-		updateTiles(Arrays.asList(tiles));
+	public void importTiles(Tile... tiles) {
+		importTiles(Arrays.asList(tiles));
 	}
 
 	@Override
-	public void updateTiles(Iterable<Tile> tiles) {
+	public void importTiles(Iterable<Tile> tiles) {
 		for (Tile tile : tiles) {
-			updateTile(tile.getPosition(), 0, tile);
+			importTile(tile.getPosition(), 0, tile);
 		}
 	}
 

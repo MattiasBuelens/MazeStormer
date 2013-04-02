@@ -119,47 +119,47 @@ public interface IMaze {
 	public int getNumberOfTiles();
 
 	/**
-	 * Update the tile in this maze to copy the given tile.
+	 * Import the given tile into this maze.
 	 * 
 	 * <p>
-	 * This is equivalent to {@code updateTile(tile.getPosition(), 0, tile)}.
+	 * This is equivalent to {@code importTile(tile.getPosition(), 0, tile)}.
 	 * </p>
 	 * 
 	 * @param tile
-	 *            The tile to copy.
-	 * @see #updateTile(LongPoint, int, Tile)
+	 *            The tile to import.
+	 * @see #importTile(LongPoint, int, Tile)
 	 */
-	public void updateTile(Tile tile);
+	public void importTile(Tile tile);
 
 	/**
-	 * Update the tile at the given position in this maze to copy the given tile
-	 * after rotating.
+	 * Import the given tile at the given position into this maze, after
+	 * rotating it.
 	 * 
 	 * @param tilePosition
-	 *            The tile position to place the copy at.
+	 *            The tile position to place the imported tile at.
 	 * @param nbRotations
 	 *            The number of counter-clockwise rotations to apply to the
-	 *            given tile before applying it to this maze.
+	 *            given tile before importing it to this maze.
 	 * @param tile
-	 *            The tile to copy.
+	 *            The tile to import.
 	 */
-	public void updateTile(LongPoint tilePosition, int nbRotations, Tile tile);
+	public void importTile(LongPoint tilePosition, int nbRotations, Tile tile);
 
 	/**
-	 * Update the tiles in this maze to copy the given tiles.
+	 * Import the given tiles into this maze.
 	 * 
 	 * @param tiles
-	 *            The tiles to copy.
+	 *            The tiles to import.
 	 */
-	public void updateTiles(Tile... tiles);
+	public void importTiles(Tile... tiles);
 
 	/**
-	 * Update the tiles in this maze to copy the given tiles.
+	 * Import the given tiles into this maze.
 	 * 
 	 * @param tiles
-	 *            The tiles to copy.
+	 *            The tiles to import.
 	 */
-	public void updateTiles(Iterable<Tile> tiles);
+	public void importTiles(Iterable<Tile> tiles);
 
 	/**
 	 * Set an edge on this maze.

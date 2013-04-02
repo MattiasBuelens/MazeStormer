@@ -58,8 +58,8 @@ public class CombinedMaze implements IMaze {
 	public void addTeamMateTile(Tile othersSentTile) {
 		LongPoint position = othersSentTile.getPosition();
 
-		// copy to teamMatesExploredMaze
-		teamMatesExploredMaze.updateTile(othersSentTile);
+		// Import into teamMatesExploredMaze
+		teamMatesExploredMaze.importTile(othersSentTile);
 
 		if (affineTransformation != null) {
 			addTeamMateTileToTotalMaze(othersSentTile);
@@ -91,7 +91,7 @@ public class CombinedMaze implements IMaze {
 		LongPoint position = getCorrespondingPositionFromOtherToTotal(othersSentTile.getPosition());
 
 		// Place the rotated tile in the totalExploredMaze
-		getTotalExploredMaze().updateTile(position, -rotationsFromOwnToOther, othersSentTile);
+		getTotalExploredMaze().importTile(position, -rotationsFromOwnToOther, othersSentTile);
 	}
 
 	/**
@@ -311,25 +311,25 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
-	public void updateTile(Tile tile) {
-		updateTile(tile.getPosition(), 0, tile);
+	public void importTile(Tile tile) {
+		importTile(tile.getPosition(), 0, tile);
 	}
 
 	@Override
-	public void updateTile(LongPoint tilePosition, int nbRotations, Tile tile) {
-		getTotalExploredMaze().updateTile(tilePosition, nbRotations, tile);
-		ownExploredMaze.updateTile(tilePosition, nbRotations, tile);
+	public void importTile(LongPoint tilePosition, int nbRotations, Tile tile) {
+		getTotalExploredMaze().importTile(tilePosition, nbRotations, tile);
+		ownExploredMaze.importTile(tilePosition, nbRotations, tile);
 	}
 
 	@Override
-	public void updateTiles(Tile... tiles) {
-		updateTiles(Arrays.asList(tiles));
+	public void importTiles(Tile... tiles) {
+		importTiles(Arrays.asList(tiles));
 	}
 
 	@Override
-	public void updateTiles(Iterable<Tile> tiles) {
-		getTotalExploredMaze().updateTiles(tiles);
-		ownExploredMaze.updateTiles(tiles);
+	public void importTiles(Iterable<Tile> tiles) {
+		getTotalExploredMaze().importTiles(tiles);
+		ownExploredMaze.importTiles(tiles);
 	}
 
 	@Override

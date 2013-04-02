@@ -119,7 +119,7 @@ public class PathFindingController extends SubController implements IPathFinding
 	@Override
 	public void addSourceMaze() {
 		if (getSourceMaze().getTiles().size() > 1) {
-			getMaze().updateTiles(getSourceMaze().getTiles());
+			getMaze().importTiles(getSourceMaze().getTiles());
 			log("The maze is set to the source maze.");
 		} else {
 			log("There is no source maze available.");
