@@ -50,7 +50,25 @@ public interface IMaze {
 	 */
 	public Mesh getMesh();
 
-	public int getNumberOfTiles();
+	/**
+	 * Get the lowest X-coordinate of all tiles on this maze.
+	 */
+	public long getMinX();
+
+	/**
+	 * Get the highest X-coordinate of all tiles on this maze.
+	 */
+	public long getMaxX();
+
+	/**
+	 * Get the lowest Y-coordinate of all tiles on this maze.
+	 */
+	public long getMinY();
+
+	/**
+	 * Get the highest Y-coordinate of all tiles on this maze.
+	 */
+	public long getMaxY();
 
 	/**
 	 * Get the tile at the given tile position.
@@ -60,14 +78,6 @@ public interface IMaze {
 	 */
 	public Tile getTileAt(LongPoint tilePosition);
 
-	public long getMinX();
-
-	public long getMaxX();
-
-	public long getMinY();
-
-	public long getMaxY();
-
 	/**
 	 * Get the tile at the given tile position.
 	 * 
@@ -76,14 +86,80 @@ public interface IMaze {
 	 */
 	public Tile getTileAt(Point2D tilePosition);
 
+	/**
+	 * Get a neighbor tile of the given tile.
+	 * 
+	 * @param tile
+	 *            The tile.
+	 * @param direction
+	 *            The direction in which to find the neighbor.
+	 * @return The neighbor tile, or null if no neighboring tile found.
+	 */
 	public Tile getNeighbor(Tile tile, Orientation direction);
 
+	/**
+	 * Get or create a neighbor tile of the given tile.
+	 * 
+	 * @param tile
+	 *            The tile.
+	 * @param direction
+	 *            The direction in which to find the neighbor.
+	 * @return The neighbor tile.
+	 */
 	public Tile getOrCreateNeighbor(Tile tile, Orientation direction);
 
 	/**
 	 * Get all tiles on this maze.
 	 */
 	public Collection<Tile> getTiles();
+
+	/**
+	 * Get the number of tiles on this maze.
+	 */
+	public int getNumberOfTiles();
+
+	/**
+	 * Update the tile in this maze to copy the given tile.
+	 * 
+	 * <p>
+	 * This is equivalent to {@code updateTile(tile.getPosition(), 0, tile)}.
+	 * </p>
+	 * 
+	 * @param tile
+	 *            The tile to copy.
+	 * @see #updateTile(LongPoint, int, Tile)
+	 */
+	public void updateTile(Tile tile);
+
+	/**
+	 * Update the tile at the given position in this maze to copy the given tile
+	 * after rotating.
+	 * 
+	 * @param tilePosition
+	 *            The tile position to place the copy at.
+	 * @param nbRotations
+	 *            The number of counter-clockwise rotations to apply to the
+	 *            given tile before applying it to this maze.
+	 * @param tile
+	 *            The tile to copy.
+	 */
+	public void updateTile(LongPoint tilePosition, int nbRotations, Tile tile);
+
+	/**
+	 * Update the tiles in this maze to copy the given tiles.
+	 * 
+	 * @param tiles
+	 *            The tiles to copy.
+	 */
+	public void updateTiles(Tile... tiles);
+
+	/**
+	 * Update the tiles in this maze to copy the given tiles.
+	 * 
+	 * @param tiles
+	 *            The tiles to copy.
+	 */
+	public void updateTiles(Iterable<Tile> tiles);
 
 	/**
 	 * Set an edge on this maze.
@@ -110,11 +186,45 @@ public interface IMaze {
 	 */
 	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException;
 
+	/**
+	 * Set the barcode of a tile.
+	 * 
+	 * @param position
+	 *            The tile position.
+	 * @param barcode
+	 *            The barcode.
+	 * 
+	 * @throws IllegalStateException
+	 *             If the tile at the given position does not accept barcodes.
+	 */
 	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException;
 
+	/**
+	 * Find the tile with the given barcode.
+	 * 
+	 * @param barcode
+	 *            The barcode.
+	 * @return The found tile, or null if not found.
+	 */
 	public Tile getBarcodeTile(Barcode barcode);
 
+	/**
+	 * Find the tile with the given barcode.
+	 * 
+	 * @param barcode
+	 *            The barcode.
+	 * @return The found tile, or null if not found.
+	 */
 	public Tile getBarcodeTile(byte barcode);
+
+	/**
+	 * Find the seesaw tile facing the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 * @return The found tile, or null if not found.
+	 */
+	public Tile getSeesawTile(Barcode barcode);
 
 	/**
 	 * Set a tile as explored.
@@ -247,14 +357,54 @@ public interface IMaze {
 		GOAL, CHECKPOINT
 	}
 
+	/**
+	 * Get the tile corresponding with the given target.
+	 * 
+	 * @param target
+	 *            The target to find.
+	 * @return The found tile, or null if not found.
+	 */
 	public Tile getTarget(Target target);
 
+	/**
+	 * Mark the given tile as a target.
+	 * 
+	 * @param target
+	 *            The target.
+	 * @param tile
+	 *            The tile to mark.
+	 */
 	public void setTarget(Target target, Tile tile);
 
+	/**
+	 * Get the start pose for a player with the given player number.
+	 * 
+	 * @param playerNumber
+	 *            The player number.
+	 * @return The start pose, or null if no start pose found.
+	 */
 	public Pose getStartPose(int playerNumber);
 
+	/**
+	 * Set the start pose for a player with the given player number.
+	 * 
+	 * @param playerNumber
+	 *            The player number.
+	 * @param pose
+	 *            The start pose.
+	 */
 	public void setStartPose(int playerNumber, Pose pose);
 
+	/**
+	 * Set the start pose for a player with the given player number.
+	 * 
+	 * @param playerNumber
+	 *            The player number.
+	 * @param tilePosition
+	 *            The start position.
+	 * @param orientation
+	 *            The start orientation.
+	 */
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation);
 
 }

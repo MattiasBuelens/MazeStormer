@@ -22,8 +22,7 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.LongPoint;
 
-public class PathFindingController extends SubController implements
-		IPathFindingController {
+public class PathFindingController extends SubController implements IPathFindingController {
 
 	private TileSequenceRunner runner;
 
@@ -36,15 +35,11 @@ public class PathFindingController extends SubController implements
 	}
 
 	private IMaze getMaze() {
-		return getMainController().getMaze();
+		return getMainController().getPlayer().getMaze();
 	}
 
 	private Maze getSourceMaze() {
 		return getMainController().getWorld().getMaze();
-	}
-
-	private void setMaze(Maze maze) {
-		getMainController().setMaze(maze);
 	}
 
 	private void log(String logText) {
@@ -58,8 +53,7 @@ public class PathFindingController extends SubController implements
 	@Override
 	public void startStepAction(long goalX, long goalY) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
-				true, false);
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, true, false);
 		this.runner.start();
 	}
 
@@ -69,11 +63,9 @@ public class PathFindingController extends SubController implements
 	}
 
 	@Override
-	public void startAction(long goalX, long goalY, boolean singleStep,
-			boolean reposition) {
+	public void startAction(long goalX, long goalY, boolean singleStep, boolean reposition) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile,
-				singleStep, reposition);
+		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, singleStep, reposition);
 		this.runner.start();
 	}
 
@@ -127,15 +119,14 @@ public class PathFindingController extends SubController implements
 	@Override
 	public void addSourceMaze() {
 		if (getSourceMaze().getTiles().size() > 1) {
-			setMaze(getSourceMaze());
+			getMaze().updateTiles(getSourceMaze().getTiles());
 			log("The maze is set to the source maze.");
 		} else {
 			log("There is no source maze available.");
 		}
 	}
 
-	public class TileSequenceRunner extends
-			StateMachine<TileSequenceRunner, TileSequenceState> implements
+	public class TileSequenceRunner extends StateMachine<TileSequenceRunner, TileSequenceState> implements
 			StateListener<TileSequenceState>, NavigatorListener {
 
 		private final Robot robot;
@@ -162,8 +153,8 @@ public class PathFindingController extends SubController implements
 		 * @param reposition
 		 *            Whether to reposition the robot before navigating.
 		 */
-		public TileSequenceRunner(ControllableRobot robot, IMaze iMaze,
-				Tile goal, boolean singleStep, boolean reposition) {
+		public TileSequenceRunner(ControllableRobot robot, IMaze iMaze, Tile goal, boolean singleStep,
+				boolean reposition) {
 			this.robot = checkNotNull(robot);
 			addStateListener(this);
 
@@ -172,8 +163,7 @@ public class PathFindingController extends SubController implements
 			this.reposition = reposition;
 
 			// Navigator
-			this.navigator = new Navigator(robot.getPilot(),
-					robot.getPoseProvider());
+			this.navigator = new Navigator(robot.getPilot(), robot.getPoseProvider());
 			navigator.addNavigatorListener(this);
 
 			// Path finder
@@ -186,19 +176,17 @@ public class PathFindingController extends SubController implements
 					PathFindingController.this.log(message);
 				}
 			};
-			lineFinder
-					.addStateListener(new AbstractStateListener<LineFinderRunner.LineFinderState>() {
-						@Override
-						public void stateFinished() {
-							transition(TileSequenceState.NAVIGATOR);
-						}
-					});
+			lineFinder.addStateListener(new AbstractStateListener<LineFinderRunner.LineFinderState>() {
+				@Override
+				public void stateFinished() {
+					transition(TileSequenceState.NAVIGATOR);
+				}
+			});
 		}
 
 		private void init() {
 			// Set path
-			Tile startTile = pathFinder.getTileAt(robot.getPoseProvider()
-					.getPose());
+			Tile startTile = pathFinder.getTileAt(robot.getPoseProvider().getPose());
 			List<Waypoint> path = pathFinder.findPath(startTile, goal);
 			if (singleStep && !path.isEmpty()) {
 				// Retain just the first way point
@@ -247,8 +235,7 @@ public class PathFindingController extends SubController implements
 		}
 
 		@Override
-		public void statePaused(TileSequenceState currentState,
-				boolean onTransition) {
+		public void statePaused(TileSequenceState currentState, boolean onTransition) {
 		}
 
 		@Override
@@ -274,14 +261,12 @@ public class PathFindingController extends SubController implements
 		}
 
 		@Override
-		public void navigatorPaused(Navigator.NavigatorState currentState,
-				Pose pose, boolean onTransition) {
+		public void navigatorPaused(Navigator.NavigatorState currentState, Pose pose, boolean onTransition) {
 			stop();
 		}
 
 		@Override
-		public void navigatorResumed(Navigator.NavigatorState currentState,
-				Pose pose) {
+		public void navigatorResumed(Navigator.NavigatorState currentState, Pose pose) {
 		}
 
 		@Override
@@ -290,8 +275,7 @@ public class PathFindingController extends SubController implements
 
 	}
 
-	protected enum TileSequenceState implements
-			State<TileSequenceRunner, TileSequenceState> {
+	protected enum TileSequenceState implements State<TileSequenceRunner, TileSequenceState> {
 		LINE_FINDER {
 			@Override
 			public void execute(TileSequenceRunner runner) {
