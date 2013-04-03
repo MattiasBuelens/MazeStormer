@@ -17,8 +17,8 @@ public class ObservePoseProvider implements PoseProvider {
 	}
 
 	@Override
-	public void setPose(Pose aPose) {
-		this.pose = aPose;
+	public void setPose(Pose pose) {
+		this.pose = pose;
 	}
 
 }

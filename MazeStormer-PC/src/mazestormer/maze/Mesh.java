@@ -42,9 +42,11 @@ public class Mesh extends AbstractMazeListener {
 		// Create list of tiles
 		int nbWaypoints = path == null ? 0 : path.size();
 		List<Tile> tiles = new ArrayList<Tile>(nbWaypoints);
-		for (Waypoint wp : path) {
-			Tile tile = getMaze().getTileAt(new LongPoint(wp));
-			tiles.add(tile);
+		if (path != null) {
+			for (Waypoint wp : path) {
+				Tile tile = getMaze().getTileAt(new LongPoint(wp));
+				tiles.add(tile);
+			}
 		}
 		return tiles;
 	}

@@ -66,8 +66,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		connection = connectionMode.newConnection();
 
-		game = new Game(connection, gameID, localPlayer, getMainController().getWorld());
-		game.addGameListener(gl);
+		game = new Game(connection, gameID, localPlayer);
+		game.addGameListener(new Listener());
 
 		worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getWorld());
 
@@ -212,7 +212,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		postEvent(new GameSetUpEvent(eventType));
 	}
 
-	private GameListener gl = new GameListener() {
+	private class Listener implements GameListener {
 
 		@Override
 		public void onGameJoined() {
@@ -264,5 +264,16 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			logTo(playerID, "Player " + playerID + " found their object");
 		}
 
-	};
+		@Override
+		public void onPartnerConnected(Player partner) {
+			getMainController().gameControl().addPlayer(partner);
+		}
+
+		@Override
+		public void onPartnerDisconnected(Player partner) {
+			getMainController().gameControl().removePlayer(partner);
+		}
+
+	}
+
 }

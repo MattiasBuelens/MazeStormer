@@ -57,10 +57,12 @@ public class PathFinder {
 		List<Tile> tiles = maze.getMesh().findTilePath(startTile, goalTile);
 		// Get path of way points
 		// Note: iteration starts at *second* tile (index 1)
-		List<Waypoint> waypoints = new ArrayList<Waypoint>(tiles.size());
-		Iterator<Tile> it = tiles.listIterator(1);
-		while (it.hasNext()) {
-			waypoints.add(toWaypoint(it.next()));
+		List<Waypoint> waypoints = new ArrayList<Waypoint>();
+		if (tiles.size() > 0) {
+			Iterator<Tile> it = tiles.listIterator(1);
+			while (it.hasNext()) {
+				waypoints.add(toWaypoint(it.next()));
+			}
 		}
 		return waypoints;
 	}

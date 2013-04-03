@@ -16,8 +16,8 @@ import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
+import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
@@ -99,7 +99,8 @@ public class MainController implements IMainController {
 		getEventBus().register(this);
 
 		// Player and world
-		this.personalPlayer = new RelativePlayer(defaultPlayerName, null);
+		IMaze personalMaze = new CombinedMaze();
+		this.personalPlayer = new RelativePlayer(defaultPlayerName, null, personalMaze);
 		this.world = new World(personalPlayer);
 		gameControl().addPlayer(personalPlayer);
 
@@ -370,6 +371,9 @@ public class MainController implements IMainController {
 		}
 	}
 
+	/**
+	 * Position mazes with origin at center of first tile.
+	 */
 	@Subscribe
 	public void setupStartPose(ConnectEvent e) {
 		if (e.isConnected()) {
@@ -381,16 +385,8 @@ public class MainController implements IMainController {
 	}
 
 	/*
-	 * Maze
+	 * World
 	 */
-
-	public IMaze getMaze() {
-		return getPlayer().getMaze();
-	}
-
-	public void setMaze(Maze maze) {
-		getPlayer().setMaze(maze);
-	}
 
 	public World getWorld() {
 		return world;

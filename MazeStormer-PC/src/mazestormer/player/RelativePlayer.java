@@ -4,18 +4,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.robot.Robot;
 
 public class RelativePlayer extends AbstractPlayer {
 
-	public RelativePlayer(String playerID, Robot robot) {
+	public RelativePlayer(String playerID, Robot robot, IMaze maze) {
 		// Set player identifier
 		setPlayerID(playerID);
 		// Set robot
 		setRobot(robot);
 		// Set maze
-		setMaze(new Maze());
+		setMaze(maze);
 
 		// Create logger
 		Logger logger = Logger.getLogger(getPlayerID());

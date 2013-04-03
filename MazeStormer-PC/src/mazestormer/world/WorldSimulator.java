@@ -60,7 +60,7 @@ public class WorldSimulator {
 	private synchronized AbsolutePlayer getOrAddPlayer(String playerID) {
 		AbsolutePlayer player = getWorld().getPlayer(playerID);
 		if (player == null) {
-			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot());
+			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot(), null);
 			player = new AbsolutePlayer(relativePlayer);
 			getWorld().addPlayer(player);
 		}
@@ -96,13 +96,13 @@ public class WorldSimulator {
 
 		@Override
 		public void gameStarted() {
-			// Reset player transforms
-			clearPlayerTransforms();
+			// TODO Reset seesaw states
 		}
 
 		@Override
 		public void gameStopped() {
-			// left empty
+			// Reset player transforms
+			clearPlayerTransforms();
 		}
 
 		@Override

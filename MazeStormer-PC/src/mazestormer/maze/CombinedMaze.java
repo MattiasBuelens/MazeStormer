@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ import mazestormer.util.LongPoint;
 /**
  * A class that contains the observed maze of the player that uses it, as well
  * as the observed maze of his teammate. Contains methods to puzzle the mazes
- * together and translate coördinates.
+ * together and translate coordinates.
  * 
  */
 public class CombinedMaze implements IMaze {
@@ -37,13 +38,12 @@ public class CombinedMaze implements IMaze {
 	private AffineTransform affineTransformation = null;
 	private int rotationsFromOwnToOther;
 
-	public CombinedMaze(Maze ownMaze) {
-		this.ownExploredMaze = ownMaze;
-		this.totalExploredMaze = null;
+	public CombinedMaze() {
+		this.ownExploredMaze = new Maze();
+		this.totalExploredMaze = new Maze();
 		// TODO verbetering: lijn hierboven: totalExploredMaze initialiseren op
-		// een kopie
-		// van ownExploredMaze
-		this.teamMatesExploredMaze = null;
+		// een kopie van ownExploredMaze
+		this.teamMatesExploredMaze = new Maze();
 		this.affineTransformation = null;
 	}
 
@@ -57,11 +57,9 @@ public class CombinedMaze implements IMaze {
 	 */
 	public void addTeamMateTile(Tile othersSentTile) {
 		LongPoint position = othersSentTile.getPosition();
-		// get the corresponding tile in the teamMatesExploredMaze
-		Tile othersMazeTile = teamMatesExploredMaze.getTileAt(position);
 
-		// make it a copy of the sentTile
-		othersMazeTile.updateTile(othersSentTile.getCopy());
+		// Import into teamMatesExploredMaze
+		teamMatesExploredMaze.importTile(othersSentTile);
 
 		if (affineTransformation != null) {
 			addTeamMateTileToTotalMaze(othersSentTile);
@@ -70,7 +68,8 @@ public class CombinedMaze implements IMaze {
 
 			teamMatesBarcodeMapping.put(barcode, position);
 
-			// check op barcode en indien genoeg barcodes gevonden: voeg mazes samen
+			// check op barcode en indien genoeg barcodes gevonden: voeg mazes
+			// samen
 			if (ownBarcodeMapping.containsKey(barcode)) {
 				if (twoCommonBarcodes[0] == null)
 					twoCommonBarcodes[0] = barcode;
@@ -89,11 +88,11 @@ public class CombinedMaze implements IMaze {
 	 * Creates/updates the corresponding tile in the totalExploredMaze.
 	 */
 	private void addTeamMateTileToTotalMaze(Tile othersSentTile) {
-		// get the corresponding tile in the totalExploredMaze
-		Tile totalMazeTile = getCorrespondingTileFromOtherToTotal(othersSentTile);
+		// Transform position to totalExploredMaze
+		LongPoint position = getCorrespondingPositionFromOtherToTotal(othersSentTile.getPosition());
 
-		// make it the rotation of the othersSentTile
-		totalMazeTile.updateTile(othersSentTile.getCopyRotatedClockwise(-rotationsFromOwnToOther));
+		// Place the rotated tile in the totalExploredMaze
+		getTotalExploredMaze().importTile(position, -rotationsFromOwnToOther, othersSentTile);
 	}
 
 	/**
@@ -162,33 +161,28 @@ public class CombinedMaze implements IMaze {
 	}
 
 	/**
-	 * Returns the corresponding tile in the others explored maze (has
-	 * coördinates in the others system).
+	 * Returns the corresponding position in the others explored maze (has
+	 * coordinates in the others system).
 	 * 
-	 * @param ownTile
-	 *            A tile in own coördinates
+	 * @param ownPosition
+	 *            A position in own coordinates.
 	 */
 	@SuppressWarnings("unused")
-	private Tile getCorrespondingTileFromOwnToOther(Tile ownTile) {
-		// van ownTile naar ownLongPoint
-		LongPoint ownPosition = ownTile.getPosition();
+	private LongPoint getCorrespondingPositionFromOwnToOther(LongPoint ownPosition) {
 		// affineTransform toepassen
 		LongPoint othersPosition = null;
 		getPointTransform().transform(ownPosition, othersPosition);
-		// van othersLongPoint naar othersTile
-		return teamMatesExploredMaze.getTileAt(othersPosition);
+		return othersPosition;
 	}
 
 	/**
-	 * Returns the corresponding tile in the own explored maze (has coördinates
-	 * in the own system).
+	 * Returns the corresponding position in the own explored maze (has
+	 * coordinates in the own system).
 	 * 
-	 * @param othersTile
-	 *            A tile that has coördinates in the teammates system.
+	 * @param othersPosition
+	 *            A position in the teammates system.
 	 */
-	private Tile getCorrespondingTileFromOtherToOwn(Tile othersTile) {
-		// van othersTile naar othersLongPoint
-		LongPoint othersPosition = othersTile.getPosition();
+	private LongPoint getCorrespondingPositionFromOtherToOwn(LongPoint othersPosition) {
 		// inverse affineTransform toepassen
 		LongPoint ownPosition = null;
 		try {
@@ -196,19 +190,18 @@ public class CombinedMaze implements IMaze {
 		} catch (NoninvertibleTransformException e) {
 			e.printStackTrace();
 		}
-		// van ownLongPoint naar ownTile
-		return ownExploredMaze.getTileAt(ownPosition);
+		return ownPosition;
 	}
 
 	/**
-	 * Returns the corresponding tile in the total explored maze (has
-	 * coördinates in the own system).
+	 * Returns the corresponding position in the total explored maze (has
+	 * coordinates in the own system).
 	 * 
-	 * @param othersTile
-	 *            A tile that has coördinates in the teammates system.
+	 * @param othersPosition
+	 *            A position in the teammates system.
 	 */
-	private Tile getCorrespondingTileFromOtherToTotal(Tile othersTile) {
-		return getCorrespondingTileFromOtherToOwn(othersTile);
+	private LongPoint getCorrespondingPositionFromOtherToTotal(LongPoint othersPosition) {
+		return getCorrespondingPositionFromOtherToOwn(othersPosition);
 	}
 
 	public Maze getOwnExploredMaze() {
@@ -247,22 +240,11 @@ public class CombinedMaze implements IMaze {
 	public void setOrigin(Pose origin) {
 		getTotalExploredMaze().setOrigin(origin);
 		ownExploredMaze.setOrigin(origin);
-
 	}
 
 	@Override
 	public Mesh getMesh() {
 		return getTotalExploredMaze().getMesh();
-	}
-
-	@Override
-	public int getNumberOfTiles() {
-		return getTotalExploredMaze().getNumberOfTiles();
-	}
-
-	@Override
-	public Tile getTileAt(LongPoint tilePosition) {
-		return getTotalExploredMaze().getTileAt(tilePosition);
 	}
 
 	@Override
@@ -286,6 +268,11 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
+	public Tile getTileAt(LongPoint tilePosition) {
+		return getTotalExploredMaze().getTileAt(tilePosition);
+	}
+
+	@Override
 	public Tile getTileAt(Point2D tilePosition) {
 		return getTotalExploredMaze().getTileAt(tilePosition);
 	}
@@ -303,6 +290,33 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public Collection<Tile> getTiles() {
 		return getTotalExploredMaze().getTiles();
+	}
+
+	@Override
+	public int getNumberOfTiles() {
+		return getTotalExploredMaze().getNumberOfTiles();
+	}
+
+	@Override
+	public void importTile(Tile tile) {
+		importTile(tile.getPosition(), 0, tile);
+	}
+
+	@Override
+	public void importTile(LongPoint tilePosition, int nbRotations, Tile tile) {
+		getTotalExploredMaze().importTile(tilePosition, nbRotations, tile);
+		ownExploredMaze.importTile(tilePosition, nbRotations, tile);
+	}
+
+	@Override
+	public void importTiles(Tile... tiles) {
+		importTiles(Arrays.asList(tiles));
+	}
+
+	@Override
+	public void importTiles(Iterable<Tile> tiles) {
+		getTotalExploredMaze().importTiles(tiles);
+		ownExploredMaze.importTiles(tiles);
 	}
 
 	@Override
@@ -454,6 +468,11 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
 		ownExploredMaze.setStartPose(playerNumber, tilePosition, orientation);
+	}
+
+	@Override
+	public Tile getSeesawTile(Barcode barcode) {
+		return getTotalExploredMaze().getSeesawTile(barcode);
 	}
 
 }

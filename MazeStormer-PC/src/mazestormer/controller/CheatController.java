@@ -20,13 +20,13 @@ public class CheatController extends SubController implements ICheatController {
 		getRobot().getPoseProvider().setPose(new Pose(absolutePosition.x, absolutePosition.y, 90f));
 		getRobot().getPilot().travel(0d);
 	}
-	
+
 	private ControllableRobot getRobot() {
 		return getMainController().getControllableRobot();
 	}
-	
+
 	private IMaze getMaze() {
-		return getMainController().getMaze();
+		return getMainController().getPlayer().getMaze();
 	}
 
 	private Maze getSourceMaze() {
