@@ -11,7 +11,7 @@ import mazestormer.robot.Robot;
 public class AbsolutePlayer implements Player {
 
 	private final RelativePlayer delegate;
-	private PoseTransform transform = new PoseTransform();
+	private PoseTransform transform = PoseTransform.getIdentity();
 
 	private final Robot robot;
 	private final PoseProvider poseProvider;

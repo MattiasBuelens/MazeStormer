@@ -5,7 +5,6 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -87,11 +86,8 @@ public class CombinedMaze implements IMaze {
 	 * Creates/updates the corresponding tile in the total maze.
 	 */
 	private void importPartnerTileIntoTotalMaze(Tile partnerTile) {
-		// Transform position to total maze
-		LongPoint position = getCorrespondingPositionFromPartnerToTotal(partnerTile.getPosition());
-
-		// Place the rotated tile in the total maze
-		getTotalMaze().importTile(position, -rotationsFromOwnToPartner, partnerTile);
+		// TODO Use a TileTransform!
+		// getTotalMaze().importTile(partnerTile, tileTransform);
 	}
 
 	/**
@@ -188,6 +184,7 @@ public class CombinedMaze implements IMaze {
 	 * @param ownPosition
 	 *            A position in own coordinates.
 	 */
+	// TODO Remove me
 	@SuppressWarnings("unused")
 	private LongPoint getCorrespondingPositionFromOwnToPartner(LongPoint ownPosition) {
 		// affineTransform toepassen
@@ -203,6 +200,7 @@ public class CombinedMaze implements IMaze {
 	 * @param partnerPosition
 	 *            A position in the partner's system.
 	 */
+	// TODO Remove me
 	private LongPoint getCorrespondingPositionFromPartnerToOwn(LongPoint partnerPosition) {
 		// inverse affineTransform toepassen
 		LongPoint ownPosition = new LongPoint();
@@ -221,6 +219,8 @@ public class CombinedMaze implements IMaze {
 	 * @param partnerPosition
 	 *            A position in the partner's system.
 	 */
+	// TODO Remove me
+	@SuppressWarnings("unused")
 	private LongPoint getCorrespondingPositionFromPartnerToTotal(LongPoint partnerPosition) {
 		return getCorrespondingPositionFromPartnerToOwn(partnerPosition);
 	}
@@ -361,24 +361,24 @@ public class CombinedMaze implements IMaze {
 
 	@Override
 	public void importTile(Tile tile) {
-		importTile(tile.getPosition(), 0, tile);
+		importTile(tile, TileTransform.getIdentity());
 	}
 
 	@Override
-	public void importTile(LongPoint tilePosition, int nbRotations, Tile tile) {
-		getOwnMaze().importTile(tilePosition, nbRotations, tile);
-		getTotalMaze().importTile(tilePosition, nbRotations, tile);
-	}
-
-	@Override
-	public void importTiles(Tile... tiles) {
-		importTiles(Arrays.asList(tiles));
+	public void importTile(Tile tile, TileTransform tileTransform) {
+		getOwnMaze().importTile(tile, tileTransform);
+		getTotalMaze().importTile(tile, tileTransform);
 	}
 
 	@Override
 	public void importTiles(Iterable<Tile> tiles) {
-		getOwnMaze().importTiles(tiles);
-		getTotalMaze().importTiles(tiles);
+		importTiles(tiles, TileTransform.getIdentity());
+	}
+
+	@Override
+	public void importTiles(Iterable<Tile> tiles, TileTransform tileTransform) {
+		getOwnMaze().importTiles(tiles, tileTransform);
+		getTotalMaze().importTiles(tiles, tileTransform);
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -216,11 +215,12 @@ public class Maze implements IMaze {
 
 	@Override
 	public void importTile(Tile tile) {
-		importTile(tile.getPosition(), 0, tile);
+		importTile(tile, TileTransform.getIdentity());
 	}
 
 	@Override
-	public void importTile(LongPoint tilePosition, int nbRotations, Tile tile) {
+	public void importTile(Tile tile, TileTransform tileTransform) {
+		LongPoint tilePosition = tileTransform.transform(tile.getPosition());
 		// Edges
 		for (Orientation orientation : Orientation.values()) {
 			// Get edge type
@@ -228,10 +228,8 @@ public class Maze implements IMaze {
 			// Ignore unknown edges
 			if (edgeType == EdgeType.UNKNOWN)
 				continue;
-			// Rotate orientation to target
-			Orientation targetOrientation = orientation.rotateCounterClockwise(nbRotations);
 			// Place edge
-			setEdge(tilePosition, targetOrientation, edgeType);
+			setEdge(tilePosition, tileTransform.transform(orientation), edgeType);
 		}
 		// Barcode
 		if (tile.hasBarcode()) {
@@ -248,14 +246,14 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void importTiles(Tile... tiles) {
-		importTiles(Arrays.asList(tiles));
+	public void importTiles(Iterable<Tile> tiles) {
+		importTiles(tiles, TileTransform.getIdentity());
 	}
 
 	@Override
-	public void importTiles(Iterable<Tile> tiles) {
+	public void importTiles(Iterable<Tile> tiles, TileTransform tileTransform) {
 		for (Tile tile : tiles) {
-			importTile(tile.getPosition(), 0, tile);
+			importTile(tile, tileTransform);
 		}
 	}
 

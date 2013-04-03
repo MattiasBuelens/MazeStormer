@@ -149,44 +149,49 @@ public interface IMaze {
 	 * Import the given tile into this maze.
 	 * 
 	 * <p>
-	 * This is equivalent to {@code importTile(tile.getPosition(), 0, tile)}.
+	 * This is equivalent to
+	 * {@code importTile(tile, TileTransform.getIdentity())}.
 	 * </p>
 	 * 
 	 * @param tile
 	 *            The tile to import.
-	 * @see #importTile(LongPoint, int, Tile)
+	 * @see #importTile(Tile, TileTransform)
 	 */
 	public void importTile(Tile tile);
 
 	/**
-	 * Import the given tile at the given position into this maze, after
-	 * rotating it.
+	 * Import the given tile into this maze after transforming it.
 	 * 
-	 * @param tilePosition
-	 *            The tile position to place the imported tile at.
-	 * @param nbRotations
-	 *            The number of counter-clockwise rotations to apply to the
-	 *            given tile before importing it to this maze.
 	 * @param tile
 	 *            The tile to import.
+	 * @param tile
+	 *            The transformation to apply.
 	 */
-	public void importTile(LongPoint tilePosition, int nbRotations, Tile tile);
+	public void importTile(Tile tile, TileTransform tileTransform);
 
 	/**
 	 * Import the given tiles into this maze.
 	 * 
-	 * @param tiles
-	 *            The tiles to import.
-	 */
-	public void importTiles(Tile... tiles);
-
-	/**
-	 * Import the given tiles into this maze.
+	 * <p>
+	 * This is equivalent to
+	 * {@code importTiles(tiles, TileTransform.getIdentity())}.
+	 * </p>
 	 * 
 	 * @param tiles
 	 *            The tiles to import.
+	 * @see #importTiles(Iterable, TileTransform)
 	 */
 	public void importTiles(Iterable<Tile> tiles);
+
+	/**
+	 * Import the given tiles into this maze after transforming them.
+	 * 
+	 * @param tiles
+	 *            The tiles to import.
+	 * @param tile
+	 *            The transformation to apply.
+	 */
+	public void importTiles(Iterable<Tile> tiles, TileTransform tileTransform);
 
 	/**
 	 * Set an edge on this maze.
