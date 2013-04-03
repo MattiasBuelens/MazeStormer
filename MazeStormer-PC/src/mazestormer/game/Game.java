@@ -207,7 +207,7 @@ public class Game {
 	 * Send all own explored tiles to the partner.
 	 */
 	public void sendOwnTiles() {
-		sendTiles(getLocalMaze().getOwnExploredMaze().getTiles());
+		sendTiles(getLocalMaze().getOwnMaze().getTiles());
 	}
 
 	public boolean hasPartner() {
@@ -232,6 +232,8 @@ public class Game {
 		// Create partner
 		RelativePlayer partner = new RelativePlayer(partnerID, new ObservableRobot(), new Maze());
 		partnerPlayer = partner;
+		// Set partner maze
+		getLocalMaze().setPartnerMaze(partner.getMaze());
 		// Send own maze
 		sendOwnTiles();
 
@@ -350,9 +352,8 @@ public class Game {
 				try {
 					// Parse tile
 					Tile parsedTile = Parser.parseTile(tile.getX(), tile.getY(), tile.getToken());
-					// Store in mazes
-					getPartner().getMaze();
-					getLocalMaze().addTeamMateTile(parsedTile);
+					// Store in partner maze
+					getPartner().getMaze().importTile(parsedTile);
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
