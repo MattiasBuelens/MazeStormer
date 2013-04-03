@@ -63,7 +63,7 @@ public class CombinedMaze implements IMaze {
 	private void updatePartnerTile(Tile partnerTile) {
 		LongPoint position = partnerTile.getPosition();
 
-		if (tileTransformation != null) {
+		if (getTileTransform() != null) {
 			// Copy to total maze
 			importPartnerTileIntoTotalMaze(partnerTile);
 		} else if (partnerTile.hasBarcode()) {
@@ -83,7 +83,7 @@ public class CombinedMaze implements IMaze {
 	 * Creates/updates the corresponding tile in the total maze.
 	 */
 	private void importPartnerTileIntoTotalMaze(Tile partnerTile) {
-		getTotalMaze().importTile(partnerTile, tileTransformation);
+		getTotalMaze().importTile(partnerTile, getTileTransform());
 	}
 
 	/**
@@ -149,8 +149,8 @@ public class CombinedMaze implements IMaze {
 				* sineRotation);
 		long biasY = (long) (ownFirstTP.getY() - partnerFirstTP.getX() * sineRotation - partnerFirstTP.getY()
 				* cosineRotation);
-		
-		//stel met deze gegevens de TileTransform op en sla deze op
+
+		// stel met deze gegevens de TileTransform op en sla deze op
 		this.tileTransformation = new TileTransform(new LongPoint(biasX, biasY), rotationsFromOwnToPartner);
 	}
 
@@ -158,6 +158,14 @@ public class CombinedMaze implements IMaze {
 		for (Tile tile : getPartnerMaze().getTiles()) {
 			importPartnerTileIntoTotalMaze(tile);
 		}
+
+	}
+
+	/**
+	 * Returns the tileTransform, which is null if it not yet calcultated.
+	 */
+	private TileTransform getTileTransform() {
+		return tileTransformation;
 	}
 
 	public final IMaze getOwnMaze() {
