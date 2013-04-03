@@ -13,7 +13,7 @@ import lejos.robotics.pathfinding.Node;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
-public class Mesh extends AbstractMazeListener {
+public class Mesh extends DefaultMazeListener {
 
 	private final Maze maze;
 

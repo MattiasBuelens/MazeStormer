@@ -77,7 +77,7 @@ public class ObjectFoundAction extends
 	 */
 
 	protected void initial() {
-		getGameRunner().setWallsOnNextTile();
+		getGameRunner().setObjectTile();
 
 		// Determine owner
 		if (getGameRunner().getObjectNumber() == getFoundObjectNumber()) {

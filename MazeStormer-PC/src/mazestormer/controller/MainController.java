@@ -371,19 +371,6 @@ public class MainController implements IMainController {
 		}
 	}
 
-	/**
-	 * Position mazes with origin at center of first tile.
-	 */
-	@Subscribe
-	public void setupStartPose(ConnectEvent e) {
-		if (e.isConnected()) {
-			float tileSize = getPlayer().getMaze().getTileSize();
-			Pose startPose = new Pose(-tileSize / 2, -tileSize / 2, 0);
-			getWorld().getMaze().setOrigin(startPose);
-			getPlayer().getMaze().setOrigin(startPose);
-		}
-	}
-
 	/*
 	 * World
 	 */

@@ -47,6 +47,8 @@ public class CombinedMaze implements IMaze {
 
 		this.partnerMaze = null;
 		this.affineTransformation = null;
+
+		setOriginToDefault();
 	}
 
 	public CombinedMaze() {
@@ -75,15 +77,7 @@ public class CombinedMaze implements IMaze {
 			// check op barcode en indien genoeg barcodes gevonden: voeg mazes
 			// samen
 			if (ownBarcodeMapping.containsKey(barcode)) {
-				if (twoCommonBarcodes[0] == null)
-					twoCommonBarcodes[0] = barcode;
-				else if (twoCommonBarcodes[1] == null) {
-					twoCommonBarcodes[1] = barcode;
-					calculatePointTransformation();
-					// using the transformation, put all tiles of the
-					// partner's maze in the total maze
-					mergeTotalAndPartnerMazes();
-				}
+				addCommonBarcode(barcode);
 			}
 		}
 	}
@@ -97,6 +91,26 @@ public class CombinedMaze implements IMaze {
 
 		// Place the rotated tile in the total maze
 		getTotalMaze().importTile(position, -rotationsFromOwnToPartner, partnerTile);
+	}
+
+	/**
+	 * Add a common barcode and merge the mazes if possible.
+	 * 
+	 * @param barcode
+	 *            The newly found common barcode.
+	 */
+	private void addCommonBarcode(Barcode barcode) {
+		if (twoCommonBarcodes[0] == null) {
+			// First of two common barcode found
+			twoCommonBarcodes[0] = barcode;
+		} else if (twoCommonBarcodes[1] == null) {
+			// Second common barcode found
+			twoCommonBarcodes[1] = barcode;
+			// Calculate transformation
+			calculatePointTransformation();
+			// Merge partner maze into the total maze using transformation
+			mergeTotalAndPartnerMazes();
+		}
 	}
 
 	/**
@@ -176,7 +190,7 @@ public class CombinedMaze implements IMaze {
 	@SuppressWarnings("unused")
 	private LongPoint getCorrespondingPositionFromOwnToPartner(LongPoint ownPosition) {
 		// affineTransform toepassen
-		LongPoint partnerPosition = null;
+		LongPoint partnerPosition = new LongPoint();
 		getPointTransform().transform(ownPosition, partnerPosition);
 		return partnerPosition;
 	}
@@ -190,7 +204,7 @@ public class CombinedMaze implements IMaze {
 	 */
 	private LongPoint getCorrespondingPositionFromPartnerToOwn(LongPoint partnerPosition) {
 		// inverse affineTransform toepassen
-		LongPoint ownPosition = null;
+		LongPoint ownPosition = new LongPoint();
 		try {
 			getPointTransform().inverseTransform(partnerPosition, ownPosition);
 		} catch (NoninvertibleTransformException e) {
@@ -210,16 +224,20 @@ public class CombinedMaze implements IMaze {
 		return getCorrespondingPositionFromPartnerToOwn(partnerPosition);
 	}
 
-	public IMaze getOwnMaze() {
+	public final IMaze getOwnMaze() {
 		return ownMaze;
 	}
 
-	public IMaze getPartnerMaze() {
+	public final boolean hasPartnerMaze() {
+		return getPartnerMaze() != null;
+	}
+
+	public final IMaze getPartnerMaze() {
 		return partnerMaze;
 	}
 
-	public void setPartnerMaze(IMaze partnerMaze) {
-		if (getPartnerMaze() != null) {
+	public final void setPartnerMaze(IMaze partnerMaze) {
+		if (hasPartnerMaze()) {
 			// Remove listener on previous partner maze
 			getPartnerMaze().removeListener(partnerListener);
 		}
@@ -229,58 +247,79 @@ public class CombinedMaze implements IMaze {
 		partnerMaze.addListener(partnerListener);
 	}
 
-	public IMaze getTotalMaze() {
+	public void resetPartnerMaze() {
+		if (!hasPartnerMaze())
+			return;
+
+		// Reset barcode mapping mapping
+		partnerBarcodeMapping.clear();
+		Arrays.fill(twoCommonBarcodes, null);
+		// Reset transformation
+		affineTransformation = null;
+	}
+
+	public final IMaze getTotalMaze() {
 		return totalMaze;
 	}
 
 	@Override
-	public float getTileSize() {
+	public final float getTileSize() {
 		return getTotalMaze().getTileSize();
 	}
 
 	@Override
-	public float getEdgeSize() {
+	public final float getEdgeSize() {
 		return getTotalMaze().getEdgeSize();
 	}
 
 	@Override
-	public float getBarLength() {
+	public final float getBarLength() {
 		return getTotalMaze().getBarLength();
 	}
 
 	@Override
-	public Pose getOrigin() {
+	public final Pose getOrigin() {
 		return getTotalMaze().getOrigin();
 	}
 
 	@Override
-	public void setOrigin(Pose origin) {
+	public final Pose getDefaultOrigin() {
+		return getOwnMaze().getDefaultOrigin();
+	}
+
+	@Override
+	public final void setOrigin(Pose origin) {
 		getOwnMaze().setOrigin(origin);
 		getTotalMaze().setOrigin(origin);
 	}
 
 	@Override
-	public Mesh getMesh() {
+	public final void setOriginToDefault() {
+		setOrigin(getDefaultOrigin());
+	}
+
+	@Override
+	public final Mesh getMesh() {
 		return getTotalMaze().getMesh();
 	}
 
 	@Override
-	public long getMinX() {
+	public final long getMinX() {
 		return getTotalMaze().getMinX();
 	}
 
 	@Override
-	public long getMaxX() {
+	public final long getMaxX() {
 		return getTotalMaze().getMaxX();
 	}
 
 	@Override
-	public long getMinY() {
+	public final long getMinY() {
 		return getTotalMaze().getMinY();
 	}
 
 	@Override
-	public long getMaxY() {
+	public final long getMaxY() {
 		return getTotalMaze().getMaxY();
 	}
 
@@ -349,15 +388,7 @@ public class CombinedMaze implements IMaze {
 		ownBarcodeMapping.put(barcode, position);
 
 		if (partnerBarcodeMapping.containsKey(barcode)) {
-			if (twoCommonBarcodes[0] == null)
-				twoCommonBarcodes[0] = barcode;
-			else if (twoCommonBarcodes[1] == null) {
-				twoCommonBarcodes[1] = barcode;
-				calculatePointTransformation();
-				// using the transformation, put all tiles of the
-				// othersExploredMaze in the totalExploredMaze
-				mergeTotalAndPartnerMazes();
-			}
+			addCommonBarcode(barcode);
 		}
 	}
 
@@ -386,18 +417,21 @@ public class CombinedMaze implements IMaze {
 	public void clear() {
 		getOwnMaze().clear();
 		getTotalMaze().clear();
-		// TODO Should we really clear the partner's maze here?
-		getPartnerMaze().clear();
+
+		// Reset own barcode mapping
+		ownBarcodeMapping.clear();
+		// Reset partner maze
+		resetPartnerMaze();
 	}
 
 	@Override
 	public void addListener(MazeListener listener) {
-		getOwnMaze().addListener(listener);
+		getTotalMaze().addListener(listener);
 	}
 
 	@Override
 	public void removeListener(MazeListener listener) {
-		getOwnMaze().removeListener(listener);
+		getTotalMaze().removeListener(listener);
 	}
 
 	@Override
@@ -438,6 +472,11 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public Point fromTile(Point tilePosition) {
 		return getOwnMaze().fromTile(tilePosition);
+	}
+
+	@Override
+	public Point getTileCenter(LongPoint tilePosition) {
+		return getOwnMaze().getTileCenter(tilePosition);
 	}
 
 	@Override
@@ -490,7 +529,7 @@ public class CombinedMaze implements IMaze {
 		return getTotalMaze().getSeesawTile(barcode);
 	}
 
-	private class TeamMateMazeListener extends AbstractMazeListener {
+	private class TeamMateMazeListener extends DefaultMazeListener {
 
 		@Override
 		public void tileAdded(Tile tile) {
@@ -500,6 +539,11 @@ public class CombinedMaze implements IMaze {
 		@Override
 		public void tileChanged(Tile tile) {
 			updatePartnerTile(tile);
+		}
+
+		@Override
+		public void mazeCleared() {
+			resetPartnerMaze();
 		}
 
 	}

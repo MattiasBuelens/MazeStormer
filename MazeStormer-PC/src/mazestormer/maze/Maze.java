@@ -31,8 +31,8 @@ public class Maze implements IMaze {
 	private final float edgeSize;
 	private final float barLength;
 
-	private Pose origin = new Pose();
-	private PoseTransform originTransform = new PoseTransform(origin);
+	private Pose origin;
+	private PoseTransform originTransform;
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
 	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
@@ -48,6 +48,8 @@ public class Maze implements IMaze {
 		this.edgeSize = edgeSize;
 		this.barLength = barLength;
 		this.mesh = new Mesh(this);
+
+		setOriginToDefault();
 	}
 
 	public Maze(float tileSize, float edgeSize) {
@@ -63,27 +65,35 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public float getTileSize() {
+	public final float getTileSize() {
 		return tileSize;
 	}
 
 	@Override
-	public float getEdgeSize() {
+	public final float getEdgeSize() {
 		return edgeSize;
 	}
 
 	@Override
-	public float getBarLength() {
+	public final float getBarLength() {
 		return barLength;
 	}
 
 	@Override
-	public Pose getOrigin() {
+	public final Pose getOrigin() {
 		return origin;
 	}
 
 	@Override
-	public void setOrigin(Pose origin) {
+	public final Pose getDefaultOrigin() {
+		Pose origin = new Pose();
+		origin.setLocation(getTileCenter(new LongPoint(0, 0)).reverse());
+		origin.setHeading(0f);
+		return origin;
+	}
+
+	@Override
+	public final void setOrigin(Pose origin) {
 		this.origin = origin;
 		this.originTransform = new PoseTransform(origin);
 
@@ -91,7 +101,12 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public Mesh getMesh() {
+	public final void setOriginToDefault() {
+		setOrigin(getDefaultOrigin());
+	}
+
+	@Override
+	public final Mesh getMesh() {
 		return mesh;
 	}
 
@@ -101,22 +116,22 @@ public class Maze implements IMaze {
 	private long maxY = 0;
 
 	@Override
-	public long getMinX() {
+	public final long getMinX() {
 		return this.minX;
 	}
 
 	@Override
-	public long getMaxX() {
+	public final long getMaxX() {
 		return this.maxX;
 	}
 
 	@Override
-	public long getMinY() {
+	public final long getMinY() {
 		return this.minY;
 	}
 
 	@Override
-	public long getMaxY() {
+	public final long getMaxY() {
 		return this.maxY;
 	}
 
@@ -412,6 +427,11 @@ public class Maze implements IMaze {
 	}
 
 	@Override
+	public Point getTileCenter(LongPoint tilePosition) {
+		return fromTile(tilePosition.toPoint().add(new Point(0.5f, 0.5f)));
+	}
+
+	@Override
 	public Collection<Line> getEdgeLines() {
 		return Collections.unmodifiableCollection(lines.values());
 	}
@@ -521,12 +541,13 @@ public class Maze implements IMaze {
 
 	@Override
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
-		Point position = fromTile(tilePosition.toPoint());
-		float angle = orientation.getAngle();
+		// Center on tile
+		Point relativePosition = getTileCenter(tilePosition);
+		float relativeAngle = orientation.getAngle();
 		// Create and set pose
 		Pose pose = new Pose();
-		pose.setLocation(position);
-		pose.setHeading(angle);
+		pose.setLocation(relativePosition);
+		pose.setHeading(relativeAngle);
 		// Transform to absolute coordinates
 		pose = toAbsolute(pose);
 		setStartPose(playerNumber, pose);

@@ -144,7 +144,10 @@ public class WorldSimulator {
 
 			// TODO Perhaps add GameListener.onPlayerTimeout() ?
 			if (reason == DisconnectReason.LEAVE || reason == DisconnectReason.TIMEOUT) {
-				getWorld().removePlayer(getWorld().getPlayer(playerID));
+				AbsolutePlayer player = getWorld().getPlayer(playerID);
+				if (player != null) {
+					getWorld().removePlayer(player);
+				}
 			}
 		}
 

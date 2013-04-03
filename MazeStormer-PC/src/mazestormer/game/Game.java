@@ -196,7 +196,9 @@ public class Game {
 		}
 
 		try {
-			client.sendTiles(tilesToSend);
+			if (client.hasTeamPartner()) {
+				client.sendTiles(tilesToSend);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -234,8 +236,6 @@ public class Game {
 		partnerPlayer = partner;
 		// Set partner maze
 		getLocalMaze().setPartnerMaze(partner.getMaze());
-		// Send own maze
-		sendOwnTiles();
 
 		// Call listeners
 		for (GameListener listener : listeners) {

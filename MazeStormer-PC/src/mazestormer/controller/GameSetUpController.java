@@ -266,11 +266,13 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		@Override
 		public void onPartnerConnected(Player partner) {
+			logToLocal("Partner connected: " + partner.getPlayerID());
 			getMainController().gameControl().addPlayer(partner);
 		}
 
 		@Override
 		public void onPartnerDisconnected(Player partner) {
+			logToLocal("Partner disconnected: " + partner.getPlayerID());
 			getMainController().gameControl().removePlayer(partner);
 		}
 

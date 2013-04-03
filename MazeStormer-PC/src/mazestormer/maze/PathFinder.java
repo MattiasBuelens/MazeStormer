@@ -76,9 +76,9 @@ public class PathFinder {
 	 */
 	public Waypoint toWaypoint(Tile tile) {
 		// Get center of tile
-		Point tilePosition = tile.getPosition().toPoint().add(new Point(0.5f, 0.5f));
+		Point relativePosition = maze.getTileCenter(tile.getPosition());
 		// Get absolute position
-		Point absolutePosition = maze.toAbsolute(maze.fromTile(tilePosition));
+		Point absolutePosition = maze.toAbsolute(relativePosition);
 		// Create way point
 		return new Waypoint(absolutePosition.getX(), absolutePosition.getY());
 	}

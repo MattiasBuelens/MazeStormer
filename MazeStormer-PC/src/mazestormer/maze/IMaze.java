@@ -32,10 +32,23 @@ public interface IMaze {
 	 * Get the pose of the robot at the bottom left corner of the origin tile,
 	 * i.e. the tile at {@code (0, 0)}.
 	 * 
+	 * <p>
 	 * This pose is used to translate between the absolute pose of the robot and
 	 * its relative pose on the maze.
+	 * </p>
 	 */
 	public Pose getOrigin();
+
+	/**
+	 * Get the default origin.
+	 * 
+	 * <p>
+	 * This corresponds to an origin such that the center of the origin tile
+	 * maps to the origin of the relative coordinate system, i.e.
+	 * {@code getTileCenter(new LongPoint(0, 0))} maps to {@code (0, 0)}.
+	 * </p>
+	 */
+	public Pose getDefaultOrigin();
 
 	/**
 	 * Set the pose of the robot at the bottom left corner of the origin tile.
@@ -44,6 +57,15 @@ public interface IMaze {
 	 *            The new origin pose.
 	 */
 	public void setOrigin(Pose origin);
+
+	/**
+	 * Set the origin to the default origin.
+	 * 
+	 * <p>
+	 * This is equivalent to {@code setOrigin(getDefaultOrigin())}.
+	 * </p>
+	 */
+	public void setOriginToDefault();
 
 	/**
 	 * Get the mesh of this maze.
@@ -320,6 +342,14 @@ public interface IMaze {
 	 *            The tile position.
 	 */
 	public Point fromTile(Point tilePosition);
+
+	/**
+	 * Get the relative position of the center of a tile.
+	 * 
+	 * @param tilePosition
+	 *            The tile position.
+	 */
+	public Point getTileCenter(LongPoint tilePosition);
 
 	/**
 	 * Get a collection of all edges as lines, in relative coordinates.
