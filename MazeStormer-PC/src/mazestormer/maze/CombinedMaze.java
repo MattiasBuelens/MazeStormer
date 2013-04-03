@@ -19,7 +19,7 @@ import mazestormer.util.LongPoint;
 /**
  * A class that contains the observed maze of the player that uses it, as well
  * as the observed maze of his teammate. Contains methods to puzzle the mazes
- * together and translate coördinates.
+ * together and translate coordinates.
  * 
  */
 public class CombinedMaze implements IMaze {
@@ -68,7 +68,8 @@ public class CombinedMaze implements IMaze {
 
 			teamMatesBarcodeMapping.put(barcode, position);
 
-			// check op barcode en eventueel: voeg mazes samen
+			// check op barcode en indien genoeg barcodes gevonden: voeg mazes
+			// samen
 			if (ownBarcodeMapping.containsKey(barcode)) {
 				if (twoCommonBarcodes[0] == null)
 					twoCommonBarcodes[0] = barcode;
@@ -160,53 +161,28 @@ public class CombinedMaze implements IMaze {
 	}
 
 	/**
-	 * Returns the corresponding tile in the others explored maze (has
-	 * coördinates in the others system).
+	 * Returns the corresponding position in the others explored maze (has
+	 * coordinates in the others system).
 	 * 
-	 * @param ownTile
-	 *            A tile in own coördinates
+	 * @param ownPosition
+	 *            A position in own coordinates.
 	 */
 	@SuppressWarnings("unused")
-	private Tile getCorrespondingTileFromOwnToOther(Tile ownTile) {
-		// van ownTile naar ownLongPoint
-		LongPoint ownPosition = ownTile.getPosition();
+	private LongPoint getCorrespondingPositionFromOwnToOther(LongPoint ownPosition) {
 		// affineTransform toepassen
 		LongPoint othersPosition = null;
 		getPointTransform().transform(ownPosition, othersPosition);
-		// van othersLongPoint naar othersTile
-		return teamMatesExploredMaze.getTileAt(othersPosition);
+		return othersPosition;
 	}
 
 	/**
-	 * Returns the corresponding tile in the own explored maze (has coördinates
-	 * in the own system).
-	 * 
-	 * @param othersTile
-	 *            A tile that has coördinates in the teammates system.
-	 */
-	@SuppressWarnings("unused")
-	private Tile getCorrespondingTileFromOtherToOwn(Tile othersTile) {
-		// van othersTile naar othersLongPoint
-		LongPoint othersPosition = othersTile.getPosition();
-		// inverse affineTransform toepassen
-		LongPoint ownPosition = null;
-		try {
-			getPointTransform().inverseTransform(othersPosition, ownPosition);
-		} catch (NoninvertibleTransformException e) {
-			e.printStackTrace();
-		}
-		// van ownLongPoint naar ownTile
-		return ownExploredMaze.getTileAt(ownPosition);
-	}
-
-	/**
-	 * Returns the corresponding position in the total explored maze (has
-	 * coördinates in the own system).
+	 * Returns the corresponding position in the own explored maze (has
+	 * coordinates in the own system).
 	 * 
 	 * @param othersPosition
 	 *            A position in the teammates system.
 	 */
-	private LongPoint getCorrespondingPositionFromOtherToTotal(LongPoint othersPosition) {
+	private LongPoint getCorrespondingPositionFromOtherToOwn(LongPoint othersPosition) {
 		// inverse affineTransform toepassen
 		LongPoint ownPosition = null;
 		try {
@@ -215,6 +191,17 @@ public class CombinedMaze implements IMaze {
 			e.printStackTrace();
 		}
 		return ownPosition;
+	}
+
+	/**
+	 * Returns the corresponding position in the total explored maze (has
+	 * coordinates in the own system).
+	 * 
+	 * @param othersPosition
+	 *            A position in the teammates system.
+	 */
+	private LongPoint getCorrespondingPositionFromOtherToTotal(LongPoint othersPosition) {
+		return getCorrespondingPositionFromOtherToOwn(othersPosition);
 	}
 
 	public Maze getOwnExploredMaze() {
