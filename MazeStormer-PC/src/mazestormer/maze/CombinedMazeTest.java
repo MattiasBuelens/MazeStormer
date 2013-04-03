@@ -47,7 +47,7 @@ public class CombinedMazeTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		ownDiscoveredMaze.setOrigin(new Pose(100f, -60f, 1f));
+		ownDiscoveredMaze.setOrigin(new Pose(60f, 100f, 3));
 		for(LongPoint lp : ownDiscoveredPoints) {
 			ownDiscoveredMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
 		}
