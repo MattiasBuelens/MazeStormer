@@ -46,15 +46,16 @@ public class CombinedMazeTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+
+		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
+		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
+
 		for (LongPoint lp : ownDiscoveredPoints) {
-			ownDiscoveredMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
+			combinedMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
 		}
 		for (LongPoint lp : partnerDiscoveredPoints) {
 			partnersDiscoveredMaze.importTile(smallMaze.getTileAt(lp), partnersTileTransform);
 		}
-
-		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
-		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
 	}
 
 	@Before
