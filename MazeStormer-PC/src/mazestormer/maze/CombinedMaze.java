@@ -22,19 +22,18 @@ import mazestormer.util.LongPoint;
  */
 public class CombinedMaze implements IMaze {
 
-	private final IMaze ownMaze; // coordinates in own relative system
+	private final IMaze ownMaze; // tilecoordinates in own relative system
 	private final Map<Barcode, LongPoint> ownBarcodeMapping = new HashMap<Barcode, LongPoint>();
 
-	private IMaze partnerMaze; // coordinates in partner's relative system
+	private IMaze partnerMaze; // tilecoordinates in partner's relative system
 	private final Map<Barcode, LongPoint> partnerBarcodeMapping = new HashMap<Barcode, LongPoint>();
 	private final TeamMateMazeListener partnerListener = new TeamMateMazeListener();
 
-	private final IMaze totalMaze; // coordinates in own relative system
+	private final IMaze totalMaze; // tilecoordinates in own relative system
 
 	private final List<Barcode> twoCommonBarcodes = new ArrayList<Barcode>(2);
 
 	private TileTransform tileTransformation = null;
-	private int rotationsFromOwnToPartner;
 
 	public CombinedMaze(IMaze ownExploredMaze) {
 		this.ownMaze = ownExploredMaze;
@@ -84,8 +83,7 @@ public class CombinedMaze implements IMaze {
 	 * Creates/updates the corresponding tile in the total maze.
 	 */
 	private void importPartnerTileIntoTotalMaze(Tile partnerTile) {
-		// TODO Use a TileTransform!
-		// getTotalMaze().importTile(partnerTile, tileTransform);
+		getTotalMaze().importTile(partnerTile, tileTransformation);
 	}
 
 	/**
@@ -134,7 +132,7 @@ public class CombinedMaze implements IMaze {
 				- Math.atan2((partnerSecondTP.getY() - partnerFirstTP.getY()),
 						(partnerSecondTP.getX() - partnerFirstTP.getX()));
 
-		rotationsFromOwnToPartner = (int) (rotation / Math.PI * 2);
+		int rotationsFromOwnToPartner = (int) (rotation / Math.PI * 2);
 
 		// rond af naar veelvoud van pi/2
 		rotation = Math.PI / 2 * (double) (rotationsFromOwnToPartner);
@@ -160,53 +158,6 @@ public class CombinedMaze implements IMaze {
 		for (Tile tile : getPartnerMaze().getTiles()) {
 			importPartnerTileIntoTotalMaze(tile);
 		}
-	}
-
-	/**
-	 * Returns the tileTransform, which is null if it not yet calcultated.
-	 */
-	private TileTransform getTileTransform() {
-		return tileTransformation;
-	}
-
-	/**
-	 * Returns the corresponding position in the partner's maze (has coordinates
-	 * in the partner's system).
-	 * 
-	 * @param ownPosition
-	 *            A position in own coordinates.
-	 */
-	// TODO Remove me
-	@SuppressWarnings("unused")
-	private LongPoint getCorrespondingPositionFromOwnToPartner(LongPoint ownPosition) {
-		// tileTransform toepassen
-		return getTileTransform().transform(ownPosition);
-	}
-
-	/**
-	 * Returns the corresponding position in the own maze (has coordinates in
-	 * the own system).
-	 * 
-	 * @param partnerPosition
-	 *            A position in the partner's system.
-	 */
-	// TODO Remove me
-	private LongPoint getCorrespondingPositionFromPartnerToOwn(LongPoint partnerPosition) {
-		// inverse tileTransform toepassen
-		return getTileTransform().inverseTransform(partnerPosition);
-	}
-
-	/**
-	 * Returns the corresponding position in the total maze (has coordinates in
-	 * the own system).
-	 * 
-	 * @param partnerPosition
-	 *            A position in the partner's system.
-	 */
-	// TODO Remove me
-	@SuppressWarnings("unused")
-	private LongPoint getCorrespondingPositionFromPartnerToTotal(LongPoint partnerPosition) {
-		return getCorrespondingPositionFromPartnerToOwn(partnerPosition);
 	}
 
 	public final IMaze getOwnMaze() {
