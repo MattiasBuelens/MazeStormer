@@ -1,7 +1,5 @@
 package mazestormer.maze;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ public class CombinedMaze implements IMaze {
 
 	private final List<Barcode> twoCommonBarcodes = new ArrayList<Barcode>(2);
 
-	private AffineTransform affineTransformation = null;
 	private TileTransform tileTransformation = null;
 	private int rotationsFromOwnToPartner;
 
@@ -48,7 +45,6 @@ public class CombinedMaze implements IMaze {
 		totalMaze.importTiles(ownExploredMaze.getTiles());
 
 		this.partnerMaze = null;
-		this.affineTransformation = null;
 		this.tileTransformation = null;
 
 		setOriginToDefault();
@@ -69,7 +65,7 @@ public class CombinedMaze implements IMaze {
 	private void updatePartnerTile(Tile partnerTile) {
 		LongPoint position = partnerTile.getPosition();
 
-		if (affineTransformation != null) {
+		if (tileTransformation != null) {
 			// Copy to total maze
 			importPartnerTileIntoTotalMaze(partnerTile);
 		} else if (partnerTile.hasBarcode()) {
@@ -113,19 +109,19 @@ public class CombinedMaze implements IMaze {
 		// Check if merge possible
 		if (twoCommonBarcodes.size() == 2) {
 			// Calculate transformation
-			calculatePointTransformation();
+			calculateTileTransformation();
 			// Merge partner maze into the total maze using transformation
 			mergeTotalAndPartnerMazes();
 		}
 	}
 
 	/**
-	 * Calculates an affine tranformation that transforms the coordinates of a
-	 * point in the own system to coordinates in the partner's system. Saves
-	 * this transformation to affineTransformation.
+	 * Calculates a tile tranformation that transforms the tilecoordinates of a
+	 * point in the own system to tilecoordinates in the partner's system. Saves
+	 * this transformation to the field tileTransformation.
 	 */
 	// TODO test: controleren of het niet juist omgekeerd is...
-	private void calculatePointTransformation() {
+	private void calculateTileTransformation() {
 		// genereer met behulp van de twee gemeenschappelijke barcodes vier
 		// LongPoints, die elk een tegel voorstellen in coördinaten van het
 		// eigen assenstelsel of dat van je teamgenoot (TP is kort voor
@@ -147,10 +143,9 @@ public class CombinedMaze implements IMaze {
 		// rond af naar veelvoud van pi/2
 		rotation = Math.PI / 2 * (double) (rotationsFromOwnToPartner);
 
-		// bereken cosinus en sinus (behoren beide tot {-1, 0, 1}, maar
-		// AffineTransform vraag doubles als input voor zijn constuctor)
-		double cosineRotation = Math.cos(rotation);
-		double sineRotation = Math.sin(rotation);
+		// bereken cosinus en sinus (behoren beide tot {-1, 0, 1}
+		int cosineRotation = (int) Math.cos(rotation);
+		int sineRotation = (int) Math.sin(rotation);
 
 		// bereken aan de hand van deze rotatie de coördinaten van de oorsprong
 		// van het assenstelsel van je teamgenoot in je eigen assenstelsel
@@ -160,14 +155,6 @@ public class CombinedMaze implements IMaze {
 				* sineRotation);
 		long biasY = (long) (ownFirstTP.getY() - partnerFirstTP.getX() * sineRotation - partnerFirstTP.getY()
 				* cosineRotation);
-
-//		// stel met deze gegevens de matrix voor de AffineTransform op
-//		AffineTransform atf = new AffineTransform();
-//		atf.rotate(rotation);
-//		atf.translate(biasX, biasY);
-//
-//		// stel de affine transformatie op en sla ze op
-//		this.affineTransformation = atf;
 		
 		//stel met deze gegevens de TileTransform op en sla deze op
 		this.tileTransformation = new TileTransform(new LongPoint(biasX, biasY), rotationsFromOwnToPartner);
@@ -180,10 +167,10 @@ public class CombinedMaze implements IMaze {
 	}
 
 	/**
-	 * Returns the affineTransform, which is null if it not yet calcultated.
+	 * Returns the tileTransform, which is null if it not yet calcultated.
 	 */
-	private AffineTransform getPointTransform() {
-		return affineTransformation;
+	private TileTransform getTileTransform() {
+		return tileTransformation;
 	}
 
 	/**
@@ -195,10 +182,8 @@ public class CombinedMaze implements IMaze {
 	 */
 	@SuppressWarnings("unused")
 	private LongPoint getCorrespondingPositionFromOwnToPartner(LongPoint ownPosition) {
-		// affineTransform toepassen
-		LongPoint partnerPosition = new LongPoint();
-		getPointTransform().transform(ownPosition, partnerPosition);
-		return partnerPosition;
+		// tileTransform toepassen
+		return getTileTransform().transform(ownPosition);
 	}
 
 	/**
@@ -209,14 +194,8 @@ public class CombinedMaze implements IMaze {
 	 *            A position in the partner's system.
 	 */
 	private LongPoint getCorrespondingPositionFromPartnerToOwn(LongPoint partnerPosition) {
-		// inverse affineTransform toepassen
-		LongPoint ownPosition = new LongPoint();
-		try {
-			getPointTransform().inverseTransform(partnerPosition, ownPosition);
-		} catch (NoninvertibleTransformException e) {
-			e.printStackTrace();
-		}
-		return ownPosition;
+		// inverse tileTransform toepassen
+		return getTileTransform().inverseTransform(partnerPosition);
 	}
 
 	/**
@@ -261,7 +240,7 @@ public class CombinedMaze implements IMaze {
 		partnerBarcodeMapping.clear();
 		twoCommonBarcodes.clear();
 		// Reset transformation
-		affineTransformation = null;
+		tileTransformation = null;
 	}
 
 	public final IMaze getTotalMaze() {
