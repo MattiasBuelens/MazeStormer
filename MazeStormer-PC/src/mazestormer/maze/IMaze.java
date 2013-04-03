@@ -278,7 +278,7 @@ public interface IMaze {
 
 	/**
 	 * Get the absolute position in robot coordinates of the given relative
-	 * position in map coordinates.
+	 * position in maze coordinates.
 	 * 
 	 * @param relativePosition
 	 *            The relative position.
@@ -287,7 +287,7 @@ public interface IMaze {
 
 	/**
 	 * Get the absolute heading in robot coordinates of the given relative
-	 * heading in map coordinates.
+	 * heading in maze coordinates.
 	 * 
 	 * @param relativeHeading
 	 *            The relative heading.
@@ -296,7 +296,7 @@ public interface IMaze {
 
 	/**
 	 * Get the absolute pose in robot coordinates of the given relative pose in
-	 * map coordinates.
+	 * maze coordinates.
 	 * 
 	 * @param relativePose
 	 *            The relative pose.
@@ -304,7 +304,7 @@ public interface IMaze {
 	public Pose toAbsolute(Pose relativePose);
 
 	/**
-	 * Get the relative position in map coordinates of the given absolute
+	 * Get the relative position in maze coordinates of the given absolute
 	 * position in robot coordinates.
 	 * 
 	 * @param absolutePosition
@@ -313,8 +313,8 @@ public interface IMaze {
 	public Point toRelative(Point absolutePosition);
 
 	/**
-	 * Get the relative heading in map coordinates of the given absolute heading
-	 * in robot coordinates.
+	 * Get the relative heading in maze coordinates of the given absolute
+	 * heading in robot coordinates.
 	 * 
 	 * @param absoluteHeading
 	 *            The absolute heading.
@@ -322,7 +322,7 @@ public interface IMaze {
 	public float toRelative(float absoluteHeading);
 
 	/**
-	 * Get the relative pose in map coordinates of the given absolute pose in
+	 * Get the relative pose in maze coordinates of the given absolute pose in
 	 * robot coordinates.
 	 * 
 	 * @param absolutePose
@@ -332,7 +332,7 @@ public interface IMaze {
 
 	/**
 	 * Get the position in tile coordinates of the given relative position in
-	 * map coordinates.
+	 * maze coordinates.
 	 * 
 	 * @param relativePosition
 	 *            The relative position.
@@ -340,8 +340,8 @@ public interface IMaze {
 	public Point toTile(Point relativePosition);
 
 	/**
-	 * Get the relative position in map coordinates of the bottom left corner of
-	 * the given tile position.
+	 * Get the relative position in maze coordinates of the bottom left corner
+	 * of the given tile position.
 	 * 
 	 * @param tilePosition
 	 *            The tile position.
