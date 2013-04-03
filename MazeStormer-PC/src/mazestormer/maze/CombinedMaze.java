@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class CombinedMaze implements IMaze {
 
 	private final IMaze totalMaze; // coordinates in own relative system
 
-	private final Barcode[] twoCommonBarcodes = { null, null };
+	private final List<Barcode> twoCommonBarcodes = new ArrayList<Barcode>(2);
 
 	private AffineTransform affineTransformation = null;
 	private int rotationsFromOwnToPartner;
@@ -100,12 +101,15 @@ public class CombinedMaze implements IMaze {
 	 *            The newly found common barcode.
 	 */
 	private void addCommonBarcode(Barcode barcode) {
-		if (twoCommonBarcodes[0] == null) {
-			// First of two common barcode found
-			twoCommonBarcodes[0] = barcode;
-		} else if (twoCommonBarcodes[1] == null) {
-			// Second common barcode found
-			twoCommonBarcodes[1] = barcode;
+		if (twoCommonBarcodes.contains(barcode))
+			return;
+		if (twoCommonBarcodes.size() >= 2)
+			return;
+
+		// Add new common barcode
+		twoCommonBarcodes.add(barcode);
+		// Check if merge possible
+		if (twoCommonBarcodes.size() == 2) {
 			// Calculate transformation
 			calculatePointTransformation();
 			// Merge partner maze into the total maze using transformation
@@ -124,10 +128,10 @@ public class CombinedMaze implements IMaze {
 		// LongPoints, die elk een tegel voorstellen in coördinaten van het
 		// eigen assenstelsel of dat van je teamgenoot (TP is kort voor
 		// TilePosition)
-		LongPoint ownFirstTP = ownBarcodeMapping.get(twoCommonBarcodes[0]);
-		LongPoint ownSecondTP = ownBarcodeMapping.get(twoCommonBarcodes[1]);
-		LongPoint partnerFirstTP = partnerBarcodeMapping.get(twoCommonBarcodes[0]);
-		LongPoint partnerSecondTP = partnerBarcodeMapping.get(twoCommonBarcodes[1]);
+		LongPoint ownFirstTP = ownBarcodeMapping.get(twoCommonBarcodes.get(0));
+		LongPoint ownSecondTP = ownBarcodeMapping.get(twoCommonBarcodes.get(1));
+		LongPoint partnerFirstTP = partnerBarcodeMapping.get(twoCommonBarcodes.get(0));
+		LongPoint partnerSecondTP = partnerBarcodeMapping.get(twoCommonBarcodes.get(1));
 
 		// bereken rotatie van ander assenstelsel in eigen assenstelsel
 		// \alpha_{X'} = \alpha_{21} - \alpha'_{21}
@@ -253,7 +257,7 @@ public class CombinedMaze implements IMaze {
 
 		// Reset barcode mapping mapping
 		partnerBarcodeMapping.clear();
-		Arrays.fill(twoCommonBarcodes, null);
+		twoCommonBarcodes.clear();
 		// Reset transformation
 		affineTransformation = null;
 	}
