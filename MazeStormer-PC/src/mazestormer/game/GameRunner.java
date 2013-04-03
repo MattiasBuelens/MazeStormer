@@ -14,8 +14,8 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
-import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.AbstractMazeListener;
+import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
@@ -117,12 +117,13 @@ public class GameRunner implements GameListener {
 		maze.setBarcode(nextTilePosition, otherBarcode);
 	}
 
-	public void objectFound() {
-		log("Report own object found");
+	public void objectFound(int teamNumber) {
+		log("Own object found, join team #" + teamNumber);
 		// Report object found
 		game.objectFound();
-		// Done
-		stopGame();
+		// Join team
+		game.joinTeam(teamNumber);
+		// TODO Start working together
 	}
 
 	public void onSeesaw(int barcode) {
@@ -220,6 +221,14 @@ public class GameRunner implements GameListener {
 	public void onObjectFound(String playerID) {
 	}
 
+	@Override
+	public void onPartnerConnected(Player partner) {
+	}
+
+	@Override
+	public void onPartnerDisconnected(Player partner) {
+	}
+
 	private class PositionReporter implements MoveListener {
 
 		private ScheduledFuture<?> task;
@@ -257,7 +266,7 @@ public class GameRunner implements GameListener {
 
 		@Override
 		public void tileExplored(Tile tile) {
-			game.sendTile(tile);
+			game.sendTiles(tile);
 		}
 
 	}

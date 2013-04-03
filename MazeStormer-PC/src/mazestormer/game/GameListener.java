@@ -1,5 +1,7 @@
 package mazestormer.game;
 
+import mazestormer.player.Player;
+
 public interface GameListener {
 
 	public void onGameJoined();
@@ -21,5 +23,9 @@ public interface GameListener {
 
 	//
 	public void onObjectFound(String playerID);
+
+	public void onPartnerConnected(Player partner);
+
+	public void onPartnerDisconnected(Player partner);
 
 }

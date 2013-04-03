@@ -90,7 +90,7 @@ public class ObjectFoundAction extends
 
 	protected void ownObject() {
 		// Publish
-		getGameRunner().objectFound();
+		getGameRunner().objectFound(getFoundTeamNumber());
 		// Forward until white line
 		bindTransition(onLine(), ObjectFoundState.FIRST_LINE);
 		getPilot().forward();
