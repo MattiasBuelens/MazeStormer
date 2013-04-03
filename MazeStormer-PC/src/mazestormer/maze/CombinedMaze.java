@@ -28,7 +28,7 @@ public class CombinedMaze implements IMaze {
 	private final Map<Barcode, LongPoint> ownBarcodeMapping = new HashMap<Barcode, LongPoint>();
 
 	private IMaze partnerMaze; // coordinates in partner's relative system
-	private Map<Barcode, LongPoint> partnerBarcodeMapping = new HashMap<Barcode, LongPoint>();
+	private final Map<Barcode, LongPoint> partnerBarcodeMapping = new HashMap<Barcode, LongPoint>();
 	private final TeamMateMazeListener partnerListener = new TeamMateMazeListener();
 
 	private final IMaze totalMaze; // coordinates in own relative system
