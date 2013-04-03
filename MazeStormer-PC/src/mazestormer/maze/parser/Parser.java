@@ -185,6 +185,14 @@ public class Parser {
 
 	}
 
+	/**
+	 * Stringify a single tile in a maze.
+	 * 
+	 * @param maze
+	 *            The maze.
+	 * @param position
+	 *            The tile position to stringify.
+	 */
 	public static String stringify(IMaze maze, LongPoint position) {
 		StringBuilder token = new StringBuilder();
 		Tile tile = maze.getTileAt(position);
@@ -211,6 +219,32 @@ public class Parser {
 			token.append('.').append(barcodeString);
 		}
 		return token.toString();
+	}
+
+	/**
+	 * Stringify a complete maze.
+	 * 
+	 * <p>
+	 * Implementation note: The bounds are contracted by one to remove the extra
+	 * tiles created by the edges around the actual maze.
+	 * </p>
+	 * 
+	 * @param maze
+	 *            The maze to stringify.
+	 */
+	public static String stringify(IMaze maze) {
+		StringBuilder sb = new StringBuilder();
+		// Dimensions
+		sb.append(maze.getMaxX() - maze.getMinX() - 1).append(' ');
+		sb.append(maze.getMaxY() - maze.getMinY() - 1).append('\n');
+		// Tiles
+		for (long y = maze.getMaxY() - 1; y > maze.getMinY(); --y) {
+			for (long x = maze.getMinX() + 1; x < maze.getMaxX(); ++x) {
+				sb.append(stringify(maze, new LongPoint(x, y))).append('\t');
+			}
+			sb.append('\n');
+		}
+		return sb.toString();
 	}
 
 }

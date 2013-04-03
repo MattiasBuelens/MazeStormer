@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 
-import lejos.robotics.navigation.Pose;
 import mazestormer.maze.parser.Parser;
 import mazestormer.util.LongPoint;
 
@@ -47,10 +46,11 @@ public class CombinedMazeTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		ownDiscoveredMaze.setOrigin(new Pose(60f, 100f, 3));
-		for(LongPoint lp : ownDiscoveredPoints) {
-			ownDiscoveredMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
+
+		for (LongPoint lp : ownDiscoveredPoints) {
+			combinedMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
 		}
+		
 		for (LongPoint lp : partnerDiscoveredPoints) {
 			partnersDiscoveredMaze.importTile(smallMaze.getTileAt(lp), partnersTileTransform);
 		}
@@ -68,8 +68,6 @@ public class CombinedMazeTest {
 			if(tile.hasBarcode()) System.out.println(tile.getBarcode().getValue());
 		}
 
-		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
-		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
 	}
 
 	@Before
