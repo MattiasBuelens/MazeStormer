@@ -1,25 +1,38 @@
 package mazestormer.maze;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+
 import mazestormer.util.LongPoint;
 
 public class TileTransform {
 
 	private final LongPoint translation;
 	private final int nbCCWRotations;
+	private final AffineTransform transform;
 
-	private static final TileTransform IDENTIFY = new TileTransform(new LongPoint(), 0);
+	private static final TileTransform IDENTIFY = new TileTransform(new LongPoint(0, 0), 0);
 
 	public TileTransform(LongPoint translation, int nbCCWRotations) {
 		this.translation = translation;
 		this.nbCCWRotations = nbCCWRotations;
+		this.transform = createTransform();
 	}
 
 	public LongPoint transform(LongPoint tilePosition) {
-		return null;
+		LongPoint transformed = new LongPoint(0, 0);
+		transform.transform(tilePosition, transformed);
+		return transformed;
 	}
 
 	public LongPoint inverseTransform(LongPoint tilePosition) {
-		return null;
+		LongPoint transformed = new LongPoint(0, 0);
+		try {
+			transform.inverseTransform(tilePosition, transformed);
+		} catch (NoninvertibleTransformException cannotHappen) {
+			// Cannot happen
+		}
+		return transformed;
 	}
 
 	public Orientation transform(Orientation orientation) {
@@ -28,6 +41,13 @@ public class TileTransform {
 
 	public Orientation inverseTransform(Orientation orientation) {
 		return orientation.rotateClockwise(nbCCWRotations);
+	}
+
+	private AffineTransform createTransform() {
+		AffineTransform transform = new AffineTransform();
+		transform.rotate(90d * (double) nbCCWRotations);
+		transform.translate(translation.getX(), translation.getY());
+		return transform;
 	}
 
 	public static TileTransform getIdentity() {

@@ -34,7 +34,6 @@ public class CombinedMaze implements IMaze {
 	private final List<Barcode> twoCommonBarcodes = new ArrayList<Barcode>(2);
 
 	private TileTransform tileTransformation = null;
-	private int rotationsFromOwnToPartner;
 
 	public CombinedMaze(IMaze ownExploredMaze) {
 		this.ownMaze = ownExploredMaze;
@@ -64,7 +63,7 @@ public class CombinedMaze implements IMaze {
 	private void updatePartnerTile(Tile partnerTile) {
 		LongPoint position = partnerTile.getPosition();
 
-		if (tileTransformation != null) {
+		if (getTileTransform() != null) {
 			// Copy to total maze
 			importPartnerTileIntoTotalMaze(partnerTile);
 		} else if (partnerTile.hasBarcode()) {
@@ -84,8 +83,7 @@ public class CombinedMaze implements IMaze {
 	 * Creates/updates the corresponding tile in the total maze.
 	 */
 	private void importPartnerTileIntoTotalMaze(Tile partnerTile) {
-		// TODO Use a TileTransform!
-		// getTotalMaze().importTile(partnerTile, tileTransform);
+		getTotalMaze().importTile(partnerTile, getTileTransform());
 	}
 
 	/**
@@ -134,7 +132,7 @@ public class CombinedMaze implements IMaze {
 				- Math.atan2((partnerSecondTP.getY() - partnerFirstTP.getY()),
 						(partnerSecondTP.getX() - partnerFirstTP.getX()));
 
-		rotationsFromOwnToPartner = (int) (rotation / Math.PI * 2);
+		int rotationsFromOwnToPartner = (int) (rotation / Math.PI * 2);
 
 		// rond af naar veelvoud van pi/2
 		rotation = Math.PI / 2 * (double) (rotationsFromOwnToPartner);
@@ -151,8 +149,8 @@ public class CombinedMaze implements IMaze {
 				* sineRotation);
 		long biasY = (long) (ownFirstTP.getY() - partnerFirstTP.getX() * sineRotation - partnerFirstTP.getY()
 				* cosineRotation);
-		
-		//stel met deze gegevens de TileTransform op en sla deze op
+
+		// stel met deze gegevens de TileTransform op en sla deze op
 		this.tileTransformation = new TileTransform(new LongPoint(biasX, biasY), rotationsFromOwnToPartner);
 	}
 
@@ -176,7 +174,7 @@ public class CombinedMaze implements IMaze {
 	 * @param ownPosition
 	 *            A position in own coordinates.
 	 */
-	// TODO Remove me
+	// TODO Remove me?
 	@SuppressWarnings("unused")
 	private LongPoint getCorrespondingPositionFromOwnToPartner(LongPoint ownPosition) {
 		// tileTransform toepassen
@@ -190,7 +188,7 @@ public class CombinedMaze implements IMaze {
 	 * @param partnerPosition
 	 *            A position in the partner's system.
 	 */
-	// TODO Remove me
+	// TODO Remove me?
 	private LongPoint getCorrespondingPositionFromPartnerToOwn(LongPoint partnerPosition) {
 		// inverse tileTransform toepassen
 		return getTileTransform().inverseTransform(partnerPosition);
@@ -203,7 +201,7 @@ public class CombinedMaze implements IMaze {
 	 * @param partnerPosition
 	 *            A position in the partner's system.
 	 */
-	// TODO Remove me
+	// TODO Remove me?
 	@SuppressWarnings("unused")
 	private LongPoint getCorrespondingPositionFromPartnerToTotal(LongPoint partnerPosition) {
 		return getCorrespondingPositionFromPartnerToOwn(partnerPosition);
