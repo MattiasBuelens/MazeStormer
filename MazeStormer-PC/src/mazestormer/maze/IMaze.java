@@ -141,6 +141,11 @@ public interface IMaze {
 	public int getNumberOfTiles();
 
 	/**
+	 * Get all explored tiles on this maze.
+	 */
+	public Collection<Tile> getExploredTiles();
+
+	/**
 	 * Import the given tile into this maze.
 	 * 
 	 * <p>

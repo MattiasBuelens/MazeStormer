@@ -209,7 +209,7 @@ public class Game {
 	 * Send all own explored tiles to the partner.
 	 */
 	public void sendOwnTiles() {
-		sendTiles(getLocalMaze().getOwnMaze().getTiles());
+		sendTiles(getLocalMaze().getOwnMaze().getExploredTiles());
 	}
 
 	public boolean hasPartner() {

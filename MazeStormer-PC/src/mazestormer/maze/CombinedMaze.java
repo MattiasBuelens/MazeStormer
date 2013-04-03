@@ -354,6 +354,11 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
+	public Collection<Tile> getExploredTiles() {
+		return getOwnMaze().getExploredTiles();
+	}
+
+	@Override
 	public void importTile(Tile tile) {
 		importTile(tile.getPosition(), 0, tile);
 	}

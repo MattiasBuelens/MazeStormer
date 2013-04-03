@@ -200,7 +200,18 @@ public class Maze implements IMaze {
 
 	@Override
 	public int getNumberOfTiles() {
-		return tiles.values().size();
+		return getTiles().size();
+	}
+
+	@Override
+	public Collection<Tile> getExploredTiles() {
+		List<Tile> exploredTiles = new ArrayList<Tile>();
+		for (Tile tile : getTiles()) {
+			if (tile.isExplored()) {
+				exploredTiles.add(tile);
+			}
+		}
+		return exploredTiles;
 	}
 
 	@Override
