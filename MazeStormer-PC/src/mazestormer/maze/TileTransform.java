@@ -45,7 +45,7 @@ public class TileTransform {
 
 	private AffineTransform createTransform() {
 		AffineTransform transform = new AffineTransform();
-		transform.rotate(90d * (double) nbCCWRotations);
+		transform.rotate(((double) nbCCWRotations) * Math.PI / 2d);
 		transform.translate(translation.getX(), translation.getY());
 		return transform;
 	}
