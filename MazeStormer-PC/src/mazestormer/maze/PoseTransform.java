@@ -13,9 +13,7 @@ public class PoseTransform {
 	private final Pose referencePose;
 	private final AffineTransform transform;
 
-	public PoseTransform() {
-		this(new Pose());
-	}
+	private static final PoseTransform IDENTITY = new PoseTransform(new Pose());
 
 	public PoseTransform(Pose referencePose) {
 		this.referencePose = referencePose;
@@ -131,6 +129,10 @@ public class PoseTransform {
 		while (heading > 180)
 			heading -= 360;
 		return heading;
+	}
+
+	public static final PoseTransform getIdentity() {
+		return IDENTITY;
 	}
 
 }
