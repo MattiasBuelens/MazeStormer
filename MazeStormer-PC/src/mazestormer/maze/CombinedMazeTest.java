@@ -67,6 +67,9 @@ public class CombinedMazeTest {
 			System.out.println(tile.getPosition());
 			if(tile.hasBarcode()) System.out.println(tile.getBarcode().getValue());
 		}
+		
+		System.out.println(Parser.stringify(smallMaze) + "END");
+		System.out.println(Parser.stringify(ownDiscoveredMaze));
 
 	}
 
