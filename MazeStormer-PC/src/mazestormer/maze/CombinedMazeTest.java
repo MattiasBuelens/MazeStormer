@@ -47,25 +47,15 @@ public class CombinedMazeTest {
 			e.printStackTrace();
 		}
 
+		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
+		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
+		
 		for (LongPoint lp : ownDiscoveredPoints) {
 			combinedMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
 		}
 		
 		for (LongPoint lp : partnerDiscoveredPoints) {
 			partnersDiscoveredMaze.importTile(smallMaze.getTileAt(lp), partnersTileTransform);
-		}
-		
-//		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
-//		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
-		
-		for(Tile tile : smallMaze.getTiles()) {
-			System.out.println(tile.getPosition());
-			if(tile.hasBarcode()) System.out.println(tile.getBarcode().getValue());
-		}
-		
-		for(Tile tile : ownDiscoveredMaze.getTiles()) {
-			System.out.println(tile.getPosition());
-			if(tile.hasBarcode()) System.out.println(tile.getBarcode().getValue());
 		}
 		
 		System.out.println(Parser.stringify(smallMaze) + "END");
