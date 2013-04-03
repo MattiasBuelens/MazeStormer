@@ -53,7 +53,7 @@ public class CombinedMazeTest {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-		ownDiscoveredMaze.setOrigin(new Pose(60f, 100f, 0f));
+		ownDiscoveredMaze.setOrigin(new Pose(100f, -60f, 1f));
 		for(LongPoint lp : ownDiscoveredPoints) {
 			ownDiscoveredMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
 		}
@@ -63,10 +63,18 @@ public class CombinedMazeTest {
 			partnersDiscoveredMaze.importTile(smallMaze.getTileAt(lp), partnersTileTransform);
 		}
 		
-		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
-		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
+//		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
+//		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
 		
-		System.out.println(ownDiscoveredMaze.getTiles());
+		for(Tile tile : smallMaze.getTiles()) {
+			System.out.println(tile.getPosition());
+			if(tile.hasBarcode()) System.out.println(tile.getBarcode().getValue());
+		}
+		
+		for(Tile tile : ownDiscoveredMaze.getTiles()) {
+			System.out.println(tile.getPosition());
+			if(tile.hasBarcode()) System.out.println(tile.getBarcode().getValue());
+		}
 	}
 
 	@Before
@@ -76,7 +84,7 @@ public class CombinedMazeTest {
 	
 	@Test
 	public void testOwnDiscoveredMaze(){
-		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0,1)).hasBarcode() && ownDiscoveredMaze.getTileAt(new LongPoint(2,0)).hasBarcode());
+		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(-1,0)).hasBarcode() && ownDiscoveredMaze.getTileAt(new LongPoint(0,2)).hasBarcode());
 		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0,1)).getBarcode().getValue(), (byte) 1);
 		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(2,0)).getBarcode().getValue(), (byte) 2);
 	}
