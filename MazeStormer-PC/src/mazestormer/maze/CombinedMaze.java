@@ -156,15 +156,12 @@ public class CombinedMaze implements IMaze {
 				* cosineRotation;
 
 		// stel met deze gegevens de matrix voor de AffineTransform op
-		// [ x ] [ cos(\alpha_{X'}) - sin(\alpha_{X'}) ] [ x' ] [ x_{O'} ]
-		// | | = | | * | | + | |
-		// [ y ] [ sin(\alpha_{X'}) cos(\alpha_{X'}) ] [ y' ] [ y_{O'} ]
-		double[] flatMatrix = { cosineRotation, sineRotation, -sineRotation, cosineRotation, biasX, biasY };
-		// TODO verbetering: eerst de identieke AffineTransform opstellen,
-		// daarna roteren en verschuiven
+		AffineTransform atf = new AffineTransform();
+		atf.rotate(rotation);
+		atf.translate(biasX, biasY);
 
 		// stel de affine transformatie op en sla ze op
-		this.affineTransformation = new AffineTransform(flatMatrix);
+		this.affineTransformation = atf;
 	}
 
 	private void mergeTotalAndPartnerMazes() {
