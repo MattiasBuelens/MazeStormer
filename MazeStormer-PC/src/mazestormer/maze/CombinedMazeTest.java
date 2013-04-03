@@ -77,9 +77,9 @@ public class CombinedMazeTest {
 	
 	@Test
 	public void testOwnDiscoveredMaze(){
-		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0,40)).hasBarcode() && ownDiscoveredMaze.getTileAt(new LongPoint(80,0)).hasBarcode());
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0,40)).getBarcode().getValue(), (byte) 1);
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(80,0)).getBarcode().getValue(), (byte) 2);
+		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0,1)).hasBarcode() && ownDiscoveredMaze.getTileAt(new LongPoint(80,0)).hasBarcode());
+		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0,1)).getBarcode().getValue(), (byte) 1);
+		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(2,0)).getBarcode().getValue(), (byte) 2);
 	}
 	
 	

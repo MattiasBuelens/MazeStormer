@@ -37,6 +37,7 @@ public class CombinedMaze implements IMaze {
 	private final List<Barcode> twoCommonBarcodes = new ArrayList<Barcode>(2);
 
 	private AffineTransform affineTransformation = null;
+	private TileTransform tileTransformation = null;
 	private int rotationsFromOwnToPartner;
 
 	public CombinedMaze(IMaze ownExploredMaze) {
@@ -48,6 +49,7 @@ public class CombinedMaze implements IMaze {
 
 		this.partnerMaze = null;
 		this.affineTransformation = null;
+		this.tileTransformation = null;
 
 		setOriginToDefault();
 	}
@@ -154,18 +156,21 @@ public class CombinedMaze implements IMaze {
 		// van het assenstelsel van je teamgenoot in je eigen assenstelsel
 		// x_{O'} = x_1 - x'_1*cos(\alpha_{X'}) + y'_1*sin(\alpha_{X'})
 		// y_{O'} = y_1 - x'_1*sin(\alpha_{X'}) - y'_1*cos(\alpha_{X'})
-		double biasX = ownFirstTP.getX() - partnerFirstTP.getX() * cosineRotation + partnerFirstTP.getY()
-				* sineRotation;
-		double biasY = ownFirstTP.getY() - partnerFirstTP.getX() * sineRotation - partnerFirstTP.getY()
-				* cosineRotation;
+		long biasX = (long) (ownFirstTP.getX() - partnerFirstTP.getX() * cosineRotation + partnerFirstTP.getY()
+				* sineRotation);
+		long biasY = (long) (ownFirstTP.getY() - partnerFirstTP.getX() * sineRotation - partnerFirstTP.getY()
+				* cosineRotation);
 
-		// stel met deze gegevens de matrix voor de AffineTransform op
-		AffineTransform atf = new AffineTransform();
-		atf.rotate(rotation);
-		atf.translate(biasX, biasY);
-
-		// stel de affine transformatie op en sla ze op
-		this.affineTransformation = atf;
+//		// stel met deze gegevens de matrix voor de AffineTransform op
+//		AffineTransform atf = new AffineTransform();
+//		atf.rotate(rotation);
+//		atf.translate(biasX, biasY);
+//
+//		// stel de affine transformatie op en sla ze op
+//		this.affineTransformation = atf;
+		
+		//stel met deze gegevens de TileTransform op en sla deze op
+		this.tileTransformation = new TileTransform(new LongPoint(biasX, biasY), rotationsFromOwnToPartner);
 	}
 
 	private void mergeTotalAndPartnerMazes() {
