@@ -235,8 +235,10 @@ public class Parser {
 	public static String stringify(IMaze maze) {
 		StringBuilder sb = new StringBuilder();
 		// Dimensions
-		sb.append(maze.getMaxX() - maze.getMinX() - 1).append(' ');
-		sb.append(maze.getMaxY() - maze.getMinY() - 1).append('\n');
+		long width = Math.max(0, maze.getMaxX() - maze.getMinX() - 1);
+		long height = Math.max(0, maze.getMaxY() - maze.getMinY() - 1);
+		sb.append(width).append(' ');
+		sb.append(height).append('\n');
 		// Tiles
 		for (long y = maze.getMaxY() - 1; y > maze.getMinY(); --y) {
 			for (long x = maze.getMinX() + 1; x < maze.getMaxX(); ++x) {

@@ -51,19 +51,21 @@ public class CombinedMazeTest {
 	}
 
 	@Before
-	public void setUp() {		
-		// add own discovered tiles to own discovered maze
+	public void setUp() {
+		// Set up combined maze
+		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
+		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
+		// Add own discovered tiles to own discovered maze
 		for (LongPoint lp : ownDiscoveredPoints) {
 			ownDiscoveredMaze.importTile(sourceMaze.getTileAt(lp),
 					transformSourceToOwn);
 			if(sourceMaze.getTileAt(lp).hasBarcode()) System.out.println("Barcode to own discovered maze: " + sourceMaze.getTileAt(lp).getBarcode().getValue());
 		}
 
-		// add partners discovered tiles to partners discovered maze
+		// Add partners discovered tiles to partners discovered maze
 		for (LongPoint lp : partnerDiscoveredPoints) {
 			partnersDiscoveredMaze.importTile(sourceMaze.getTileAt(lp),
 					transformSourceToPartner);
-			if(sourceMaze.getTileAt(lp).hasBarcode()) System.out.println("Barcode to partners discovered maze: " + sourceMaze.getTileAt(lp).getBarcode().getValue());
 		}
 		
 		// set up combined maze
@@ -85,7 +87,6 @@ public class CombinedMazeTest {
 				.hasBarcode());
 		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0))
 				.getBarcode().getValue(), (byte) 1);
-
 		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0, 2))
 				.hasBarcode());
 		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0, 2))

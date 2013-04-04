@@ -164,8 +164,11 @@ public interface IMaze {
 	 * 
 	 * @param tile
 	 *            The tile to import.
-	 * @param tile
-	 *            The transformation to apply.
+	 * @param tileTransform
+	 *            The transformation from this maze's system to the system used
+	 *            by the given tiles. This transformation will be
+	 *            <strong>inversely</strong> applied to the given tiles when
+	 *            importing.
 	 */
 	public void importTile(Tile tile, TileTransform tileTransform);
 
@@ -188,8 +191,11 @@ public interface IMaze {
 	 * 
 	 * @param tiles
 	 *            The tiles to import.
-	 * @param tile
-	 *            The transformation to apply.
+	 * @param tileTransform
+	 *            The transformation from this maze's system to the system used
+	 *            by the given tiles. This transformation will be
+	 *            <strong>inversely</strong> applied to the given tiles when
+	 *            importing.
 	 */
 	public void importTiles(Iterable<Tile> tiles, TileTransform tileTransform);
 
