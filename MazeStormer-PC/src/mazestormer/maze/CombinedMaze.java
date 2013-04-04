@@ -54,12 +54,16 @@ public class CombinedMaze implements IMaze {
 	}
 
 	/**
-	 * Registers any barcode and checks for a common barcode.
+	 * Creates/updates the corresponding tile in the total maze (if it wasn't
+	 * already present), registers any barcode and checks for a common barcode.
 	 * 
 	 * @param ownTile
 	 *            A tile in the own coordinate system.
 	 */
 	private void updateOwnTile(Tile ownTile) {
+		// Import in total maze
+		getTotalMaze().importTile(ownTile);
+
 		if (ownTile.hasBarcode()) {
 			// Add to own mapping
 			LongPoint position = ownTile.getPosition();
@@ -338,7 +342,6 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public void importTile(Tile tile, TileTransform tileTransform) {
 		getOwnMaze().importTile(tile, tileTransform);
-		getTotalMaze().importTile(tile, tileTransform);
 	}
 
 	@Override
@@ -349,19 +352,16 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public void importTiles(Iterable<Tile> tiles, TileTransform tileTransform) {
 		getOwnMaze().importTiles(tiles, tileTransform);
-		getTotalMaze().importTiles(tiles, tileTransform);
 	}
 
 	@Override
 	public void setEdge(LongPoint tilePosition, Orientation orientation, EdgeType type) {
 		getOwnMaze().setEdge(tilePosition, orientation, type);
-		getTotalMaze().setEdge(tilePosition, orientation, type);
 	}
 
 	@Override
 	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
 		getOwnMaze().setBarcode(position, barcode);
-		getTotalMaze().setBarcode(position, barcode);
 	}
 
 	@Override
@@ -382,7 +382,6 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public void setExplored(LongPoint position) {
 		getOwnMaze().setExplored(position);
-		getTotalMaze().setExplored(position);
 	}
 
 	@Override
