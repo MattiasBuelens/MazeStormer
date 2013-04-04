@@ -58,7 +58,7 @@ public class CombinedMazeTest {
 			partnersDiscoveredMaze.importTile(smallMaze.getTileAt(lp), partnersTileTransform);
 		}
 		
-		System.out.println(Parser.stringify(smallMaze) + "END");
+		System.out.println(Parser.stringify(smallMaze));
 		System.out.println(Parser.stringify(ownDiscoveredMaze));
 
 	}
