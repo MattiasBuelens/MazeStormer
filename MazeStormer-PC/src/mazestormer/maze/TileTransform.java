@@ -11,7 +11,7 @@ public class TileTransform {
 	private final int nbCCWRotations;
 	private final AffineTransform transform;
 
-	private static final TileTransform IDENTIFY = new TileTransform(new LongPoint(0, 0), 0);
+	private static final TileTransform IDENTITY = new TileTransform(new LongPoint(0, 0), 0);
 
 	public TileTransform(LongPoint translation, int nbCCWRotations) {
 		this.translation = translation;
@@ -45,13 +45,13 @@ public class TileTransform {
 
 	private AffineTransform createTransform() {
 		AffineTransform transform = new AffineTransform();
-		transform.rotate(((double) nbCCWRotations) * Math.PI / 2d);
 		transform.translate(translation.getX(), translation.getY());
+		transform.quadrantRotate(nbCCWRotations);
 		return transform;
 	}
 
 	public static TileTransform getIdentity() {
-		return IDENTIFY;
+		return IDENTITY;
 	}
 
 }
