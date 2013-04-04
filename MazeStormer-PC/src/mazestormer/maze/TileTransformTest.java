@@ -111,8 +111,8 @@ public class TileTransformTest {
 		LongPoint P = new LongPoint(3,4);
 		
 		
-		assertEquals(1, (long) transform.transform(origin).getX());
-		assertEquals(2, (long) transform.transform(origin).getY());
+		assertEquals(2, (long) transform.transform(origin).getX());
+		assertEquals(-1, (long) transform.transform(origin).getY());
 		
 		assertEquals(2, (long) transform.transform(e_x).getX());
 		assertEquals(0, (long) transform.transform(e_x).getY());
