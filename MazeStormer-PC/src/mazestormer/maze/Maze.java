@@ -261,6 +261,10 @@ public class Maze implements IMaze {
 	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type) {
 		Tile tile = getTileAt(tilePosition);
 		Edge edge = tile.getEdgeAt(orientation);
+
+		// Set edge
+		if (edge.getType() == type)
+			return;
 		edge.setType(type);
 
 		// Fire edge changed event
@@ -275,8 +279,11 @@ public class Maze implements IMaze {
 
 	@Override
 	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
-		// Set barcode
 		Tile tile = getTileAt(position);
+
+		// Set barcode
+		if (tile.hasBarcode() && tile.getBarcode().equals(barcode))
+			return;
 		tile.setBarcode(barcode);
 
 		// Fire tile changed event
@@ -321,12 +328,15 @@ public class Maze implements IMaze {
 	@Override
 	public void setExplored(LongPoint position) {
 		Tile tile = getTileAt(position);
-		if (!tile.isExplored()) {
-			// Set explored
-			tile.setExplored();
-			// Fire tile explored event
-			fireTileExplored(tile);
-		}
+
+		// Set explored
+		if (tile.isExplored())
+			return;
+		tile.setExplored();
+
+		// Fire tile explored event
+		fireTileExplored(tile);
+
 	}
 
 	@Override

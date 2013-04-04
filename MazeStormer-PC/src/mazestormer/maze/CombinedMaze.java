@@ -499,16 +499,31 @@ public class CombinedMaze implements IMaze {
 
 		@Override
 		public void tileAdded(Tile tile) {
+			// Import and check
 			updateOwnTile(tile);
 		}
 
 		@Override
 		public void tileChanged(Tile tile) {
+			// Import and check
 			updateOwnTile(tile);
 		}
 
 		@Override
+		public void tileExplored(Tile tile) {
+			// Relay to total maze
+			getTotalMaze().setExplored(tile.getPosition());
+		}
+
+		@Override
+		public void edgeChanged(Edge edge) {
+			// Relay to total maze
+			getTotalMaze().setEdge(edge.getPosition(), edge.getOrientation(), edge.getType());
+		}
+
+		@Override
 		public void mazeCleared() {
+			// Reset
 			resetOwnMaze();
 		}
 
@@ -518,16 +533,19 @@ public class CombinedMaze implements IMaze {
 
 		@Override
 		public void tileAdded(Tile tile) {
+			// Check
 			updatePartnerTile(tile);
 		}
 
 		@Override
 		public void tileChanged(Tile tile) {
+			// Check
 			updatePartnerTile(tile);
 		}
 
 		@Override
 		public void mazeCleared() {
+			// Reset
 			resetPartnerMaze();
 		}
 
