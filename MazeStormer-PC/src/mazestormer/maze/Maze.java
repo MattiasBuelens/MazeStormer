@@ -220,7 +220,7 @@ public class Maze implements IMaze {
 
 	@Override
 	public void importTile(Tile tile, TileTransform tileTransform) {
-		LongPoint tilePosition = tileTransform.inverseTransform(tile.getPosition());
+		LongPoint tilePosition = tileTransform.transform(tile.getPosition());
 		// Edges
 		for (Orientation orientation : Orientation.values()) {
 			// Get edge type
@@ -229,7 +229,7 @@ public class Maze implements IMaze {
 			if (edgeType == EdgeType.UNKNOWN)
 				continue;
 			// Place edge
-			setEdge(tilePosition, tileTransform.inverseTransform(orientation), edgeType);
+			setEdge(tilePosition, tileTransform.transform(orientation), edgeType);
 		}
 		// Barcode
 		if (tile.hasBarcode()) {

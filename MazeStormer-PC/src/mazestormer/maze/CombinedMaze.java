@@ -184,7 +184,7 @@ public class CombinedMaze implements IMaze {
 	}
 
 	/**
-	 * Returns the tileTransform, which is null if it not yet calcultated.
+	 * Returns the tileTransform, which is null if it not yet calculated.
 	 */
 	private TileTransform getTileTransform() {
 		return tileTransformation;

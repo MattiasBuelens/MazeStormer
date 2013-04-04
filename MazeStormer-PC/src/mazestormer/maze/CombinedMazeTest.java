@@ -52,12 +52,12 @@ public class CombinedMazeTest {
 
 		// Add own discovered tiles to own discovered maze
 		for (LongPoint lp : ownDiscoveredPoints) {
-			ownDiscoveredMaze.importTile(sourceMaze.getTileAt(lp), transformSourceToOwn);
+			ownDiscoveredMaze.importTile(sourceMaze.getTileAt(lp), transformSourceToOwn.inverse());
 		}
 
 		// Add partners discovered tiles to partners discovered maze
 		for (LongPoint lp : partnerDiscoveredPoints) {
-			partnersDiscoveredMaze.importTile(sourceMaze.getTileAt(lp), transformSourceToPartner);
+			partnersDiscoveredMaze.importTile(sourceMaze.getTileAt(lp), transformSourceToPartner.inverse());
 		}
 	}
 
@@ -89,8 +89,13 @@ public class CombinedMazeTest {
 
 	@Test
 	public void testCombinedMaze() {
+		System.out.println(Parser.stringify(ownDiscoveredMaze));
+		System.out.println(Parser.stringify(partnersDiscoveredMaze));
 		System.out.println(Parser.stringify(combinedMaze));
-		System.out.println(Parser.stringify(sourceMaze));
+
+		Maze transformedSourceMaze = new Maze();
+		transformedSourceMaze.importTiles(sourceMaze.getTiles(), transformSourceToOwn.inverse());
+		System.out.println(Parser.stringify(transformedSourceMaze));
 	}
 
 	/**
