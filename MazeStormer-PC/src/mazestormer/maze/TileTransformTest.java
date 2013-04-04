@@ -99,4 +99,22 @@ public class TileTransformTest {
 		assertEquals(new LongPoint(-2, 2), transform.inverseTransform(P));
 	}
 
+	@Test
+	public void inverse() {
+		TileTransform transform = new TileTransform(new LongPoint(1, 2), 3);
+		TileTransform inverse = transform.inverse();
+		LongPoint P = new LongPoint(1, 1);
+		Orientation O = Orientation.EAST;
+
+		assertEquals(new LongPoint(2, 1), transform.transform(P));
+		assertEquals(new LongPoint(1, 0), transform.inverseTransform(P));
+		assertEquals(Orientation.SOUTH, transform.transform(O));
+		assertEquals(Orientation.NORTH, transform.inverseTransform(O));
+
+		assertEquals(new LongPoint(1, 0), inverse.transform(P));
+		assertEquals(new LongPoint(2, 1), inverse.inverseTransform(P));
+		assertEquals(Orientation.NORTH, inverse.transform(O));
+		assertEquals(Orientation.SOUTH, inverse.inverseTransform(O));
+	}
+
 }

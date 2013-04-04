@@ -10,14 +10,18 @@ import lejos.robotics.navigation.Pose;
 
 public class PoseTransform {
 
-	private final Pose referencePose;
 	private final AffineTransform transform;
+	private final float referenceHeading;
 
 	private static final PoseTransform IDENTITY = new PoseTransform(new Pose());
 
 	public PoseTransform(Pose referencePose) {
-		this.referencePose = referencePose;
-		this.transform = createTransform(referencePose);
+		this(createTransform(referencePose), referencePose.getHeading());
+	}
+
+	private PoseTransform(AffineTransform transform, float referenceHeading) {
+		this.transform = transform;
+		this.referenceHeading = referenceHeading;
 	}
 
 	/**
@@ -55,29 +59,29 @@ public class PoseTransform {
 	/**
 	 * Transform the given relative heading to an absolute heading.
 	 * 
-	 * @param position
+	 * @param heading
 	 *            The relative heading.
 	 * @return The absolute heading.
 	 */
 	public float transform(float heading) {
-		return normalizeHeading(heading + referencePose.getHeading());
+		return normalizeHeading(heading + referenceHeading);
 	}
 
 	/**
 	 * Transform the given absolute heading to a relative heading.
 	 * 
-	 * @param position
+	 * @param heading
 	 *            The absolute heading.
 	 * @return The relative heading.
 	 */
 	public float inverseTransform(float heading) {
-		return normalizeHeading(heading - referencePose.getHeading());
+		return normalizeHeading(heading - referenceHeading);
 	}
 
 	/**
 	 * Transform the given relative pose to absolute coordinates.
 	 * 
-	 * @param position
+	 * @param pose
 	 *            The relative pose.
 	 * @return The absolute pose.
 	 */
@@ -92,7 +96,7 @@ public class PoseTransform {
 	/**
 	 * Transform the given absolute pose to relative coordinates.
 	 * 
-	 * @param position
+	 * @param pose
 	 *            The absolute pose.
 	 * @return The relative pose.
 	 */
@@ -102,6 +106,17 @@ public class PoseTransform {
 		transformed.setLocation(inverseTransform(pose.getLocation()));
 		transformed.setHeading(inverseTransform(pose.getHeading()));
 		return transformed;
+	}
+
+	/**
+	 * Get the inverse pose transformation.
+	 */
+	public PoseTransform inverse() {
+		try {
+			return new PoseTransform(transform.createInverse(), -referenceHeading);
+		} catch (NoninvertibleTransformException cannotHappen) {
+			return null;
+		}
 	}
 
 	/**
@@ -131,6 +146,9 @@ public class PoseTransform {
 		return heading;
 	}
 
+	/**
+	 * Get the identity pose transformation.
+	 */
 	public static final PoseTransform getIdentity() {
 		return IDENTITY;
 	}
