@@ -27,7 +27,7 @@ public class CombinedMaze implements IMaze {
 
 	private IMaze partnerMaze; // tilecoordinates in partner's relative system
 	private final Map<Barcode, LongPoint> partnerBarcodeMapping = new HashMap<Barcode, LongPoint>();
-	private final TeamMateMazeListener partnerListener = new TeamMateMazeListener();
+	private final PartnerMazeListener partnerListener = new PartnerMazeListener();
 
 	private final IMaze totalMaze; // tilecoordinates in own relative system
 
@@ -37,6 +37,7 @@ public class CombinedMaze implements IMaze {
 
 	public CombinedMaze(IMaze ownExploredMaze) {
 		this.ownMaze = ownExploredMaze;
+		ownMaze.addListener(new OwnMazeListener());
 
 		// Copy own maze into total maze
 		this.totalMaze = new Maze();
@@ -53,26 +54,43 @@ public class CombinedMaze implements IMaze {
 	}
 
 	/**
-	 * Put a copy of the given tile in the partner's maze (or updates it if it
-	 * was already present) and creates/updates the corresponding tile in the
-	 * total maze (if it wasn't already present).
+	 * Registers any barcode and checks for a common barcode.
+	 * 
+	 * @param ownTile
+	 *            A tile in the own coordinate system.
+	 */
+	private void updateOwnTile(Tile ownTile) {
+		if (ownTile.hasBarcode()) {
+			// Add to own mapping
+			LongPoint position = ownTile.getPosition();
+			Barcode barcode = ownTile.getBarcode();
+			ownBarcodeMapping.put(barcode, position);
+
+			// Check if common barcode and add if it is
+			if (partnerBarcodeMapping.containsKey(barcode)) {
+				addCommonBarcode(barcode);
+			}
+		}
+	}
+
+	/**
+	 * Creates/updates the corresponding tile in the total maze (if it wasn't
+	 * already present), registers any barcode and checks for a common barcode.
 	 * 
 	 * @param partnerTile
 	 *            A tile in the partner's coordinate system.
 	 */
 	private void updatePartnerTile(Tile partnerTile) {
-		LongPoint position = partnerTile.getPosition();
-
 		if (getTileTransform() != null) {
 			// Copy to total maze
 			importPartnerTileIntoTotalMaze(partnerTile);
 		} else if (partnerTile.hasBarcode()) {
+			// Add to partner's mapping
+			LongPoint position = partnerTile.getPosition();
 			Barcode barcode = partnerTile.getBarcode();
-
 			partnerBarcodeMapping.put(barcode, position);
 
-			// check op barcode en indien genoeg barcodes gevonden: voeg mazes
-			// samen
+			// Check if common barcode and add if it is
 			if (ownBarcodeMapping.containsKey(barcode)) {
 				addCommonBarcode(barcode);
 			}
@@ -168,6 +186,25 @@ public class CombinedMaze implements IMaze {
 		return tileTransformation;
 	}
 
+	private void resetOwnMaze() {
+		// Reset barcode mapping
+		ownBarcodeMapping.clear();
+		twoCommonBarcodes.clear();
+		// Reset transformation
+		tileTransformation = null;
+	}
+
+	private void resetPartnerMaze() {
+		if (!hasPartnerMaze())
+			return;
+
+		// Reset barcode mapping
+		partnerBarcodeMapping.clear();
+		twoCommonBarcodes.clear();
+		// Reset transformation
+		tileTransformation = null;
+	}
+
 	public final IMaze getOwnMaze() {
 		return ownMaze;
 	}
@@ -187,19 +224,10 @@ public class CombinedMaze implements IMaze {
 		}
 
 		this.partnerMaze = partnerMaze;
+		// Reset partner maze
+		resetPartnerMaze();
 		// Add listener
 		partnerMaze.addListener(partnerListener);
-	}
-
-	public void resetPartnerMaze() {
-		if (!hasPartnerMaze())
-			return;
-
-		// Reset barcode mapping mapping
-		partnerBarcodeMapping.clear();
-		twoCommonBarcodes.clear();
-		// Reset transformation
-		tileTransformation = null;
 	}
 
 	public final IMaze getTotalMaze() {
@@ -334,11 +362,6 @@ public class CombinedMaze implements IMaze {
 	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
 		getOwnMaze().setBarcode(position, barcode);
 		getTotalMaze().setBarcode(position, barcode);
-		ownBarcodeMapping.put(barcode, position);
-
-		if (partnerBarcodeMapping.containsKey(barcode)) {
-			addCommonBarcode(barcode);
-		}
 	}
 
 	@Override
@@ -366,11 +389,6 @@ public class CombinedMaze implements IMaze {
 	public void clear() {
 		getOwnMaze().clear();
 		getTotalMaze().clear();
-
-		// Reset own barcode mapping
-		ownBarcodeMapping.clear();
-		// Reset partner maze
-		resetPartnerMaze();
 	}
 
 	@Override
@@ -478,7 +496,26 @@ public class CombinedMaze implements IMaze {
 		return getTotalMaze().getSeesawTile(barcode);
 	}
 
-	private class TeamMateMazeListener extends DefaultMazeListener {
+	private class OwnMazeListener extends DefaultMazeListener {
+
+		@Override
+		public void tileAdded(Tile tile) {
+			updateOwnTile(tile);
+		}
+
+		@Override
+		public void tileChanged(Tile tile) {
+			updateOwnTile(tile);
+		}
+
+		@Override
+		public void mazeCleared() {
+			resetOwnMaze();
+		}
+
+	}
+
+	private class PartnerMazeListener extends DefaultMazeListener {
 
 		@Override
 		public void tileAdded(Tile tile) {
