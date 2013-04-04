@@ -122,6 +122,11 @@ public class TileTransformTest {
 		
 		assertEquals(-2, (long) transform.transform(P).getX());
 		assertEquals(2, (long) transform.transform(P).getY());
+		
+//		System.out.println(transform.transform(origin));
+//		System.out.println(transform.transform(e_x));
+//		System.out.println(transform.transform(e_y));
+//		System.out.println(transform.transform(P));
 	}
 
 }

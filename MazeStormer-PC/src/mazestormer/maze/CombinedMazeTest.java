@@ -29,8 +29,8 @@ public class CombinedMazeTest {
 	private LongPoint[] ownDiscoveredPoints = { new LongPoint(0, 3), new LongPoint(1, 3), new LongPoint(2, 3),
 			new LongPoint(3, 3), new LongPoint(0, 2), new LongPoint(1, 2), new LongPoint(2, 2), new LongPoint(3, 2),
 			new LongPoint(0, 1), new LongPoint(2, 1), new LongPoint(3, 1), new LongPoint(0, 0) };
-	private TileTransform transformSourceToOwn = new TileTransform(new LongPoint(1, 2), 3);
-	private TileTransform transformOwnToSource = new TileTransform(new LongPoint(2, -1), 1);
+//	private TileTransform transformSourceToOwn = new TileTransform(new LongPoint(1, 2), 3);
+	private TileTransform transformSourceToOwn = new TileTransform(new LongPoint(-1, -2), -3);
 
 	private Maze partnersDiscoveredMaze = new Maze();
 	private LongPoint[] partnerDiscoveredPoints = { new LongPoint(0, 3), new LongPoint(1, 3), new LongPoint(2, 3),
@@ -76,11 +76,11 @@ public class CombinedMazeTest {
 		System.out.println(Parser.stringify(ownDiscoveredMaze));
 
 		// Test results
-		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0, 1)).hasBarcode());
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0, 1)).getBarcode().getValue(), (byte) 1);
+		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).hasBarcode());
+		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue(), (byte) 1);
 
-		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(2, 0)).hasBarcode());
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(2, 0)).getBarcode().getValue(), (byte) 2);
+		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0,2)).hasBarcode());
+		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0,2)).getBarcode().getValue(), (byte) 2);
 	}
 	
 	@Test
