@@ -16,20 +16,21 @@ import org.junit.Test;
 public class CombinedMazeTest {
 
 	// @formatter:off
-	private static String smallMazeSource = "4 4\n"
+	private static String sourceMazeString = "4 4\n"
 			+ "DeadEnd.W.V Straight.W.01 Corner.E DeadEnd.N.V\n"
 			+ "Corner.N Straight.W.S1E T.E.S2S Straight.N.02\n"
 			+ "Straight.S.00 Corner.N.S4N T.S.S3W Corner.S\n"
 			+ "DeadEnd.S.V Corner.W Straight.E.03 DeadEnd.E.V";
 	// @formatter:on
 
-	private static Maze smallMaze;
+	private static Maze sourceMaze;
 
 	private Maze ownDiscoveredMaze = new Maze();
 	private LongPoint[] ownDiscoveredPoints = { new LongPoint(0, 3), new LongPoint(1, 3), new LongPoint(2, 3),
 			new LongPoint(3, 3), new LongPoint(0, 2), new LongPoint(1, 2), new LongPoint(2, 2), new LongPoint(3, 2),
 			new LongPoint(0, 1), new LongPoint(2, 1), new LongPoint(3, 1), new LongPoint(0, 0) };
-	private TileTransform ownTileTransform = new TileTransform(new LongPoint(1, 2), 3);
+	private TileTransform transformSourceToOwn = new TileTransform(new LongPoint(1, 2), 3);
+	private TileTransform transformOwnToSource = new TileTransform(new LongPoint(2, -1), 1);
 
 	private Maze partnersDiscoveredMaze = new Maze();
 	private LongPoint[] partnerDiscoveredPoints = { new LongPoint(0, 3), new LongPoint(1, 3), new LongPoint(2, 3),
@@ -41,11 +42,21 @@ public class CombinedMazeTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws ParseException {
-		smallMaze = parse(smallMazeSource);
+		sourceMaze = parse(sourceMazeString);
 	}
 
 	@Before
 	public void setUp() {
+		//add own discovered tiles to own discovered maze
+		for (LongPoint lp : ownDiscoveredPoints) {
+			ownDiscoveredMaze.importTile(sourceMaze.getTileAt(lp), transformSourceToOwn);
+		}
+		//add partners discovered tiles to partners discovered maze
+		for (LongPoint lp : partnerDiscoveredPoints) {
+			partnersDiscoveredMaze.importTile(sourceMaze.getTileAt(lp),
+					partnersTileTransform);
+		}
+		// set up combined maze
 		combinedMaze = new CombinedMaze(ownDiscoveredMaze);
 		combinedMaze.setPartnerMaze(partnersDiscoveredMaze);
 	}
@@ -60,15 +71,8 @@ public class CombinedMazeTest {
 	@Test
 	public void testOwnDiscoveredMaze() {
 		// Run test
-		for (LongPoint lp : ownDiscoveredPoints) {
-			combinedMaze.importTile(smallMaze.getTileAt(lp), ownTileTransform);
-		}
-
-		for (LongPoint lp : partnerDiscoveredPoints) {
-			partnersDiscoveredMaze.importTile(smallMaze.getTileAt(lp), partnersTileTransform);
-		}
-
-		System.out.println(Parser.stringify(smallMaze) + "END");
+		System.out.println(Parser.stringify(sourceMaze));
+		Parser smallParser = new Parser(sourceMaze);
 		System.out.println(Parser.stringify(ownDiscoveredMaze));
 
 		// Test results
@@ -77,6 +81,11 @@ public class CombinedMazeTest {
 
 		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(2, 0)).hasBarcode());
 		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(2, 0)).getBarcode().getValue(), (byte) 2);
+	}
+	
+	@Test
+	public void testPartnersDicoveredMaze() {
+		
 	}
 
 	/**
