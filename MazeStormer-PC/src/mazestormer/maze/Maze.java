@@ -9,13 +9,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
+import mazestormer.infrared.Model;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
@@ -595,5 +598,38 @@ public class Maze implements IMaze {
 		}
 		return null;
 	}
-
+	
+	private final Set<Model> staticModels = new HashSet<Model>();
+	
+	public void addModel(Model model) {
+		this.staticModels.add(model);
+	}
+	
+	public void removeModel(Model model) {
+		this.staticModels.remove(model);
+	}
+	
+	public Set<Model> getModels() {
+		return Collections.unmodifiableSet(this.staticModels);
+	}
+	
+    public <T extends Model> Set<T> getAllStrictModelsClass(Class<T> clazz) {
+       Set<T> temp = new HashSet<T>();
+       for(Model model : this.staticModels) {
+    	   if (model.getClass() == clazz) {
+    		   temp.add(clazz.cast(model));
+    	   }
+        }
+        return Collections.unmodifiableSet(temp);
+    }
+    
+    public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType){
+    	Set<T> temp = new HashSet<T>();
+        for(Model model : this.staticModels) {
+     	   if (modelType.isInstance(model)) {
+     		   temp.add(modelType.cast(model));
+     	   }
+         }
+         return Collections.unmodifiableSet(temp);
+    }
 }

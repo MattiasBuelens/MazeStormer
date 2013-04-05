@@ -1,6 +1,6 @@
 package mazestormer.infrared;
 
-public interface IRSource {
+public interface IRSource extends Model {
 	
 	public boolean isEmitting();
 	

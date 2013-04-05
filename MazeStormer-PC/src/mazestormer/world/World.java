@@ -91,5 +91,4 @@ public class World {
 	public Logger getLogger() {
 		return logger;
 	}
-
 }
