@@ -167,11 +167,12 @@ public class WorldIRDetector implements IRSensor {
 	
 	private class IRRobot implements IRSource {
 		
+		private static final double EXTERNAL_ZONE = 0;
 		private final Envelope envelope;
 		
 		private IRRobot(Robot robot) {
 			// TODO: dimension support
-			this.envelope = new RectangularEnvelope(robot.getPoseProvider(), 0, 0);
+			this.envelope = new RectangularEnvelope(robot.getPoseProvider(), 0+EXTERNAL_ZONE, 0+EXTERNAL_ZONE);
 		}
 
 		@Override
