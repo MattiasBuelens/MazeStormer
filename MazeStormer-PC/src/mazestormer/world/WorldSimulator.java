@@ -13,6 +13,7 @@ import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
 import peno.htttp.DisconnectReason;
+import peno.htttp.PlayerDetails;
 import peno.htttp.SpectatorClient;
 import peno.htttp.SpectatorHandler;
 
@@ -57,9 +58,11 @@ public class WorldSimulator {
 		return getLocalPlayer().getPlayerID().equals(playerID);
 	}
 
-	private synchronized AbsolutePlayer getOrAddPlayer(String playerID) {
+	private synchronized AbsolutePlayer getOrAddPlayer(PlayerDetails playerDetails) {
+		String playerID = playerDetails.getPlayerID();
 		AbsolutePlayer player = getWorld().getPlayer(playerID);
 		if (player == null) {
+			// TODO Set up player's type, width and height
 			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot(), null);
 			player = new AbsolutePlayer(relativePlayer);
 			getWorld().addPlayer(player);
@@ -107,33 +110,30 @@ public class WorldSimulator {
 
 		@Override
 		public void gamePaused() {
-			// left empty
+			// Nothing to do here
 		}
 
 		@Override
 		public void gameWon(int teamNumber) {
-			// left empty
+			// Nothing to do here
 		}
 
 		@Override
-		public void playerRolled(String playerID, int playerNumber) {
+		public void playerRolled(PlayerDetails playerDetails, int playerNumber) {
+			AbsolutePlayer player = getOrAddPlayer(playerDetails);
+
 			// Setup transformation if not set yet
-			AbsolutePlayer player = getOrAddPlayer(playerID);
 			setupPlayerTransform(player, playerNumber);
 		}
 
 		@Override
 		public void playerJoining(String playerID) {
-			// left empty
+			// Nothing to do here
 		}
 
 		@Override
 		public void playerJoined(String playerID) {
-			// Ignore local player
-			if (isLocalPlayer(playerID))
-				return;
-			// Store player
-			getOrAddPlayer(playerID);
+			// Nothing to do here
 		}
 
 		@Override
@@ -153,23 +153,22 @@ public class WorldSimulator {
 
 		@Override
 		public void playerReady(String playerID, boolean isReady) {
-			// left empty
+			// Nothing to do here
 		}
 
 		@Override
 		public void playerFoundObject(String playerID, int playerNumber) {
-			// Ignore local player
-			if (isLocalPlayer(playerID))
-				return;
+			// Nothing to do here
 		}
 
 		@Override
-		public void playerUpdate(String playerID, int playerNumber, double x, double y, double angle,
+		public void playerUpdate(PlayerDetails playerDetails, int playerNumber, double x, double y, double angle,
 				boolean foundObject) {
-			AbsolutePlayer player = getOrAddPlayer(playerID);
+			// Setup player if not done yet
+			playerRolled(playerDetails, playerNumber);
 
-			// Setup transformation if not set yet
-			playerRolled(playerID, playerNumber);
+			String playerID = playerDetails.getPlayerID();
+			AbsolutePlayer player = getOrAddPlayer(playerDetails);
 
 			// Set pose of non-local player
 			if (!isLocalPlayer(playerID)) {

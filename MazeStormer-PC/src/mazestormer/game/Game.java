@@ -20,6 +20,7 @@ import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
 import peno.htttp.PlayerHandler;
+import peno.htttp.PlayerType;
 
 import com.rabbitmq.client.Connection;
 
@@ -39,7 +40,10 @@ public class Game {
 		this.localPlayer = localPlayer;
 
 		this.handler = new Handler();
-		this.client = new PlayerClient(connection, this.handler, id, localPlayer.getPlayerID());
+		
+		// TODO Insert robot details
+		peno.htttp.PlayerDetails player = new peno.htttp.PlayerDetails(localPlayer.getPlayerID(), PlayerType.PHYSICAL, 0, 0);
+		this.client = new PlayerClient(connection, this.handler, id, player);
 	}
 
 	public void addGameListener(GameListener listener) {
