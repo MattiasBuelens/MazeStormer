@@ -10,6 +10,7 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRBall;
 import mazestormer.infrared.IRSource;
+import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.robot.IRSensor;
@@ -126,21 +127,21 @@ public class WorldIRDetector implements IRSensor {
 		// Avoids self-detection
 		// Avoids not-detectable joy-riding objects
 		if (!((currentPose.getX() == otherPose.getX()) && (currentPose.getY() == otherPose.getY()))) {
-			Point2D.Double currentPoint = new Point2D.Double(currentPose.getX(), currentPose.getY());
+			Point2D currentPoint = new Point2D.Double(currentPose.getX(), currentPose.getY());
 			
-			Point2D.Double h_e = new Point2D.Double(Math.cos(currentPose.getHeading()), Math.sin(currentPose.getHeading()));
-			Point2D.Double[] cps = envelope.getClosestPoints(currentPoint);
-			Line2D.Double[] edgeLines = getMaze().getEdgeLines().toArray(new Line2D.Double[0]);
+			Point2D h_e = new Point2D.Double(Math.cos(currentPose.getHeading()), Math.sin(currentPose.getHeading()));
+			Point2D[] cps = envelope.getClosestPoints(currentPoint);
+			Line2D[] edgeLines = getMaze().getEdgeLines().toArray(new Line2D.Double[0]);
 			for (int i=0; i<cps.length && !isDetected; i++) {
-				Line2D.Double l = new Line2D.Double(currentPoint, cps[i]);
+				Line2D l = new Line2D.Double(currentPoint, cps[i]);
 				
 				if (l.getP1().distance(l.getP2()) > getRadius()) {
-					break;
+					continue;
 				}
 				
 				angle = getAngle(cps[i], currentPoint, h_e);
 				if (angle > getRange() ||  angle < (-1)*getRange()) {
-					break;
+					continue;
 				}
 				
 				isDetected = true;
@@ -155,7 +156,7 @@ public class WorldIRDetector implements IRSensor {
 		return result;
 	}	
 		
-	private static double getAngle(Point2D.Double p1, Point2D.Double center, Point2D.Double p2) {
+	private static double getAngle(Point2D p1, Point2D center, Point2D p2) {
 		double cp1 = center.distance(p1);
 		double cp2 = center.distance(p2);
 		double p1p2 = p1.distance(p2);
@@ -170,7 +171,7 @@ public class WorldIRDetector implements IRSensor {
 		
 		private IRRobot(Robot robot) {
 			// TODO: dimension support
-			this.envelope = new Envelope(robot.getPoseProvider(), 0, 0);
+			this.envelope = new RectangularEnvelope(robot.getPoseProvider(), 0, 0);
 		}
 
 		@Override
