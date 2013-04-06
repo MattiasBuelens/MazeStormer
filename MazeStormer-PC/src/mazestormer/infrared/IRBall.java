@@ -8,10 +8,13 @@ public class IRBall implements IRSource {
 	private final PoseProvider staticPoseProvider;
 	private final Envelope envelope;
 	
+	//TODO: cm's?
+	public static final double INTERNAL_RADIUS = (7.5)/2;
+	public static final double EXTERNAL_RADIUS = 5000;
+	
 	public IRBall(Pose pose) {
 		this.staticPoseProvider = new StaticPoseProvider(pose);
-		//TODO: cm's?
-		this.envelope = new Envelope(this.staticPoseProvider, 7.5/2);
+		this.envelope = new CircularEnvelope(this.staticPoseProvider, INTERNAL_RADIUS+EXTERNAL_RADIUS);
 	}
 
 	@Override
@@ -27,24 +30,5 @@ public class IRBall implements IRSource {
 	@Override
 	public PoseProvider getPoseProvider() {
 		return this.staticPoseProvider;
-	}
-	
-	private class StaticPoseProvider implements PoseProvider {
-		
-		private Pose pose;
-		
-		private StaticPoseProvider(Pose pose) {
-			this.pose = pose;
-		}
-
-		@Override
-		public Pose getPose() {
-			return this.pose;
-		}
-
-		@Override
-		public void setPose(Pose aPose) {
-			// disabled
-		}
 	}
 }
