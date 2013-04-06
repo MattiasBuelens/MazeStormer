@@ -43,122 +43,125 @@ public class StatePanel extends ViewPanel {
 		this.controller = controller;
 
 		setBorder(new TitledBorder(null, "Current state", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new MigLayout("", "[100px:148.00:148px][150px:n:200px]", "[grow][grow]"));
+		setLayout(new MigLayout("", "[100px][192px]", "[grow][grow]"));
 		
 		JPanel posePanel = new JPanel();
 		add(posePanel, "cell 0 0,grow");
-		posePanel.setLayout(new MigLayout("", "[]", "[grow][grow][grow][grow]"));
+		posePanel.setLayout(new MigLayout("", "[][25:25:25][]", "[grow][grow][grow][grow]"));
 		
 		JLabel lblPose = new JLabel("Pose:");
+		lblPose.setFont(new Font("Tahoma", Font.BOLD, 11));
 		posePanel.add(lblPose, "cell 0 0");
-		lblPose.setFont(lblPose.getFont().deriveFont(lblPose.getFont().getStyle() | Font.BOLD));
 		
 		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
 		posePanel.add(horizontalStrut_1, "flowx,cell 0 1");
 		
-		JLabel lblX = new JLabel("X:");
-		posePanel.add(lblX, "cell 0 1");
-		lblX.setHorizontalAlignment(SwingConstants.TRAILING);
-		
 		textField = new JTextField();
-		posePanel.add(textField, "cell 0 1,growx");
+		posePanel.add(textField, "cell 1 1,growx");
 		textField.setColumns(10);
+		
+		JLabel lblCm = new JLabel("cm");
+		posePanel.add(lblCm, "cell 2 1");
 		
 		Component horizontalStrut = Box.createHorizontalStrut(20);
 		posePanel.add(horizontalStrut, "flowx,cell 0 2");
 		
-		JLabel lblY = new JLabel("Y:");
-		posePanel.add(lblY, "cell 0 2");
-		
 		textField_1 = new JTextField();
-		posePanel.add(textField_1, "cell 0 2,growx");
+		posePanel.add(textField_1, "cell 1 2,growx");
 		textField_1.setColumns(10);
 		
 		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
 		posePanel.add(horizontalStrut_4, "flowx,cell 0 3");
 		
+		textField_2 = new JTextField();
+		textField_2.setText("180");
+		posePanel.add(textField_2, "cell 1 3,growx");
+		textField_2.setColumns(10);
+		
+		JLabel lblCm_1 = new JLabel("cm");
+		posePanel.add(lblCm_1, "cell 2 2");
+		
+		JLabel label = new JLabel("\u00B0");
+		posePanel.add(label, "cell 2 3");
+		
+		JLabel lblX = new JLabel("X:");
+		posePanel.add(lblX, "cell 0 1");
+		lblX.setHorizontalAlignment(SwingConstants.TRAILING);
+		
+		JLabel lblY = new JLabel("Y:");
+		posePanel.add(lblY, "cell 0 2");
+		
 		JLabel lblHeading = new JLabel("Heading:");
 		posePanel.add(lblHeading, "cell 0 3");
 		
-		textField_2 = new JTextField();
-		posePanel.add(textField_2, "cell 0 3,growx");
-		textField_2.setColumns(10);
-		
-		JLabel lblCm = new JLabel("cm");
-		posePanel.add(lblCm, "cell 0 1");
-		
-		JLabel lblCm_1 = new JLabel("cm");
-		posePanel.add(lblCm_1, "cell 0 2");
-		
-		JLabel label = new JLabel("\u00B0");
-		posePanel.add(label, "cell 0 3");
-		
 		JPanel sensorPanel = new JPanel();
 		add(sensorPanel, "cell 1 0,grow");
-		sensorPanel.setLayout(new MigLayout("", "[130.00][75.00]", "[grow][grow][grow][grow]"));
+		sensorPanel.setLayout(new MigLayout("", "[][25:25:25][][25:25:25][]", "[grow][grow][grow][grow]"));
 		
 		JLabel lblNewLabel = new JLabel("Sensorreadings:");
-		sensorPanel.add(lblNewLabel, "cell 0 0");
+		sensorPanel.add(lblNewLabel, "cell 0 0 2 1");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
 		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
 		sensorPanel.add(horizontalStrut_2, "flowx,cell 0 1");
 		
-		JLabel lblLight = new JLabel("Light:");
-		sensorPanel.add(lblLight, "cell 0 1");
-		
 		textField_3 = new JTextField();
-		sensorPanel.add(textField_3, "cell 0 1,growx");
+		sensorPanel.add(textField_3, "cell 1 1,growx");
 		textField_3.setColumns(10);
+		
+		JLabel label_1 = new JLabel("%");
+		sensorPanel.add(label_1, "cell 2 1");
 		
 		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
 		sensorPanel.add(horizontalStrut_3, "flowx,cell 0 2");
 		
-		JLabel lblInfrared = new JLabel("Infrared:");
-		sensorPanel.add(lblInfrared, "cell 0 2");
-		
 		textField_4 = new JTextField();
-		sensorPanel.add(textField_4, "cell 0 2,growx");
+		textField_4.setText("100");
+		sensorPanel.add(textField_4, "cell 1 2,growx");
 		textField_4.setColumns(10);
 		
+		JLabel label_2 = new JLabel("%");
+		sensorPanel.add(label_2, "flowx,cell 2 2");
+		
 		JLabel lblAt = new JLabel("at");
-		sensorPanel.add(lblAt, "flowx,cell 1 2");
+		sensorPanel.add(lblAt, "cell 2 2");
 		
 		textField_6 = new JTextField();
-		sensorPanel.add(textField_6, "cell 1 2,growx");
+		sensorPanel.add(textField_6, "cell 3 2,growx");
 		textField_6.setColumns(10);
+		
+		JLabel label_3 = new JLabel("\u00B0");
+		sensorPanel.add(label_3, "cell 4 2");
 		
 		Component horizontalStrut_5 = Box.createHorizontalStrut(20);
 		sensorPanel.add(horizontalStrut_5, "flowx,cell 0 3");
 		
-		JLabel lblUltrasonic = new JLabel("Ultrasonic:");
-		sensorPanel.add(lblUltrasonic, "cell 0 3");
-		
 		textField_5 = new JTextField();
-		sensorPanel.add(textField_5, "cell 0 3,growx");
+		sensorPanel.add(textField_5, "cell 1 3,growx");
 		textField_5.setColumns(10);
 		
+		JLabel lblCm_2 = new JLabel("cm");
+		sensorPanel.add(lblCm_2, "flowx,cell 2 3");
+		
 		JLabel lblAt_1 = new JLabel("at");
-		sensorPanel.add(lblAt_1, "flowx,cell 1 3");
+		sensorPanel.add(lblAt_1, "cell 2 3");
 		
 		textField_7 = new JTextField();
-		sensorPanel.add(textField_7, "cell 1 3,growx");
+		textField_7.setText("180");
+		sensorPanel.add(textField_7, "cell 3 3,growx");
 		textField_7.setColumns(10);
 		
-		JLabel label_1 = new JLabel("%");
-		sensorPanel.add(label_1, "cell 0 1");
-		
-		JLabel label_2 = new JLabel("%");
-		sensorPanel.add(label_2, "cell 0 2");
-		
-		JLabel lblCm_2 = new JLabel("cm");
-		sensorPanel.add(lblCm_2, "cell 0 3");
-		
 		JLabel label_4 = new JLabel("\u00B0");
-		sensorPanel.add(label_4, "cell 1 3");
+		sensorPanel.add(label_4, "cell 4 3");
 		
-		JLabel label_3 = new JLabel("\u00B0");
-		sensorPanel.add(label_3, "cell 1 2");
+		JLabel lblLight = new JLabel("Light:");
+		sensorPanel.add(lblLight, "cell 0 1");
+		
+		JLabel lblInfrared = new JLabel("Infrared:");
+		sensorPanel.add(lblInfrared, "cell 0 2");
+		
+		JLabel lblUltrasonic = new JLabel("Ultrasonic:");
+		sensorPanel.add(lblUltrasonic, "cell 0 3");
 		
 		JPanel assignmentPanel = new JPanel();
 		add(assignmentPanel, "cell 0 1 2 1,grow");
