@@ -7,7 +7,7 @@ import lejos.robotics.navigation.Pose;
 public class Envelope {
 	
 	private final PoseProvider poseProvider;
-	private double length;
+	private double height;
 	private double width;
 	
 	public Envelope(PoseProvider poseProvider, double radius)
@@ -15,17 +15,17 @@ public class Envelope {
 		this(poseProvider, 2*radius, 2*radius);
 	}
 	
-	public Envelope(PoseProvider poseProvider, double length, double width)
+	public Envelope(PoseProvider poseProvider, double height, double width)
 			throws NullPointerException, IllegalArgumentException {
 		if (poseProvider == null) {
 			throw new NullPointerException("The given pose provider may not refer the null reference.");
 		}
-		if (length == 0 || width == 0) {
+		if (height == 0 || width == 0) {
 			throw new IllegalArgumentException("The given length and width may not be equal to zero.");
 		}
 		
 		this.poseProvider = poseProvider;
-		setLength(length);
+		setHeight(height);
 		setWidth(width);
 	}
 	
@@ -33,12 +33,12 @@ public class Envelope {
 		return this.poseProvider;
 	}
 	
-	public double getLength() {
-		return this.length;
+	public double getHeight() {
+		return this.height;
 	}
 	
-	public void setLength(double length) {
-		this.length = Math.abs(length);
+	public void setHeight(double height) {
+		this.height = Math.abs(height);
 	}
 	
 	public double getWidth() {
@@ -87,10 +87,10 @@ public class Envelope {
 		
 		Point2D.Double[] cps = new Point2D.Double[4];
 		// cps[i] is a neighbour of cps[i+1] and cps[i-1] with the index % 4 (e.g.: i % 4,(i+1) % 4,(i-1) % 4)
-		cps[0] = rotatePoint(new Point2D.Double((center_x+getLength()/2), (center_y+getWidth()/2)), angle);
-		cps[1] = rotatePoint(new Point2D.Double((center_x-getLength()/2), (center_y+getWidth()/2)), angle);
-		cps[2] = rotatePoint(new Point2D.Double((center_x-getLength()/2), (center_y-getWidth()/2)), angle);
-		cps[3] = rotatePoint(new Point2D.Double((center_x+getLength()/2), (center_y-getWidth()/2)), angle);
+		cps[0] = rotatePoint(new Point2D.Double((center_x+getHeight()/2), (center_y+getWidth()/2)), angle);
+		cps[1] = rotatePoint(new Point2D.Double((center_x-getHeight()/2), (center_y+getWidth()/2)), angle);
+		cps[2] = rotatePoint(new Point2D.Double((center_x-getHeight()/2), (center_y-getWidth()/2)), angle);
+		cps[3] = rotatePoint(new Point2D.Double((center_x+getHeight()/2), (center_y-getWidth()/2)), angle);
 		return cps;
 	}
 	
