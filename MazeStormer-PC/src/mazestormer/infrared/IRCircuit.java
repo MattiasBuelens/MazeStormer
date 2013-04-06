@@ -3,18 +3,18 @@ package mazestormer.infrared;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 
-public class IRBall implements VirtualIRSource {
-	
+public class IRCircuit implements VirtualIRSource {
+
 	private final PoseProvider staticPoseProvider;
 	private final Envelope envelope;
 	
 	//TODO: cm's?
-	public static final double INTERNAL_RADIUS = (7.5)/2;
-	public static final double EXTERNAL_RADIUS = 5000;
+	public static final double HEIGHT = 0;
+	public static final double WIDTH = 0;
 	
-	public IRBall(Pose pose) {
+	public IRCircuit(Pose pose) {
 		this.staticPoseProvider = new StaticPoseProvider(pose);
-		this.envelope = new CircularEnvelope(this.staticPoseProvider, INTERNAL_RADIUS+EXTERNAL_RADIUS);
+		this.envelope = new RectangularEnvelope(this.staticPoseProvider, HEIGHT, WIDTH);
 	}
 
 	@Override
