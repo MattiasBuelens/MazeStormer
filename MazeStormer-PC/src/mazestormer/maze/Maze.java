@@ -300,7 +300,7 @@ public class Maze implements IMaze {
 		checkNotNull(barcode);
 
 		for (Tile tile : tiles.values()) {
-			if (tile.getBarcode().equals(barcode)) {
+			if (tile.hasBarcode() && tile.getBarcode().equals(barcode)) {
 				return tile;
 			}
 		}
