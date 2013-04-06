@@ -8,13 +8,10 @@ import java.util.List;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.infrared.Envelope;
-import mazestormer.infrared.IRBall;
 import mazestormer.infrared.IRSource;
-import mazestormer.infrared.RectangularEnvelope;
+import mazestormer.infrared.VirtualIRSource;
 import mazestormer.maze.Maze;
-import mazestormer.player.AbsolutePlayer;
 import mazestormer.robot.IRSensor;
-import mazestormer.robot.Robot;
 import mazestormer.world.World;
 
 public class WorldIRDetector implements IRSensor {
@@ -24,12 +21,18 @@ public class WorldIRDetector implements IRSensor {
 	
 	private final PoseProvider poseProvider;
 	private final World world;
+	private final IRDetectionMode mode;
 
-	public WorldIRDetector(World world, PoseProvider poseProvider, double radius, float range) {
+	public WorldIRDetector(World world, PoseProvider poseProvider, double radius, float range, IRDetectionMode mode) {
 		this.world = world;
 		this.poseProvider = poseProvider;
+		this.mode = mode;
 		setRadius(radius);
 		setRange(range);
+	}
+	
+	public IRDetectionMode getMode() {
+		return this.mode;
 	}
 
 	private World getWorld() {
@@ -71,17 +74,13 @@ public class WorldIRDetector implements IRSensor {
 	}
 	
 	private float detect() {
-		Float[] ras = getDetectedRobotAngles();
-		Float[] bas = getDetectedIRBallAngles();
-		Float[] combined = new Float[ras.length + bas.length];
-		System.arraycopy(ras, 0, combined, 0, ras.length);  
-        System.arraycopy(bas, 0, combined, ras.length, bas.length);
+		Float[] angles = getDetectedIRAngles();
         
-        if (combined.length != 0) {
+        if (angles.length != 0) {
 			// Selecting the closest angle difference
 			float bestAngle = 180;
-			for (int i=0; i<combined.length; i++) {
-				float f = combined[i];
+			for (int i=0; i<angles.length; i++) {
+				float f = angles[i];
 				if (Math.abs(bestAngle) > Math.abs(f)) {
 					bestAngle = f;
 				}
@@ -91,31 +90,19 @@ public class WorldIRDetector implements IRSensor {
         return Float.NaN;
 	}
 	
-	private Float[] getDetectedIRBallAngles() {
+	private Float[] getDetectedIRAngles() {
 		// TODO: seesaw troubles
-		List<Float> detectedBallAngles = new ArrayList<Float>();
+		// TODO: maze collection -> world collection
 		
-		for (IRBall irb : getMaze().getAllModelsClass(IRBall.class)) {
-			Float result = (irb.isEmitting()) ? getDetectedAngle(irb.getEnvelope()) : Float.NaN;
+		List<Float> detectedAngles = new ArrayList<Float>();
+		
+		for (IRSource irs : getMaze().getAllModelsClass(getMode().getIRSourceType())) {
+			Float result = (irs.isEmitting()) ? getDetectedAngle(irs.getEnvelope()) : Float.NaN;
 			if (!Float.isNaN(result)) {
-				detectedBallAngles.add(result);
+				detectedAngles.add(result);
 			}
 		}
-		return detectedBallAngles.toArray(new Float[0]);
-	}
-	
-	private Float[] getDetectedRobotAngles() {
-		// TODO: semi-physical casts
-		List<Float> detectedRobotAngles = new ArrayList<Float>();
-		
-		for (AbsolutePlayer ap : getWorld().getPlayers()) {
-			IRRobot otherIR = new IRRobot(ap.getRobot());
-			Float result = (otherIR.isEmitting()) ? getDetectedAngle(otherIR.getEnvelope()) : Float.NaN;
-			if (!Float.isNaN(result)) {
-				detectedRobotAngles.add(result);
-			}
-		}
-		return detectedRobotAngles.toArray(new Float[0]);
+		return detectedAngles.toArray(new Float[0]);
 	}
 	
 	private Float getDetectedAngle(Envelope envelope) {
@@ -163,29 +150,17 @@ public class WorldIRDetector implements IRSensor {
 		return Math.acos((cp1*cp1+cp2*cp2-p1p2*p1p2)/(2*cp1*cp2));
 	}
 	
-	private class IRRobot implements IRSource {
+	public enum IRDetectionMode {
+		VIRTUAL(IRSource.class), SEMI_PHYSICAL(VirtualIRSource.class);
 		
-		private static final double EXTERNAL_ZONE = 0;
-		private final Envelope envelope;
-		
-		private IRRobot(Robot robot) {
-			// TODO: dimension support
-			this.envelope = new RectangularEnvelope(robot.getPoseProvider(), 0+EXTERNAL_ZONE, 0+EXTERNAL_ZONE);
-		}
+		private Class<? extends IRSource> irSourceType;
 
-		@Override
-		public PoseProvider getPoseProvider() {
-			return getEnvelope().getPoseProvider();
+		private <T extends IRSource> IRDetectionMode(Class<T> irSourceType) {
+			this.irSourceType = irSourceType;
 		}
-	
-		@Override
-		public boolean isEmitting() {
-			return true;
-		}
-	
-		@Override
-		public Envelope getEnvelope() {
-			return this.envelope;
+		
+		public Class<? extends IRSource> getIRSourceType(){
+			return this.irSourceType;
 		}
 	}
 }
