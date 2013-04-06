@@ -161,8 +161,6 @@ public class WorldIRDetector implements IRSensor {
 		double cp2 = center.distance(p2);
 		double p1p2 = p1.distance(p2);
 		return Math.acos((cp1*cp1+cp2*cp2-p1p2*p1p2)/(2*cp1*cp2));
-		
-		// TODO: range?
 	}
 	
 	private class IRRobot implements IRSource {
