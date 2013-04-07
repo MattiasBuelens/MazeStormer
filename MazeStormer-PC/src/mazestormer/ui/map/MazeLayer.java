@@ -18,7 +18,6 @@ import mazestormer.util.CoordUtils;
 import mazestormer.util.LongPoint;
 
 import org.apache.batik.dom.svg.SVGOMTransform;
-import org.apache.batik.dom.svg.SVGStylableElement;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.svg.SVGDefsElement;
@@ -27,7 +26,6 @@ import org.w3c.dom.svg.SVGGElement;
 import org.w3c.dom.svg.SVGLineElement;
 import org.w3c.dom.svg.SVGLinearGradientElement;
 import org.w3c.dom.svg.SVGRectElement;
-import org.w3c.dom.svg.SVGStopElement;
 import org.w3c.dom.svg.SVGTransform;
 import org.w3c.dom.svg.SVGTransformList;
 import org.w3c.dom.svg.SVGTransformable;
@@ -38,6 +36,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private static final String wallColor = CSS_PERU_VALUE;
 	private static final String lineColor = CSS_WHITE_VALUE;
 	private static final String unknownColor = CSS_LIGHTGRAY_VALUE;
+	private static final String infraredColor = CSS_RED_VALUE;
+	private static final String shadowColor = CSS_PERU_VALUE;
 
 	private static final double tileSize = 1d;
 
@@ -93,39 +93,14 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private Node defineGradients() {
 		SVGDefsElement defs = (SVGDefsElement) createElement(SVG_DEFS_TAG);
 
-		SVGLinearGradientElement seesawOpen = (SVGLinearGradientElement) createElement(SVG_LINEAR_GRADIENT_TAG);
-		seesawOpen.setAttribute(SVG_ID_ATTRIBUTE, "seesawOpen");
-		seesawOpen.setAttribute(SVG_X2_ATTRIBUTE, "0");
-		seesawOpen.setAttribute(SVG_Y2_ATTRIBUTE, "1");
+		SVGLinearGradientElement seesawOpen = new SVGUtils.LinearGradientBuilder(getDocument(), "seesawOpen")
+				.vertical().add(0, shadowColor, 0.75f).add(1, shadowColor, 0).build();
 		defs.appendChild(seesawOpen);
 
-		SVGStopElement seesawOpen1 = (SVGStopElement) createElement(SVG_STOP_TAG);
-		seesawOpen1.setAttribute(SVG_OFFSET_ATTRIBUTE, "0%");
-		seesawOpen1.setAttribute(SVG_STOP_COLOR_ATTRIBUTE, CSS_GREEN_VALUE);
-		seesawOpen1.setAttribute(SVG_STOP_OPACITY_ATTRIBUTE, "0");
-		seesawOpen.appendChild(seesawOpen1);
-
-		SVGStopElement seesawOpen2 = (SVGStopElement) createElement(SVG_STOP_TAG);
-		seesawOpen2.setAttribute(SVG_OFFSET_ATTRIBUTE, "100%");
-		seesawOpen2.setAttribute(SVG_STOP_COLOR_ATTRIBUTE, CSS_GREEN_VALUE);
-		seesawOpen.appendChild(seesawOpen2);
-
-		SVGLinearGradientElement seesawClosed = (SVGLinearGradientElement) createElement(SVG_LINEAR_GRADIENT_TAG);
-		seesawClosed.setAttribute(SVG_ID_ATTRIBUTE, "seesawClosed");
-		seesawClosed.setAttribute(SVG_X2_ATTRIBUTE, "0");
-		seesawClosed.setAttribute(SVG_Y2_ATTRIBUTE, "1");
+		SVGLinearGradientElement seesawClosed = new SVGUtils.LinearGradientBuilder(getDocument(), "seesawClosed")
+				.vertical().add(0, infraredColor, 0).add(0.5f, infraredColor, 0.75f).add(0.5f, lineColor, 0.5f)
+				.add(1, lineColor, 0).build();
 		defs.appendChild(seesawClosed);
-
-		SVGStopElement seesawClosed1 = (SVGStopElement) createElement(SVG_STOP_TAG);
-		seesawClosed1.setAttribute(SVG_OFFSET_ATTRIBUTE, "0%");
-		seesawClosed1.setAttribute(SVG_STOP_COLOR_ATTRIBUTE, CSS_RED_VALUE);
-		seesawClosed.appendChild(seesawClosed1);
-
-		SVGStopElement seesawClosed2 = (SVGStopElement) createElement(SVG_STOP_TAG);
-		seesawClosed2.setAttribute(SVG_OFFSET_ATTRIBUTE, "100%");
-		seesawClosed2.setAttribute(SVG_STOP_COLOR_ATTRIBUTE, CSS_RED_VALUE);
-		seesawClosed2.setAttribute(SVG_STOP_OPACITY_ATTRIBUTE, "0");
-		seesawClosed.appendChild(seesawClosed2);
 
 		return defs;
 	}
@@ -239,14 +214,6 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		tilePosition(element, tilePosition.getX(), tilePosition.getY());
 	}
 
-	private static void setVisible(Element element, boolean isVisible) {
-		if (element != null && element instanceof SVGStylableElement) {
-			SVGStylableElement styleElement = (SVGStylableElement) element;
-			String displayValue = isVisible ? CSS_INLINE_VALUE : CSS_NONE_VALUE;
-			styleElement.getOverrideStyle().setProperty(CSS_DISPLAY_PROPERTY, displayValue, null);
-		}
-	}
-
 	private class TileElement {
 
 		private final Tile tile;
@@ -266,14 +233,13 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			tilePosition(tileGroup, tile.getPosition());
 
 			rect = (SVGRectElement) createElement(SVG_RECT_TAG);
-			rect.setAttribute(SVG_WIDTH_ATTRIBUTE, tileSize + "");
-			rect.setAttribute(SVG_HEIGHT_ATTRIBUTE, tileSize + "");
+			rect.setAttribute(SVG_WIDTH_ATTRIBUTE, SVGUtils.doubleString(tileSize));
+			rect.setAttribute(SVG_HEIGHT_ATTRIBUTE, SVGUtils.doubleString(tileSize));
 			rect.setAttribute(SVG_FILL_ATTRIBUTE, tileColor);
 			tileGroup.appendChild(rect);
 
 			// Tile: barcode
 			barcode = new BarcodeElement(tile);
-			tileGroup.appendChild(barcode.get());
 
 			// Edges
 			for (Orientation orientation : Orientation.values()) {
@@ -283,7 +249,6 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			// Seesaw
 			seesaw = new SeesawElement(tile);
 			tilePosition(seesaw.get(), tile.getPosition());
-			overlayGroup.appendChild(seesaw.get());
 
 			// Tooltip
 			tooltip = (SVGDescElement) createElement(SVG_DESC_TAG);
@@ -301,9 +266,9 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		public void update() {
 			// Update barcode
-			barcode.update();
+			updateBarcode();
 			// Update seesaw
-			seesaw.update();
+			updateSeesaw();
 			// Update tooltip
 			updateTooltip();
 		}
@@ -332,6 +297,32 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 				edgesGroup.appendChild(edgeElement.get());
 			} else {
 				edgesGroup.insertBefore(edgeElement.get(), edgesGroup.getFirstChild());
+			}
+		}
+
+		private void updateBarcode() {
+			if (tile.hasBarcode()) {
+				barcode.update();
+				if (barcode.get().getParentNode() == null) {
+					tileGroup.appendChild(barcode.get());
+				}
+			} else {
+				if (barcode.get().getParentNode() != null) {
+					tileGroup.removeChild(barcode.get());
+				}
+			}
+		}
+
+		private void updateSeesaw() {
+			if (tile.isSeesaw()) {
+				seesaw.update();
+				if (seesaw.get().getParentNode() == null) {
+					overlayGroup.appendChild(seesaw.get());
+				}
+			} else {
+				if (seesaw.get().getParentNode() != null) {
+					overlayGroup.removeChild(seesaw.get());
+				}
 			}
 		}
 
@@ -398,25 +389,27 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		private final SVGRectElement openSide;
 		private final SVGRectElement closedSide;
 
+		private SVGRectElement currentSide;
+		private SVGRectElement otherSide;
+
 		public SeesawElement(final Tile tile) {
 			this.tile = tile;
+
 			seesawGroup = (SVGGElement) createElement(SVG_G_TAG);
 
 			openSide = (SVGRectElement) createElement(SVG_RECT_TAG);
-			openSide.setAttribute(SVG_X_ATTRIBUTE, 0 + "");
-			openSide.setAttribute(SVG_Y_ATTRIBUTE, 0.75 + "");
-			openSide.setAttribute(SVG_WIDTH_ATTRIBUTE, 1 + "");
-			openSide.setAttribute(SVG_HEIGHT_ATTRIBUTE, 0.25 + "");
+			openSide.setAttribute(SVG_X_ATTRIBUTE, SVGUtils.doubleString(-0.5));
+			openSide.setAttribute(SVG_Y_ATTRIBUTE, SVGUtils.doubleString(-0.5));
+			openSide.setAttribute(SVG_WIDTH_ATTRIBUTE, SVGUtils.doubleString(1));
+			openSide.setAttribute(SVG_HEIGHT_ATTRIBUTE, SVGUtils.doubleString(0.25));
 			openSide.setAttribute(SVG_FILL_ATTRIBUTE, "url(#seesawOpen)");
-			seesawGroup.appendChild(openSide);
 
 			closedSide = (SVGRectElement) createElement(SVG_RECT_TAG);
-			closedSide.setAttribute(SVG_X_ATTRIBUTE, 0 + "");
-			closedSide.setAttribute(SVG_Y_ATTRIBUTE, 1 + "");
-			closedSide.setAttribute(SVG_WIDTH_ATTRIBUTE, 1 + "");
-			closedSide.setAttribute(SVG_HEIGHT_ATTRIBUTE, 0.25 + "");
+			closedSide.setAttribute(SVG_X_ATTRIBUTE, SVGUtils.doubleString(-0.5));
+			closedSide.setAttribute(SVG_Y_ATTRIBUTE, SVGUtils.doubleString(-0.75));
+			closedSide.setAttribute(SVG_WIDTH_ATTRIBUTE, SVGUtils.doubleString(1));
+			closedSide.setAttribute(SVG_HEIGHT_ATTRIBUTE, SVGUtils.doubleString(0.5));
 			closedSide.setAttribute(SVG_FILL_ATTRIBUTE, "url(#seesawClosed)");
-			seesawGroup.appendChild(closedSide);
 
 			update();
 		}
@@ -426,22 +419,32 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		}
 
 		public void update() {
-			// Visibility
-			setVisible(openSide, tile.isSeesaw() && tile.isSeesawOpen());
-			setVisible(closedSide, tile.isSeesaw() && !tile.isSeesawOpen());
+			if (!tile.isSeesaw())
+				return;
+
+			// State
+			currentSide = tile.isSeesawOpen() ? openSide : closedSide;
+			otherSide = tile.isSeesawOpen() ? closedSide : openSide;
+			if (otherSide.getParentNode() != null) {
+				seesawGroup.removeChild(otherSide);
+			}
+			seesawGroup.appendChild(currentSide);
 
 			// Orientation
-			if (tile.isSeesaw()) {
-				Tile barcodeTile = maze.getBarcodeTile(tile.getSeesawBarcode());
-				if (barcodeTile != null) {
-					// TODO
-					Orientation orientation = tile.orientationTo(barcodeTile);
-					float angle = -orientation.angleTo(Orientation.SOUTH);
-					SVGTransform transform = new SVGOMTransform();
-					transform.setRotate(angle, 0.5f, 0.5f);
-					SVGTransformList transformList = seesawGroup.getTransform().getBaseVal();
-					transformList.appendItem(transform);
-				}
+			Tile barcodeTile = maze.getBarcodeTile(tile.getSeesawBarcode());
+			if (barcodeTile != null) {
+				// Get rotation angle
+				Orientation orientation = tile.orientationTo(barcodeTile);
+				float angle = -orientation.getAngle() + 90f;
+				// Set rotation on current side
+				SVGTransform translate = new SVGOMTransform();
+				translate.setTranslate(0.5f, 0.5f);
+				SVGTransform rotate = new SVGOMTransform();
+				rotate.setRotate(angle, 0, 0);
+				SVGTransformList list = currentSide.getTransform().getBaseVal();
+				list.clear();
+				list.appendItem(translate);
+				list.appendItem(rotate);
 			}
 		}
 
@@ -461,7 +464,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			this.type = Edge.EdgeType.UNKNOWN;
 
 			line = (SVGLineElement) createElement(SVG_LINE_TAG);
-			line.setAttribute(SVG_STROKE_WIDTH_ATTRIBUTE, edgeStrokeWidth + "");
+			line.setAttribute(SVG_STROKE_WIDTH_ATTRIBUTE, SVGUtils.doubleString(edgeStrokeWidth));
 			tilePosition(line, getPosition());
 
 			update();
@@ -512,8 +515,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			// Stroke color
 			line.setAttribute(SVG_STROKE_ATTRIBUTE, color);
 			// Dashes
-			line.setAttribute(SVG_STROKE_DASHARRAY_ATTRIBUTE, dashed ? (edgeDashSize * edgeStrokeWidth) + ""
-					: SVG_NONE_VALUE);
+			line.setAttribute(SVG_STROKE_DASHARRAY_ATTRIBUTE,
+					dashed ? SVGUtils.doubleString(edgeDashSize * edgeStrokeWidth) + "" : SVG_NONE_VALUE);
 		}
 
 		private void setPoints() {
