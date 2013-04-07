@@ -96,7 +96,7 @@ public class WorldIRDetector implements IRSensor {
 		
 		List<Float> detectedAngles = new ArrayList<Float>();
 		
-		for (IRSource irs : getMaze().getAllModelsClass(getMode().getIRSourceType())) {
+		for (IRSource irs : getWorld().getAllModelsClass(getMode().getIRSourceType())) {
 			Float result = (irs.isEmitting()) ? getDetectedAngle(irs.getEnvelope()) : Float.NaN;
 			if (!Float.isNaN(result)) {
 				detectedAngles.add(result);

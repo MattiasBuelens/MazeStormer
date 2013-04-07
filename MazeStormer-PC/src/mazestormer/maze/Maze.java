@@ -598,38 +598,4 @@ public class Maze implements IMaze {
 		}
 		return null;
 	}
-	
-	private final Set<Model> staticModels = new HashSet<Model>();
-	
-	public void addModel(Model model) {
-		this.staticModels.add(model);
-	}
-	
-	public void removeModel(Model model) {
-		this.staticModels.remove(model);
-	}
-	
-	public Set<Model> getModels() {
-		return Collections.unmodifiableSet(this.staticModels);
-	}
-	
-    public <T extends Model> Set<T> getAllStrictModelsClass(Class<T> clazz) {
-       Set<T> temp = new HashSet<T>();
-       for(Model model : this.staticModels) {
-    	   if (model.getClass() == clazz) {
-    		   temp.add(clazz.cast(model));
-    	   }
-        }
-        return Collections.unmodifiableSet(temp);
-    }
-    
-    public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType){
-    	Set<T> temp = new HashSet<T>();
-        for(Model model : this.staticModels) {
-     	   if (modelType.isInstance(model)) {
-     		   temp.add(modelType.cast(model));
-     	   }
-         }
-         return Collections.unmodifiableSet(temp);
-    }
 }

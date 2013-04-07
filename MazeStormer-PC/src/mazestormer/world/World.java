@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.infrared.Model;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.RelativePlayer;
@@ -55,6 +58,8 @@ public class World {
 
 	public void addPlayer(AbsolutePlayer player) {
 		players.put(player.getPlayerID(), player);
+		addModel(player.getIRRobot());
+		
 		for (WorldListener listener : listeners) {
 			listener.playerAdded(player);
 		}
@@ -62,6 +67,8 @@ public class World {
 
 	public void removePlayer(AbsolutePlayer player) {
 		players.remove(player.getPlayerID());
+		removeModel(player.getIRRobot());
+		
 		for (WorldListener listener : listeners) {
 			listener.playerRemoved(player);
 		}
@@ -91,4 +98,40 @@ public class World {
 	public Logger getLogger() {
 		return logger;
 	}
+	
+	// TODO: Objects and ir circuits need to be added after parsing
+	
+	private final Set<Model> models = new HashSet<Model>();
+	
+	public void addModel(Model model) {
+		this.models.add(model);
+	}
+	
+	public void removeModel(Model model) {
+		this.models.remove(model);
+	}
+	
+	public Set<Model> getModels() {
+		return Collections.unmodifiableSet(this.models);
+	}
+	
+    public <T extends Model> Set<T> getAllStrictModelsClass(Class<T> clazz) {
+       Set<T> temp = new HashSet<T>();
+       for(Model model : this.models) {
+    	   if (model.getClass() == clazz) {
+    		   temp.add(clazz.cast(model));
+    	   }
+        }
+        return Collections.unmodifiableSet(temp);
+    }
+    
+    public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType){
+    	Set<T> temp = new HashSet<T>();
+        for(Model model : this.models) {
+     	   if (modelType.isInstance(model)) {
+     		   temp.add(modelType.cast(model));
+     	   }
+         }
+         return Collections.unmodifiableSet(temp);
+    }
 }
