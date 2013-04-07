@@ -153,7 +153,7 @@ public class WorldIRDetector implements IRSensor {
 	public enum IRDetectionMode {
 		VIRTUAL(IRSource.class), SEMI_PHYSICAL(VirtualIRSource.class);
 		
-		private Class<? extends IRSource> irSourceType;
+		private final Class<? extends IRSource> irSourceType;
 
 		private <T extends IRSource> IRDetectionMode(Class<T> irSourceType) {
 			this.irSourceType = irSourceType;
