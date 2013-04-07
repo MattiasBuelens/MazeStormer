@@ -67,6 +67,8 @@ public class World {
 
 	public void removePlayer(AbsolutePlayer player) {
 		players.remove(player.getPlayerID());
+		
+		//TODO: de oude robot zijn ir robot kan nog steeds in de set aanwezig zijn
 		removeModel(player.getIRRobot());
 		
 		for (WorldListener listener : listeners) {
