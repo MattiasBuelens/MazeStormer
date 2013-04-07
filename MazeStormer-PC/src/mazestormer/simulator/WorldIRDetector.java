@@ -92,7 +92,6 @@ public class WorldIRDetector implements IRSensor {
 	
 	private Float[] getDetectedIRAngles() {
 		// TODO: seesaw troubles
-		// TODO: maze collection -> world collection
 		
 		List<Float> detectedAngles = new ArrayList<Float>();
 		
