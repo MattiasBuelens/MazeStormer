@@ -22,6 +22,7 @@ public class PhysicalRobot extends PhysicalComponent implements
 	 */
 	public static final int requestTimeout = 10000;
 	
+	// TODO: De wereld moet nog toegevoegd worden op één of andere manier
 	private World world;
 
 	private PhysicalPilot pilot;
