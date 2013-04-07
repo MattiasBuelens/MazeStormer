@@ -5,11 +5,10 @@ import java.util.logging.Logger;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.infrared.IRRobot;
-import mazestormer.infrared.PhysicalIRRobot;
-import mazestormer.infrared.VirtualIRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
 import mazestormer.robot.Robot;
+import mazestormer.world.IRDelegate;
 
 public class AbsolutePlayer extends Player {
 
@@ -17,14 +16,14 @@ public class AbsolutePlayer extends Player {
 	private PoseTransform transform = new PoseTransform();
 
 	private final Robot robot;
-	private final IRRobot irRobot;
+	private final IRDelegate irDelegate;
 	private final PoseProvider poseProvider;
 
 	public AbsolutePlayer(RelativePlayer player) {
 		this.delegate = player;
 
 		this.robot = new AbsoluteRobot();
-		this.irRobot = getAnIRRobot(this.robot);
+		this.irDelegate = new IRDelegate(this.delegate);
 		this.poseProvider = new AbsolutePoseProvider();
 	}
 
@@ -55,18 +54,8 @@ public class AbsolutePlayer extends Player {
 		return robot;
 	}
 	
-	private static IRRobot getAnIRRobot(Robot robot) {
-		// TODO: Physical <> virtual
-		// dummy if test without yellow remarks :D
-		if(robot.hashCode()!=0) {
-			return (new VirtualIRRobot(robot));
-		} else {
-			return (new PhysicalIRRobot(robot));
-		}
-	}
-	
 	public IRRobot getIRRobot() {
-		return this.irRobot;
+		return this.irDelegate.getIRRobot();
 	}
 
 	@Override

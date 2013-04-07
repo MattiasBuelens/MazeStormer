@@ -12,6 +12,7 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
+import mazestormer.world.World;
 
 public class PhysicalRobot extends PhysicalComponent implements
 		ControllableRobot {
@@ -20,6 +21,8 @@ public class PhysicalRobot extends PhysicalComponent implements
 	 * Timeout for synchronous requests.
 	 */
 	public static final int requestTimeout = 10000;
+	
+	private World world;
 
 	private PhysicalPilot pilot;
 	private PoseProvider poseProvider;
@@ -60,10 +63,14 @@ public class PhysicalRobot extends PhysicalComponent implements
 		return scanner;
 	}
 	
+	private World getWorld() {
+		return this.world;
+	}
+	
 	@Override
 	public IRSensor getIRSensor() {
 		if (irSensor == null) {
-			irSensor = new PhysicalIRSensor(getCommunicator());
+			irSensor = new ExtendedPhysicalIRSensor(getCommunicator(), getWorld());
 		}
 		return irSensor;
 	}
