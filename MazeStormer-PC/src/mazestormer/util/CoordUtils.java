@@ -12,41 +12,67 @@ public final class CoordUtils {
 	/**
 	 * Convert the given robot position to map coordinates.
 	 * 
-	 * @param position
+	 * @param robotPosition
 	 *            The position in robot coordinates.
 	 */
-	public static Point2D toMapCoordinates(Point2D position) {
-		return new Point2D.Double(position.getX(), -position.getY());
+	public static <P extends Point2D> P toMapCoordinates(P robotPosition) {
+		@SuppressWarnings("unchecked")
+		P mapPosition = (P) robotPosition.clone();
+		mapPosition.setLocation(robotPosition.getX(), -robotPosition.getY());
+		return mapPosition;
 	}
 
 	/**
 	 * Convert the given map position to robot coordinates.
 	 * 
-	 * @param position
+	 * @param mapPosition
 	 *            The position in map coordinates.
 	 */
-	public static Point2D toRobotCoordinates(Point2D position) {
-		return toMapCoordinates(position);
+	public static <P extends Point2D> P toRobotCoordinates(P mapPosition) {
+		return toMapCoordinates(mapPosition);
+	}
+
+	/**
+	 * Convert the given robot heading to map coordinates.
+	 * 
+	 * @param robotHeading
+	 *            The heading in robot coordinates.
+	 */
+	public static float toMapCoordinates(float robotHeading) {
+		return -robotHeading + 90f;
+	}
+
+	/**
+	 * Convert the given map heading to robot coordinates.
+	 * 
+	 * @param mapHeading
+	 *            The heading in map coordinates.
+	 */
+	public static float toRobotCoordinates(float mapHeading) {
+		return toMapCoordinates(mapHeading);
 	}
 
 	/**
 	 * Convert the given robot pose to map coordinates.
 	 * 
-	 * @param pose
+	 * @param robotPose
 	 *            The pose in robot coordinates.
 	 */
-	public static Pose toMapCoordinates(Pose pose) {
-		return new Pose(pose.getX(), -pose.getY(), -pose.getHeading() + 90f);
+	public static Pose toMapCoordinates(Pose robotPose) {
+		Pose mapPose = new Pose();
+		mapPose.setLocation(toMapCoordinates(robotPose.getLocation()));
+		mapPose.setHeading(toMapCoordinates(robotPose.getHeading()));
+		return mapPose;
 	}
 
 	/**
 	 * Convert the given map pose to robot coordinates.
 	 * 
-	 * @param pose
+	 * @param mapPose
 	 *            The pose in map coordinates.
 	 */
-	public static Pose toRobotCoordinates(Pose pose) {
-		return toMapCoordinates(pose);
+	public static Pose toRobotCoordinates(Pose mapPose) {
+		return toMapCoordinates(mapPose);
 	}
 
 }

@@ -435,7 +435,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			if (barcodeTile != null) {
 				// Get rotation angle
 				Orientation orientation = tile.orientationTo(barcodeTile);
-				float angle = -orientation.getAngle() + 90f;
+				float angle = CoordUtils.toMapCoordinates(orientation.getAngle());
 				// Set rotation on current side
 				SVGTransform translate = new SVGOMTransform();
 				translate.setTranslate(0.5f, 0.5f);
