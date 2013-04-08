@@ -319,7 +319,7 @@ public class Maze implements IMaze {
 		checkNotNull(barcode);
 
 		for (Tile tile : tiles.values()) {
-			if (tile.getBarcode().equals(barcode)) {
+			if (tile.hasBarcode() && tile.getBarcode().equals(barcode)) {
 				return tile;
 			}
 		}
@@ -368,6 +368,7 @@ public class Maze implements IMaze {
 		Tile tile = getTileAt(tilePosition);
 		tile.setSeesaw(seesaw, seesawBarcode);
 		registerSeesaw(seesaw);
+		fireTileChanged(tile);
 	}
 
 	private void registerSeesaw(Seesaw seesaw) {
