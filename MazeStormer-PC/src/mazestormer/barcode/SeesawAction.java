@@ -68,7 +68,26 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		}
 	}
 
+	/**
+	 * <ol>
+	 * <li>rijd vooruit tot aan een bruin-zwart overgang (van de barcode aan de
+	 * andere kant van de wip)</li>
+	 * <li>informatie over wip aan het ontdekte doolhof toevoegen</li>
+	 * <li>rijd vooruit tot 20 cm over een witte lijn (= eerste bruin-wit
+	 * overgang)</li>
+	 * <li>verwijder eventueel tegels uit de queue</li>
+	 * </ol>
+	 * 
+	 * @pre robot staat voor de wip aan de neergelaten kant, hij kijkt naar de
+	 *      wip
+	 * @post robot staat op een tegel achter de tegel achter de wip, in het
+	 *       midden, en kijkt weg van de wip (tegel achter de wip bevat een
+	 *       andere barcode). alle informatie over de gepasseerde tegels staat
+	 *       in de observedMaze. de eerste tegel, de tegels van de wip en de
+	 *       tegel na de wip staan niet meer in de queue
+	 */
 	protected void onwards() {
+		// TODO Implement seesaw action
 		getGameRunner().onSeesaw(barcode);
 		bindTransition(getPilot().travelComplete(130), // TODO 130 juist?
 				SeesawState.FIND_LINE);
@@ -109,7 +128,23 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		}
 	}
 
+	/**
+	 * <ol>
+	 * <li>informatie over wip aan het ontdekte doolhof toevoegen</li>
+	 * <li>180° omdraaien</li>
+	 * <li>rijd vooruit tot 20 cm over een witte lijn</li>
+	 * <li>verwijder eventueel tegels uit de queue</li>
+	 * </ol>
+	 * 
+	 * @pre robot staat voor de wip aan de opgelaten kant, hij kijkt naar de wip
+	 * @post robot staan op de tegel voor de tegel voor de wip, in het midden,
+	 *       en kijkt weg van de wip (tegel voor de wip bevat de barcode) alle
+	 *       informatie over de tegel voor de wip, de tegels van de wip en de
+	 *       tegel achter de wip is toegevoegd aan de observedMaze. geen van die
+	 *       tegels staat nog in de queue
+	 */
 	protected void resumeExploring() {
+		// TODO Implement seesaw action
 		stop(); // stops this seesaw action
 	}
 
