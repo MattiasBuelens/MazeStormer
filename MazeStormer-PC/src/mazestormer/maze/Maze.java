@@ -241,7 +241,12 @@ public class Maze implements IMaze {
 		}
 		// Seesaw
 		if (tile.isSeesaw()) {
-			// TODO Set seesaw tile
+			// TODO Set seesaw tile and link to tiles
+			Tile ownTile = getTileAt(tilePosition);
+			ownTile.setSeesawBarcode(tile.getSeesawBarcode());
+			ownTile.setOtherSeesawBarcode(tile.getOtherSeesawBarcode());
+			ownTile.setSeesawOpen(tile.isSeesawOpen());
+			fireTileChanged(ownTile);
 		}
 	}
 
@@ -300,7 +305,7 @@ public class Maze implements IMaze {
 		checkNotNull(barcode);
 
 		for (Tile tile : tiles.values()) {
-			if (tile.getBarcode().equals(barcode)) {
+			if (tile.hasBarcode() && tile.getBarcode().equals(barcode)) {
 				return tile;
 			}
 		}

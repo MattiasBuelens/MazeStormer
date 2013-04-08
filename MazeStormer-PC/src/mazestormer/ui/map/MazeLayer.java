@@ -19,9 +19,12 @@ import mazestormer.util.LongPoint;
 
 import org.apache.batik.dom.svg.SVGOMTransform;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.svg.SVGDefsElement;
 import org.w3c.dom.svg.SVGDescElement;
 import org.w3c.dom.svg.SVGGElement;
 import org.w3c.dom.svg.SVGLineElement;
+import org.w3c.dom.svg.SVGLinearGradientElement;
 import org.w3c.dom.svg.SVGRectElement;
 import org.w3c.dom.svg.SVGTransform;
 import org.w3c.dom.svg.SVGTransformList;
@@ -34,6 +37,15 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private static final String lineColor = CSS_WHITE_VALUE;
 	private static final String unknownColor = CSS_LIGHTGRAY_VALUE;
 
+	private static final String infraredColor = CSS_RED_VALUE;
+
+	// low = hsl(28, 87.1%, 66.7%) = tileColor
+	private static final String seesawLowColor = CSS_SANDYBROWN_VALUE;
+	// mid: hsl(28, 87.1%, 69.7%) = rgb(245, 173, 110)
+	private static final String seesawMidColor = "rgb(245,173,110)";
+	// hi: hsl(28, 87.1%, 72.7%) = rgb(246, 181, 125)
+	private static final String seesawHighColor = "rgb(246,181,125)";
+
 	private static final double tileSize = 1d;
 
 	private final double edgeStrokeWidth;
@@ -45,6 +57,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	private SVGGElement mazeElement;
 	private SVGGElement tilesGroup;
 	private SVGGElement edgesGroup;
+	private SVGGElement overlayGroup;
 	private Map<LongPoint, TileElement> tiles = new HashMap<LongPoint, TileElement>();
 
 	public MazeLayer(String name, IMaze maze) {
@@ -61,21 +74,45 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 	@Override
 	public SVGGElement getTransformElement() {
-		if (mazeElement == null) {
-			mazeElement = (SVGGElement) createElement(SVG_G_TAG);
-			tilesGroup = (SVGGElement) createElement(SVG_G_TAG);
-			edgesGroup = (SVGGElement) createElement(SVG_G_TAG);
-			tilesGroup.setAttribute(SVG_ID_ATTRIBUTE, "tiles");
-			edgesGroup.setAttribute(SVG_ID_ATTRIBUTE, "edges");
+		if (mazeElement != null)
+			return mazeElement;
 
-			mazeElement.appendChild(tilesGroup);
-			mazeElement.appendChild(edgesGroup);
+		mazeElement = (SVGGElement) createElement(SVG_G_TAG);
+		tilesGroup = (SVGGElement) createElement(SVG_G_TAG);
+		edgesGroup = (SVGGElement) createElement(SVG_G_TAG);
+		overlayGroup = (SVGGElement) createElement(SVG_G_TAG);
+		tilesGroup.setAttribute(SVG_ID_ATTRIBUTE, "tiles");
+		edgesGroup.setAttribute(SVG_ID_ATTRIBUTE, "edges");
+		overlayGroup.setAttribute(SVG_ID_ATTRIBUTE, "overlay");
 
-			for (Tile tile : maze.getTiles()) {
-				tileAdded(tile);
-			}
+		mazeElement.appendChild(defineGradients());
+		mazeElement.appendChild(tilesGroup);
+		mazeElement.appendChild(edgesGroup);
+		mazeElement.appendChild(overlayGroup);
+
+		for (Tile tile : maze.getTiles()) {
+			tileAdded(tile);
 		}
+
 		return mazeElement;
+	}
+
+	private Node defineGradients() {
+		SVGDefsElement defs = (SVGDefsElement) createElement(SVG_DEFS_TAG);
+
+		SVGLinearGradientElement seesawOpen = new SVGUtils.LinearGradientBuilder(getDocument(), "seesawOpen")
+				.vertical().add(0, seesawLowColor).add(1, seesawMidColor).build();
+		defs.appendChild(seesawOpen);
+
+		SVGLinearGradientElement seesawClosed = new SVGUtils.LinearGradientBuilder(getDocument(), "seesawClosed")
+				.vertical().add(0, seesawHighColor).add(1, seesawMidColor).build();
+		defs.appendChild(seesawClosed);
+
+		SVGLinearGradientElement seesawInfrared = new SVGUtils.LinearGradientBuilder(getDocument(), "seesawInfrared")
+				.vertical().add(0, infraredColor, 0).add(1, infraredColor, 0.75f).build();
+		defs.appendChild(seesawInfrared);
+
+		return defs;
 	}
 
 	public IMaze getMaze() {
@@ -101,6 +138,37 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		setPosition(CoordUtils.toMapCoordinates(origin.getLocation()));
 		setRotationAngle(-origin.getHeading());
 		update();
+	}
+
+	private boolean isTileClosed(Tile tile) {
+		return tile.getClosedSides().size() == tile.getEdges().size();
+	}
+
+	// private boolean isEdgeBetweenClosed(Edge edge) {
+	// for (LongPoint touchingPosition : edge.getTouching()) {
+	// if (!isTileClosed(getMaze().getTileAt(touchingPosition))) {
+	// return false;
+	// }
+	// }
+	// return true;
+	// }
+
+	private String getTooltipText(Tile tile) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<strong>Tile</strong>");
+		// Position
+		sb.append("<br>X: ").append(tile.getX());
+		sb.append("<br>Y: ").append(tile.getY());
+		// Barcode
+		if (tile.hasBarcode()) {
+			sb.append("<br>Barcode: ").append(tile.getBarcode().getValue());
+		}
+		// Seesaw
+		if (tile.isSeesaw()) {
+			sb.append("<br>Seesaw: ").append(tile.isSeesawOpen() ? "open" : "closed");
+			sb.append(" facing ").append(tile.getSeesawBarcode().getValue());
+		}
+		return sb.toString();
 	}
 
 	@Override
@@ -152,6 +220,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			public void run() {
 				SVGUtils.removeChildNodes(tilesGroup);
 				SVGUtils.removeChildNodes(edgesGroup);
+				SVGUtils.removeChildNodes(overlayGroup);
 			}
 		});
 	}
@@ -194,29 +263,34 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		private final SVGGElement tileGroup;
 		private final SVGRectElement rect;
 		private final BarcodeElement barcode;
+		private final SeesawElement seesaw;
 		private final SVGDescElement tooltip;
 
 		public TileElement(final Tile tile) {
 			this.tile = tile;
 
-			// Tile: rectangle and barcode
+			// Tile: rectangle
 			tileGroup = (SVGGElement) createElement(SVG_G_TAG);
 			tilePosition(tileGroup, tile.getPosition());
 
 			rect = (SVGRectElement) createElement(SVG_RECT_TAG);
-			rect.setAttribute(SVG_WIDTH_ATTRIBUTE, tileSize + "");
-			rect.setAttribute(SVG_HEIGHT_ATTRIBUTE, tileSize + "");
-			rect.setAttribute(SVG_FILL_ATTRIBUTE, tileColor);
+			rect.setAttribute(SVG_WIDTH_ATTRIBUTE, SVGUtils.doubleString(tileSize));
+			rect.setAttribute(SVG_HEIGHT_ATTRIBUTE, SVGUtils.doubleString(tileSize));
 			tileGroup.appendChild(rect);
+			updateTile();
 
+			// Tile: barcode
 			barcode = new BarcodeElement(tile);
-			tileGroup.appendChild(barcode.get());
 
 			// Edges
 			for (Orientation orientation : Orientation.values()) {
 				setEdge(orientation, tile.getEdgeAt(orientation).getType());
 			}
-			
+
+			// Seesaw
+			seesaw = new SeesawElement(tile);
+			tilePosition(seesaw.get(), tile.getPosition());
+
 			// Tooltip
 			tooltip = (SVGDescElement) createElement(SVG_DESC_TAG);
 			tileGroup.appendChild(tooltip);
@@ -232,9 +306,9 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		}
 
 		public void update() {
-			// Update barcode
-			barcode.update();
-			// Update tooltip
+			updateTile();
+			updateBarcode();
+			updateSeesaw();
 			updateTooltip();
 		}
 
@@ -259,23 +333,59 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 			// Put walls above lines
 			if (type == Edge.EdgeType.WALL) {
+				// Do not show walls between closed tiles
+				// if (!isEdgeBetweenClosed(tile.getEdgeAt(orientation))) {
 				edgesGroup.appendChild(edgeElement.get());
+				// }
 			} else {
 				edgesGroup.insertBefore(edgeElement.get(), edgesGroup.getFirstChild());
 			}
 		}
-		
-		private void updateTooltip() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("<strong>Tile</strong>");
-			// Position
-			sb.append("<br>X: ").append(tile.getX());
-			sb.append("<br>Y: ").append(tile.getY());
-			// Barcode
-			if(tile.hasBarcode()) {
-				sb.append("<br>Barcode: ").append(tile.getBarcode().getValue());
+
+		private void updateTile() {
+			if (isTileClosed(tile)) {
+				rect.setAttribute(SVG_FILL_ATTRIBUTE, wallColor);
+				// Do not show closed tiles
+				// if (rect.getParentNode() != null) {
+				// tileGroup.removeChild(rect);
+				// }
+			} else {
+				rect.setAttribute(SVG_FILL_ATTRIBUTE, tileColor);
+				// Show regular tiles
+				// if (rect.getParentNode() == null) {
+				// tileGroup.insertBefore(rect, tileGroup.getFirstChild());
+				// }
 			}
-			tooltip.setTextContent(sb.toString());
+		}
+
+		private void updateBarcode() {
+			if (tile.hasBarcode()) {
+				barcode.update();
+				if (barcode.get().getParentNode() == null) {
+					tileGroup.appendChild(barcode.get());
+				}
+			} else {
+				if (barcode.get().getParentNode() != null) {
+					tileGroup.removeChild(barcode.get());
+				}
+			}
+		}
+
+		private void updateSeesaw() {
+			if (tile.isSeesaw()) {
+				seesaw.update();
+				if (seesaw.get().getParentNode() == null) {
+					overlayGroup.appendChild(seesaw.get());
+				}
+			} else {
+				if (seesaw.get().getParentNode() != null) {
+					overlayGroup.removeChild(seesaw.get());
+				}
+			}
+		}
+
+		private void updateTooltip() {
+			tooltip.setTextContent(getTooltipText(tile));
 		}
 
 	}
@@ -316,6 +426,95 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 	}
 
+	private class SeesawElement {
+
+		private final Tile tile;
+		private final SVGGElement seesawGroup;
+		private final Element openSide;
+		private final Element closedSide;
+		private final SVGDescElement tooltip;
+
+		private Element currentSide;
+		private Element otherSide;
+
+		public SeesawElement(final Tile tile) {
+			this.tile = tile;
+
+			seesawGroup = (SVGGElement) createElement(SVG_G_TAG);
+
+			// Open side: tile
+			openSide = createElement(SVG_RECT_TAG);
+			openSide.setAttribute(SVG_X_ATTRIBUTE, SVGUtils.doubleString(-0.5 + edgeStrokeWidth / 2));
+			openSide.setAttribute(SVG_Y_ATTRIBUTE, SVGUtils.doubleString(-0.5 - edgeStrokeWidth));
+			openSide.setAttribute(SVG_WIDTH_ATTRIBUTE, SVGUtils.doubleString(1 - edgeStrokeWidth));
+			openSide.setAttribute(SVG_HEIGHT_ATTRIBUTE, SVGUtils.doubleString(1 + edgeStrokeWidth));
+			openSide.setAttribute(SVG_FILL_ATTRIBUTE, "url(#seesawOpen)");
+
+			// Closed side: tile
+			closedSide = createElement(SVG_G_TAG);
+			SVGRectElement closedRect = (SVGRectElement) createElement(SVG_RECT_TAG);
+			closedRect.setAttribute(SVG_X_ATTRIBUTE, SVGUtils.doubleString(-0.5 + edgeStrokeWidth / 2));
+			closedRect.setAttribute(SVG_Y_ATTRIBUTE, SVGUtils.doubleString(-0.5 - edgeStrokeWidth / 2));
+			closedRect.setAttribute(SVG_WIDTH_ATTRIBUTE, SVGUtils.doubleString(1 - edgeStrokeWidth));
+			closedRect.setAttribute(SVG_HEIGHT_ATTRIBUTE, SVGUtils.doubleString(1 + edgeStrokeWidth));
+			closedRect.setAttribute(SVG_FILL_ATTRIBUTE, "url(#seesawClosed)");
+			closedSide.appendChild(closedRect);
+
+			// Closed side: infrared glow
+			SVGRectElement closedIR = (SVGRectElement) createElement(SVG_RECT_TAG);
+			closedIR.setAttribute(SVG_X_ATTRIBUTE, SVGUtils.doubleString(-0.5 + edgeStrokeWidth / 2));
+			closedIR.setAttribute(SVG_Y_ATTRIBUTE, SVGUtils.doubleString(-0.75 - edgeStrokeWidth / 2));
+			closedIR.setAttribute(SVG_WIDTH_ATTRIBUTE, SVGUtils.doubleString(1 - edgeStrokeWidth));
+			closedIR.setAttribute(SVG_HEIGHT_ATTRIBUTE, SVGUtils.doubleString(0.25));
+			closedIR.setAttribute(SVG_FILL_ATTRIBUTE, "url(#seesawInfrared)");
+			closedSide.appendChild(closedIR);
+
+			// Tooltip
+			tooltip = (SVGDescElement) createElement(SVG_DESC_TAG);
+			seesawGroup.appendChild(tooltip);
+
+			update();
+		}
+
+		public SVGGElement get() {
+			return seesawGroup;
+		}
+
+		public void update() {
+			if (!tile.isSeesaw())
+				return;
+
+			// State
+			currentSide = tile.isSeesawOpen() ? openSide : closedSide;
+			otherSide = tile.isSeesawOpen() ? closedSide : openSide;
+			if (otherSide.getParentNode() != null) {
+				seesawGroup.removeChild(otherSide);
+			}
+			seesawGroup.appendChild(currentSide);
+
+			// Orientation
+			Tile barcodeTile = maze.getBarcodeTile(tile.getSeesawBarcode());
+			if (barcodeTile != null) {
+				// Get rotation angle
+				Orientation orientation = tile.orientationTo(barcodeTile);
+				float angle = CoordUtils.toMapCoordinates(orientation.getAngle());
+				// Set rotation on current side
+				SVGTransform translate = new SVGOMTransform();
+				translate.setTranslate(0.5f, 0.5f);
+				SVGTransform rotate = new SVGOMTransform();
+				rotate.setRotate(angle, 0, 0);
+				SVGTransformList list = ((SVGTransformable) currentSide).getTransform().getBaseVal();
+				list.clear();
+				list.appendItem(translate);
+				list.appendItem(rotate);
+			}
+
+			// Tooltip
+			tooltip.setTextContent(getTooltipText(tile));
+		}
+
+	}
+
 	private class EdgeElement {
 
 		private final LongPoint position;
@@ -330,7 +529,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			this.type = Edge.EdgeType.UNKNOWN;
 
 			line = (SVGLineElement) createElement(SVG_LINE_TAG);
-			line.setAttribute(SVG_STROKE_WIDTH_ATTRIBUTE, edgeStrokeWidth + "");
+			line.setAttribute(SVG_STROKE_WIDTH_ATTRIBUTE, SVGUtils.doubleString(edgeStrokeWidth));
 			tilePosition(line, getPosition());
 
 			update();
@@ -381,8 +580,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			// Stroke color
 			line.setAttribute(SVG_STROKE_ATTRIBUTE, color);
 			// Dashes
-			line.setAttribute(SVG_STROKE_DASHARRAY_ATTRIBUTE, dashed ? (edgeDashSize * edgeStrokeWidth) + ""
-					: SVG_NONE_VALUE);
+			line.setAttribute(SVG_STROKE_DASHARRAY_ATTRIBUTE,
+					dashed ? SVGUtils.doubleString(edgeDashSize * edgeStrokeWidth) + "" : SVG_NONE_VALUE);
 		}
 
 		private void setPoints() {
