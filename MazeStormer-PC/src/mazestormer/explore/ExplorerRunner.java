@@ -741,11 +741,11 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 
 		// TODO This won't work if there exist longer paths around a seesaw!!!
 		public int shortestPathLength(Tile startTile, Tile endTile) {
-			List<Waypoint> path = pathFinder.findPath(startTile, endTile);
-			IMaze maze = player.getMaze();
-			for (Waypoint wp : path) {
-				if (maze.getTileAt(wp.getPose().getLocation()).getIgnoreFlag())
+			List<Tile> path = pathFinder.findTilePath(startTile, endTile);
+			for (Tile tile : path) {
+				if (tile.getIgnoreFlag()) {
 					return Integer.MAX_VALUE;
+				}
 			}
 			return path.size();
 		}

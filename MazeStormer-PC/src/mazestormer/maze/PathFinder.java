@@ -1,7 +1,6 @@
 package mazestormer.maze;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import lejos.geom.Point;
@@ -49,20 +48,37 @@ public class PathFinder {
 	 *            The start tile.
 	 * @param goalTile
 	 *            The goal tile.
+	 * @return An ordered list of tiles. The starting tile is
+	 *         <strong>not</strong> included.
+	 */
+	public List<Tile> findTilePath(Tile startTile, Tile goalTile) {
+		// Get path of tiles
+		List<Tile> tiles = maze.getMesh().findTilePath(startTile, goalTile);
+		// Skip starting tile
+		if (tiles.size() <= 1) {
+			return new ArrayList<Tile>();
+		} else {
+			return tiles.subList(1, tiles.size());
+		}
+	}
+
+	/**
+	 * Find the shortest path from the start tile to the goal tile.
+	 * 
+	 * @param startTile
+	 *            The start tile.
+	 * @param goalTile
+	 *            The goal tile.
 	 * @return An ordered list of way points. The way point at the starting tile
 	 *         is <strong>not</strong> included.
 	 */
 	public List<Waypoint> findPath(Tile startTile, Tile goalTile) {
 		// Get path of tiles
-		List<Tile> tiles = maze.getMesh().findTilePath(startTile, goalTile);
+		List<Tile> tiles = findTilePath(startTile, goalTile);
 		// Get path of way points
-		// Note: iteration starts at *second* tile (index 1)
 		List<Waypoint> waypoints = new ArrayList<Waypoint>();
-		if (tiles.size() > 0) {
-			Iterator<Tile> it = tiles.listIterator(1);
-			while (it.hasNext()) {
-				waypoints.add(toWaypoint(it.next()));
-			}
+		for (Tile tile : tiles) {
+			waypoints.add(toWaypoint(tile));
 		}
 		return waypoints;
 	}
