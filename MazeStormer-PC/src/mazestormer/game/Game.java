@@ -1,60 +1,65 @@
 package mazestormer.game;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.maze.CombinedMaze;
+import mazestormer.maze.Maze;
+import mazestormer.maze.Tile;
+import mazestormer.maze.parser.Parser;
+import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
-import mazestormer.world.World;
+import mazestormer.player.RelativePlayer;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
 import peno.htttp.PlayerHandler;
-import peno.htttp.Tile;
 
 import com.rabbitmq.client.Connection;
 
 public class Game {
 
 	private final String id;
+
 	private final Player localPlayer;
-	private final World world;
+	private Player partnerPlayer;
 
 	private final PlayerClient client;
-
 	private final Handler handler;
-	private final List<GameListener> gls = new ArrayList<GameListener>();
+	private final List<GameListener> listeners = new ArrayList<GameListener>();
 
-	public Game(Connection connection, String id, Player localPlayer, World world) throws IOException,
-			IllegalStateException {
+	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
-		this.world = world;
 
 		this.handler = new Handler();
 		this.client = new PlayerClient(connection, this.handler, id, localPlayer.getPlayerID());
 	}
 
-	public void addGameListener(GameListener gl) {
-		this.gls.add(gl);
+	public void addGameListener(GameListener listener) {
+		listeners.add(listener);
 	}
 
-	public void removeGameListener(GameListener gl) {
-		this.gls.remove(gl);
+	public void removeGameListener(GameListener listener) {
+		listeners.remove(listener);
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public World getWorld() {
-		return this.world;
-	}
-
 	public Set<String> getPlayers() {
 		return client.getPlayers();
+	}
+
+	private CombinedMaze getLocalMaze() {
+		return (CombinedMaze) localPlayer.getMaze();
 	}
 
 	public void join(final Callback<Void> callback) {
@@ -63,8 +68,8 @@ public class Game {
 				@Override
 				public void onSuccess(Void result) {
 					// Call listeners
-					for (GameListener gl : gls) {
-						gl.onGameJoined();
+					for (GameListener listener : listeners) {
+						listener.onGameJoined();
 					}
 					// Callback
 					callback.onSuccess(result);
@@ -85,8 +90,8 @@ public class Game {
 		try {
 			client.leave();
 			// Call listeners
-			for (GameListener gl : gls) {
-				gl.onGameLeft();
+			for (GameListener listener : listeners) {
+				listener.onGameLeft();
 			}
 			// Callback
 			callback.onSuccess(null);
@@ -121,7 +126,17 @@ public class Game {
 			e.printStackTrace();
 		}
 	}
-	
+
+	public void joinTeam(int teamNumber) {
+		try {
+			client.joinTeam(teamNumber);
+		} catch (IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Could not join team #" + teamNumber);
+			e.printStackTrace();
+		}
+	}
+
 	public void lockSeesaw(int barcode) {
 		try {
 			client.lockSeesaw(barcode);
@@ -130,7 +145,7 @@ public class Game {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void unlockSeesaw() {
 		try {
 			client.unlockSeesaw();
@@ -151,40 +166,147 @@ public class Game {
 		}
 	}
 
+	/**
+	 * Send a set of tiles to the partner.
+	 * 
+	 * @param tiles
+	 */
+	public void sendTiles(Tile... tiles) {
+		sendTiles(Arrays.asList(tiles));
+	}
+
+	/**
+	 * Send a set of tiles to the partner.
+	 * 
+	 * @param tiles
+	 */
+	public void sendTiles(Collection<Tile> tiles) {
+		if (!hasPartner()) {
+			// Partner not connected yet
+			return;
+		}
+
+		List<peno.htttp.Tile> tilesToSend = new ArrayList<>(tiles.size());
+		for (Tile tile : tiles) {
+			// TODO Is this conform with maze coordinate specification?
+			long x = tile.getX();
+			long y = tile.getY();
+			String token = Parser.stringify(localPlayer.getMaze(), tile.getPosition());
+			tilesToSend.add(new peno.htttp.Tile(x, y, token));
+		}
+
+		try {
+			if (client.hasTeamPartner()) {
+				client.sendTiles(tilesToSend);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Send all own explored tiles to the partner.
+	 */
+	public void sendOwnTiles() {
+		sendTiles(getLocalMaze().getOwnMaze().getExploredTiles());
+	}
+
+	public boolean hasPartner() {
+		return partnerPlayer != null;
+	}
+
+	public Player getPartner() {
+		if (!hasPartner()) {
+			throw new IllegalStateException("Partner still unknown.");
+		}
+		return partnerPlayer;
+	}
+
+	public boolean isPartner(String playerID) {
+		return hasPartner() && getPartner().getPlayerID().equals(playerID);
+	}
+
+	private void createPartner(String partnerID) {
+		if (hasPartner())
+			return;
+
+		// Create partner
+		RelativePlayer partner = new RelativePlayer(partnerID, new ObservableRobot(), new Maze());
+		partnerPlayer = partner;
+		// Set partner maze
+		getLocalMaze().setPartnerMaze(partner.getMaze());
+
+		// Call listeners
+		for (GameListener listener : listeners) {
+			listener.onPartnerConnected(getPartner());
+		}
+	}
+
+	private void removePartner() {
+		if (!hasPartner())
+			return;
+
+		Player partner = getPartner();
+		// Clear maze
+		partner.getMaze().clear();
+		// TODO Clear partner maze in total maze?
+		// Unset partner
+		partnerPlayer = null;
+
+		// Call listeners
+		for (GameListener listener : listeners) {
+			listener.onPartnerDisconnected(partner);
+		}
+	}
+
+	/**
+	 * Resets the game.
+	 */
+	private void reset() {
+		// Remove partner
+		removePartner();
+		// Clear own maze
+		getLocalMaze().clear();
+	}
+
 	private class Handler implements PlayerHandler {
 
 		@Override
 		public void gameRolled(int playerNumber, int objectNumber) {
-			for (GameListener gl : gls) {
-				gl.onGameRolled(playerNumber, objectNumber);
+			for (GameListener listener : listeners) {
+				listener.onGameRolled(playerNumber, objectNumber);
 			}
 		}
 
 		@Override
 		public void gameStarted() {
-			for (GameListener gl : gls) {
-				gl.onGameStarted();
+			// Reset game
+			reset();
+			// Call listeners
+			for (GameListener listener : listeners) {
+				listener.onGameStarted();
 			}
 		}
 
 		@Override
 		public void gameStopped() {
-			for (GameListener gl : gls) {
-				gl.onGameStopped();
+			for (GameListener listener : listeners) {
+				listener.onGameStopped();
 			}
 		}
 
 		@Override
 		public void gamePaused() {
-			for (GameListener gl : gls) {
-				gl.onGamePaused();
+			for (GameListener listener : listeners) {
+				listener.onGamePaused();
 			}
 		}
 
 		@Override
 		public void gameWon(int teamNumber) {
-			for (GameListener gl : gls) {
-				gl.onGameWon(teamNumber);
+			for (GameListener listener : listeners) {
+				listener.onGameWon(teamNumber);
 			}
 		}
 
@@ -199,38 +321,52 @@ public class Game {
 
 		@Override
 		public void playerDisconnected(String playerID, DisconnectReason reason) {
+			if (isPartner(playerID)) {
+				// Partner disconnected
+				removePartner();
+			}
 		}
 
 		@Override
 		public void playerReady(String playerID, boolean isReady) {
-			for (GameListener gl : gls) {
-				gl.onPlayerReady(playerID, isReady);
+			for (GameListener listener : listeners) {
+				listener.onPlayerReady(playerID, isReady);
 			}
 		}
 
 		@Override
 		public void playerFoundObject(String playerID, int playerNumber) {
-			for (GameListener gl : gls) {
-				gl.onObjectFound(playerID);
+			for (GameListener listener : listeners) {
+				listener.onObjectFound(playerID);
 			}
 		}
 
 		@Override
 		public void teamConnected(String partnerID) {
-			// TODO Auto-generated method stub
-
+			createPartner(partnerID);
 		}
 
 		@Override
-		public void teamTilesReceived(List<Tile> tiles) {
-			// TODO Auto-generated method stub
-
+		public void teamTilesReceived(List<peno.htttp.Tile> tiles) {
+			for (peno.htttp.Tile tile : tiles) {
+				try {
+					// Parse tile
+					Tile parsedTile = Parser.parseTile(tile.getX(), tile.getY(), tile.getToken());
+					// Store in partner maze
+					getPartner().getMaze().importTile(parsedTile);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		@Override
 		public void teamPosition(double x, double y, double angle) {
-			// TODO Auto-generated method stub
-			
+			if (hasPartner()) {
+				// Update partner pose
+				Pose pose = new Pose((float) x, (float) y, (float) angle);
+				getPartner().getRobot().getPoseProvider().setPose(pose);
+			}
 		}
 
 	}

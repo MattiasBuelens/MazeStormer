@@ -2,11 +2,11 @@ package mazestormer.controller;
 
 import java.util.Set;
 
-import org.w3c.dom.svg.SVGDocument;
-
-import lejos.robotics.navigation.Pose;
 import mazestormer.ui.map.MapLayer;
+import mazestormer.ui.map.MapLayerHandler;
 import mazestormer.util.EventSource;
+
+import org.w3c.dom.svg.SVGDocument;
 
 public interface IMapController extends EventSource {
 
@@ -14,6 +14,11 @@ public interface IMapController extends EventSource {
 	 * Get the map as a SVG document.
 	 */
 	public SVGDocument getDocument();
+
+	/**
+	 * Set the handler to use for map layer updates.
+	 */
+	public void setMapLayerHandler(MapLayerHandler handler);
 
 	/**
 	 * Get the map layers to display.
@@ -30,14 +35,6 @@ public interface IMapController extends EventSource {
 	 */
 	public void setLayerVisible(MapLayer layer, boolean isVisible);
 
-	/**
-	 * Get the robot's current pose, in map coordinates.
-	 */
-	public Pose getRobotPose();
-
-	/**
-	 * Clear the detected points on the map.
-	 */
-	public void clearRanges();
+	public void updatePoses();
 
 }

@@ -4,23 +4,53 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import mazestormer.controller.PlayerEvent.EventType;
-import mazestormer.player.IPlayer;
 import mazestormer.player.Player;
-import mazestormer.world.WorldListener;
+import mazestormer.player.PlayerIdentifier;
+import mazestormer.player.PlayerListener;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 public class GameController extends SubController implements IGameController {
 
-	private Map<IPlayer, IPlayerController> pcs = new LinkedHashMap<IPlayer, IPlayerController>();
+	private Map<PlayerIdentifier, IPlayerController> pcs = new LinkedHashMap<PlayerIdentifier, IPlayerController>();
+	private final Listener listener = new Listener();
+
+	private final WorldController worldController;
+
+	private ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(factory);
+	private Runnable updateTask = new UpdateTask();
+	private ScheduledFuture<?> updateHandle;
+	private long updateInterval;
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MapController-%d").build();
+	private static final long defaultUpdateFPS = 25;
 
 	public GameController(MainController mainController) {
 		super(mainController);
-		getMainController().getWorld().addListener(new Listener());
+
+		worldController = new WorldController(mainController, mainController.getWorld());
+
+		setUpdateFPS(defaultUpdateFPS);
+		scheduleUpdater();
 	}
 
 	@Override
-	public IPlayerController getPlayerController(IPlayer player) {
+	public IWorldController getWorldController() {
+		return worldController;
+	}
+
+	/*
+	 * Player controllers
+	 */
+
+	@Override
+	public IPlayerController getPlayerController(PlayerIdentifier player) {
 		return pcs.get(player);
 	}
 
@@ -34,35 +64,90 @@ public class GameController extends SubController implements IGameController {
 		return Collections.unmodifiableCollection(pcs.values());
 	}
 
-	private void onPlayerAdded(Player p) {
-		this.pcs.put(p, new PlayerController(this.getMainController(), p));
-		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, p));
+	@Override
+	public void addPlayer(Player player) {
+		player.addPlayerListener(listener);
+		this.pcs.put(player, new PlayerController(this.getMainController(), player));
+		postEvent(new PlayerEvent(EventType.PLAYER_ADDED, player));
 	}
 
-	private void onPlayerRemoved(Player p) {
-		this.pcs.remove(p);
-		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, p));
+	@Override
+	public void removePlayer(Player player) {
+		player.removePlayerListener(listener);
+		this.pcs.remove(player);
+		postEvent(new PlayerEvent(EventType.PLAYER_REMOVED, player));
 	}
 
-	private void onPlayerRenamed(Player p) {
-		postEvent(new PlayerEvent(EventType.PLAYER_RENAMED, p));
+	private void renamePlayer(Player player) {
+		postEvent(new PlayerEvent(EventType.PLAYER_RENAMED, player));
 	}
 
-	private class Listener implements WorldListener {
+	private class Listener implements PlayerListener {
 
 		@Override
-		public void playerAdded(Player player) {
-			onPlayerAdded(player);
+		public void playerRenamed(Player player, String previousID, String newID) {
+			renamePlayer(player);
 		}
 
-		@Override
-		public void playerRemoved(Player player) {
-			onPlayerRemoved(player);
+	}
+
+	/*
+	 * Map updates
+	 */
+
+	private long getUpdateInterval() {
+		return updateInterval;
+	}
+
+	public void setUpdateInterval(long interval) {
+		interval = Math.abs(interval);
+		if (interval != this.updateInterval) {
+			this.updateInterval = interval;
+			// Reschedule with new delay
+			rescheduleUpdater();
 		}
+	}
+
+	public void setUpdateFPS(long fps) {
+		setUpdateInterval((long) (1000f / (float) fps));
+	}
+
+	private void scheduleUpdater() {
+		// Cancel if still running
+		cancelUpdater();
+		// Reschedule updater
+		updateHandle = executor.scheduleAtFixedRate(updateTask, 0, getUpdateInterval(), TimeUnit.MILLISECONDS);
+	}
+
+	private void cancelUpdater() {
+		if (updateHandle != null) {
+			updateHandle.cancel(false);
+			updateHandle = null;
+		}
+	}
+
+	private void rescheduleUpdater() {
+		// Schedule only if still running
+		if (updateHandle != null && !updateHandle.isDone()) {
+			scheduleUpdater();
+		}
+	}
+
+	public void terminate() {
+		// Shutdown executor
+		executor.shutdown();
+	}
+
+	private class UpdateTask implements Runnable {
 
 		@Override
-		public void playerRenamed(Player player) {
-			onPlayerRenamed(player);
+		public void run() {
+			// Update player controllers
+			for (IPlayerController pc : pcs.values()) {
+				pc.map().updatePoses();
+			}
+			// Update world
+			getWorldController().map().updatePoses();
 		}
 
 	}

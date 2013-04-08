@@ -13,6 +13,8 @@ public class PoseTransform {
 	private final Pose referencePose;
 	private final AffineTransform transform;
 
+	private static final PoseTransform IDENTITY = new PoseTransform(new Pose());
+
 	public PoseTransform(Pose referencePose) {
 		this.referencePose = referencePose;
 		this.transform = createTransform(referencePose);
@@ -39,10 +41,14 @@ public class PoseTransform {
 	 *            The absolute position.
 	 * @return The relative position.
 	 */
-	public Point inverseTransform(Point position) throws NoninvertibleTransformException {
+	public Point inverseTransform(Point position) {
 		checkNotNull(position);
 		Point transformed = new Point(0, 0);
-		transform.inverseTransform(position, transformed);
+		try {
+			transform.inverseTransform(position, transformed);
+		} catch (NoninvertibleTransformException cannotHappen) {
+			// Cannot happen
+		}
 		return transformed;
 	}
 
@@ -90,7 +96,7 @@ public class PoseTransform {
 	 *            The absolute pose.
 	 * @return The relative pose.
 	 */
-	public Pose inverseTransform(Pose pose) throws NoninvertibleTransformException {
+	public Pose inverseTransform(Pose pose) {
 		checkNotNull(pose);
 		Pose transformed = new Pose();
 		transformed.setLocation(inverseTransform(pose.getLocation()));
@@ -123,6 +129,10 @@ public class PoseTransform {
 		while (heading > 180)
 			heading -= 360;
 		return heading;
+	}
+
+	public static final PoseTransform getIdentity() {
+		return IDENTITY;
 	}
 
 }

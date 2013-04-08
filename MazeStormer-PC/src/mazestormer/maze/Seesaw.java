@@ -23,6 +23,14 @@ public class Seesaw {
 		this(new Barcode(barcodeValue));
 	}
 
+	public Barcode getLowestBarcode() {
+		return lowestBarcode;
+	}
+
+	public Barcode getHighestBarcode() {
+		return highestBarcode;
+	}
+
 	public boolean isHighOpen() {
 		return isHighOpen;
 	}
@@ -38,7 +46,7 @@ public class Seesaw {
 	public void setLowOpen() {
 		this.isHighOpen = false;
 	}
-	
+
 	public void flip() {
 		this.isHighOpen = !this.isHighOpen;
 	}
@@ -49,8 +57,7 @@ public class Seesaw {
 		} else if (barcode.getValue() == highestBarcode.getValue()) {
 			return isHighOpen();
 		} else {
-			throw new IllegalArgumentException(
-					"Barcode does not belong to this seesaw.");
+			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
 		}
 	}
 
@@ -60,8 +67,7 @@ public class Seesaw {
 		} else if (barcode.getValue() == highestBarcode.getValue()) {
 			setHighOpen();
 		} else {
-			throw new IllegalArgumentException(
-					"Barcode does not belong to this seesaw.");
+			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
 		}
 	}
 }

@@ -1,14 +1,14 @@
 package mazestormer.ui.map.event;
 
-import mazestormer.player.IPlayer;
+import mazestormer.controller.IMapController;
 import mazestormer.ui.map.MapLayer;
 
 public class MapLayerAddEvent extends MapEvent {
 
 	private final MapLayer layer;
 
-	public MapLayerAddEvent(MapLayer layer, IPlayer player) {
-		super(player);
+	public MapLayerAddEvent(IMapController owner, MapLayer layer) {
+		super(owner);
 		this.layer = layer;
 	}
 

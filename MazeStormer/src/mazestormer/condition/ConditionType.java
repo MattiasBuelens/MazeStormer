@@ -21,5 +21,4 @@ public enum ConditionType implements MessageType<Condition> {
 			return new LightCompareCondition(this);
 		}
 	};
-
 }

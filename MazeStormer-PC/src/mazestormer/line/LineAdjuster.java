@@ -1,43 +1,60 @@
 package mazestormer.line;
 
+import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
 import mazestormer.state.AbstractStateListener;
 
 public class LineAdjuster {
-	private Player playa;
+
+	private Player player;
 
 	public LineAdjuster(Player player, LineFinderRunner lineFinderRunner) {
+		this.player = player;
+
 		lineFinderRunner.addStateListener(new LineFinderListener());
-		this.playa = player;
+	}
+
+	protected void log(String message) {
+		System.out.println(message);
+	}
+
+	private IMaze getMaze() {
+		return player.getMaze();
+	}
+
+	private PoseProvider getPoseProvider() {
+		return player.getRobot().getPoseProvider();
 	}
 
 	private void adjust() {
-		Pose pose = playa.getRobot().getPoseProvider().getPose();
-		
-		//Rond orientatie af
+		Pose pose = getMaze().toRelative(getPoseProvider().getPose());
+
+		// Round orientation
 		float newHeading = roundAngle(pose.getHeading());
-		
-		//Zet 1 coordinaat just
+
+		// Fix one coordinate
 		float newX, newY;
-		
-		if(newHeading == -90f || newHeading == 90f){
+		if (newHeading == -90f || newHeading == 90f) {
 			newX = pose.getX();
-			newY = roundToMultipleOfForty(pose.getY());
+			newY = roundToTileSize(pose.getY());
 		} else {
-			newX = roundToMultipleOfForty(pose.getX());
+			newX = roundToTileSize(pose.getX());
 			newY = pose.getY();
 		}
-		
-		Pose newPose = new Pose(newX, newY, newHeading);
-		System.out.println(newPose);
-		playa.getRobot().getPoseProvider().setPose(newPose);
+
+		// Adjust pose
+		Pose newPose = getMaze().toAbsolute(new Pose(newX, newY, newHeading));
+		getPoseProvider().setPose(newPose);
+		log("Adjusted pose: " + newPose);
 	}
 
-	private float roundToMultipleOfForty(float coordinate){
-		 return Math.round(coordinate/40f) * 40f;
+	private float roundToTileSize(float coordinate) {
+		final float tileSize = getMaze().getTileSize();
+		return Math.round(coordinate / tileSize) * tileSize;
 	}
-	
+
 	/**
 	 * Get the orientation corresponding to the given angle.
 	 * 
@@ -57,7 +74,7 @@ public class LineAdjuster {
 			return -90f;
 		}
 	}
-	
+
 	/**
 	 * Normalize the given angle between -180° and +180°.
 	 * 
@@ -71,9 +88,8 @@ public class LineAdjuster {
 			angle += 360f;
 		return angle;
 	}
-	
-	private class LineFinderListener extends
-			AbstractStateListener<LineFinderRunner.LineFinderState> {
+
+	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			adjust();

@@ -11,7 +11,7 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.state.State;
@@ -66,7 +66,7 @@ public class BarcodeRunner extends
 		return (ControllableRobot) player.getRobot();
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return player.getMaze();
 	}
 

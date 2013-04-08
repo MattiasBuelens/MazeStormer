@@ -1,6 +1,6 @@
 package mazestormer.maze.parser;
 
-public class CommentToken implements Token {
+public final class CommentToken implements Token {
 
 	private final String comment;
 

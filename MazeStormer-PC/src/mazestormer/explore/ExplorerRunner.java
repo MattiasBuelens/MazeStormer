@@ -23,8 +23,8 @@ import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinderRunner;
 import mazestormer.maze.Edge.EdgeType;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.IMaze.Target;
-import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
@@ -113,8 +113,13 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 			}
 		};
 
-		lineAdjuster = new LineAdjuster(player, lineFinder);
-		lineFinder.addStateListener(new LineFinderListener());
+		this.lineAdjuster = new LineAdjuster(player, lineFinder) {
+			@Override
+			protected void log(String message) {
+				ExplorerRunner.this.log(message);
+			}
+		};
+		this.lineFinder.addStateListener(new LineFinderListener());
 
 		// Barcode scanner
 		this.barcodeScanner = new BarcodeRunner(player) {
@@ -133,7 +138,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		return (ControllableRobot) player.getRobot();
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return player.getMaze();
 	}
 
@@ -221,7 +226,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		if (!currentTile.isExplored()) {
 			log("Scan for edges at " + currentTile.getPosition());
 			scanAndUpdate(currentTile);
-			currentTile.setExplored();
+			getMaze().setExplored(currentTile.getPosition());
 		}
 
 		// Create new paths to all neighbors
@@ -424,10 +429,10 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		for (Orientation orientation : tile.getUnknownSides()) {
 			getMaze().setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
 		}
-		// Mark as explored
-		tile.setExplored();
 		// Set barcode
 		getMaze().setBarcode(tile.getPosition(), barcode);
+		// Mark as explored
+		getMaze().setExplored(tile.getPosition());
 	}
 
 	/**
@@ -739,12 +744,12 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 			return Integer.compare(leftDistance, rightDistance);
 		}
 
-		// TODO optimaliseren!
+		// TODO This won't work if there exist longer paths around a seesaw!!!
 		public int shortestPathLength(Tile startTile, Tile endTile) {
 			List<Waypoint> path = pathFinder.findPath(startTile, endTile);
-			Maze maze = player.getMaze();
-			for(Waypoint wp : path) {
-				if(maze.getTileAt(wp.getPose().getLocation()).getIgnoreFlag())
+			IMaze maze = player.getMaze();
+			for (Waypoint wp : path) {
+				if (maze.getTileAt(wp.getPose().getLocation()).getIgnoreFlag())
 					return Integer.MAX_VALUE;
 			}
 			return path.size();

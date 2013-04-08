@@ -1,9 +1,6 @@
 package mazestormer.maze.parser;
 
-import static mazestormer.maze.Orientation.EAST;
-import static mazestormer.maze.Orientation.NORTH;
-import static mazestormer.maze.Orientation.SOUTH;
-import static mazestormer.maze.Orientation.WEST;
+import static mazestormer.maze.Orientation.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -14,6 +11,7 @@ import java.util.EnumSet;
 
 import lejos.geom.Point;
 import mazestormer.maze.Edge.EdgeType;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
@@ -30,7 +28,7 @@ public class ParserTest {
 		final Orientation[] expectedEdges = new Orientation[] {};
 
 		String source = "0 0";
-		Maze maze = parse(source);
+		IMaze maze = parse(source);
 
 		Tile tile = maze.getTileAt(new LongPoint(0, 0));
 		checkWalls(tile, expectedEdges);
@@ -41,7 +39,7 @@ public class ParserTest {
 		final Orientation[] expectedEdges = new Orientation[] { WEST, EAST };
 
 		String source = "1 1\nStraight.N.00";
-		Maze maze = parse(source);
+		IMaze maze = parse(source);
 
 		Tile tile = maze.getTileAt(new LongPoint(0, 0));
 		checkWalls(tile, expectedEdges);
@@ -50,7 +48,7 @@ public class ParserTest {
 	@Test
 	public void square() throws ParseException {
 		String source = "2 2\nCorner.N Corner.E\nCorner.W Corner.S";
-		Maze maze = parse(source);
+		IMaze maze = parse(source);
 
 		// Bottom left corner
 		checkWalls(maze.getTileAt(new LongPoint(0, 0)), SOUTH, WEST);
@@ -65,7 +63,7 @@ public class ParserTest {
 	@Test
 	public void horizontal() throws ParseException {
 		String source = "3 1\nDeadEnd.W Straight.E.00 DeadEnd.E";
-		Maze maze = parse(source);
+		IMaze maze = parse(source);
 
 		// Left
 		checkWalls(maze.getTileAt(new LongPoint(0, 0)), NORTH, SOUTH, WEST);
@@ -78,7 +76,7 @@ public class ParserTest {
 	@Test
 	public void vertical() throws ParseException {
 		String source = "1 3\nDeadEnd.N\nStraight.N.00\nDeadEnd.S";
-		Maze maze = parse(source);
+		IMaze maze = parse(source);
 
 		// Top
 		checkWalls(maze.getTileAt(new LongPoint(0, 2)), WEST, EAST, NORTH);
@@ -177,7 +175,7 @@ public class ParserTest {
 	@Test
 	public void startPosition() throws ParseException {
 		String source = "2 2\nStraight.N.S2E DeadEnd.N.S3S\nCorner.W.S0N Corner.S.S1W";
-		Maze maze = parse(source);
+		IMaze maze = parse(source);
 
 		// Player 0 in bottom left facing north
 		assertEquals(maze.getStartPose(0).getLocation(), new Point(20, 20));
@@ -194,9 +192,19 @@ public class ParserTest {
 	}
 
 	@Test
+	public void singleTile() throws ParseException {
+		String source = "Straight.E.37";
+		Tile tile = Parser.parseTile(0, 0, source);
+
+		checkWalls(tile, NORTH, SOUTH);
+		assertEquals(new LongPoint(0, 0), tile.getPosition());
+		assertEquals(tile.getBarcode().getValue(), 37);
+	}
+
+	@Test
 	public void seesaw() throws ParseException {
 		String source = "4 1\nStraight.E.11 Seesaw.W Seesaw.E Straight.E.13";
-		Maze maze = parse(source);
+		IMaze maze = parse(source);
 
 		// (0, 0) Barcode 11
 		Tile tile00 = maze.getTileAt(new LongPoint(0, 0));
@@ -225,11 +233,75 @@ public class ParserTest {
 		assertEquals(tile30.getBarcode().getValue(), 13);
 	}
 
+	@Test
+	public void seesawVertical() throws ParseException {
+		String source = "1 4\nStraight.N.11\nSeesaw.N\nSeesaw.S\nStraight.N.13";
+		IMaze maze = parse(source);
+
+		// (0, 3) Barcode 11
+		Tile tile03 = maze.getTileAt(new LongPoint(0, 3));
+		checkWalls(tile03, WEST, EAST);
+		assertTrue(tile03.hasBarcode());
+		assertEquals(tile03.getBarcode().getValue(), 11);
+
+		// (0, 2) Seesaw at side 11, open
+		Tile tile02 = maze.getTileAt(new LongPoint(0, 2));
+		checkWalls(tile02, WEST, EAST);
+		assertTrue(tile02.isSeesaw());
+		assertTrue(tile02.isSeesawOpen());
+		assertEquals(tile02.getSeesawBarcode().getValue(), 11);
+
+		// (0, 1) Seesaw at side 13, closed
+		Tile tile01 = maze.getTileAt(new LongPoint(0, 1));
+		checkWalls(tile01, WEST, EAST);
+		assertTrue(tile01.isSeesaw());
+		assertFalse(tile01.isSeesawOpen());
+		assertEquals(tile01.getSeesawBarcode().getValue(), 13);
+
+		// (0, 0) Barcode 13
+		Tile tile00 = maze.getTileAt(new LongPoint(0, 0));
+		checkWalls(tile00, WEST, EAST);
+		assertTrue(tile00.hasBarcode());
+		assertEquals(tile00.getBarcode().getValue(), 13);
+	}
+
+	@Test
+	public void parseTileBarcode() throws ParseException {
+		Tile parsedTile = Parser.parseTile(80, 120, "Straight.N.11");
+		// Position
+		assertEquals(parsedTile.getX(), 80);
+		assertEquals(parsedTile.getY(), 120);
+		// Edges
+		checkWalls(parsedTile, WEST, EAST);
+		// Barcode
+		assertEquals(parsedTile.getBarcode().getValue(), 11);
+	}
+
+	@Test
+	public void stringifyBarcode() throws ParseException {
+		String expected = "Straight.E.37";
+		IMaze maze = parse("1 1\n" + expected);
+		String actual = Parser.stringify(maze, new LongPoint(0, 0));
+
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void stringifySeesaw() throws ParseException {
+		String source = "4 1\nStraight.E.11 Seesaw.W Seesaw.E Straight.E.13";
+		IMaze maze = parse(source);
+
+		assertEquals("Straight.E.11", Parser.stringify(maze, new LongPoint(0, 0)));
+		assertEquals("Seesaw.W", Parser.stringify(maze, new LongPoint(1, 0)));
+		assertEquals("Seesaw.E", Parser.stringify(maze, new LongPoint(2, 0)));
+		assertEquals("Straight.E.13", Parser.stringify(maze, new LongPoint(3, 0)));
+	}
+
 	/**
 	 * Parse the given source into a new maze.
 	 */
-	private Maze parse(CharSequence source) throws ParseException {
-		Maze maze = new Maze();
+	private IMaze parse(CharSequence source) throws ParseException {
+		IMaze maze = new Maze();
 		Parser parser = new Parser(maze);
 		parser.parse(source);
 		return maze;
@@ -249,4 +321,5 @@ public class ParserTest {
 			assertEquals(message, expectWall, isWall);
 		}
 	}
+
 }

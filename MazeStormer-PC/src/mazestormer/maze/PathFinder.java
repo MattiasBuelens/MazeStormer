@@ -13,10 +13,10 @@ import lejos.robotics.navigation.Waypoint;
  */
 public class PathFinder {
 
-	protected final Maze maze;
+	protected final IMaze maze;
 
-	public PathFinder(Maze maze) {
-		this.maze = maze;
+	public PathFinder(IMaze iMaze) {
+		this.maze = iMaze;
 	}
 
 	/**
@@ -57,10 +57,12 @@ public class PathFinder {
 		List<Tile> tiles = maze.getMesh().findTilePath(startTile, goalTile);
 		// Get path of way points
 		// Note: iteration starts at *second* tile (index 1)
-		List<Waypoint> waypoints = new ArrayList<Waypoint>(tiles.size());
-		Iterator<Tile> it = tiles.listIterator(1);
-		while (it.hasNext()) {
-			waypoints.add(toWaypoint(it.next()));
+		List<Waypoint> waypoints = new ArrayList<Waypoint>();
+		if (tiles.size() > 0) {
+			Iterator<Tile> it = tiles.listIterator(1);
+			while (it.hasNext()) {
+				waypoints.add(toWaypoint(it.next()));
+			}
 		}
 		return waypoints;
 	}
@@ -74,9 +76,9 @@ public class PathFinder {
 	 */
 	public Waypoint toWaypoint(Tile tile) {
 		// Get center of tile
-		Point tilePosition = tile.getPosition().toPoint().add(new Point(0.5f, 0.5f));
+		Point relativePosition = maze.getTileCenter(tile.getPosition());
 		// Get absolute position
-		Point absolutePosition = maze.toAbsolute(maze.fromTile(tilePosition));
+		Point absolutePosition = maze.toAbsolute(relativePosition);
 		// Create way point
 		return new Waypoint(absolutePosition.getX(), absolutePosition.getY());
 	}

@@ -1,6 +1,6 @@
 package mazestormer.maze.parser;
 
-public class EOFToken implements Token {
+public final class EOFToken implements Token {
 
 	private static final EOFToken instance = new EOFToken();
 

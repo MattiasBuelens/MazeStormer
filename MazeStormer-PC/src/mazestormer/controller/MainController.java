@@ -16,8 +16,9 @@ import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
-import mazestormer.maze.Maze;
-import mazestormer.player.Player;
+import mazestormer.maze.CombinedMaze;
+import mazestormer.maze.IMaze;
+import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
 import mazestormer.simulator.VirtualRobot;
@@ -61,9 +62,9 @@ public class MainController implements IMainController {
 	private final ConnectionContext connectionContext = new ConnectionContext();
 	private Connector connector;
 
-	private World world = new World();
+	private final World world;
 
-	private Player personalPlayer;
+	private RelativePlayer personalPlayer;
 	public static final String defaultPlayerName = "Brons";
 
 	/*
@@ -97,6 +98,12 @@ public class MainController implements IMainController {
 		// Register on event bus
 		getEventBus().register(this);
 
+		// Player and world
+		IMaze personalMaze = new CombinedMaze();
+		this.personalPlayer = new RelativePlayer(defaultPlayerName, null, personalMaze);
+		this.world = new World(personalPlayer);
+		gameControl().addPlayer(personalPlayer);
+
 		// Connection
 		connectionProvider = new ConnectionProvider();
 		// TODO Configure device name in GUI?
@@ -106,8 +113,6 @@ public class MainController implements IMainController {
 		// View
 		view = createView();
 		view.registerEventBus(getEventBus());
-
-		createPersonalPlayer();
 
 		// Post initialized
 		postEvent(new InitializeEvent());
@@ -212,7 +217,7 @@ public class MainController implements IMainController {
 	}
 
 	@Override
-	public IMapController map() {
+	public IPlayerMapController map() {
 		return gameControl().getPersonalPlayerController().map();
 	}
 
@@ -358,37 +363,17 @@ public class MainController implements IMainController {
 	 * Robot pose
 	 */
 
-	private Pose getStartPose() {
-		// return new Pose(0f, 0f, 90f);
-		return new Pose(20f, 20f, 90f);
-	}
-
 	public Pose getPose() {
 		if (isConnected()) {
 			return getControllableRobot().getPoseProvider().getPose();
 		} else {
-			return getStartPose();
-		}
-	}
-
-	@Subscribe
-	public void setupStartPose(ConnectEvent e) {
-		if (e.isConnected()) {
-			getControllableRobot().getPoseProvider().setPose(getStartPose());
+			return new Pose();
 		}
 	}
 
 	/*
-	 * Maze
+	 * World
 	 */
-
-	public Maze getMaze() {
-		return getPlayer().getMaze();
-	}
-
-	public void setMaze(Maze maze) {
-		getPlayer().setMaze(maze);
-	}
 
 	public World getWorld() {
 		return world;
@@ -398,14 +383,8 @@ public class MainController implements IMainController {
 	 * Player
 	 */
 
-	public Player getPlayer() {
+	public RelativePlayer getPlayer() {
 		return personalPlayer;
-	}
-
-	private void createPersonalPlayer() {
-		personalPlayer = new Player();
-		personalPlayer.setPlayerID(defaultPlayerName);
-		getWorld().addPlayer(personalPlayer);
 	}
 
 }

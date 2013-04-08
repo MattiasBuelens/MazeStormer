@@ -8,9 +8,10 @@ import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.collision.CollisionObserver;
@@ -23,6 +24,7 @@ public class VirtualRobot implements ControllableRobot {
 	private CalibratedLightSensor light;
 	private RangeScanner scanner;
 	private RangeScannerFeatureDetector detector;
+	private VirtualIRSensor ir;
 	private SoundPlayer soundPlayer;
 	private PoseProvider poseProvider;
 	private final VirtualCollisionDetector collisionDetector;
@@ -34,13 +36,17 @@ public class VirtualRobot implements ControllableRobot {
 	public VirtualRobot(World world) {
 		this.world = world;
 
-		this.collisionDetector = new VirtualCollisionDetector(getMaze(), getPoseProvider());
+		this.collisionDetector = new VirtualCollisionDetector(world);
 		this.collisionObserver = new CollisionObserver(this);
 
 		this.conditionResolvers = new VirtualConditionResolvers(this);
 	}
 
-	private Maze getMaze() {
+	private World getWorld() {
+		return world;
+	}
+
+	private IMaze getMaze() {
 		return world.getMaze();
 	}
 
@@ -55,7 +61,7 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public CalibratedLightSensor getLightSensor() {
 		if (light == null) {
-			light = new VirtualLightSensor(getMaze(), getPoseProvider());
+			light = new VirtualLightSensor(getWorld());
 		}
 		return light;
 	}
@@ -63,7 +69,7 @@ public class VirtualRobot implements ControllableRobot {
 	// @Override
 	protected RangeScanner getRangeScanner() {
 		if (scanner == null) {
-			scanner = new VirtualRangeScanner(getMaze(), getPoseProvider());
+			scanner = new VirtualRangeScanner(getWorld());
 		}
 		return scanner;
 	}
@@ -72,9 +78,17 @@ public class VirtualRobot implements ControllableRobot {
 	public RangeFeatureDetector getRangeDetector() {
 		if (detector == null) {
 			detector = new RangeScannerFeatureDetector(getRangeScanner(), sensorMaxDistance, new Point(0f, 0f));
-			detector.setPoseProvider(getPoseProvider());
+			detector.setPoseProvider(getWorld().getLocalPlayer().getRobot().getPoseProvider());
 		}
 		return detector;
+	}
+
+	@Override
+	public IRSensor getIRSensor() {
+		if (ir == null) {
+			ir = new VirtualIRSensor(world);
+		}
+		return ir;
 	}
 
 	@Override

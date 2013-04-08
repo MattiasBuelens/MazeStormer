@@ -30,6 +30,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private void logToAll(String message) {
+		getWorld().getLogger().info(message);
 		for (Player player : getWorld().getPlayers()) {
 			logTo(player, message);
 		}
@@ -44,7 +45,9 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private void logTo(Player player, String message) {
-		player.getLogger().info(message);
+		if (player != null) {
+			player.getLogger().info(message);
+		}
 	}
 
 	@Override
@@ -55,7 +58,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	@Override
 	public void setPlayerID(String newPlayerID) {
 		Player player = getMainController().getPlayer();
-		getMainController().getWorld().renamePlayer(player, newPlayerID);
+		getWorld().renamePlayer(player.getPlayerID(), newPlayerID);
 	}
 
 	private void createGame(ConnectionMode connectionMode, String gameID) throws IOException {
@@ -63,8 +66,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		connection = connectionMode.newConnection();
 
-		game = new Game(connection, gameID, localPlayer, getMainController().getWorld());
-		game.addGameListener(gl);
+		game = new Game(connection, gameID, localPlayer);
+		game.addGameListener(new Listener());
 
 		worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getWorld());
 
@@ -209,7 +212,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		postEvent(new GameSetUpEvent(eventType));
 	}
 
-	private GameListener gl = new GameListener() {
+	private class Listener implements GameListener {
 
 		@Override
 		public void onGameJoined() {
@@ -261,5 +264,18 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			logTo(playerID, "Player " + playerID + " found their object");
 		}
 
-	};
+		@Override
+		public void onPartnerConnected(Player partner) {
+			logToLocal("Partner connected: " + partner.getPlayerID());
+			getMainController().gameControl().addPlayer(partner);
+		}
+
+		@Override
+		public void onPartnerDisconnected(Player partner) {
+			logToLocal("Partner disconnected: " + partner.getPlayerID());
+			getMainController().gameControl().removePlayer(partner);
+		}
+
+	}
+
 }

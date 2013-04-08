@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.TileType;
 
-public class TileToken implements Token {
+public final class TileToken implements Token {
 
 	private final TileType type;
 	private final Orientation orientation;

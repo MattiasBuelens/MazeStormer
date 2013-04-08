@@ -9,13 +9,10 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
-import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
-import mazestormer.util.AbstractFuture;
 import mazestormer.util.Future;
 
-public class SeesawAction extends
-		StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
+public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
 
 	private final GameRunner gameRunner;
 	private final int barcode;
@@ -59,23 +56,24 @@ public class SeesawAction extends
 		getGameRunner().setSeesawWalls();
 		transition(SeesawState.SCAN);
 	}
-	
+
 	protected void scan() {
 		boolean seesawOpen = false;
-		//TODO vraag aan IRSensor (matthias)
-		if(seesawOpen)
+		// TODO vraag aan IRSensor (matthias)
+		if (seesawOpen) {
 			transition(SeesawState.ONWARDS);
-		else //TODO opvragen of we moeten hervatten of wait and scan?
+		} else {
+			// TODO opvragen of we moeten hervatten of wait and scan?
 			transition(SeesawState.RESUME_EXPLORING);
-			
+		}
 	}
-	
+
 	protected void onwards() {
 		getGameRunner().onSeesaw(barcode);
 		bindTransition(getPilot().travelComplete(130), // TODO 130 juist?
 				SeesawState.FIND_LINE);
 	}
-	
+
 	protected void findLine() {
 		LineFinderRunner lineFinder = new LineFinderRunner(getControllableRobot()) {
 			@Override
@@ -88,18 +86,18 @@ public class SeesawAction extends
 		LineAdjuster lineAdjuster = new LineAdjuster(player, lineFinder);
 		lineFinder.addStateListener(new LineFinderListener());
 	}
-	
+
 	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(SeesawState.RESUME_EXPLORING);
 		}
 	}
-	
+
 	protected void waitAndScan() {
 		boolean seesawOpen = false;
-		//TODO vraag aan IRSensor (matthias)
-		if(seesawOpen)
+		// TODO vraag aan IRSensor (matthias)
+		if (seesawOpen)
 			transition(SeesawState.ONWARDS);
 		else {
 			try {
@@ -110,22 +108,21 @@ public class SeesawAction extends
 			}
 		}
 	}
-	
+
 	protected void resumeExploring() {
 		stop(); // stops this seesaw action
 	}
 
-	public enum SeesawState implements
-			State<SeesawAction, SeesawAction.SeesawState> {
+	public enum SeesawState implements State<SeesawAction, SeesawAction.SeesawState> {
 
 		INITIAL {
-			
+
 			@Override
 			public void execute(SeesawAction input) {
 				input.initial();
 			}
 		},
-		
+
 		SCAN {
 
 			@Override
@@ -133,7 +130,7 @@ public class SeesawAction extends
 				input.scan();
 			}
 		},
-		
+
 		ONWARDS {
 
 			@Override
@@ -141,70 +138,41 @@ public class SeesawAction extends
 				input.onwards();
 			}
 		},
-		
+
 		FIND_LINE {
 
 			@Override
 			public void execute(SeesawAction input) {
 				input.findLine();
 			}
-			
+
 		},
-		
+
 		WAIT_AND_SCAN {
 
 			@Override
 			public void execute(SeesawAction input) {
 				input.waitAndScan();
 			}
-			
+
 		},
-		
+
 		RESUME_EXPLORING {
 
 			@Override
 			public void execute(SeesawAction input) {
 				input.resumeExploring();
 			}
-			
+
 		};
 
 	}
 
-	private class FinishFuture extends AbstractFuture<Void> implements
-			StateListener<SeesawState> {
+	private class FinishFuture extends StateMachine.FinishFuture<SeesawState> {
 
 		@Override
-		public void stateStarted() {
-		}
-
-		@Override
-		public void stateStopped() {
-			// Failed
-			cancel();
-		}
-
-		@Override
-		public void stateFinished() {
-			// Success
-			if (getGameRunner().isRunning()) {
-				resolve(null);
-			} else {
-				cancel();
-			}
-		}
-
-		@Override
-		public void statePaused(SeesawState currentState,
-				boolean onTransition) {
-		}
-
-		@Override
-		public void stateResumed(SeesawState currentState) {
-		}
-
-		@Override
-		public void stateTransitioned(SeesawState nextState) {
+		public boolean isFinished() {
+			return getGameRunner().isRunning();
 		}
 
 	}

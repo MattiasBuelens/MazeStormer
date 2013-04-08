@@ -8,6 +8,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import org.apache.batik.bridge.UserAgent;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.gvt.AbstractPanInteractor;
 import org.apache.batik.swing.gvt.Interactor;
@@ -28,30 +29,48 @@ public class MapCanvas extends JSVGCanvas {
 		setupInteractors();
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	public double getZoomScale() {
 		return zoomScale;
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	public void zoom(double zoomFactor) {
 		zoomOn(getCenter(), zoomFactor);
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	public void resetZoom() {
 		zoom(1d / getZoomScale());
 		zoomScale = 1d;
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	@Override
 	public void resetRenderingTransform() {
 		zoomScale = 1f;
 		super.resetRenderingTransform();
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	private Point2D getCenter() {
 		Dimension size = getSize();
 		return new Point2D.Double(size.getWidth() / 2d, size.getHeight() / 2d);
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	public void centerOn(double x, double y, double angle) {
 		AffineTransform at = new AffineTransform();
 
@@ -80,10 +99,12 @@ public class MapCanvas extends JSVGCanvas {
 		setRenderingTransform(at);
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	private void zoomOn(Point2D center, double zoomFactor) {
 		double newZoomScale = zoomScale * zoomFactor;
-		if (newZoomScale <= zoomScaleLimit
-				&& 1 <= newZoomScale * zoomScaleLimit) {
+		if (newZoomScale <= zoomScaleLimit && 1 <= newZoomScale * zoomScaleLimit) {
 			// Store new zoom scale
 			zoomScale = newZoomScale;
 			// Set new rendering transform
@@ -93,6 +114,9 @@ public class MapCanvas extends JSVGCanvas {
 		}
 	}
 
+	/**
+	 * @category zoom transform
+	 */
 	private AffineTransform getZoomTransform(Point2D center, double scale) {
 		double dx = -center.getX() * (scale - 1.0);
 		double dy = -center.getY() * (scale - 1.0);
@@ -103,6 +127,9 @@ public class MapCanvas extends JSVGCanvas {
 		return at;
 	}
 
+	/**
+	 * @category interactor
+	 */
 	private void setupInteractors() {
 		// Disable default interactors
 		super.setEnableImageZoomInteractor(false);
@@ -115,11 +142,32 @@ public class MapCanvas extends JSVGCanvas {
 		setEnableZoomInteractor(true);
 	}
 
+	/**
+	 * @category interactor
+	 */
+	@SuppressWarnings("unchecked")
+	private void addInteractor(Interactor interactor) {
+		getInteractors().add(interactor);
+	}
+
+	/**
+	 * @category interactor
+	 */
+	private void removeInteractor(Interactor interactor) {
+		getInteractors().remove(interactor);
+	}
+
+	/**
+	 * @category pan interactor
+	 */
 	@Override
 	public boolean getEnablePanInteractor() {
 		return isPanInteractorEnabled;
 	}
 
+	/**
+	 * @category pan interactor
+	 */
 	@Override
 	public void setEnablePanInteractor(boolean b) {
 		if (isPanInteractorEnabled != b) {
@@ -134,11 +182,17 @@ public class MapCanvas extends JSVGCanvas {
 		}
 	}
 
+	/**
+	 * @category zoom interactor
+	 */
 	@Override
 	public boolean getEnableZoomInteractor() {
 		return isZoomInteractorEnabled;
 	}
 
+	/**
+	 * @category zoom interactor
+	 */
 	@Override
 	public void setEnableZoomInteractor(boolean b) {
 		if (isZoomInteractorEnabled != b) {
@@ -153,25 +207,21 @@ public class MapCanvas extends JSVGCanvas {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void addInteractor(Interactor interactor) {
-		getInteractors().add(interactor);
-	}
-
-	private void removeInteractor(Interactor interactor) {
-		getInteractors().remove(interactor);
-	}
-
+	/**
+	 * @category pan interactor
+	 */
 	private class PanInteractor extends AbstractPanInteractor {
 		@Override
 		public boolean startInteraction(InputEvent ie) {
 			int mods = ie.getModifiers();
-			boolean res = ie.getID() == MouseEvent.MOUSE_PRESSED
-					&& (mods & InputEvent.BUTTON1_MASK) != 0;
+			boolean res = ie.getID() == MouseEvent.MOUSE_PRESSED && (mods & InputEvent.BUTTON1_MASK) != 0;
 			return res;
 		}
 	}
 
+	/**
+	 * @category zoom interactor
+	 */
 	private class ZoomListener implements MouseWheelListener {
 
 		private static final double defaultFactor = 1.25d;
@@ -187,10 +237,55 @@ public class MapCanvas extends JSVGCanvas {
 
 		@Override
 		public void mouseWheelMoved(MouseWheelEvent ev) {
-			double zoomFactor = (ev.getWheelRotation() < 0) ? factor
-					: 1d / factor;
+			double zoomFactor = (ev.getWheelRotation() < 0) ? factor : 1d / factor;
 			zoomOn(ev.getPoint(), zoomFactor);
 		}
+	}
+
+	/*
+	 * Tooltip
+	 */
+
+	/**
+	 * @category tooltip
+	 */
+	@Override
+	protected UserAgent createUserAgent() {
+		return new MapCanvasUserAgent();
+	}
+
+	/**
+	 * Removes Batik's default tooltip HTML formatting.
+	 * 
+	 * @see org.apache.batik.swing.Messages
+	 * @category tooltip
+	 */
+	@Override
+	public void setToolTipText(String text) {
+		if (text != null) {
+			// <title>
+			text = text.replaceAll("<b><i>", "");
+			text = text.replaceAll("</i></b>", "");
+			// <desc>
+			text = text.replaceAll("</?tt>", "");
+		}
+		super.setToolTipText(text);
+	}
+
+	/**
+	 * Allows SVG {@code <title>} and {@code <desc>} elements to produce
+	 * formatted HTML tooltips by bypassing Batik's HTML removal.
+	 * 
+	 * @category tooltip
+	 */
+	protected class MapCanvasUserAgent extends CanvasUserAgent {
+
+		@Override
+		public String toFormattedHTML(String str) {
+			// Keep raw HTML
+			return str;
+		}
+
 	}
 
 }

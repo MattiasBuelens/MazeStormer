@@ -1,15 +1,16 @@
 package mazestormer.world;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.barcode.Barcode;
 import mazestormer.maze.PoseTransform;
 import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
+import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
+import mazestormer.player.RelativePlayer;
 import peno.htttp.DisconnectReason;
 import peno.htttp.SpectatorClient;
 import peno.htttp.SpectatorHandler;
@@ -25,10 +26,10 @@ public class WorldSimulator {
 	private final Player localPlayer;
 	private final String id;
 
-	private final Map<Integer, PoseTransform> playerTransforms = new HashMap<Integer, PoseTransform>();
+	private final Set<Integer> transformedPlayers = new HashSet<Integer>();
 
-	public WorldSimulator(Connection connection, String id, Player localPlayer,
-			World world) throws IOException, IllegalStateException {
+	public WorldSimulator(Connection connection, String id, Player localPlayer, World world) throws IOException,
+			IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
 		this.world = world;
@@ -40,60 +41,67 @@ public class WorldSimulator {
 	}
 
 	public String getId() {
-		return this.id;
+		return id;
 	}
 
 	public World getWorld() {
-		return this.world;
+		return world;
 	}
 
 	public Player getLocalPlayer() {
-		return this.localPlayer;
+		return localPlayer;
 	}
 
 	private boolean isLocalPlayer(String playerID) {
 		return getLocalPlayer().getPlayerID().equals(playerID);
 	}
 
-	private Pose transformPlayerPose(int playerNumber, Pose pose) {
-		return getPlayerTransform(playerNumber).transform(pose);
+	private synchronized AbsolutePlayer getOrAddPlayer(String playerID) {
+		AbsolutePlayer player = getWorld().getPlayer(playerID);
+		if (player == null) {
+			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot(), null);
+			player = new AbsolutePlayer(relativePlayer);
+			getWorld().addPlayer(player);
+		}
+		return player;
 	}
 
-	private PoseTransform getPlayerTransform(int playerNumber) {
-		// Look up cached transformation
-		PoseTransform transform = playerTransforms.get(playerNumber);
-		if (transform == null) {
-			// Create transformation from start pose
-			Pose startPose = getWorld().getMaze().getStartPose(playerNumber);
-			transform = new PoseTransform(startPose);
-			// Store transformation for reuse
-			playerTransforms.put(playerNumber, transform);
-		}
-		return transform;
+	private void setupPlayerTransform(AbsolutePlayer player, int playerNumber) {
+		// Ignore if already set
+		if (transformedPlayers.contains(playerNumber))
+			return;
+
+		// Create transformation from start pose
+		Pose startPose = getWorld().getMaze().getStartPose(playerNumber);
+		player.setTransform(new PoseTransform(startPose));
+		// Set as transformed
+		transformedPlayers.add(playerNumber);
 	}
 
 	private void clearPlayerTransforms() {
-		playerTransforms.clear();
+		transformedPlayers.clear();
 	}
 
 	public void terminate() {
-		// Reset state
-		clearPlayerTransforms();
 		// Stop spectating
 		client.stop();
+		// Reset state
+		clearPlayerTransforms();
+		// Reset world
+		getWorld().removeOtherPlayers();
 	}
 
 	private class Handler implements SpectatorHandler {
 
 		@Override
 		public void gameStarted() {
-			// Reset player transforms
-			clearPlayerTransforms();
+			// TODO Reset seesaw states
 		}
 
 		@Override
 		public void gameStopped() {
-			// left empty
+			// Reset player transforms
+			clearPlayerTransforms();
 		}
 
 		@Override
@@ -107,6 +115,13 @@ public class WorldSimulator {
 		}
 
 		@Override
+		public void playerRolled(String playerID, int playerNumber) {
+			// Setup transformation if not set yet
+			AbsolutePlayer player = getOrAddPlayer(playerID);
+			setupPlayerTransform(player, playerNumber);
+		}
+
+		@Override
 		public void playerJoining(String playerID) {
 			// left empty
 		}
@@ -116,8 +131,8 @@ public class WorldSimulator {
 			// Ignore local player
 			if (isLocalPlayer(playerID))
 				return;
-
-			getWorld().addPlayer(new Player(playerID, new ObservableRobot()));
+			// Store player
+			getOrAddPlayer(playerID);
 		}
 
 		@Override
@@ -127,9 +142,11 @@ public class WorldSimulator {
 				return;
 
 			// TODO Perhaps add GameListener.onPlayerTimeout() ?
-			if (reason == DisconnectReason.LEAVE
-					|| reason == DisconnectReason.TIMEOUT) {
-				getWorld().removePlayer(getWorld().getPlayer(playerID));
+			if (reason == DisconnectReason.LEAVE || reason == DisconnectReason.TIMEOUT) {
+				AbsolutePlayer player = getWorld().getPlayer(playerID);
+				if (player != null) {
+					getWorld().removePlayer(player);
+				}
 			}
 		}
 
@@ -146,38 +163,31 @@ public class WorldSimulator {
 		}
 
 		@Override
-		public void playerUpdate(String playerID, int playerNumber, double x,
-				double y, double angle, boolean foundObject) {
-			// Ignore local player
-			if (isLocalPlayer(playerID))
-				return;
+		public void playerUpdate(String playerID, int playerNumber, double x, double y, double angle,
+				boolean foundObject) {
+			AbsolutePlayer player = getOrAddPlayer(playerID);
 
-			Pose pose = new Pose((float) x, (float) y, (float) angle);
-			// Transform
-			pose = transformPlayerPose(playerNumber, pose);
-			// Set pose
-			getWorld().getPlayer(playerID).getRobot().getPoseProvider()
-					.setPose(pose);
+			// Setup transformation if not set yet
+			playerRolled(playerID, playerNumber);
+
+			// Set pose of non-local player
+			if (!isLocalPlayer(playerID)) {
+				Pose pose = new Pose((float) x, (float) y, (float) angle);
+
+				// Set relative pose
+				player.setRelativePose(pose);
+			}
 		}
 
 		@Override
 		public void lockedSeesaw(String playerID, int playerNumber, int barcode) {
-			// Deze methode mag leeg blijven, keitof!
-
+			// Nothing to do here
 		}
 
-		@Override
-		public void unlockedSeesaw(String playerID, int playerNumber,
-				int barcode) {
-			Seesaw seesaw = getWorld().getMaze().getSeesaw(
-					new Barcode((byte) barcode));
+		public void unlockedSeesaw(String playerID, int playerNumber, int barcode) {
+			// Flip this seesaw
+			Seesaw seesaw = getWorld().getMaze().getSeesaw((byte) barcode);
 			seesaw.flip();
-		}
-
-		@Override
-		public void playerRolled(String playerID, int playerNumber) {
-			// leeg te blijven?
-
 		}
 
 	}

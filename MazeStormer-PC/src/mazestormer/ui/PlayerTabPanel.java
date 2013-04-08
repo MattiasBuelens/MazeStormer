@@ -5,7 +5,7 @@ import java.beans.Beans;
 import javax.swing.UIManager;
 
 import mazestormer.controller.IPlayerController;
-import mazestormer.ui.map.MapPanel;
+import mazestormer.ui.map.PlayerMapPanel;
 import net.miginfocom.swing.MigLayout;
 
 public class PlayerTabPanel extends ViewPanel {
@@ -14,7 +14,7 @@ public class PlayerTabPanel extends ViewPanel {
 
 	private final IPlayerController controller;
 
-	private MapPanel mapPanel;
+	private PlayerMapPanel mapPanel;
 	private LogPanel logPanel;
 
 	public PlayerTabPanel(IPlayerController controller) {
@@ -22,7 +22,7 @@ public class PlayerTabPanel extends ViewPanel {
 
 		setLayout(new MigLayout("", "[grow]", "[grow][::200px,growprio 50,grow]"));
 
-		mapPanel = new MapPanel(controller.map(), controller.getPlayer());
+		mapPanel = new PlayerMapPanel(controller.map(), controller.getPlayer());
 		mapPanel.setBorder(UIManager.getBorder("TitledBorder.border"));
 		add(mapPanel, "cell 0 0,grow");
 

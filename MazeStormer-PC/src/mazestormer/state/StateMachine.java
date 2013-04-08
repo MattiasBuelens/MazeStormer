@@ -351,7 +351,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		return (M) this;
 	}
 
-	protected class StateFuture<T extends State<?, ?>> extends AbstractFuture<Boolean> implements StateListener<T> {
+	public static class StateFuture<T extends State<?, ?>> extends AbstractFuture<Boolean> implements StateListener<T> {
 
 		private final T checkState;
 
@@ -390,6 +390,46 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 				resolve(true);
 			}
 		}
+
+	}
+
+	public static abstract class FinishFuture<T extends State<?, ?>> extends AbstractFuture<Void> implements
+			StateListener<T> {
+
+		@Override
+		public void stateStarted() {
+		}
+
+		@Override
+		public void stateStopped() {
+			// Failed
+			cancel();
+		}
+
+		@Override
+		public void stateFinished() {
+			if (isFinished()) {
+				// Success
+				resolve(null);
+			} else {
+				// Failed
+				cancel();
+			}
+		}
+
+		@Override
+		public void statePaused(T currentState, boolean onTransition) {
+		}
+
+		@Override
+		public void stateResumed(T currentState) {
+		}
+
+		@Override
+		public void stateTransitioned(T nextState) {
+		}
+
+		public abstract boolean isFinished();
 
 	}
 

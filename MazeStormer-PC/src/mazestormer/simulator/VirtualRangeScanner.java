@@ -8,28 +8,29 @@ import lejos.robotics.RangeReadings;
 import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
+import mazestormer.world.World;
 
 public class VirtualRangeScanner implements RangeScanner {
 
+	private World world;
 	private static final float maxDistance = 255f;
 
-	public VirtualRangeScanner(Maze maze, PoseProvider poseProvider) {
-		this.maze = maze;
-		this.poseProvider = poseProvider;
+	public VirtualRangeScanner(World world) {
+		this.world = world;
+	}
+
+	private World getWorld() {
+		return this.world;
 	}
 
 	private PoseProvider getPoseProvider() {
-		return this.poseProvider;
+		return getWorld().getLocalPlayer().getRobot().getPoseProvider();
 	}
 
-	private PoseProvider poseProvider;
-
-	private Maze getMaze() {
-		return this.maze;
+	private IMaze getMaze() {
+		return getWorld().getMaze();
 	}
-
-	private Maze maze;
 
 	public static final float getMaxDistance() {
 		return maxDistance;

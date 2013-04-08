@@ -5,30 +5,24 @@ import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import mazestormer.player.Player;
+public abstract class LogController extends SubController implements ILogController {
 
-public class LogController extends SubController implements ILogController {
-
-	private Player player;
 	private List<Handler> handlers = new ArrayList<Handler>();
 
-	public LogController(MainController mainController, Player player) {
+	public LogController(MainController mainController) {
 		super(mainController);
-		this.player = player;
 	}
-
-	private Player getPlayer() {
-		return this.player;
-	}
+	
+	protected abstract Logger getLogger();
 
 	@Override
 	public void addLogHandler(Handler handler) {
-		getPlayer().getLogger().addHandler(handler);
+		getLogger().addHandler(handler);
 		handlers.add(handler);
 	}
 
 	public void terminate() {
-		Logger logger = getPlayer().getLogger();
+		Logger logger = getLogger();
 		for (Handler handler : handlers) {
 			logger.removeHandler(handler);
 		}

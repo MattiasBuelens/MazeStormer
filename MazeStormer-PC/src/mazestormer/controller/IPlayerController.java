@@ -1,13 +1,13 @@
 package mazestormer.controller;
 
-import mazestormer.player.IPlayer;
+import mazestormer.player.PlayerIdentifier;
 import mazestormer.util.EventSource;
 
 public interface IPlayerController extends EventSource {
 
-	public IPlayer getPlayer();
+	public PlayerIdentifier getPlayer();
 
-	public IMapController map();
+	public IPlayerMapController map();
 
 	public ILogController log();
 

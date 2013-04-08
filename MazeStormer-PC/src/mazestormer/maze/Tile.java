@@ -15,13 +15,13 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
-			Orientation.class);
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
 
 	/*
 	 * Exploration
 	 */
 	private boolean isExplored = false;
+	private boolean ignoreFlag = false;
 
 	/*
 	 * Barcode
@@ -32,11 +32,7 @@ public class Tile {
 	 * Seesaw
 	 */
 	private Seesaw seesaw;
-	private Barcode seesawBarcode; // alleen ingevuld wanneer seesaw ingevuld
-									// is, hieruit leidt men af of de seesaw
-									// open is of niet
-
-	private boolean ignoreFlag;
+	private Barcode seesawBarcode;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -85,7 +81,11 @@ public class Tile {
 	}
 
 	public void setExplored() {
-		isExplored = true;
+		setExplored(true);
+	}
+
+	private void setExplored(boolean isExplored) {
+		this.isExplored = isExplored;
 	}
 
 	public boolean hasBarcode() {
@@ -98,8 +98,7 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException(
-					"Tile type does not support barcodes.");
+			throw new IllegalStateException("Tile type does not support barcodes.");
 		this.barcode = barcode;
 	}
 
@@ -119,7 +118,7 @@ public class Tile {
 	public Seesaw getSeesaw() {
 		return seesaw;
 	}
-	
+
 	public Barcode getSeesawBarcode() {
 		return seesawBarcode;
 	}
@@ -128,17 +127,23 @@ public class Tile {
 		this.seesaw = seesaw;
 		this.seesawBarcode = seesawBarcode;
 	}
-	
+
+	/**
+	 * Deze methode alleen opvragen in de wereldsimulator, dus in de sourceMaze,
+	 * fysiek moet gebruik gemaakt worden van de ir-sensor en sophie's bal.
+	 * Virtueel moet dit onrechtstreeks wel naar hier komen via een
+	 * VirtualIRSensor.
+	 */
 	public boolean isSeesawOpen() {
 		return seesaw.isOpen(seesawBarcode);
 	}
 
-	public void setIgnoreFlag(boolean flag) {
-		this.ignoreFlag = flag;
-	}
-
 	public boolean getIgnoreFlag() {
 		return this.ignoreFlag;
+	}
+
+	public void setIgnoreFlag(boolean flag) {
+		this.ignoreFlag = flag;
 	}
 
 	public TileShape getShape() {

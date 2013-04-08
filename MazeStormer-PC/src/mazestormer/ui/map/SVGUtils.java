@@ -20,7 +20,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Node;
 import org.w3c.dom.svg.SVGDocument;
 
-public class SVGUtils {
+public final class SVGUtils {
 
 	private SVGUtils() {
 	}

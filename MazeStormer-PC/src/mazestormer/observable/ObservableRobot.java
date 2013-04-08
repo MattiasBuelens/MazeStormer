@@ -8,13 +8,12 @@ public class ObservableRobot implements Robot {
 	private PoseProvider poseProvider;
 
 	public ObservableRobot() {
+		poseProvider = new ObservePoseProvider();
 	}
 
 	@Override
 	public PoseProvider getPoseProvider() {
-		if (poseProvider == null) {
-			poseProvider = new ObservePoseProvider();
-		}
 		return poseProvider;
 	}
+
 }

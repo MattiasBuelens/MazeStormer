@@ -3,7 +3,7 @@ package mazestormer.barcode;
 import static com.google.common.base.Preconditions.checkNotNull;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
 import mazestormer.robot.Robot;
 import mazestormer.util.Future;
@@ -16,7 +16,7 @@ public class CheckPointAction implements IAction {
 		checkNotNull(player);
 		Robot robot = player.getRobot();
 		checkNotNull(robot);
-		Maze maze = player.getMaze();
+		IMaze maze = player.getMaze();
 		checkNotNull(maze);
 
 		// Get absolute robot pose

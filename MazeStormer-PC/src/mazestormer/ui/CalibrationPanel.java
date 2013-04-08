@@ -64,8 +64,8 @@ public class CalibrationPanel extends ViewPanel {
 	}
 
 	private void createModels() {
-		highModel = new SpinnerNumberModel(new Integer(0), new Integer(0),
-				new Integer(1023), new Integer(1));
+		highModel = new SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0),
+				Integer.valueOf(1023), Integer.valueOf(1));
 		highModel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -73,8 +73,8 @@ public class CalibrationPanel extends ViewPanel {
 			}
 		});
 
-		lowModel = new SpinnerNumberModel(new Integer(0), new Integer(0),
-				new Integer(1023), new Integer(1));
+		lowModel = new SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0),
+				Integer.valueOf(1023), Integer.valueOf(1));
 		lowModel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {

@@ -1,14 +1,6 @@
 <class-diagram version="1.0.11" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="true" nesting-relationships="true">  
-  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.player.Player" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/player/Player.java" binary="false">    
-    <position height="-1" width="-1" x="546" y="153"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
-      <attributes public="false" package="false" protected="false" private="false"/>      
-      <operations public="true" package="true" protected="true" private="true"/>    
-    </display>  
-  </class>  
-  <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.maze.Maze" project="MazeStormer-PC" 
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.maze.Maze" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/maze/Maze.java" binary="false">    
     <position height="-1" width="-1" x="376" y="331"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -16,7 +8,7 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <interface id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Robot" project="MazeStormer" 
+  <interface id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Robot" project="MazeStormer" 
     file="/MazeStormer/src/mazestormer/robot/Robot.java" binary="false">    
     <position height="-1" width="-1" x="533" y="324"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -24,7 +16,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <interface id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.ControllableRobot" 
+  <interface id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.ControllableRobot" 
     project="MazeStormer" file="/MazeStormer/src/mazestormer/robot/ControllableRobot.java" binary="false">    
     <position height="-1" width="-1" x="537" y="483"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -32,7 +24,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.observable.ObservableRobot" 
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.observable.ObservableRobot" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/observable/ObservableRobot.java" binary="false">    
     <position height="-1" width="-1" x="293" y="596"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -40,7 +32,7 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.physical.PhysicalRobot" project="MazeStormer-PC" 
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.physical.PhysicalRobot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/physical/PhysicalRobot.java" binary="false">    
     <position height="-1" width="-1" x="591" y="622"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -48,7 +40,7 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.simulator.VirtualRobot" project="MazeStormer-PC" 
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.simulator.VirtualRobot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/simulator/VirtualRobot.java" binary="false">    
     <position height="-1" width="-1" x="481" y="622"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -56,7 +48,7 @@
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.Game" project="MazeStormer-PC" 
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.Game" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/game/Game.java" binary="false">    
     <position height="-1" width="-1" x="378" y="147"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
@@ -64,98 +56,57 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="9" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.Client" project="htttp-peno" 
-    file="/htttp-peno/src/peno/htttp/Client.java" binary="false">    
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.PlayerClient" project="htttp-peno" 
+    file="/htttp-peno/src/peno/htttp/PlayerClient.java" binary="false">    
     <position height="-1" width="-1" x="162" y="289"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="false"/>    
     </display>  
   </class>  
-  <interface id="10" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.Handler" project="htttp-peno" 
-    file="/htttp-peno/src/peno/htttp/Handler.java" binary="false">    
+  <interface id="9" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.PlayerHandler" project="htttp-peno" 
+    file="/htttp-peno/src/peno/htttp/PlayerHandler.java" binary="false">    
     <position height="-1" width="-1" x="193" y="465"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <realization id="11">    
-    <end type="SOURCE" refId="7"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
-  <realization id="12">    
-    <bendpoint x="405" y="408"/>    
-    <end type="SOURCE" refId="5"/>    
-    <end type="TARGET" refId="3"/>  
-  </realization>  
-  <association id="13">    
-    <bendpoint x="437" y="28"/>    
-    <bendpoint x="488" y="27"/>    
+  <generalization id="10">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="2"/>  
+  </generalization>  
+  <association id="11">    
     <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="14" name="players">        
-        <position height="15" width="43" x="432" y="13"/>      
-      </attribute>      
-      <multiplicity id="15" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="1" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <association id="16">    
-    <end type="SOURCE" refId="9" navigable="false">      
-      <attribute id="17" name="handler"/>      
-      <multiplicity id="18" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <association id="19">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="20" name="client">        
-        <position height="15" width="32" x="255" y="176"/>      
-      </attribute>      
-      <multiplicity id="21" minimum="0" maximum="1"/>    
+      <attribute id="12" name="handler"/>      
+      <multiplicity id="13" minimum="0" maximum="1"/>    
     </end>    
     <end type="TARGET" refId="9" navigable="true"/>    
     <display labels="true" multiplicity="false"/>  
   </association>  
-  <association id="22">    
-    <bendpoint x="302" y="374"/>    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="23" name="handler">        
-        <position height="15" width="43" x="297" y="388"/>      
-      </attribute>      
-      <multiplicity id="24" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <realization id="25">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
-  <association id="26">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="27" name="robot">        
-        <position height="15" width="32" x="389" y="359"/>      
-      </attribute>      
-      <multiplicity id="28" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="3" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <association id="29">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="30" name="maze"/>      
-      <multiplicity id="31" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="false"/>  
-  </association>  
-  <generalization id="32">    
+  <realization id="14">    
+    <bendpoint x="405" y="408"/>    
     <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="2"/>  
+  </realization>  
+  <association id="15">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="16" name="client">        
+        <position height="15" width="32" x="255" y="176"/>      
+      </attribute>      
+      <multiplicity id="17" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <realization id="18">    
+    <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="3"/>  
-  </generalization>  
+  </realization>  
+  <realization id="19">    
+    <end type="SOURCE" refId="5"/>    
+    <end type="TARGET" refId="3"/>  
+  </realization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="true" package="true" protected="true" private="true"/>    

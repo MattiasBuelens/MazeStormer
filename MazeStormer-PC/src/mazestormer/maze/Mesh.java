@@ -7,23 +7,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.pathfinding.AstarSearchAlgorithm;
 import lejos.robotics.pathfinding.Node;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
-public class Mesh implements MazeListener {
+public class Mesh extends DefaultMazeListener {
 
-	private final Maze maze;
+	private final IMaze maze;
 
-	public Mesh(Maze maze) {
+	public Mesh(IMaze maze) {
 		this.maze = maze;
 		maze.addListener(this);
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return this.maze;
 	}
 
@@ -43,9 +42,11 @@ public class Mesh implements MazeListener {
 		// Create list of tiles
 		int nbWaypoints = path == null ? 0 : path.size();
 		List<Tile> tiles = new ArrayList<Tile>(nbWaypoints);
-		for (Waypoint wp : path) {
-			Tile tile = getMaze().getTileAt(new LongPoint(wp));
-			tiles.add(tile);
+		if (path != null) {
+			for (Waypoint wp : path) {
+				Tile tile = getMaze().getTileAt(new LongPoint(wp));
+				tiles.add(tile);
+			}
 		}
 		return tiles;
 	}
@@ -76,11 +77,11 @@ public class Mesh implements MazeListener {
 	@Deprecated
 	public void printNodeMap() {
 		for (Tile tile : this.nodeMap.keySet()) {
-			System.out.println("Tile X: " + tile.getX() + "\t" + " Y: " + tile.getY() + "\t" + " | Borders: " + tile.getClosedSides().size()
-					+ " | Openings: " + tile.getOpenSides().size());
+			System.out.println("Tile X: " + tile.getX() + "\t" + " Y: " + tile.getY() + "\t" + " | Borders: "
+					+ tile.getClosedSides().size() + " | Openings: " + tile.getOpenSides().size());
 			Node node = this.nodeMap.get(tile);
-			System.out.println("Node X: " + node.x + "\t" + " Y: " + node.y + "\t" + " | Borders: " + (4 - node.getNeighbors().size())
-					+ " | Openings: " + node.getNeighbors().size());
+			System.out.println("Node X: " + node.x + "\t" + " Y: " + node.y + "\t" + " | Borders: "
+					+ (4 - node.getNeighbors().size()) + " | Openings: " + node.getNeighbors().size());
 		}
 	}
 
@@ -90,16 +91,8 @@ public class Mesh implements MazeListener {
 	}
 
 	@Override
-	public void tileChanged(Tile tile) {
-	}
-
-	@Override
 	public void edgeChanged(Edge edge) {
 		edgeUpdate(edge);
-	}
-
-	@Override
-	public void mazeOriginChanged(Pose origin) {
 	}
 
 	@Override
