@@ -1,6 +1,5 @@
 package mazestormer.game;
 
-import java.util.EnumSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -15,10 +14,8 @@ import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.DefaultMazeListener;
-import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
-import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
@@ -84,12 +81,12 @@ public class GameRunner implements GameListener {
 	public void setObjectTile() {
 		log("Object on next tile, set walls");
 
-		// Set all unknown edges to walls
+		Tile currentTile = explorerRunner.getCurrentTile();
 		Tile nextTile = explorerRunner.getNextTile();
-		EnumSet<Orientation> unknownSides = nextTile.getUnknownSides();
-		for (Orientation side : unknownSides) {
-			getMaze().setEdge(nextTile.getPosition(), side, EdgeType.WALL);
-		}
+		Orientation orientation = currentTile.orientationTo(nextTile);
+
+		// Make next tile a dead end
+		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
 
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
@@ -107,17 +104,16 @@ public class GameRunner implements GameListener {
 
 		Barcode seesawBarcode = currentTile.getBarcode();
 		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
-		Seesaw seesaw = new Seesaw(seesawBarcode);
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();
 		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, seesaw, seesawBarcode);
+		maze.setSeesaw(nextTilePosition, seesawBarcode);
 
 		// Seesaw
 		nextTilePosition = orientation.shift(nextTilePosition);
 		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, seesaw, otherBarcode);
+		maze.setSeesaw(nextTilePosition, otherBarcode);
 
 		// Other seesaw barcode
 		nextTilePosition = orientation.shift(nextTilePosition);

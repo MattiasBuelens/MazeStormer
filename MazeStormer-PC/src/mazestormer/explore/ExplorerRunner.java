@@ -28,6 +28,7 @@ import mazestormer.maze.IMaze.Target;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
+import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
@@ -422,13 +423,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		Orientation heading = angleToOrientation(relativeHeading);
 
 		// Make straight tile
-		for (Orientation wall : TileType.STRAIGHT.getWalls(heading)) {
-			getMaze().setEdge(tile.getPosition(), wall, EdgeType.WALL);
-		}
-		// Replace unknown edges with openings
-		for (Orientation orientation : tile.getUnknownSides()) {
-			getMaze().setEdge(tile.getPosition(), orientation, EdgeType.OPEN);
-		}
+		getMaze().setTileShape(tile.getPosition(), new TileShape(TileType.STRAIGHT, heading));
 		// Set barcode
 		getMaze().setBarcode(tile.getPosition(), barcode);
 		// Mark as explored

@@ -186,7 +186,7 @@ public class WorldSimulator {
 
 		public void unlockedSeesaw(String playerID, int playerNumber, int barcode) {
 			// Flip this seesaw
-			Seesaw seesaw = getWorld().getMaze().getSeesaw((byte) barcode);
+			Seesaw seesaw = getWorld().getMaze().getOrCreateSeesaw((byte) barcode);
 			seesaw.flip();
 		}
 

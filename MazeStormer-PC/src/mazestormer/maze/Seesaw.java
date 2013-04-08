@@ -10,9 +10,14 @@ public class Seesaw {
 
 	private boolean isHighOpen = false;
 
-	public Seesaw(Barcode lowestBarcode, Barcode highestBarcode) {
-		this.lowestBarcode = lowestBarcode;
-		this.highestBarcode = highestBarcode;
+	public Seesaw(Barcode barcode, Barcode otherBarcode) {
+		if (barcode.getValue() < otherBarcode.getValue()) {
+			this.lowestBarcode = barcode;
+			this.highestBarcode = otherBarcode;
+		} else {
+			this.lowestBarcode = otherBarcode;
+			this.highestBarcode = barcode;
+		}
 	}
 
 	public Seesaw(Barcode barcode) {

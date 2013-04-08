@@ -178,17 +178,17 @@ public class ParserTest {
 		IMaze maze = parse(source);
 
 		// Player 0 in bottom left facing north
-		assertEquals(maze.getStartPose(0).getLocation(), new Point(20, 20));
-		assertEquals(maze.getStartPose(0).getHeading(), 90d, 0.1d);
+		assertEquals(new Point(0, 0), maze.getStartPose(0).getLocation());
+		assertEquals(90d, maze.getStartPose(0).getHeading(), 0.1d);
 		// Player 1 in bottom right facing west
-		assertEquals(maze.getStartPose(1).getLocation(), new Point(60, 20));
-		assertEquals(maze.getStartPose(1).getHeading(), 180d, 0.1d);
+		assertEquals(new Point(40, 0), maze.getStartPose(1).getLocation());
+		assertEquals(180d, maze.getStartPose(1).getHeading(), 0.1d);
 		// Player 2 in top left facing east
-		assertEquals(maze.getStartPose(2).getLocation(), new Point(20, 60));
-		assertEquals(maze.getStartPose(2).getHeading(), 0d, 0.1d);
+		assertEquals(new Point(0, 40), maze.getStartPose(2).getLocation());
+		assertEquals(0d, maze.getStartPose(2).getHeading(), 0.1d);
 		// Player 3 in top right facing south
-		assertEquals(maze.getStartPose(3).getLocation(), new Point(60, 60));
-		assertEquals(maze.getStartPose(3).getHeading(), -90d, 0.1d);
+		assertEquals(new Point(40, 40), maze.getStartPose(3).getLocation());
+		assertEquals(-90d, maze.getStartPose(3).getHeading(), 0.1d);
 	}
 
 	@Test
@@ -198,7 +198,7 @@ public class ParserTest {
 
 		checkWalls(tile, NORTH, SOUTH);
 		assertEquals(new LongPoint(0, 0), tile.getPosition());
-		assertEquals(tile.getBarcode().getValue(), 37);
+		assertEquals(37, tile.getBarcode().getValue());
 	}
 
 	@Test
@@ -210,27 +210,27 @@ public class ParserTest {
 		Tile tile00 = maze.getTileAt(new LongPoint(0, 0));
 		checkWalls(tile00, NORTH, SOUTH);
 		assertTrue(tile00.hasBarcode());
-		assertEquals(tile00.getBarcode().getValue(), 11);
+		assertEquals(11, tile00.getBarcode().getValue());
 
 		// (1, 0) Seesaw at side 11, open
 		Tile tile10 = maze.getTileAt(new LongPoint(1, 0));
 		checkWalls(tile10, NORTH, SOUTH);
 		assertTrue(tile10.isSeesaw());
 		assertTrue(tile10.isSeesawOpen());
-		assertEquals(tile10.getSeesawBarcode().getValue(), 11);
+		assertEquals(11, tile10.getSeesawBarcode().getValue());
 
 		// (2, 0) Seesaw at side 13, closed
 		Tile tile20 = maze.getTileAt(new LongPoint(2, 0));
 		checkWalls(tile20, NORTH, SOUTH);
 		assertTrue(tile20.isSeesaw());
 		assertFalse(tile20.isSeesawOpen());
-		assertEquals(tile20.getSeesawBarcode().getValue(), 13);
+		assertEquals(13, tile20.getSeesawBarcode().getValue());
 
 		// (3, 0) Barcode 13
 		Tile tile30 = maze.getTileAt(new LongPoint(3, 0));
 		checkWalls(tile30, NORTH, SOUTH);
 		assertTrue(tile30.hasBarcode());
-		assertEquals(tile30.getBarcode().getValue(), 13);
+		assertEquals(13, tile30.getBarcode().getValue());
 	}
 
 	@Test
@@ -242,39 +242,39 @@ public class ParserTest {
 		Tile tile03 = maze.getTileAt(new LongPoint(0, 3));
 		checkWalls(tile03, WEST, EAST);
 		assertTrue(tile03.hasBarcode());
-		assertEquals(tile03.getBarcode().getValue(), 11);
+		assertEquals(11, tile03.getBarcode().getValue());
 
 		// (0, 2) Seesaw at side 11, open
 		Tile tile02 = maze.getTileAt(new LongPoint(0, 2));
 		checkWalls(tile02, WEST, EAST);
 		assertTrue(tile02.isSeesaw());
 		assertTrue(tile02.isSeesawOpen());
-		assertEquals(tile02.getSeesawBarcode().getValue(), 11);
+		assertEquals(11, tile02.getSeesawBarcode().getValue());
 
 		// (0, 1) Seesaw at side 13, closed
 		Tile tile01 = maze.getTileAt(new LongPoint(0, 1));
 		checkWalls(tile01, WEST, EAST);
 		assertTrue(tile01.isSeesaw());
 		assertFalse(tile01.isSeesawOpen());
-		assertEquals(tile01.getSeesawBarcode().getValue(), 13);
+		assertEquals(13, tile01.getSeesawBarcode().getValue());
 
 		// (0, 0) Barcode 13
 		Tile tile00 = maze.getTileAt(new LongPoint(0, 0));
 		checkWalls(tile00, WEST, EAST);
 		assertTrue(tile00.hasBarcode());
-		assertEquals(tile00.getBarcode().getValue(), 13);
+		assertEquals(13, tile00.getBarcode().getValue());
 	}
 
 	@Test
 	public void parseTileBarcode() throws ParseException {
 		Tile parsedTile = Parser.parseTile(80, 120, "Straight.N.11");
 		// Position
-		assertEquals(parsedTile.getX(), 80);
-		assertEquals(parsedTile.getY(), 120);
+		assertEquals(80, parsedTile.getX());
+		assertEquals(120, parsedTile.getY());
 		// Edges
 		checkWalls(parsedTile, WEST, EAST);
 		// Barcode
-		assertEquals(parsedTile.getBarcode().getValue(), 11);
+		assertEquals(11, parsedTile.getBarcode().getValue());
 	}
 
 	@Test

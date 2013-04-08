@@ -138,25 +138,8 @@ public class Parser {
 			Orientation orientation = token.getToken().getOrientation();
 			LongPoint barcodePosition = orientation.shift(position);
 			Barcode barcode = maze.getTileAt(barcodePosition).getBarcode();
-			// Set barcode
-			maze.getTileAt(position).setSeesawBarcode(barcode);
-		}
-
-		// Set seesaw states
-		for (PositionedToken token : seesawTokens) {
-			// Find neighboring seesaw tile
-			LongPoint position = token.getPosition();
-			Orientation orientation = token.getToken().getOrientation();
-			LongPoint neighborPosition = orientation.shift(position, -1);
-			// Get tiles
-			Tile tile = maze.getTileAt(position);
-			Tile neighborTile = maze.getTileAt(neighborPosition);
-			// Compare barcodes and set state
-			// The specification states that the seesaw is initially open
-			// on the side with the lowest barcode
-			boolean isLowest = tile.getSeesawBarcode().getValue() < neighborTile.getSeesawBarcode().getValue();
-			tile.setSeesawOpen(isLowest);
-			neighborTile.setSeesawOpen(!isLowest);
+			// Set seesaw
+			maze.setSeesaw(position, barcode);
 		}
 	}
 

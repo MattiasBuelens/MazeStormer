@@ -284,16 +284,30 @@ public interface IMaze {
 	public Seesaw getSeesaw(byte barcode);
 
 	/**
+	 * Get or create the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 */
+	public Seesaw getOrCreateSeesaw(Barcode barcode);
+
+	/**
+	 * Get or create the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 */
+	public Seesaw getOrCreateSeesaw(byte barcode);
+
+	/**
 	 * Set the seesaw of a tile.
 	 * 
 	 * @param tilePosition
 	 *            The tile position.
-	 * @param seesaw
-	 *            The seesaw of the tile.
 	 * @param seesawBarcode
 	 *            The seesaw barcode at the side of the tile.
 	 */
-	public void setSeesaw(LongPoint tilePosition, Seesaw seesaw, Barcode seesawBarcode);
+	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode);
 
 	/**
 	 * Find the seesaw tile facing the given seesaw barcode.

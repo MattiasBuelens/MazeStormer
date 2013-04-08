@@ -243,7 +243,14 @@ public class Maze implements IMaze {
 		}
 		// Seesaw
 		if (tile.isSeesaw()) {
-			// TODO Set seesaw tile
+			// Try to use own seesaw
+			Barcode seesawBarcode = tile.getSeesawBarcode();
+			Seesaw seesaw = getSeesaw(seesawBarcode);
+			if (seesaw == null) {
+				// Import seesaw
+				seesaw = tile.getSeesaw();
+			}
+			setSeesaw(tilePosition, seesawBarcode, seesaw);
 		}
 	}
 
@@ -336,10 +343,36 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setSeesaw(LongPoint tilePosition, Seesaw seesaw, Barcode seesawBarcode) {
+	public Seesaw getOrCreateSeesaw(Barcode barcode) {
+		checkNotNull(barcode);
+
+		Seesaw seesaw = getSeesaw(barcode);
+		if (seesaw == null) {
+			seesaw = new Seesaw(barcode);
+			registerSeesaw(seesaw);
+		}
+		return seesaw;
+	}
+
+	@Override
+	public Seesaw getOrCreateSeesaw(byte barcode) {
+		return getOrCreateSeesaw(new Barcode(barcode));
+	}
+
+	@Override
+	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode) {
+		setSeesaw(tilePosition, seesawBarcode, getOrCreateSeesaw(seesawBarcode));
+	}
+
+	protected void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode, Seesaw seesaw) {
 		Tile tile = getTileAt(tilePosition);
 		tile.setSeesaw(seesaw, seesawBarcode);
-		seesaws.put(seesawBarcode, seesaw);
+		registerSeesaw(seesaw);
+	}
+
+	private void registerSeesaw(Seesaw seesaw) {
+		seesaws.put(seesaw.getLowestBarcode(), seesaw);
+		seesaws.put(seesaw.getHighestBarcode(), seesaw);
 	}
 
 	@Override

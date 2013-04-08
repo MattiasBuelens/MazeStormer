@@ -72,19 +72,19 @@ public class CombinedMazeTest {
 	public void testOwnDiscoveredMaze() {
 		// Test results
 		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).hasBarcode());
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue(), (byte) 1);
+		assertEquals(1, ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue());
 		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0, 2)).hasBarcode());
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue(), (byte) 2);
+		assertEquals(2, ownDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue());
 	}
 
 	@Test
 	public void testPartnersDicoveredMaze() {
 		// Test results
 		assertTrue(partnersDiscoveredMaze.getTileAt(new LongPoint(0, 2)).hasBarcode());
-		assertEquals(partnersDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue(), (byte) 3);
+		assertEquals(3, partnersDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue());
 
 		assertTrue(partnersDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).hasBarcode());
-		assertEquals(partnersDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue(), (byte) 2);
+		assertEquals(2, partnersDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue());
 	}
 
 	@Test
