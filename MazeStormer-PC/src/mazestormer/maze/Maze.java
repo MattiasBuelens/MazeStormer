@@ -243,14 +243,7 @@ public class Maze implements IMaze {
 		}
 		// Seesaw
 		if (tile.isSeesaw()) {
-			// Try to use own seesaw
-			Barcode seesawBarcode = tile.getSeesawBarcode();
-			Seesaw seesaw = getSeesaw(seesawBarcode);
-			if (seesaw == null) {
-				// Import seesaw
-				seesaw = tile.getSeesaw();
-			}
-			setSeesaw(tilePosition, seesawBarcode, seesaw);
+			setSeesaw(tilePosition, tile.getSeesawBarcode());
 		}
 	}
 
@@ -361,13 +354,14 @@ public class Maze implements IMaze {
 
 	@Override
 	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode) {
-		setSeesaw(tilePosition, seesawBarcode, getOrCreateSeesaw(seesawBarcode));
-	}
-
-	protected void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode, Seesaw seesaw) {
 		Tile tile = getTileAt(tilePosition);
-		tile.setSeesaw(seesaw, seesawBarcode);
-		registerSeesaw(seesaw);
+
+		// Set seesaw
+		if (tile.isSeesaw() && tile.getSeesawBarcode().equals(seesawBarcode))
+			return;
+		tile.setSeesaw(getOrCreateSeesaw(seesawBarcode), seesawBarcode);
+
+		// Fire tile changed event
 		fireTileChanged(tile);
 	}
 

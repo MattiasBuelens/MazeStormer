@@ -410,6 +410,11 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
+	public Tile getSeesawTile(Barcode barcode) {
+		return getTotalMaze().getSeesawTile(barcode);
+	}
+
+	@Override
 	public void setExplored(LongPoint position) {
 		getOwnMaze().setExplored(position);
 	}
@@ -518,11 +523,6 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
 		getOwnMaze().setStartPose(playerNumber, tilePosition, orientation);
-	}
-
-	@Override
-	public Tile getSeesawTile(Barcode barcode) {
-		return getTotalMaze().getSeesawTile(barcode);
 	}
 
 	private class OwnMazeListener extends DefaultMazeListener {

@@ -111,7 +111,8 @@ public class Barcode {
 
 	@Override
 	public int hashCode() {
-		return getValue();
+		// Exclusive OR keeps hashcodes symmetrical
+		return getValue() ^ reverse(getValue());
 	}
 
 }
