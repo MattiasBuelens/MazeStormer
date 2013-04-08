@@ -19,6 +19,7 @@ import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
@@ -89,37 +90,27 @@ public class GameRunner implements GameListener {
 
 	public void setSeesawWalls() {
 		log("Seesaw on next tiles, set seesaw & barcode");
-		
+
 		// Set all unknown edges to walls or open
 		Tile currentTile = explorerRunner.getCurrentTile();
 		Barcode seesawBarcode = currentTile.getBarcode();
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
+				.getOtherSeesawBarcode(seesawBarcode);
 		Tile nextTile = explorerRunner.getNextTile();
-		
-		Orientation orientation = currentTile.orientationTo(nextTile);
-		
+		Seesaw seesaw = new Seesaw(seesawBarcode);
 		Maze maze = player.getMaze();
-		
+
+		// get the orientation where the seesaw is.
+		Orientation orientation = currentTile.orientationTo(nextTile);
+
 		LongPoint nextTilePosition = nextTile.getPosition();
-		
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-		maze.getTileAt(nextTilePosition).setIgnoreFlag(true);
-		
+		maze.setSeesawTile(nextTilePosition, seesaw, seesawBarcode, orientation);
+
 		nextTilePosition = orientation.shift(nextTilePosition);
-		
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-		maze.getTileAt(nextTilePosition).setIgnoreFlag(true);
-		
+		maze.setSeesawTile(nextTilePosition, seesaw, otherBarcode, orientation);
+
 		nextTilePosition = orientation.shift(nextTilePosition);
-		
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
-		maze.setBarcode(nextTilePosition, otherBarcode);
+		maze.setBarcodeTile(nextTilePosition, otherBarcode, orientation);
 	}
 
 	public void objectFound() {
@@ -129,12 +120,12 @@ public class GameRunner implements GameListener {
 		// Done
 		stopGame();
 	}
-	
+
 	public void onSeesaw(int barcode) {
 		log("The seesaw is currently opened, onwards!");
 		game.lockSeesaw(barcode);
 	}
-	
+
 	public void offSeesaw() {
 		game.unlockSeesaw();
 	}

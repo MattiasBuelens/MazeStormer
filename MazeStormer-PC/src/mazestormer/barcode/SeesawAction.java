@@ -65,6 +65,9 @@ public class SeesawAction extends
 		//TODO vraag aan IRSensor (matthias)
 		if(seesawOpen)
 			transition(SeesawState.ONWARDS);
+		else //TODO opvragen of we moeten hervatten of wait and scan?
+			transition(SeesawState.RESUME_EXPLORING);
+			
 	}
 	
 	protected void onwards() {

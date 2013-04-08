@@ -42,7 +42,7 @@ public class Maze implements IMaze {
 	private final Mesh mesh;
 	private Map<Target, Tile> targets = new EnumMap<Target, Tile>(Target.class);
 	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
-	
+
 	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
 
 	public Maze(float tileSize, float edgeSize, float barLength) {
@@ -578,15 +578,62 @@ public class Maze implements IMaze {
 		}
 		return null;
 	}
-	
+
 	public Seesaw getSeesaw(Barcode barcode) {
 		return seesaws.get(barcode);
 	}
 
+	/**
+	 * Makes the tile at tilePosition a seesaw tile, also makes it explored, and
+	 * turns on the ignoreflag, also puts the seesaw in the seesaw-mapping.
+	 */
 	public void setSeesawTile(LongPoint tilePosition, Seesaw seesaw,
 			Barcode seesawBarcode) {
 		Tile tile = getTileAt(tilePosition);
 		tile.setSeesaw(seesaw, seesawBarcode);
+		tile.setExplored();
+		tile.setIgnoreFlag(true);
+		seesaws.put(seesawBarcode, seesaw);
 	}
 
+	/**
+	 * This method is the same as the previous one, but also closes the edges at
+	 * the sides of the seesaw.
+	 * 
+	 * @param orientation
+	 *            this is the orientation of an open side.
+	 */
+	public void setSeesawTile(LongPoint tilePosition, Seesaw seesaw,
+			Barcode seesawBarcode, Orientation orientation) {
+		setSeesawTile(tilePosition, seesaw, seesawBarcode);
+		setTileEdges(tilePosition, TileType.SEESAW, orientation);
+	}
+
+	/**
+	 * Creates a barcode tile at the given position.
+	 * 
+	 * @param orientation
+	 *            the orientation of an open side
+	 */
+	public void setBarcodeTile(LongPoint tilePosition, Barcode barcode,
+			Orientation orientation) {
+		Tile tile = getTileAt(tilePosition);
+		tile.setBarcode(barcode);
+		tile.setExplored();
+		setTileEdges(tilePosition, TileType.STRAIGHT, orientation);
+
+	}
+
+	/**
+	 * sets walls according to the type and orientation given. (see methods
+	 * TileType.getWalls(orientation) & TileType.getOpenings(orientation) to see
+	 * which orientation to choose
+	 */
+	private void setTileEdges(LongPoint tilePosition, TileType type,
+			Orientation orientation) {
+		for (Orientation wallOrientation : type.getWalls(orientation))
+			setEdge(tilePosition, wallOrientation, EdgeType.WALL);
+		for (Orientation openOrientation : type.getOpenings(orientation))
+			setEdge(tilePosition, openOrientation, EdgeType.OPEN);
+	}
 }
