@@ -1,6 +1,7 @@
 package mazestormer.maze;
 
 import mazestormer.barcode.Barcode;
+import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 
 public class Seesaw {
 
@@ -8,19 +9,18 @@ public class Seesaw {
 	private final Barcode highestBarcode;
 
 	private boolean isHighOpen = false;
-	private boolean isOccupied = false;
 
 	public Seesaw(Barcode lowestBarcode, Barcode highestBarcode) {
 		this.lowestBarcode = lowestBarcode;
 		this.highestBarcode = highestBarcode;
 	}
 
-	public Seesaw(Barcode lowestBarcode) {
-		this(lowestBarcode, new Barcode((byte) (lowestBarcode.getValue() + 2)));
+	public Seesaw(Barcode barcode) {
+		this(barcode, TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(barcode));
 	}
 
-	public Seesaw(byte lowestBarcodeValue) {
-		this(new Barcode(lowestBarcodeValue));
+	public Seesaw(byte barcodeValue) {
+		this(new Barcode(barcodeValue));
 	}
 
 	public boolean isHighOpen() {
@@ -37,6 +37,10 @@ public class Seesaw {
 
 	public void setLowOpen() {
 		this.isHighOpen = false;
+	}
+	
+	public void flip() {
+		this.isHighOpen = !this.isHighOpen;
 	}
 
 	public boolean isOpen(Barcode barcode) {
@@ -60,17 +64,4 @@ public class Seesaw {
 					"Barcode does not belong to this seesaw.");
 		}
 	}
-
-	public boolean isOccupied() {
-		return isOccupied;
-	}
-
-	public void setOccupied(boolean isOccupied) {
-		this.isOccupied = isOccupied;
-	}
-
-	public boolean canEnter(Barcode barcode) {
-		return !isOccupied() && isOpen(barcode);
-	}
-
 }

@@ -7,7 +7,7 @@ import java.util.Map;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.maze.PoseTransform;
-import mazestormer.maze.Tile;
+import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
 import peno.htttp.DisconnectReason;
@@ -169,13 +169,14 @@ public class WorldSimulator {
 		@Override
 		public void unlockedSeesaw(String playerID, int playerNumber,
 				int barcode) {
-			Tile seesawTile = getWorld().getMaze().getSeesawTile(
+			Seesaw seesaw = getWorld().getMaze().getSeesaw(
 					new Barcode((byte) barcode));
-			seesawTile.flipSeesaw();
-			Barcode otherBarcode = seesawTile.getOtherSeesawBarcode();
-			Tile otherSeesawTile = getWorld().getMaze().getSeesawTile(
-					otherBarcode);
-			otherSeesawTile.flipSeesaw();
+			seesaw.flip();
+		}
+
+		@Override
+		public void playerRolled(String playerID, int playerNumber) {
+			// leeg te blijven?
 
 		}
 

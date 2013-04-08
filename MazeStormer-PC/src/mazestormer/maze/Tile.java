@@ -15,7 +15,8 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
+			Orientation.class);
 
 	/*
 	 * Exploration
@@ -30,10 +31,12 @@ public class Tile {
 	/*
 	 * Seesaw
 	 */
-	private Barcode seesawBarcode;
-	private boolean seesawOpen = false;
-	private Barcode otherSeesawBarcode;
-	private boolean ignoreFlag = false;
+	private Seesaw seesaw;
+	private Barcode seesawBarcode; // alleen ingevuld wanneer seesaw ingevuld
+									// is, hieruit leidt men af of de seesaw
+									// open is of niet
+
+	private boolean ignoreFlag;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -95,60 +98,45 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException("Tile type does not support barcodes.");
+			throw new IllegalStateException(
+					"Tile type does not support barcodes.");
 		this.barcode = barcode;
 	}
-	
+
 	public Orientation orientationTo(Tile otherTile) {
-		for(Orientation orientation : Orientation.values()) {
+		for (Orientation orientation : Orientation.values()) {
 			LongPoint neighborPosition = orientation.shift(this.getPosition());
-			if(otherTile.getPosition().equals(neighborPosition))
+			if (otherTile.getPosition().equals(neighborPosition))
 				return orientation;
 		}
 		return null;
 	}
 
 	public boolean isSeesaw() {
-		return getSeesawBarcode() != null;
+		return getSeesaw() != null;
 	}
 
+	public Seesaw getSeesaw() {
+		return seesaw;
+	}
+	
 	public Barcode getSeesawBarcode() {
 		return seesawBarcode;
 	}
 
-	public void setSeesawBarcode(Barcode seesawBarcode) {
+	public void setSeesaw(Seesaw seesaw, Barcode seesawBarcode) {
+		this.seesaw = seesaw;
 		this.seesawBarcode = seesawBarcode;
 	}
-
-	/**
-	 * Deze methode alleen opvragen in de wereldsimulator, dus in de sourceMaze,
-	 * fysiek moet gebruik gemaakt worden van de ir-sensor en sophie's bal.
-	 * Virtueel moet dit onrechtstreeks wel naar hier komen via een VirtualIRSensor.
-	 */
+	
 	public boolean isSeesawOpen() {
-		return seesawOpen;
+		return seesaw.isOpen(seesawBarcode);
 	}
 
-	public void setSeesawOpen(boolean seesawOpen) {
-		this.seesawOpen = seesawOpen;
-	}
-	
-	public void flipSeesaw() {
-		setSeesawOpen(!isSeesawOpen());
-	}
-	
-	public Barcode getOtherSeesawBarcode() {
-		return this.otherSeesawBarcode;
-	}
-	
-	public void setOtherSeesawBarcode(Barcode barcode) {
-		this.otherSeesawBarcode = barcode;
-	}
-	
 	public void setIgnoreFlag(boolean flag) {
-		this.ignoreFlag = flag; 
+		this.ignoreFlag = flag;
 	}
-	
+
 	public boolean getIgnoreFlag() {
 		return this.ignoreFlag;
 	}

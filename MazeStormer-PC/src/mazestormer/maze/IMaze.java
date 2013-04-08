@@ -249,4 +249,6 @@ public interface IMaze {
 	public void setStartPose(int playerNumber, LongPoint tilePosition,
 			Orientation orientation);
 
+	public void setSeesawTile(LongPoint tilePosition, Seesaw seesaw,
+			Barcode seesawBarcode);
 }

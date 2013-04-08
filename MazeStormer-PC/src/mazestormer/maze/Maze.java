@@ -42,6 +42,8 @@ public class Maze implements IMaze {
 	private final Mesh mesh;
 	private Map<Target, Tile> targets = new EnumMap<Target, Tile>(Target.class);
 	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
+	
+	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
 
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
@@ -570,12 +572,21 @@ public class Maze implements IMaze {
 
 	public Tile getSeesawTile(Barcode barcode) {
 		for (Tile tile : tiles.values()) {
-			if (tile.isSeesaw()
-					&& tile.getSeesawBarcode().equals(barcode)) {
+			if (tile.isSeesaw() && tile.getSeesawBarcode().equals(barcode)) {
 				return tile;
 			}
 		}
 		return null;
+	}
+	
+	public Seesaw getSeesaw(Barcode barcode) {
+		return seesaws.get(barcode);
+	}
+
+	public void setSeesawTile(LongPoint tilePosition, Seesaw seesaw,
+			Barcode seesawBarcode) {
+		Tile tile = getTileAt(tilePosition);
+		tile.setSeesaw(seesaw, seesawBarcode);
 	}
 
 }
