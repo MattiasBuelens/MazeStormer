@@ -9,6 +9,7 @@ import java.util.Map;
 
 import lejos.geom.Line;
 import lejos.robotics.navigation.Pose;
+import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.MazeListener;
@@ -161,12 +162,16 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		sb.append("<br>Y: ").append(tile.getY());
 		// Barcode
 		if (tile.hasBarcode()) {
-			sb.append("<br>Barcode: ").append(tile.getBarcode().getValue());
+			byte barcode = tile.getBarcode().getValue();
+			sb.append("<br>Barcode: ").append(barcode);
+			sb.append(" (= ").append(Barcode.reverse(barcode)).append(")");
 		}
 		// Seesaw
 		if (tile.isSeesaw()) {
+			byte barcode = tile.getSeesawBarcode().getValue();
 			sb.append("<br>Seesaw: ").append(tile.isSeesawOpen() ? "open" : "closed");
-			sb.append(" facing ").append(tile.getSeesawBarcode().getValue());
+			sb.append("<br>&emsp;facing ").append(barcode);
+			sb.append(" (= ").append(Barcode.reverse(barcode)).append(")");
 		}
 		return sb.toString();
 	}

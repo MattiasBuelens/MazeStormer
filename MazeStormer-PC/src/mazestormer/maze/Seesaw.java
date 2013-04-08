@@ -57,9 +57,9 @@ public class Seesaw {
 	}
 
 	public boolean isOpen(Barcode barcode) {
-		if (barcode.getValue() == lowestBarcode.getValue()) {
+		if (barcode.equals(lowestBarcode)) {
 			return isLowOpen();
-		} else if (barcode.getValue() == highestBarcode.getValue()) {
+		} else if (barcode.equals(highestBarcode)) {
 			return isHighOpen();
 		} else {
 			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
@@ -67,9 +67,9 @@ public class Seesaw {
 	}
 
 	public void setOpen(Barcode barcode) {
-		if (barcode.getValue() == lowestBarcode.getValue()) {
+		if (barcode.equals(lowestBarcode)) {
 			setLowOpen();
-		} else if (barcode.getValue() == highestBarcode.getValue()) {
+		} else if (barcode.equals(highestBarcode)) {
 			setHighOpen();
 		} else {
 			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
