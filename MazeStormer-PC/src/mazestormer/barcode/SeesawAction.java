@@ -170,7 +170,7 @@ public class SeesawAction extends
 	}
 
 	/**
-	 * @return true if there are more than one seesaws in the maze.
+	 * @return true if there are more than one seesaws discovered in the maze.
 	 */
 	private boolean moreThanOneSeesaw() {
 		IMaze maze = getMaze();
@@ -186,6 +186,9 @@ public class SeesawAction extends
 	 *         you can go without crossing the seesaw you're currently standing
 	 *         at.
 	 */
+	// Deze methode neemt nog niet in rekening dat een andere seesaw een kortste
+	// pad heeft over de seesaw, maar ook een pad ernaast, hiervoor moet
+	// pathfinder mogelijk een extra methode hebben.
 	private Collection<Tile> reachableSeesawTiles() {
 
 		Collection<Tile> tiles = new HashSet<>();
