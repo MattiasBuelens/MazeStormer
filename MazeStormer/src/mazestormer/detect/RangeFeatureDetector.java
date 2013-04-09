@@ -36,4 +36,18 @@ public interface RangeFeatureDetector extends FeatureDetector {
 	 */
 	public RangeFeature scan(float[] angles);
 
+	/**
+	 * Add a range feature listener.
+	 * 
+	 * @param listener
+	 */
+	public void addListener(RangeFeatureListener listener);
+
+	/**
+	 * Remove a range feature listener.
+	 * 
+	 * @param listener
+	 */
+	public void removeListener(RangeFeatureListener listener);
+
 }

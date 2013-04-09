@@ -6,7 +6,11 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
+import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.connect.ConnectEvent;
+import mazestormer.detect.RangeFeatureDetectEvent;
+import mazestormer.detect.RangeFeatureListener;
+import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.RangeScannerListener;
@@ -20,17 +24,22 @@ public class StateController extends SubController implements IStateController {
 	private final MovePublisher movePublisher = new MovePublisher();
 	private final UpdatePublisher updatePublisher = new UpdatePublisher();
 	private final RangeReadingPublisher rangeReadingPublisher = new RangeReadingPublisher();
+	private final RangeFeaturePublisher rangeFeaturePublisher = new RangeFeaturePublisher();
 
 	public StateController(MainController mainController) {
 		super(mainController);
 	}
 
-	private ControllableRobot getRobot() {
-		return getMainController().getControllableRobot();
+	private RelativePlayer getPlayer() {
+		return getMainController().getPlayer();
 	}
 
-	public Logger getLogger() {
-		return getMainController().getPlayer().getLogger();
+	private Logger getLogger() {
+		return getPlayer().getLogger();
+	}
+
+	private ControllableRobot getRobot() {
+		return getMainController().getControllableRobot();
 	}
 
 	@Subscribe
@@ -39,6 +48,7 @@ public class StateController extends SubController implements IStateController {
 			getRobot().getPilot().addMoveListener(movePublisher);
 			getRobot().addUpdateListener(updatePublisher);
 			getRobot().getRangeScanner().addListener(rangeReadingPublisher);
+			getRobot().getRangeDetector().addListener(rangeFeaturePublisher);
 		}
 	}
 
@@ -91,6 +101,15 @@ public class StateController extends SubController implements IStateController {
 		@Override
 		public void readingReceived(RangeReading reading) {
 			postEvent(reading);
+		}
+
+	}
+
+	private class RangeFeaturePublisher implements RangeFeatureListener {
+
+		@Override
+		public void featureReceived(RangeFeature feature) {
+			postEvent(new RangeFeatureDetectEvent(getPlayer(), feature));
 		}
 
 	}

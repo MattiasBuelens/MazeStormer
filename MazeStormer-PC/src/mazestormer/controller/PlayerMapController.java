@@ -54,7 +54,9 @@ public class PlayerMapController extends MapController implements IPlayerMapCont
 
 	@Subscribe
 	public void rangeFeatureDetected(RangeFeatureDetectEvent e) {
-		rangesLayer.addRangeFeature(e.getFeature());
+		if (getPlayer().equals(e.getPlayer())) {
+			rangesLayer.addRangeFeature(e.getFeature());
+		}
 	}
 
 	public void terminate() {

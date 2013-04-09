@@ -2,8 +2,10 @@ package mazestormer.detect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import lejos.geom.Point;
 import lejos.robotics.RangeReading;
@@ -15,16 +17,15 @@ import lejos.robotics.objectdetection.RangeFeature;
 /**
  * A range feature detector which uses a range scanner to locate objects.
  */
-public class RangeScannerFeatureDetector extends AbstractFeatureDetector
-		implements RangeFeatureDetector {
+public class RangeScannerFeatureDetector extends AbstractFeatureDetector implements RangeFeatureDetector {
 
 	private final RangeScanner scanner;
 	private final Point offset;
 	private float maxDistance;
 	private PoseProvider pp = null;
+	private final List<RangeFeatureListener> listeners = new ArrayList<RangeFeatureListener>();
 
-	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance,
-			Point offset) {
+	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance, Point offset) {
 		this.scanner = checkNotNull(scanner);
 		this.maxDistance = maxDistance;
 		this.offset = offset;
@@ -85,8 +86,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 			// Change coordinate system from sensor with the origin in the
 			// rotation center of the sensor-servo to NXT with the origin in the
 			// rotation center of the robot
-			Point position = getOffset().pointAt(rawReading.getRange(),
-					rawReading.getAngle());
+			Point position = getOffset().pointAt(rawReading.getRange(), rawReading.getAngle());
 			float angle = (float) Math.toDegrees(position.angle());
 			float range = position.length();
 			RangeReading reading = new RangeReading(angle, range);
@@ -94,8 +94,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 			// Only retain readings smaller than the maximum distance
 			if (reading.getRange() <= getMaxDistance()) {
 				// Sort the filtered readings
-				int index = Collections.binarySearch(readings, reading,
-						comparator);
+				int index = Collections.binarySearch(readings, reading, comparator);
 				if (index < 0) {
 					index = -index - 1;
 				}
@@ -108,11 +107,17 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 			return null;
 
 		// Add current pose if pose provider available
+		RangeFeature feature;
 		if (pp != null) {
-			return new RangeFeature(readings, pp.getPose());
+			feature = new RangeFeature(readings, pp.getPose());
 		} else {
-			return new RangeFeature(readings);
+			feature = new RangeFeature(readings);
 		}
+
+		// Trigger listeners
+		fireFeatureReceived(feature);
+
+		return feature;
 	}
 
 	/**
@@ -123,6 +128,22 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector
 	public RangeFeature scan(float[] angles) {
 		getScanner().setAngles(angles);
 		return scan();
+	}
+
+	@Override
+	public void addListener(RangeFeatureListener listener) {
+		listeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(RangeFeatureListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void fireFeatureReceived(RangeFeature feature) {
+		for (RangeFeatureListener listener : listeners) {
+			listener.featureReceived(feature);
+		}
 	}
 
 }
