@@ -53,5 +53,9 @@ public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 	public static Barcode getOtherSeesawBarcode(Barcode barcode) {
 		return barcodeMapping.get(barcode);
 	}
+	
+	public static boolean isSeesawBarcode(Barcode barcode) {
+		return barcodeMapping.get(barcode) != null;
+	}
 
 }

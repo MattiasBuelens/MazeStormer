@@ -9,13 +9,15 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import mazestormer.barcode.Barcode;
+import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
+			Orientation.class);
 
 	/*
 	 * Exploration
@@ -32,6 +34,10 @@ public class Tile {
 	 * Seesaw
 	 */
 	private Seesaw seesaw;
+	/*
+	 * The seesawBarcode is used for tiles which are part of a seesaw, it's the
+	 * same barcode as the one right in front of it.
+	 */
 	private Barcode seesawBarcode;
 
 	public Tile(LongPoint position) {
@@ -98,7 +104,8 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException("Tile type does not support barcodes.");
+			throw new IllegalStateException(
+					"Tile type does not support barcodes.");
 		this.barcode = barcode;
 	}
 
@@ -136,6 +143,19 @@ public class Tile {
 	 */
 	public boolean isSeesawOpen() {
 		return seesaw.isOpen(seesawBarcode);
+	}
+
+	/**
+	 * @return true if barcode is a seesaw barcode or if seesaw is set
+	 */
+	public boolean belongsToSeesaw() {
+		if (this.isSeesaw())
+			return true;
+		Barcode barcode = this.getBarcode();
+		if (barcode == null)
+			return false;
+		else
+			return TeamTreasureTrekBarcodeMapping.isSeesawBarcode(barcode);
 	}
 
 	public boolean getIgnoreFlag() {

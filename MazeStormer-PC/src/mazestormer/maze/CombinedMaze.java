@@ -333,6 +333,11 @@ public class CombinedMaze implements IMaze {
 	public Collection<Tile> getExploredTiles() {
 		return getOwnMaze().getExploredTiles();
 	}
+	
+	@Override
+	public Collection<Tile> getUnexploredTiles() {
+		return getOwnMaze().getUnexploredTiles();
+	}
 
 	@Override
 	public void importTile(Tile tile) {
@@ -412,6 +417,11 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public Tile getSeesawTile(Barcode barcode) {
 		return getTotalMaze().getSeesawTile(barcode);
+	}
+	
+	@Override
+	public Collection<Tile> getSeesawTiles() {
+		return getTotalMaze().getSeesawTiles();
 	}
 
 	@Override

@@ -1,9 +1,17 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinderRunner;
+import mazestormer.maze.IMaze;
+import mazestormer.maze.PathFinder;
+import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
@@ -13,7 +21,8 @@ import mazestormer.state.State;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
+public class SeesawAction extends
+		StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
 
 	private final GameRunner gameRunner;
 	private final int barcode;
@@ -49,13 +58,12 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		return (ControllableRobot) player.getRobot();
 	}
 
+	private IMaze getMaze() {
+		return player.getMaze();
+	}
+
 	private Pilot getPilot() {
 		return getControllableRobot().getPilot();
-	}
-	
-	private boolean isSeesawOpen() {
-		IRSensor ir = getControllableRobot().getIRSensor();
-		return !ir.hasReading();
 	}
 
 	/**
@@ -83,14 +91,20 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	}
 
 	protected void scan() {
-		if (isSeesawOpen()) {
-			transition(SeesawState.ONWARDS);
-		} else {
-			// TODO opvragen of we moeten hervatten of wait and scan?
+		if (hasUnexploredTiles())
 			transition(SeesawState.RESUME_EXPLORING);
+		else if (isSeesawOpen())
+			transition(SeesawState.ONWARDS);
+		else {
+			Collection<Tile> reachableSeesawTiles = reachableSeesawTiles();
+			if (moreThanOneSeesaw() && !reachableSeesawTiles.isEmpty()) {
+				// TODO repeatedly go to these seesaws, more states?
+			} else {
+				transition(SeesawState.WAIT_AND_SCAN);
+			}
 		}
 	}
-	
+
 	protected void onwards() {
 		// TODO Implement seesaw action
 		getGameRunner().onSeesaw(barcode);
@@ -99,7 +113,8 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	}
 
 	protected void findLine() {
-		LineFinderRunner lineFinder = new LineFinderRunner(getControllableRobot()) {
+		LineFinderRunner lineFinder = new LineFinderRunner(
+				getControllableRobot()) {
 			@Override
 			protected void log(String message) {
 				// log indien nodig
@@ -111,7 +126,8 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends
+			AbstractStateListener<LineFinderRunner.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(SeesawState.RESUME_EXPLORING);
@@ -136,7 +152,76 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		stop(); // stops this seesaw action
 	}
 
-	public enum SeesawState implements State<SeesawAction, SeesawAction.SeesawState> {
+	private boolean isSeesawOpen() {
+		IRSensor ir = getControllableRobot().getIRSensor();
+		return !ir.hasReading();
+	}
+
+	/**
+	 * @return true if there are still tiles to explore without traversing a
+	 *         seesaw.
+	 */
+	private boolean hasUnexploredTiles() {
+		IMaze maze = getMaze();
+		for (Tile tile : maze.getUnexploredTiles())
+			if (!tile.belongsToSeesaw())
+				return true;
+		return false;
+	}
+
+	/**
+	 * @return true if there are more than one seesaws in the maze.
+	 */
+	private boolean moreThanOneSeesaw() {
+		IMaze maze = getMaze();
+		int nbOfSeesawTiles = 0;
+		for (Tile tile : maze.getTiles())
+			if (!tile.belongsToSeesaw())
+				nbOfSeesawTiles++;
+		return nbOfSeesawTiles / 4 > 1;
+	}
+
+	/**
+	 * @return A collection with barcode tiles belonging to a seesaw, to which
+	 *         you can go without crossing the seesaw you're currently standing
+	 *         at.
+	 */
+	private Collection<Tile> reachableSeesawTiles() {
+
+		Collection<Tile> tiles = new HashSet<>();
+		Tile currentTile = getGameRunner().getCurrentTile();
+		Barcode[] currentSeesaw = getGameRunner().getCurrentSeesawBarcodes();
+		IMaze maze = getMaze();
+		Collection<Tile> seesawTiles = maze.getSeesawTiles();
+		PathFinder PF = new PathFinder(maze);
+
+		for (Tile tile : seesawTiles) {
+			if (tile.getSeesawBarcode().equals(currentSeesaw[0])
+					|| tile.getSeesawBarcode().equals(currentSeesaw[1])) {
+				continue;
+			} else {
+				List<Tile> path = PF.findTilePath(currentTile, tile);
+				if (!containsSeesaw(path, currentSeesaw))
+					tiles.add(tile);
+			}
+		}
+
+		return tiles;
+	}
+
+	private boolean containsSeesaw(List<Tile> path, Barcode[] seesaw) {
+		for (Tile tile : path) {
+			if (tile.isSeesaw()
+					&& (tile.getSeesawBarcode().equals(seesaw[0]) || tile
+							.getSeesawBarcode().equals(seesaw[1]))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public enum SeesawState implements
+			State<SeesawAction, SeesawAction.SeesawState> {
 
 		INITIAL {
 
@@ -195,7 +280,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 
 		@Override
 		public boolean isFinished() {
-			return getGameRunner().isRunning();
+			return isRunning();
 		}
 
 	}

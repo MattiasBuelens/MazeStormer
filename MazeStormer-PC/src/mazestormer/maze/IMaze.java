@@ -146,6 +146,11 @@ public interface IMaze {
 	public Collection<Tile> getExploredTiles();
 
 	/**
+	 * Get all unexplored tiles on this maze.
+	 */
+	public Collection<Tile> getUnexploredTiles();
+
+	/**
 	 * Import the given tile into this maze.
 	 * 
 	 * <p>
@@ -207,7 +212,8 @@ public interface IMaze {
 	 * @param type
 	 *            The edge type.
 	 */
-	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type);
+	public void setEdge(LongPoint tilePosition, Orientation orientation,
+			Edge.EdgeType type);
 
 	/**
 	 * Set the walls and openings of a tile.
@@ -234,7 +240,8 @@ public interface IMaze {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException;
+	public void setBarcode(LongPoint position, Barcode barcode)
+			throws IllegalStateException;
 
 	/**
 	 * Set the barcode of a tile.
@@ -247,7 +254,8 @@ public interface IMaze {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException;
+	public void setBarcode(LongPoint position, byte barcode)
+			throws IllegalStateException;
 
 	/**
 	 * Find the tile with the given barcode.
@@ -317,6 +325,13 @@ public interface IMaze {
 	 * @return The found tile, or null if not found.
 	 */
 	public Tile getSeesawTile(Barcode barcode);
+
+	/**
+	 * Finds all the tiles associated with a seesaw.
+	 * 
+	 * @return A collection with all seesaw tiles.
+	 */
+	public Collection<Tile> getSeesawTiles();
 
 	/**
 	 * Set a tile as explored.
@@ -505,6 +520,7 @@ public interface IMaze {
 	 * @param orientation
 	 *            The start orientation.
 	 */
-	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation);
+	public void setStartPose(int playerNumber, LongPoint tilePosition,
+			Orientation orientation);
 
 }

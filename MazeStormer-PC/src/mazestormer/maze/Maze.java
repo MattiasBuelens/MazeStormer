@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +40,8 @@ public class Maze implements IMaze {
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
 	private final Mesh mesh;
-	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(Target.class);
+	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(
+			Target.class);
 	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
 
 	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
@@ -216,6 +218,17 @@ public class Maze implements IMaze {
 	}
 
 	@Override
+	public Collection<Tile> getUnexploredTiles() {
+		List<Tile> unexploredTiles = new ArrayList<Tile>();
+		for (Tile tile : getTiles()) {
+			if (!tile.isExplored()) {
+				unexploredTiles.add(tile);
+			}
+		}
+		return unexploredTiles;
+	}
+
+	@Override
 	public void importTile(Tile tile) {
 		importTile(tile, TileTransform.getIdentity());
 	}
@@ -231,7 +244,8 @@ public class Maze implements IMaze {
 			if (edgeType == EdgeType.UNKNOWN)
 				continue;
 			// Place edge
-			setEdge(tilePosition, tileTransform.transform(orientation), edgeType);
+			setEdge(tilePosition, tileTransform.transform(orientation),
+					edgeType);
 		}
 		// Barcode
 		if (tile.hasBarcode()) {
@@ -260,7 +274,8 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type) {
+	public void setEdge(LongPoint tilePosition, Orientation orientation,
+			Edge.EdgeType type) {
 		Tile tile = getTileAt(tilePosition);
 		Edge edge = tile.getEdgeAt(orientation);
 
@@ -281,16 +296,19 @@ public class Maze implements IMaze {
 
 	@Override
 	public void setTileShape(LongPoint tilePosition, TileShape shape) {
-		for (Orientation orientation : shape.getType().getWalls(shape.getOrientation())) {
+		for (Orientation orientation : shape.getType().getWalls(
+				shape.getOrientation())) {
 			setEdge(tilePosition, orientation, EdgeType.WALL);
 		}
-		for (Orientation orientation : shape.getType().getOpenings(shape.getOrientation())) {
+		for (Orientation orientation : shape.getType().getOpenings(
+				shape.getOrientation())) {
 			setEdge(tilePosition, orientation, EdgeType.OPEN);
 		}
 	}
 
 	@Override
-	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
+	public void setBarcode(LongPoint position, Barcode barcode)
+			throws IllegalStateException {
 		Tile tile = getTileAt(position);
 
 		// Set barcode
@@ -303,7 +321,8 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException {
+	public void setBarcode(LongPoint position, byte barcode)
+			throws IllegalStateException {
 		setBarcode(position, new Barcode(barcode));
 	}
 
@@ -381,6 +400,15 @@ public class Maze implements IMaze {
 		}
 
 		return null;
+	}
+
+	@Override
+	public Collection<Tile> getSeesawTiles() {
+		Collection<Tile> seesawTiles = new HashSet<>();
+		for (Tile tile : tiles.values())
+			if (tile.isSeesaw())
+				seesawTiles.add(tile);
+		return seesawTiles;
 	}
 
 	@Override
@@ -530,7 +558,8 @@ public class Maze implements IMaze {
 		p2 = p2.add(shift);
 
 		// Return bounding box
-		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX() - p1.getX(), p2.getY() - p1.getY());
+		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX()
+				- p1.getX(), p2.getY() - p1.getY());
 	}
 
 	private void updateEdgeLine(Edge edge) {
@@ -583,9 +612,11 @@ public class Maze implements IMaze {
 			// Add bar
 			float barWidth = width * barLength;
 			if (isVertical) {
-				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint.getY(), 1, barWidth));
+				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint
+						.getY(), 1, barWidth));
 			} else {
-				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint.getY(), barWidth, 1));
+				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint
+						.getY(), barWidth, 1));
 			}
 			// Move to next bar
 			barPoint = direction.shift(barPoint, barWidth);
@@ -616,7 +647,8 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
+	public void setStartPose(int playerNumber, LongPoint tilePosition,
+			Orientation orientation) {
 		// Center on tile
 		Point relativePosition = getTileCenter(tilePosition);
 		float relativeAngle = orientation.getAngle();

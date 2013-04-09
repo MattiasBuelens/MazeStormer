@@ -38,9 +38,11 @@ public class GameRunner implements GameListener {
 
 	private final PositionReporter positionReporter = new PositionReporter();
 	private final TileReporter tileReporter = new TileReporter();
-	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
+	private final ScheduledExecutorService positionExecutor = Executors
+			.newSingleThreadScheduledExecutor(factory);
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("GameRunner-%d").build();
 
 	private int objectNumber;
 
@@ -52,7 +54,8 @@ public class GameRunner implements GameListener {
 				GameRunner.this.log(message);
 			}
 		};
-		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(this));
+		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(
+				this));
 
 		this.game = game;
 		game.addGameListener(this);
@@ -86,10 +89,27 @@ public class GameRunner implements GameListener {
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
 		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
+		getMaze().setTileShape(nextTile.getPosition(),
+				new TileShape(TileType.DEAD_END, orientation));
 
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
+	}
+
+	/**
+	 * @return both barcodes of the seesaw if the robot is standing on a
+	 *         seesaw-barcode.
+	 */
+	public Barcode[] getCurrentSeesawBarcodes() {
+		Tile currentTile = explorerRunner.getCurrentTile();
+		Barcode seesawBarcode = currentTile.getBarcode();
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
+				.getOtherSeesawBarcode(seesawBarcode);
+		return new Barcode[] { seesawBarcode, otherBarcode };
+	}
+	
+	public Tile getCurrentTile() {
+		return explorerRunner.getCurrentTile();
 	}
 
 	public void setSeesawWalls() {
@@ -97,13 +117,14 @@ public class GameRunner implements GameListener {
 
 		IMaze maze = getMaze();
 
-		Tile currentTile = explorerRunner.getCurrentTile();
+		Tile currentTile = getCurrentTile();
 		Tile nextTile = explorerRunner.getNextTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
 		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
+				.getOtherSeesawBarcode(seesawBarcode);
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();
