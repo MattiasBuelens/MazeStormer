@@ -32,10 +32,10 @@ public class VirtualPilot implements Pilot {
 	private volatile Move move;
 	private AtomicBoolean isMoving = new AtomicBoolean(false);
 
-	private ScheduledExecutorService executor;
+	private final ScheduledExecutorService executor;
 	private volatile ScheduledFuture<?> moveEndHandle;
 
-	private List<MoveListener> moveListeners = Collections.synchronizedList(new ArrayList<MoveListener>());
+	private final List<MoveListener> moveListeners = Collections.synchronizedList(new ArrayList<MoveListener>());
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("VirtualPilot-%d").build();
 
@@ -270,8 +270,7 @@ public class VirtualPilot implements Pilot {
 			movementStop(true);
 
 		// Set current move
-		Move move = new Move(moveType, distance, angle,
-				(float) getTravelSpeed(), (float) getRotateSpeed(), wasMoving);
+		Move move = new Move(moveType, distance, angle, (float) getTravelSpeed(), (float) getRotateSpeed(), wasMoving);
 		this.move = move;
 		isMoving.set(true);
 
@@ -284,8 +283,7 @@ public class VirtualPilot implements Pilot {
 		// Start timer
 		float delay = getMoveDuration(move);
 		if (!Float.isInfinite(delay)) {
-			moveEndHandle = executor.schedule(new MoveEndRunner(move),
-					(long) delay, TimeUnit.MILLISECONDS);
+			moveEndHandle = executor.schedule(new MoveEndRunner(move), (long) delay, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -301,8 +299,7 @@ public class VirtualPilot implements Pilot {
 		resetMove();
 
 		// Publish the *traveled* move distance and angle
-		Move travelledMove = new Move(move.getMoveType(),
-				getMovementIncrement(), getAngleIncrement(),
+		Move travelledMove = new Move(move.getMoveType(), getMovementIncrement(), getAngleIncrement(),
 				move.getTravelSpeed(), move.getRotateSpeed(), wasMoving);
 
 		MoveListener[] listeners = moveListeners.toArray(new MoveListener[0]);

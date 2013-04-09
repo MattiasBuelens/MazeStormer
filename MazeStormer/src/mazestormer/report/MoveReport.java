@@ -27,10 +27,6 @@ public class MoveReport extends Report<Move> {
 		this.move = move;
 	}
 
-	private Move createMove() {
-		return new Move(0, 0, false);
-	}
-
 	@Override
 	public Move getValue() {
 		return getMove();
@@ -55,6 +51,10 @@ public class MoveReport extends Report<Move> {
 		super.write(dos);
 		// Dump move
 		getMove().dumpObject(dos);
+	}
+
+	private static final Move createMove() {
+		return new Move(0, 0, false);
 	}
 
 }

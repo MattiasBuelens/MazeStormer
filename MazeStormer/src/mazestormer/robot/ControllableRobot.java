@@ -60,6 +60,11 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	public static final float sensorMaxDistance = 28;
 
 	/**
+	 * The frequency of update reports, in milliseconds.
+	 */
+	public static final long updateReportDelay = 100;
+
+	/**
 	 * Get the pilot controlling this robot's movement.
 	 */
 	public Pilot getPilot();
@@ -78,7 +83,7 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	 * Get the range feature detector of this robot.
 	 */
 	public RangeFeatureDetector getRangeDetector();
-	
+
 	/**
 	 * Get the infrared sensor of this robot.
 	 */
@@ -88,6 +93,20 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	 * Get the sound player of this robot.
 	 */
 	public SoundPlayer getSoundPlayer();
+
+	/**
+	 * Add a robot update listener.
+	 * 
+	 * @param listener
+	 */
+	public void addUpdateListener(RobotUpdateListener listener);
+
+	/**
+	 * Remove a robot update listener.
+	 * 
+	 * @param listener
+	 */
+	public void removeUpdateListener(RobotUpdateListener listener);
 
 	/**
 	 * Terminate this robot.

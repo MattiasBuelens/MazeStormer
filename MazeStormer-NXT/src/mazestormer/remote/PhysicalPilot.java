@@ -2,26 +2,23 @@ package mazestormer.remote;
 
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.DifferentialPilot;
-import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.Move.MoveType;
+import lejos.robotics.navigation.MoveListener;
 import mazestormer.command.Command;
 import mazestormer.command.PilotParameterCommand;
 import mazestormer.command.RotateCommand;
 import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
 import mazestormer.report.MoveReporter;
-import mazestormer.report.MovementReporter;
+import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
-import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 
 public class PhysicalPilot extends DifferentialPilot implements Pilot,
 		MessageListener<Command> {
 
 	private final NXTCommunicator communicator;
-
-	private MovementReporter movementReporter;
 
 	public PhysicalPilot(NXTCommunicator communicator) {
 		super(ControllableRobot.leftWheelDiameter,
@@ -38,10 +35,6 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 
 		// Move listener
 		addMoveListener(new MoveReporter(communicator));
-
-		// Start reporting movements
-		movementReporter = new MovementReporter(communicator, this);
-		movementReporter.start();
 	}
 
 	@Override
@@ -71,9 +64,6 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 	public void terminate() {
 		// Stop the pilot
 		stop();
-
-		// Stop reporting movements
-		movementReporter.stop();
 	}
 
 	@Override

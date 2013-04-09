@@ -3,20 +3,20 @@ package mazestormer.report;
 import lejos.util.Delay;
 import mazestormer.remote.MessageSender;
 import mazestormer.remote.NXTCommunicator;
-import mazestormer.robot.Pilot;
+import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.RobotUpdate;
 
-public class MovementReporter extends MessageSender<Report<?>> implements
+public class UpdateReporter extends MessageSender<Report<?>> implements
 		Runnable {
 
-	private Pilot pilot;
+	private final ControllableRobot robot;
 
 	private Thread thread;
 	private boolean isRunning = false;
-	private long delay = Pilot.movementReportFrequency;
 
-	public MovementReporter(NXTCommunicator communicator, Pilot pilot) {
+	public UpdateReporter(NXTCommunicator communicator, ControllableRobot robot) {
 		super(communicator);
-		this.pilot = pilot;
+		this.robot = robot;
 	}
 
 	public void start() {
@@ -36,15 +36,13 @@ public class MovementReporter extends MessageSender<Report<?>> implements
 	@Override
 	public void run() {
 		while (isRunning) {
-			if (pilot.isMoving()) {
-				reportMovement();
-			}
-			Delay.msDelay(delay);
+			report();
+			Delay.msDelay(ControllableRobot.updateReportDelay);
 		}
 	}
 
-	public void reportMovement() {
-		send(new MoveReport(ReportType.MOVEMENT, pilot.getMovement()));
+	public void report() {
+		send(new UpdateReport(ReportType.UPDATE, RobotUpdate.create(robot)));
 	}
 
 }

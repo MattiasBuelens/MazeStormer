@@ -3,8 +3,19 @@ package mazestormer.report;
 import lejos.robotics.RangeReadings;
 import lejos.robotics.navigation.Move;
 import mazestormer.remote.MessageType;
+import mazestormer.robot.RobotUpdate;
 
 public enum ReportType implements MessageType<Report<?>> {
+
+	/*
+	 * General
+	 */
+	UPDATE {
+		@Override
+		public Report<RobotUpdate> build() {
+			return new UpdateReport(this);
+		}
+	},
 
 	/*
 	 * Pilot
@@ -23,12 +34,6 @@ public enum ReportType implements MessageType<Report<?>> {
 			return new MoveReport(this);
 		}
 	},
-	MOVEMENT {
-		@Override
-		public Report<Move> build() {
-			return new MoveReport(this);
-		}
-	},
 
 	/*
 	 * Light sensor
@@ -40,7 +45,7 @@ public enum ReportType implements MessageType<Report<?>> {
 			return new LightReadReport(this);
 		}
 	},
-	
+
 	/*
 	 * IR sensor
 	 */
@@ -53,7 +58,7 @@ public enum ReportType implements MessageType<Report<?>> {
 	},
 
 	/*
-	 * Light sensor
+	 * Ultrasonic sensor
 	 */
 
 	SCAN {
