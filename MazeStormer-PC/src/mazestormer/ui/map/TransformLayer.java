@@ -349,7 +349,7 @@ public abstract class TransformLayer extends MapLayer {
 			@Override
 			public void run() {
 				// Set opacity
-				group.setAttribute(SVG_OPACITY_ATTRIBUTE, getOpacity() + "");
+				group.setAttribute(SVG_OPACITY_ATTRIBUTE, SVGUtils.doubleString(getOpacity()));
 				// Apply transformation
 				SVGTransformList list = group.getTransform().getBaseVal();
 				list.clear();

@@ -1,6 +1,7 @@
 package mazestormer.maze;
 
 import mazestormer.barcode.Barcode;
+import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 
 public class Seesaw {
 
@@ -8,19 +9,31 @@ public class Seesaw {
 	private final Barcode highestBarcode;
 
 	private boolean isHighOpen = false;
-	private boolean isOccupied = false;
 
-	public Seesaw(Barcode lowestBarcode, Barcode highestBarcode) {
-		this.lowestBarcode = lowestBarcode;
-		this.highestBarcode = highestBarcode;
+	public Seesaw(Barcode barcode, Barcode otherBarcode) {
+		if (barcode.getValue() < otherBarcode.getValue()) {
+			this.lowestBarcode = barcode;
+			this.highestBarcode = otherBarcode;
+		} else {
+			this.lowestBarcode = otherBarcode;
+			this.highestBarcode = barcode;
+		}
 	}
 
-	public Seesaw(Barcode lowestBarcode) {
-		this(lowestBarcode, new Barcode((byte) (lowestBarcode.getValue() + 2)));
+	public Seesaw(Barcode barcode) {
+		this(barcode, TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(barcode));
 	}
 
-	public Seesaw(byte lowestBarcodeValue) {
-		this(new Barcode(lowestBarcodeValue));
+	public Seesaw(byte barcodeValue) {
+		this(new Barcode(barcodeValue));
+	}
+
+	public Barcode getLowestBarcode() {
+		return lowestBarcode;
+	}
+
+	public Barcode getHighestBarcode() {
+		return highestBarcode;
 	}
 
 	public boolean isHighOpen() {
@@ -39,38 +52,27 @@ public class Seesaw {
 		this.isHighOpen = false;
 	}
 
+	public void flip() {
+		this.isHighOpen = !this.isHighOpen;
+	}
+
 	public boolean isOpen(Barcode barcode) {
-		if (barcode.getValue() == lowestBarcode.getValue()) {
+		if (barcode.equals(lowestBarcode)) {
 			return isLowOpen();
-		} else if (barcode.getValue() == highestBarcode.getValue()) {
+		} else if (barcode.equals(highestBarcode)) {
 			return isHighOpen();
 		} else {
-			throw new IllegalArgumentException(
-					"Barcode does not belong to this seesaw.");
+			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
 		}
 	}
 
 	public void setOpen(Barcode barcode) {
-		if (barcode.getValue() == lowestBarcode.getValue()) {
+		if (barcode.equals(lowestBarcode)) {
 			setLowOpen();
-		} else if (barcode.getValue() == highestBarcode.getValue()) {
+		} else if (barcode.equals(highestBarcode)) {
 			setHighOpen();
 		} else {
-			throw new IllegalArgumentException(
-					"Barcode does not belong to this seesaw.");
+			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
 		}
 	}
-
-	public boolean isOccupied() {
-		return isOccupied;
-	}
-
-	public void setOccupied(boolean isOccupied) {
-		this.isOccupied = isOccupied;
-	}
-
-	public boolean canEnter(Barcode barcode) {
-		return !isOccupied() && isOpen(barcode);
-	}
-
 }

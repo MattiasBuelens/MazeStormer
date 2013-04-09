@@ -3,7 +3,6 @@ package mazestormer.controller;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
 
@@ -34,7 +33,7 @@ public class CheatController extends SubController implements ICheatController {
 		return getMainController().getPlayer().getMaze();
 	}
 
-	private Maze getSourceMaze() {
+	private IMaze getSourceMaze() {
 		return getMainController().getWorld().getMaze();
 	}
 

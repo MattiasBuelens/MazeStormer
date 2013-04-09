@@ -42,6 +42,8 @@ public class Maze implements IMaze {
 	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(Target.class);
 	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
 
+	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
+
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
@@ -241,7 +243,7 @@ public class Maze implements IMaze {
 		}
 		// Seesaw
 		if (tile.isSeesaw()) {
-			// TODO Set seesaw tile
+			setSeesaw(tilePosition, tile.getSeesawBarcode());
 		}
 	}
 
@@ -278,6 +280,16 @@ public class Maze implements IMaze {
 	}
 
 	@Override
+	public void setTileShape(LongPoint tilePosition, TileShape shape) {
+		for (Orientation orientation : shape.getType().getWalls(shape.getOrientation())) {
+			setEdge(tilePosition, orientation, EdgeType.WALL);
+		}
+		for (Orientation orientation : shape.getType().getOpenings(shape.getOrientation())) {
+			setEdge(tilePosition, orientation, EdgeType.OPEN);
+		}
+	}
+
+	@Override
 	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
 		Tile tile = getTileAt(position);
 
@@ -300,7 +312,7 @@ public class Maze implements IMaze {
 		checkNotNull(barcode);
 
 		for (Tile tile : tiles.values()) {
-			if (tile.getBarcode().equals(barcode)) {
+			if (tile.hasBarcode() && tile.getBarcode().equals(barcode)) {
 				return tile;
 			}
 		}
@@ -314,6 +326,51 @@ public class Maze implements IMaze {
 	}
 
 	@Override
+	public Seesaw getSeesaw(Barcode barcode) {
+		return seesaws.get(barcode);
+	}
+
+	@Override
+	public Seesaw getSeesaw(byte barcode) {
+		return getSeesaw(new Barcode(barcode));
+	}
+
+	@Override
+	public Seesaw getOrCreateSeesaw(Barcode barcode) {
+		checkNotNull(barcode);
+
+		Seesaw seesaw = getSeesaw(barcode);
+		if (seesaw == null) {
+			seesaw = new Seesaw(barcode);
+			registerSeesaw(seesaw);
+		}
+		return seesaw;
+	}
+
+	@Override
+	public Seesaw getOrCreateSeesaw(byte barcode) {
+		return getOrCreateSeesaw(new Barcode(barcode));
+	}
+
+	@Override
+	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode) {
+		Tile tile = getTileAt(tilePosition);
+
+		// Set seesaw
+		if (tile.isSeesaw() && tile.getSeesawBarcode().equals(seesawBarcode))
+			return;
+		tile.setSeesaw(getOrCreateSeesaw(seesawBarcode), seesawBarcode);
+
+		// Fire tile changed event
+		fireTileChanged(tile);
+	}
+
+	private void registerSeesaw(Seesaw seesaw) {
+		seesaws.put(seesaw.getLowestBarcode(), seesaw);
+		seesaws.put(seesaw.getHighestBarcode(), seesaw);
+	}
+
+	@Override
 	public Tile getSeesawTile(Barcode barcode) {
 		checkNotNull(barcode);
 
@@ -322,6 +379,7 @@ public class Maze implements IMaze {
 				return tile;
 			}
 		}
+
 		return null;
 	}
 
@@ -336,7 +394,6 @@ public class Maze implements IMaze {
 
 		// Fire tile explored event
 		fireTileExplored(tile);
-
 	}
 
 	@Override

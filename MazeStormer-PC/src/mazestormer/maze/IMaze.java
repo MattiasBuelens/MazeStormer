@@ -210,6 +210,20 @@ public interface IMaze {
 	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type);
 
 	/**
+	 * Set the walls and openings of a tile.
+	 * 
+	 * @param tilePosition
+	 *            The tile position.
+	 * @param tileShape
+	 *            The new tile shape.
+	 * 
+	 * @see TileShape
+	 * @see TileType#getWalls(Orientation)
+	 * @see TileType#getOpenings(Orientation)
+	 */
+	public void setTileShape(LongPoint tilePosition, TileShape tileShape);
+
+	/**
 	 * Set the barcode of a tile.
 	 * 
 	 * @param position
@@ -252,6 +266,48 @@ public interface IMaze {
 	 * @return The found tile, or null if not found.
 	 */
 	public Tile getBarcodeTile(byte barcode);
+
+	/**
+	 * Get the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 */
+	public Seesaw getSeesaw(Barcode barcode);
+
+	/**
+	 * Get the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 */
+	public Seesaw getSeesaw(byte barcode);
+
+	/**
+	 * Get or create the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 */
+	public Seesaw getOrCreateSeesaw(Barcode barcode);
+
+	/**
+	 * Get or create the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 */
+	public Seesaw getOrCreateSeesaw(byte barcode);
+
+	/**
+	 * Set the seesaw of a tile.
+	 * 
+	 * @param tilePosition
+	 *            The tile position.
+	 * @param seesawBarcode
+	 *            The seesaw barcode at the side of the tile.
+	 */
+	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode);
 
 	/**
 	 * Find the seesaw tile facing the given seesaw barcode.

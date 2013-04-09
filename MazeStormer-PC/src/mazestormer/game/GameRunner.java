@@ -1,6 +1,5 @@
 package mazestormer.game;
 
-import java.util.EnumSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -15,10 +14,11 @@ import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ExplorerRunner;
 import mazestormer.maze.DefaultMazeListener;
-import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.maze.TileShape;
+import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
@@ -81,12 +81,12 @@ public class GameRunner implements GameListener {
 	public void setObjectTile() {
 		log("Object on next tile, set walls");
 
-		// Set all unknown edges to walls
+		Tile currentTile = explorerRunner.getCurrentTile();
 		Tile nextTile = explorerRunner.getNextTile();
-		EnumSet<Orientation> unknownSides = nextTile.getUnknownSides();
-		for (Orientation side : unknownSides) {
-			getMaze().setEdge(nextTile.getPosition(), side, EdgeType.WALL);
-		}
+		Orientation orientation = currentTile.orientationTo(nextTile);
+
+		// Make next tile a dead end
+		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
 
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
@@ -95,34 +95,29 @@ public class GameRunner implements GameListener {
 	public void setSeesawWalls() {
 		log("Seesaw on next tiles, set seesaw and barcode");
 
-		// Set all unknown edges to walls or open
-		Tile currentTile = explorerRunner.getCurrentTile();
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Tile nextTile = explorerRunner.getNextTile();
-
-		Orientation orientation = currentTile.orientationTo(nextTile);
 		IMaze maze = getMaze();
+
+		Tile currentTile = explorerRunner.getCurrentTile();
+		Tile nextTile = explorerRunner.getNextTile();
+		Orientation orientation = currentTile.orientationTo(nextTile);
+		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
+
+		Barcode seesawBarcode = currentTile.getBarcode();
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-		// TODO Mark as seesaw
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, seesawBarcode);
 
 		// Seesaw
 		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-		// TODO Mark as seesaw
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, otherBarcode);
 
 		// Other seesaw barcode
 		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
+		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setBarcode(nextTilePosition, otherBarcode);
 
 		// TODO Do we need to mark seesaw tiles as explored here?

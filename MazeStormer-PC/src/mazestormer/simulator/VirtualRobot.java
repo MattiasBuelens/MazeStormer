@@ -8,7 +8,7 @@ import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
@@ -46,7 +46,7 @@ public class VirtualRobot implements ControllableRobot {
 		return world;
 	}
 
-	private Maze getMaze() {
+	private IMaze getMaze() {
 		return world.getMaze();
 	}
 

@@ -15,14 +15,14 @@ import mazestormer.util.LongPoint;
 
 public class Mesh extends DefaultMazeListener {
 
-	private final Maze maze;
+	private final IMaze maze;
 
-	public Mesh(Maze maze) {
+	public Mesh(IMaze maze) {
 		this.maze = maze;
 		maze.addListener(this);
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return this.maze;
 	}
 

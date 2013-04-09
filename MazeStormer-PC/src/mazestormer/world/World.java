@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.RelativePlayer;
@@ -17,7 +18,7 @@ import mazestormer.player.RelativePlayer;
 public class World {
 
 	private final AbsolutePlayer localPlayer;
-	private final Maze maze = new Maze();
+	private final IMaze maze = new Maze();
 	private final Logger logger;
 	private final Map<String, AbsolutePlayer> players = new HashMap<String, AbsolutePlayer>();
 	private final List<WorldListener> listeners = new ArrayList<WorldListener>();
@@ -34,7 +35,7 @@ public class World {
 		this(new AbsolutePlayer(localPlayer));
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return maze;
 	}
 

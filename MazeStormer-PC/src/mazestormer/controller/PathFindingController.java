@@ -9,7 +9,6 @@ import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import mazestormer.line.LineFinderRunner;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.robot.ControllableRobot;
@@ -38,7 +37,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		return getMainController().getPlayer().getMaze();
 	}
 
-	private Maze getSourceMaze() {
+	private IMaze getSourceMaze() {
 		return getMainController().getWorld().getMaze();
 	}
 

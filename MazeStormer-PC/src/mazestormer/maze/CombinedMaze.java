@@ -360,6 +360,11 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
+	public void setTileShape(LongPoint tilePosition, TileShape tileShape) {
+		getOwnMaze().setTileShape(tilePosition, tileShape);
+	}
+
+	@Override
 	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
 		getOwnMaze().setBarcode(position, barcode);
 	}
@@ -377,6 +382,36 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public Tile getBarcodeTile(byte barcode) {
 		return getBarcodeTile(new Barcode(barcode));
+	}
+
+	@Override
+	public Seesaw getSeesaw(Barcode barcode) {
+		return getOwnMaze().getSeesaw(barcode);
+	}
+
+	@Override
+	public Seesaw getSeesaw(byte barcode) {
+		return getSeesaw(new Barcode(barcode));
+	}
+
+	@Override
+	public Seesaw getOrCreateSeesaw(Barcode barcode) {
+		return getOwnMaze().getOrCreateSeesaw(barcode);
+	}
+
+	@Override
+	public Seesaw getOrCreateSeesaw(byte barcode) {
+		return getOrCreateSeesaw(new Barcode(barcode));
+	}
+
+	@Override
+	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode) {
+		getOwnMaze().setSeesaw(tilePosition, seesawBarcode);
+	}
+
+	@Override
+	public Tile getSeesawTile(Barcode barcode) {
+		return getTotalMaze().getSeesawTile(barcode);
 	}
 
 	@Override
@@ -488,11 +523,6 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
 		getOwnMaze().setStartPose(playerNumber, tilePosition, orientation);
-	}
-
-	@Override
-	public Tile getSeesawTile(Barcode barcode) {
-		return getTotalMaze().getSeesawTile(barcode);
 	}
 
 	private class OwnMazeListener extends DefaultMazeListener {
