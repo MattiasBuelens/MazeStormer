@@ -12,6 +12,7 @@ import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.IStateController;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.MoveEvent.EventType;
+import mazestormer.robot.RobotUpdate;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
@@ -90,7 +91,8 @@ public class StatePanel extends ViewPanel {
 		sensorPanel.setBorder(new TitledBorder(null, "Sensor readings", TitledBorder.LEADING, TitledBorder.TOP, null,
 				null));
 		add(sensorPanel, "cell 1 0,grow");
-		sensorPanel.setLayout(new MigLayout("", "[grow][25:25:25,fill][fill][25:25:25,fill][fill]", "[grow][grow][grow]"));
+		sensorPanel.setLayout(new MigLayout("", "[grow][25:25:25,fill][fill][25:25:25,fill][fill]",
+				"[grow][grow][grow]"));
 
 		createLight(sensorPanel);
 		createInfrared(sensorPanel);
@@ -164,12 +166,12 @@ public class StatePanel extends ViewPanel {
 	}
 
 	@Subscribe
-	public void onConnected(ConnectEvent e) {
-		updateState(e.isConnected());
+	public void onConnected(ConnectEvent event) {
+		updateState(event.isConnected());
 	}
 
 	@Subscribe
-	public void onMove(MoveEvent e) {
+	public void onMove(MoveEvent event) {
 		// Pose
 		String x = String.format("%.2f", controller.getXPosition());
 		poseX.setText(x);
@@ -179,10 +181,10 @@ public class StatePanel extends ViewPanel {
 		poseHeading.setText(heading);
 
 		// Move
-		Move move = e.getMove();
+		Move move = event.getMove();
 		if (move != null) {
 			StringBuilder sb = new StringBuilder("");
-			if (e.getEventType() == EventType.STOPPED) {
+			if (event.getEventType() == EventType.STOPPED) {
 				sb.append("stand still");
 			} else {
 				switch (move.getMoveType()) {
@@ -223,6 +225,19 @@ public class StatePanel extends ViewPanel {
 			}
 			movement.setText(sb.toString());
 		}
+	}
+
+	@Subscribe
+	public void onUpdate(RobotUpdate update) {
+		// Light
+		lightValue.setText(Integer.toString(update.getLightValue()));
+		// Infrared
+		float infraredAngle = update.getInfraredAngle();
+		String infraredText = null;
+		if (!Float.isNaN(infraredAngle)) {
+			infraredText = String.format("%.0f", infraredAngle);
+		}
+		infraredValue.setText(infraredText);
 	}
 
 }

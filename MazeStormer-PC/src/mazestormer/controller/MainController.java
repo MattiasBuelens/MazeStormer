@@ -7,9 +7,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import lejos.robotics.navigation.Move;
-import lejos.robotics.navigation.MoveListener;
-import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionContext;
@@ -20,7 +17,6 @@ import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
 import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.MoveEvent;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
@@ -316,29 +312,6 @@ public class MainController implements IMainController {
 		ControllableRobot r = connector.getRobot();
 		getPlayer().setRobot(r);
 		return r;
-	}
-
-	@Subscribe
-	public void registerPilotMoveListener(ConnectEvent e) {
-		if (e.isConnected()) {
-			getControllableRobot().getPilot().addMoveListener(new MovePublisher());
-		}
-	}
-
-	private class MovePublisher implements MoveListener {
-
-		@Override
-		public void moveStarted(Move event, MoveProvider mp) {
-			getPlayer().getLogger().fine("Move started: " + event.toString());
-			postEvent(new MoveEvent(MoveEvent.EventType.STARTED, event));
-		}
-
-		@Override
-		public void moveStopped(Move event, MoveProvider mp) {
-			getPlayer().getLogger().fine("Move stopped: " + event.toString());
-			postEvent(new MoveEvent(MoveEvent.EventType.STOPPED, event));
-		}
-
 	}
 
 	@Subscribe

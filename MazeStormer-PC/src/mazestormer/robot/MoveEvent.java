@@ -3,9 +3,10 @@ package mazestormer.robot;
 import lejos.robotics.navigation.Move;
 
 public class MoveEvent {
+
 	public enum EventType {
 		STARTED, STOPPED
-	};
+	}
 
 	private final EventType eventType;
 	private final Move move;
