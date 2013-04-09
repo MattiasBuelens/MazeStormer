@@ -6,6 +6,7 @@ import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinderRunner;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
@@ -51,21 +52,10 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	private Pilot getPilot() {
 		return getControllableRobot().getPilot();
 	}
-
-	protected void initial() {
-		getGameRunner().setSeesawWalls();
-		transition(SeesawState.SCAN);
-	}
-
-	protected void scan() {
-		boolean seesawOpen = false;
-		// TODO vraag aan IRSensor (matthias)
-		if (seesawOpen) {
-			transition(SeesawState.ONWARDS);
-		} else {
-			// TODO opvragen of we moeten hervatten of wait and scan?
-			transition(SeesawState.RESUME_EXPLORING);
-		}
+	
+	private boolean isSeesawOpen() {
+		IRSensor ir = getControllableRobot().getIRSensor();
+		return !ir.hasReading();
 	}
 
 	/**
@@ -86,6 +76,21 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	 *       in de observedMaze. de eerste tegel, de tegels van de wip en de
 	 *       tegel na de wip staan niet meer in de queue
 	 */
+
+	protected void initial() {
+		getGameRunner().setSeesawWalls();
+		transition(SeesawState.SCAN);
+	}
+
+	protected void scan() {
+		if (isSeesawOpen()) {
+			transition(SeesawState.ONWARDS);
+		} else {
+			// TODO opvragen of we moeten hervatten of wait and scan?
+			transition(SeesawState.RESUME_EXPLORING);
+		}
+	}
+	
 	protected void onwards() {
 		// TODO Implement seesaw action
 		getGameRunner().onSeesaw(barcode);
@@ -114,9 +119,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	}
 
 	protected void waitAndScan() {
-		boolean seesawOpen = false;
-		// TODO vraag aan IRSensor (matthias)
-		if (seesawOpen)
+		if (isSeesawOpen())
 			transition(SeesawState.ONWARDS);
 		else {
 			try {
@@ -128,21 +131,6 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		}
 	}
 
-	/**
-	 * <ol>
-	 * <li>informatie over wip aan het ontdekte doolhof toevoegen</li>
-	 * <li>180° omdraaien</li>
-	 * <li>rijd vooruit tot 20 cm over een witte lijn</li>
-	 * <li>verwijder eventueel tegels uit de queue</li>
-	 * </ol>
-	 * 
-	 * @pre robot staat voor de wip aan de opgelaten kant, hij kijkt naar de wip
-	 * @post robot staan op de tegel voor de tegel voor de wip, in het midden,
-	 *       en kijkt weg van de wip (tegel voor de wip bevat de barcode) alle
-	 *       informatie over de tegel voor de wip, de tegels van de wip en de
-	 *       tegel achter de wip is toegevoegd aan de observedMaze. geen van die
-	 *       tegels staat nog in de queue
-	 */
 	protected void resumeExploring() {
 		// TODO Implement seesaw action
 		stop(); // stops this seesaw action
