@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Move;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.IStateController;
@@ -238,6 +239,13 @@ public class StatePanel extends ViewPanel {
 			infraredText = String.format("%.0f", infraredAngle);
 		}
 		infraredValue.setText(infraredText);
+	}
+
+	@Subscribe
+	public void onRangeReading(RangeReading reading) {
+		// Ultrasonic
+		ultrasonicValue.setText(String.format("%.0f", reading.getRange()));
+		ultrasonicAngle.setText(String.format("%.0f", reading.getAngle()));
 	}
 
 }

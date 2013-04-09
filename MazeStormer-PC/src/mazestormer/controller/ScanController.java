@@ -50,4 +50,5 @@ public class ScanController extends SubController implements IScanController {
 	public void setMaxDistance(float distance) {
 		getRangeDetector().setMaxDistance(distance);
 	}
+
 }

@@ -11,13 +11,10 @@ import java.util.Set;
 import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.objectdetection.RangeFeature;
-import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.util.CoordUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGCircleElement;
-
-import com.google.common.eventbus.Subscribe;
 
 public class RangesLayer extends MapLayer {
 
@@ -37,12 +34,7 @@ public class RangesLayer extends MapLayer {
 		return createElement(SVG_G_TAG);
 	}
 
-	@Subscribe
-	public void rangeFeatureDetected(RangeFeatureDetectEvent e) {
-		addRangeFeature(e.getFeature());
-	}
-
-	private void addRangeFeature(RangeFeature feature) {
+	public void addRangeFeature(RangeFeature feature) {
 		final Set<Element> newPoints = new HashSet<Element>();
 
 		// Get robot pose at time of reading
@@ -50,11 +42,10 @@ public class RangesLayer extends MapLayer {
 
 		// Get points
 		for (RangeReading reading : feature.getRangeReadings()) {
-			if (reading.invalidReading() || reading.getRange() < 0f)
+			if (reading.invalidReading())
 				continue;
 			// Get reading point in robot coordinates
-			Point2D robotPoint = robotPose.pointAt(reading.getRange(),
-					reading.getAngle() + robotPose.getHeading());
+			Point2D robotPoint = robotPose.pointAt(reading.getRange(), reading.getAngle() + robotPose.getHeading());
 			// Convert to map coordinates
 			Point2D mapPoint = CoordUtils.toMapCoordinates(robotPoint);
 			// Create point element and store
@@ -94,20 +85,16 @@ public class RangesLayer extends MapLayer {
 			int index = it.previousIndex();
 			Set<Element> set = it.previous();
 			// Get color position
-			int colorIndex = Math.min(pointColorThreshold,
-					Math.max(0, length - index));
-			float colorPosition = (float) colorIndex
-					/ (float) pointColorThreshold;
+			int colorIndex = Math.min(pointColorThreshold, Math.max(0, length - index));
+			float colorPosition = (float) colorIndex / (float) pointColorThreshold;
 			// Set color
-			Color color = interpolateColor(pointStartColor, pointEndColor,
-					colorPosition);
+			Color color = interpolateColor(pointStartColor, pointEndColor, colorPosition);
 			setFillColor(set, color);
 		}
 	}
 
 	private void setFillColor(Iterable<Element> points, Color color) {
-		String colorString = String.format("rgb(%d,%d,%d)", color.getRed(),
-				color.getGreen(), color.getBlue());
+		String colorString = String.format("rgb(%d,%d,%d)", color.getRed(), color.getGreen(), color.getBlue());
 		for (Element element : points) {
 			element.setAttribute(SVG_FILL_ATTRIBUTE, colorString);
 		}
@@ -115,12 +102,9 @@ public class RangesLayer extends MapLayer {
 
 	private Color interpolateColor(Color start, Color end, float position) {
 		int red = interpolateComponent(start.getRed(), end.getRed(), position);
-		int green = interpolateComponent(start.getGreen(), end.getGreen(),
-				position);
-		int blue = interpolateComponent(start.getBlue(), end.getBlue(),
-				position);
-		int alpha = interpolateComponent(start.getAlpha(), end.getAlpha(),
-				position);
+		int green = interpolateComponent(start.getGreen(), end.getGreen(), position);
+		int blue = interpolateComponent(start.getBlue(), end.getBlue(), position);
+		int alpha = interpolateComponent(start.getAlpha(), end.getAlpha(), position);
 		return new Color(red, green, blue, alpha);
 	}
 

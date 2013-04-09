@@ -77,7 +77,7 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	/**
 	 * Get the range scanner of this robot.
 	 */
-	// public RangeScanner getRangeScanner();
+	public ObservableRangeScanner getRangeScanner();
 
 	/**
 	 * Get the range feature detector of this robot.

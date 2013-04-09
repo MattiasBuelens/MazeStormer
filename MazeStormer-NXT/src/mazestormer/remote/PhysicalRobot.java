@@ -4,7 +4,6 @@ import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.RangeFinder;
-import lejos.robotics.RangeScanner;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
@@ -17,6 +16,7 @@ import mazestormer.report.UpdateReporter;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
+import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
@@ -49,8 +49,8 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S4);
 		RegulatedMotor headMotor = Motor.C;
 		float gearRatio = ControllableRobot.sensorGearRatio;
-		RangeScanner headScanner = new RotatingRangeScanner(headMotor,
-				ultrasonicSensor, gearRatio);
+		ObservableRangeScanner headScanner = new RotatingRangeScanner(
+				headMotor, ultrasonicSensor, gearRatio);
 		scanner = new PhysicalRangeScanner(communicator, headScanner);
 
 		// Infrared
@@ -77,8 +77,8 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		return light;
 	}
 
-	// @Override
-	protected RangeScanner getRangeScanner() {
+	@Override
+	public ObservableRangeScanner getRangeScanner() {
 		return scanner;
 	}
 
@@ -136,6 +136,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		// Release resources
 		pilot.terminate();
 		light.terminate();
+		scanner.terminate();
 		// Remove registered message listeners
 		super.terminate();
 	}

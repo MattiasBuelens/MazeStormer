@@ -1,25 +1,35 @@
 package mazestormer.remote;
 
 import lejos.robotics.RangeFinder;
+import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
-import lejos.robotics.RangeScanner;
 import mazestormer.command.Command;
 import mazestormer.command.CommandReplier;
 import mazestormer.command.ScanCommand;
+import mazestormer.report.RangeReadingReport;
 import mazestormer.report.Report;
 import mazestormer.report.ReportType;
+import mazestormer.robot.ObservableRangeScanner;
+import mazestormer.robot.RangeScannerListener;
 
-public class PhysicalRangeScanner extends CommandReplier<RangeReadings>
-		implements RangeScanner {
+public class PhysicalRangeScanner extends NXTComponent implements
+		ObservableRangeScanner, RangeScannerListener {
 
-	private final RangeScanner scanner;
+	private final ObservableRangeScanner scanner;
+
+	private final ScanReplier scanReplier;
 
 	public PhysicalRangeScanner(NXTCommunicator communicator,
-			RangeScanner scanner) {
+			ObservableRangeScanner scanner) {
 		super(communicator);
-		communicator.addListener(this);
-
 		this.scanner = scanner;
+
+		// Reply to scan commands
+		scanReplier = new ScanReplier(getCommunicator());
+		communicator.addListener(scanReplier);
+
+		// Report readings
+		addListener(this);
 	}
 
 	@Override
@@ -37,29 +47,54 @@ public class PhysicalRangeScanner extends CommandReplier<RangeReadings>
 		return scanner.getRangeFinder();
 	}
 
+	@Override
+	public void addListener(RangeScannerListener listener) {
+		scanner.addListener(listener);
+	}
+
+	@Override
+	public void removeListener(RangeScannerListener listener) {
+		scanner.removeListener(listener);
+	}
+
 	/**
 	 * Handles scan requests.
 	 */
-	@Override
-	public void messageReceived(Command command) {
-		if (command instanceof ScanCommand) {
-			onScanCommand((ScanCommand) command);
+	private class ScanReplier extends CommandReplier<RangeReadings> {
+
+		public ScanReplier(NXTCommunicator communicator) {
+			super(communicator);
+		}
+
+		@Override
+		public void messageReceived(Command command) {
+			if (command instanceof ScanCommand) {
+				onScanCommand((ScanCommand) command);
+			}
+		}
+
+		private void onScanCommand(ScanCommand command) {
+			// Scan at given angles
+			float[] angles = command.getAngles();
+			setAngles(angles);
+			RangeReadings readings = getRangeValues();
+			// Reply with readings
+			reply(command, readings);
+		}
+
+		@Override
+		protected MessageType<Report<?>> getResponseType(
+				MessageType<Command> requestType) {
+			return ReportType.SCAN;
 		}
 	}
 
-	private void onScanCommand(ScanCommand command) {
-		// Scan at given angles
-		float[] angles = command.getAngles();
-		setAngles(angles);
-		RangeReadings readings = getRangeValues();
-		// Reply with readings
-		reply(command, readings);
-	}
-
+	/**
+	 * Report range readings.
+	 */
 	@Override
-	protected MessageType<Report<?>> getResponseType(
-			MessageType<Command> requestType) {
-		return ReportType.SCAN;
+	public void readingReceived(RangeReading reading) {
+		send(new RangeReadingReport(ReportType.RANGE_READING, reading));
 	}
 
 }

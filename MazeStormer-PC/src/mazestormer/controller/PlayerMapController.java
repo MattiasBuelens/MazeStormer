@@ -2,6 +2,7 @@ package mazestormer.controller;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
+import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.player.Player;
 import mazestormer.ui.map.RangesLayer;
 
@@ -49,6 +50,11 @@ public class PlayerMapController extends MapController implements IPlayerMapCont
 			// Clear detected ranges
 			clearRanges();
 		}
+	}
+
+	@Subscribe
+	public void rangeFeatureDetected(RangeFeatureDetectEvent e) {
+		rangesLayer.addRangeFeature(e.getFeature());
 	}
 
 	public void terminate() {

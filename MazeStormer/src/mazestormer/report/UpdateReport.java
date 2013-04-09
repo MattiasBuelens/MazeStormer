@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import mazestormer.robot.RobotUpdate;
 
-public class UpdateReport extends RequestReport<RobotUpdate> {
+public class UpdateReport extends Report<RobotUpdate> {
 
 	private RobotUpdate update;
 

@@ -2,12 +2,14 @@ package mazestormer.controller;
 
 import java.util.logging.Logger;
 
+import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
+import mazestormer.robot.RangeScannerListener;
 import mazestormer.robot.RobotUpdate;
 import mazestormer.robot.RobotUpdateListener;
 
@@ -17,6 +19,7 @@ public class StateController extends SubController implements IStateController {
 
 	private final MovePublisher movePublisher = new MovePublisher();
 	private final UpdatePublisher updatePublisher = new UpdatePublisher();
+	private final RangeReadingPublisher rangeReadingPublisher = new RangeReadingPublisher();
 
 	public StateController(MainController mainController) {
 		super(mainController);
@@ -31,10 +34,11 @@ public class StateController extends SubController implements IStateController {
 	}
 
 	@Subscribe
-	public void registerPilotMoveListener(ConnectEvent e) {
+	public void registerRobotListeners(ConnectEvent e) {
 		if (e.isConnected()) {
 			getRobot().getPilot().addMoveListener(movePublisher);
 			getRobot().addUpdateListener(updatePublisher);
+			getRobot().getRangeScanner().addListener(rangeReadingPublisher);
 		}
 	}
 
@@ -78,6 +82,15 @@ public class StateController extends SubController implements IStateController {
 		@Override
 		public void updateReceived(RobotUpdate update) {
 			postEvent(update);
+		}
+
+	}
+
+	private class RangeReadingPublisher implements RangeScannerListener {
+
+		@Override
+		public void readingReceived(RangeReading reading) {
+			postEvent(reading);
 		}
 
 	}

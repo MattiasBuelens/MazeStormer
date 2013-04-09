@@ -1,7 +1,6 @@
 package mazestormer.simulator;
 
 import lejos.geom.Point;
-import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.condition.Condition;
@@ -11,6 +10,7 @@ import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
+import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
@@ -26,7 +26,7 @@ public class VirtualRobot implements ControllableRobot {
 	private final PoseProvider poseProvider;
 
 	private final CalibratedLightSensor light;
-	private final RangeScanner rangeScanner;
+	private final ObservableRangeScanner rangeScanner;
 	private final RangeScannerFeatureDetector rangeDetector;
 	private final VirtualIRSensor infrared;
 
@@ -85,8 +85,8 @@ public class VirtualRobot implements ControllableRobot {
 		return light;
 	}
 
-	// @Override
-	protected RangeScanner getRangeScanner() {
+	@Override
+	public ObservableRangeScanner getRangeScanner() {
 		return rangeScanner;
 	}
 

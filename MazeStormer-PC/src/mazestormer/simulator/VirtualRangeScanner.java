@@ -1,27 +1,35 @@
 package mazestormer.simulator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
-import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.IMaze;
+import mazestormer.robot.ObservableRangeScanner;
+import mazestormer.robot.RangeScannerListener;
 import mazestormer.world.World;
 
-public class VirtualRangeScanner implements RangeScanner {
+public class VirtualRangeScanner implements ObservableRangeScanner {
 
-	private World world;
+	private final World world;
 	private static final float maxDistance = 255f;
+
+	private float[] angles;
+
+	private final List<RangeScannerListener> listeners = new ArrayList<RangeScannerListener>();
 
 	public VirtualRangeScanner(World world) {
 		this.world = world;
 	}
 
 	private World getWorld() {
-		return this.world;
+		return world;
 	}
 
 	private PoseProvider getPoseProvider() {
@@ -32,17 +40,43 @@ public class VirtualRangeScanner implements RangeScanner {
 		return getWorld().getMaze();
 	}
 
-	public static final float getMaxDistance() {
-		return maxDistance;
+	@Override
+	public void setAngles(float[] angles) {
+		this.angles = angles;
+	}
+
+	@Override
+	public RangeFinder getRangeFinder() {
+		return null;
 	}
 
 	@Override
 	public RangeReadings getRangeValues() {
 		RangeReadings r = new RangeReadings(angles.length);
 		for (int i = 0; i < angles.length; i++) {
-			r.set(i, new RangeReading(angles[i], generateRange(angles[i])));
+			// Get and store reading
+			RangeReading reading = new RangeReading(angles[i], generateRange(angles[i]));
+			r.set(i, reading);
+			// Trigger listeners
+			fireReadingReceived(reading);
 		}
 		return r;
+	}
+
+	@Override
+	public void addListener(RangeScannerListener listener) {
+		listeners.add(listener);
+	}
+
+	@Override
+	public void removeListener(RangeScannerListener listener) {
+		listeners.add(listener);
+	}
+
+	private void fireReadingReceived(RangeReading reading) {
+		for (RangeScannerListener listener : listeners) {
+			listener.readingReceived(reading);
+		}
 	}
 
 	private float generateRange(float angle) {
@@ -72,16 +106,8 @@ public class VirtualRangeScanner implements RangeScanner {
 		return (Float.isInfinite(bestDistance) ? -1 : bestDistance);
 	}
 
-	@Override
-	public void setAngles(float[] angles) {
-		this.angles = angles;
-	}
-
-	private float[] angles;
-
-	@Override
-	public RangeFinder getRangeFinder() {
-		return null;
+	public static final float getMaxDistance() {
+		return maxDistance;
 	}
 
 	/*

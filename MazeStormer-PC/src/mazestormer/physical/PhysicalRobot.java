@@ -3,7 +3,6 @@ package mazestormer.physical;
 import java.util.ArrayList;
 import java.util.List;
 
-import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.CommandType;
@@ -16,6 +15,7 @@ import mazestormer.report.UpdateReport;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
+import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdate;
 import mazestormer.robot.RobotUpdateListener;
@@ -32,7 +32,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 	private final PoseProvider poseProvider;
 
 	private final PhysicalLightSensor light;
-	private final RangeScanner rangeScanner;
+	private final ObservableRangeScanner rangeScanner;
 	private final RangeScannerFeatureDetector rangeDetector;
 	private final IRSensor infrared;
 
@@ -78,8 +78,8 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 		return light;
 	}
 
-	// @Override
-	protected RangeScanner getRangeScanner() {
+	@Override
+	public ObservableRangeScanner getRangeScanner() {
 		return rangeScanner;
 	}
 
