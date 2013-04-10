@@ -64,8 +64,7 @@ public class MainView extends JFrame implements EventSource {
 		setLocationRelativeTo(null);
 
 		this.mainPanel = new JPanel();
-		this.mainPanel.setLayout(new MigLayout("hidemode 3", "[grow][]",
-				"[][grow][::200px,growprio 50,grow]"));
+		this.mainPanel.setLayout(new MigLayout("hidemode 3", "[grow][]", "[][grow][grow]"));
 
 		this.configurationPanel = new ConfigurationPanel(
 				controller.configuration());

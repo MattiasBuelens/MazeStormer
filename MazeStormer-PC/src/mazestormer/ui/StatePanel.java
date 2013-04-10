@@ -14,6 +14,7 @@ import mazestormer.controller.IStateController;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.MoveEvent.EventType;
 import mazestormer.robot.RobotUpdate;
+import mazestormer.ui.sensor.SensorPanel;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
@@ -37,11 +38,14 @@ public class StatePanel extends ViewPanel {
 		this.controller = controller;
 
 		setBorder(new TitledBorder(null, "Current state", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		setLayout(new MigLayout("", "[grow][grow]", "[grow][grow]"));
+		setLayout(new MigLayout("", "[grow,fill][grow,fill]", "[grow][grow][grow]"));
 
 		createPosePanel();
 		createSensorPanel();
 		createMovement();
+
+		SensorPanel sensorPanel = new SensorPanel(controller);
+		add(sensorPanel, "cell 0 2 2 1");
 
 		if (!Beans.isDesignTime())
 			registerController();
