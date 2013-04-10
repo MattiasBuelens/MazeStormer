@@ -138,8 +138,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		private boolean reposition;
 
 		/**
-		 * Create a new tile sequence runner with given robot, maze and goal
-		 * tile.
+		 * Create a new tile navigator with given robot, maze and goal tile.
 		 * 
 		 * @param robot
 		 *            The robot who must follow a tile sequence.
@@ -152,8 +151,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		 * @param reposition
 		 *            Whether to reposition the robot before navigating.
 		 */
-		public TileNavigator(ControllableRobot robot, IMaze iMaze, Tile goal, boolean singleStep,
-				boolean reposition) {
+		public TileNavigator(ControllableRobot robot, IMaze iMaze, Tile goal, boolean singleStep, boolean reposition) {
 			this.robot = checkNotNull(robot);
 			addStateListener(this);
 
@@ -277,14 +275,14 @@ public class PathFindingController extends SubController implements IPathFinding
 	protected enum TileSequenceState implements State<TileNavigator, TileSequenceState> {
 		LINE_FINDER {
 			@Override
-			public void execute(TileNavigator runner) {
-				runner.startLineFinder();
+			public void execute(TileNavigator navigator) {
+				navigator.startLineFinder();
 			}
 		},
 		NAVIGATOR {
 			@Override
-			public void execute(TileNavigator runner) {
-				runner.startNavigator();
+			public void execute(TileNavigator navigator) {
+				navigator.startNavigator();
 			}
 		}
 	}
