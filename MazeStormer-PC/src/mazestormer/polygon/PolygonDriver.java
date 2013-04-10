@@ -9,9 +9,9 @@ import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 
-public class PolygonRunner extends
-		StateMachine<PolygonRunner, PolygonRunner.PolygonState> implements
-		StateListener<PolygonRunner.PolygonState> {
+public class PolygonDriver extends
+		StateMachine<PolygonDriver, PolygonDriver.PolygonState> implements
+		StateListener<PolygonDriver.PolygonState> {
 
 	/*
 	 * Settings
@@ -28,7 +28,7 @@ public class PolygonRunner extends
 
 	private final AtomicInteger remaining = new AtomicInteger();
 
-	public PolygonRunner(Pilot pilot, int nbSides, double sideLength,
+	public PolygonDriver(Pilot pilot, int nbSides, double sideLength,
 			Direction direction) {
 		this.pilot = checkNotNull(pilot);
 		this.nbSides = nbSides;
@@ -111,23 +111,23 @@ public class PolygonRunner extends
 	public void stateTransitioned(PolygonState nextState) {
 	}
 
-	public enum PolygonState implements State<PolygonRunner, PolygonState> {
+	public enum PolygonState implements State<PolygonDriver, PolygonState> {
 		NEXT {
 			@Override
-			public void execute(PolygonRunner runner) {
-				runner.next();
+			public void execute(PolygonDriver driver) {
+				driver.next();
 			}
 		},
 		TRAVEL {
 			@Override
-			public void execute(PolygonRunner runner) {
-				runner.travel();
+			public void execute(PolygonDriver driver) {
+				driver.travel();
 			}
 		},
 		ROTATE {
 			@Override
-			public void execute(PolygonRunner runner) {
-				runner.rotate();
+			public void execute(PolygonDriver driver) {
+				driver.rotate();
 			}
 		};
 	}

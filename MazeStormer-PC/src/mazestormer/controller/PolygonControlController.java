@@ -1,7 +1,7 @@
 package mazestormer.controller;
 
 import mazestormer.polygon.PolygonEvent;
-import mazestormer.polygon.PolygonRunner;
+import mazestormer.polygon.PolygonDriver;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
 import mazestormer.state.AbstractStateListener;
@@ -15,7 +15,7 @@ public class PolygonControlController extends SubController implements
 		super(mainController);
 	}
 
-	private PolygonRunner runner;
+	private PolygonDriver polygonDriver;
 
 	private Pilot getPilot() {
 		return getMainController().getControllableRobot().getPilot();
@@ -23,16 +23,16 @@ public class PolygonControlController extends SubController implements
 
 	@Override
 	public void startPolygon(int nbSides, double sideLength, Direction direction) {
-		runner = new PolygonRunner(getPilot(), nbSides, sideLength, direction);
-		runner.addStateListener(new PolygonListener());
-		runner.start();
+		polygonDriver = new PolygonDriver(getPilot(), nbSides, sideLength, direction);
+		polygonDriver.addStateListener(new PolygonListener());
+		polygonDriver.start();
 	}
 
 	@Override
 	public void stopPolygon() {
-		if (runner != null) {
-			runner.stop();
-			runner = null;
+		if (polygonDriver != null) {
+			polygonDriver.stop();
+			polygonDriver = null;
 		}
 	}
 
@@ -51,7 +51,7 @@ public class PolygonControlController extends SubController implements
 	}
 
 	private class PolygonListener extends
-			AbstractStateListener<PolygonRunner.PolygonState> {
+			AbstractStateListener<PolygonDriver.PolygonState> {
 
 		@Override
 		public void stateStarted() {

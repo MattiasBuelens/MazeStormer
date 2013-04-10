@@ -22,9 +22,9 @@ import mazestormer.util.Future;
 import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 
-public class BarcodeRunner extends
-		StateMachine<BarcodeRunner, BarcodeRunner.BarcodeState> implements
-		StateListener<BarcodeRunner.BarcodeState>, BarcodeRunnerListener {
+public class BarcodeScanner extends
+		StateMachine<BarcodeScanner, BarcodeScanner.BarcodeState> implements
+		StateListener<BarcodeScanner.BarcodeState>, BarcodeScannerListener {
 
 	/*
 	 * Constants
@@ -53,9 +53,9 @@ public class BarcodeRunner extends
 	private volatile Pose strokeEnd;
 	private final List<Float> distances = new ArrayList<Float>();
 
-	private final List<BarcodeRunnerListener> listeners = new ArrayList<BarcodeRunnerListener>();
+	private final List<BarcodeScannerListener> listeners = new ArrayList<BarcodeScannerListener>();
 
-	public BarcodeRunner(Player player) {
+	public BarcodeScanner(Player player) {
 		this.player = checkNotNull(player);
 
 		addBarcodeListener(this);
@@ -110,11 +110,11 @@ public class BarcodeRunner extends
 		System.out.println(message);
 	}
 
-	public void addBarcodeListener(BarcodeRunnerListener listener) {
+	public void addBarcodeListener(BarcodeScannerListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeBarcodeListener(BarcodeRunnerListener listener) {
+	public void removeBarcodeListener(BarcodeScannerListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -182,7 +182,7 @@ public class BarcodeRunner extends
 
 	protected void goToStart() {
 		// Notify listeners
-		for (BarcodeRunnerListener listener : listeners) {
+		for (BarcodeScannerListener listener : listeners) {
 			listener.onStartBarcode();
 		}
 
@@ -310,7 +310,7 @@ public class BarcodeRunner extends
 		// Read barcode
 		byte barcode = (byte) readBarcode(distances);
 		// Notify listeners
-		for (BarcodeRunnerListener listener : listeners) {
+		for (BarcodeScannerListener listener : listeners) {
 			listener.onEndBarcode(barcode);
 		}
 	}
@@ -327,53 +327,53 @@ public class BarcodeRunner extends
 	public void stateTransitioned(BarcodeState nextState) {
 	}
 
-	public enum BarcodeState implements State<BarcodeRunner, BarcodeState> {
+	public enum BarcodeState implements State<BarcodeScanner, BarcodeState> {
 		FIND_START {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.findStart();
+			public void execute(BarcodeScanner scanner) {
+				scanner.findStart();
 			}
 		},
 		GO_TO_START {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.goToStart();
+			public void execute(BarcodeScanner scanner) {
+				scanner.goToStart();
 			}
 		},
 		STROKE_START {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.strokeStart();
+			public void execute(BarcodeScanner scanner) {
+				scanner.strokeStart();
 			}
 		},
 		FIND_STROKE_BLACK {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.findBlackStroke();
+			public void execute(BarcodeScanner scanner) {
+				scanner.findBlackStroke();
 			}
 		},
 		FIND_STROKE_WHITE {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.findWhiteStroke();
+			public void execute(BarcodeScanner scanner) {
+				scanner.findWhiteStroke();
 			}
 		},
 		STROKE_BLACK {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.stroke(true);
+			public void execute(BarcodeScanner scanner) {
+				scanner.stroke(true);
 			}
 		},
 		STROKE_WHITE {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.stroke(false);
+			public void execute(BarcodeScanner scanner) {
+				scanner.stroke(false);
 			}
 		},
 		FINISH {
 			@Override
-			public void execute(BarcodeRunner runner) {
-				runner.finish();
+			public void execute(BarcodeScanner scanner) {
+				scanner.finish();
 			}
 		}
 

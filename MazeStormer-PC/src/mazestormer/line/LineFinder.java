@@ -11,9 +11,9 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class LineFinderRunner extends
-		StateMachine<LineFinderRunner, LineFinderRunner.LineFinderState>
-		implements StateListener<LineFinderRunner.LineFinderState> {
+public class LineFinder extends
+		StateMachine<LineFinder, LineFinder.LineFinderState>
+		implements StateListener<LineFinder.LineFinderState> {
 
 	/*
 	 * Constants
@@ -44,7 +44,7 @@ public class LineFinderRunner extends
 
 	private volatile double lineWidth;
 
-	public LineFinderRunner(ControllableRobot robot) {
+	public LineFinder(ControllableRobot robot) {
 		this.robot = checkNotNull(robot);
 		addStateListener(this);
 	}
@@ -201,53 +201,53 @@ public class LineFinderRunner extends
 	}
 
 	public enum LineFinderState implements
-			State<LineFinderRunner, LineFinderState> {
+			State<LineFinder, LineFinderState> {
 		FIND_LINE_START {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.findLineStart();
+			public void execute(LineFinder finder) {
+				finder.findLineStart();
 			}
 		},
 		FIND_LINE_END {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.findLineEnd();
+			public void execute(LineFinder finder) {
+				finder.findLineEnd();
 			}
 		},
 		ROTATE_CENTER {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.rotateCenter();
+			public void execute(LineFinder finder) {
+				finder.rotateCenter();
 			}
 		},
 		ROTATE_FIXED {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.rotateFixed();
+			public void execute(LineFinder finder) {
+				finder.rotateFixed();
 			}
 		},
 		ROTATE_UNTIL_LINE {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.rotateUntilLine();
+			public void execute(LineFinder finder) {
+				finder.rotateUntilLine();
 			}
 		},
 		POSITION_PERPENDICULAR {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.positionPerpendicular();
+			public void execute(LineFinder finder) {
+				finder.positionPerpendicular();
 			}
 		},
 		POSITION_CENTER {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.positionCenter();
+			public void execute(LineFinder finder) {
+				finder.positionCenter();
 			}
 		},
 		FINISH {
 			@Override
-			public void execute(LineFinderRunner runner) {
-				runner.finish();
+			public void execute(LineFinder finder) {
+				finder.finish();
 			}
 		};
 	}

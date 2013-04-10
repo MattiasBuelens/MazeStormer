@@ -10,10 +10,10 @@ public class LineAdjuster {
 
 	private Player player;
 
-	public LineAdjuster(Player player, LineFinderRunner lineFinderRunner) {
+	public LineAdjuster(Player player, LineFinder lineFinder) {
 		this.player = player;
 
-		lineFinderRunner.addStateListener(new LineFinderListener());
+		lineFinder.addStateListener(new LineFinderListener());
 	}
 
 	protected void log(String message) {
@@ -89,7 +89,7 @@ public class LineAdjuster {
 		return angle;
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			adjust();

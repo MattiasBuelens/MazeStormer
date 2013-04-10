@@ -3,7 +3,7 @@ package mazestormer.barcode;
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
-import mazestormer.line.LineFinderRunner;
+import mazestormer.line.LineFinder;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
@@ -94,7 +94,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	}
 
 	protected void findLine() {
-		LineFinderRunner lineFinder = new LineFinderRunner(getControllableRobot()) {
+		LineFinder lineFinder = new LineFinder(getControllableRobot()) {
 			@Override
 			protected void log(String message) {
 				// log indien nodig
@@ -106,7 +106,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(SeesawState.RESUME_EXPLORING);

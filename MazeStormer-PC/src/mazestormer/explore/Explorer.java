@@ -17,11 +17,11 @@ import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.barcode.BarcodeMapping;
-import mazestormer.barcode.BarcodeRunner;
-import mazestormer.barcode.BarcodeRunnerListener;
+import mazestormer.barcode.BarcodeScanner;
+import mazestormer.barcode.BarcodeScannerListener;
 import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.line.LineAdjuster;
-import mazestormer.line.LineFinderRunner;
+import mazestormer.line.LineFinder;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.IMaze.Target;
@@ -43,16 +43,16 @@ import mazestormer.state.StateMachine;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Longs;
 
-public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.ExplorerState> implements
-		StateListener<ExplorerRunner.ExplorerState>, NavigatorListener {
+public class Explorer extends StateMachine<Explorer, Explorer.ExplorerState> implements
+		StateListener<Explorer.ExplorerState>, NavigatorListener {
 
 	/*
 	 * Subroutines
 	 */
 	private final Navigator navigator;
-	private final LineFinderRunner lineFinder;
+	private final LineFinder lineFinder;
 	private final LineAdjuster lineAdjuster;
-	private final BarcodeRunner barcodeScanner;
+	private final BarcodeScanner barcodeScanner;
 
 	/*
 	 * Exploration
@@ -94,7 +94,7 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 	 */
 	private AtomicBoolean shouldLineAdjust = new AtomicBoolean(false);
 
-	public ExplorerRunner(Player player) {
+	public Explorer(Player player) {
 		this.player = checkNotNull(player);
 		addStateListener(this);
 
@@ -107,26 +107,26 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		this.pathFinder = new PathFinder(getMaze());
 
 		// Line finder
-		this.lineFinder = new LineFinderRunner(getRobot()) {
+		this.lineFinder = new LineFinder(getRobot()) {
 			@Override
 			protected void log(String message) {
-				ExplorerRunner.this.log(message);
+				Explorer.this.log(message);
 			}
 		};
 
 		this.lineAdjuster = new LineAdjuster(player, lineFinder) {
 			@Override
 			protected void log(String message) {
-				ExplorerRunner.this.log(message);
+				Explorer.this.log(message);
 			}
 		};
 		this.lineFinder.addStateListener(new LineFinderListener());
 
 		// Barcode scanner
-		this.barcodeScanner = new BarcodeRunner(player) {
+		this.barcodeScanner = new BarcodeScanner(player) {
 			@Override
 			protected void log(String message) {
-				ExplorerRunner.this.log(message);
+				Explorer.this.log(message);
 			}
 		};
 		barcodeScanner.addBarcodeListener(new BarcodeListener());
@@ -701,14 +701,14 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 		transition(ExplorerState.NEXT_CYCLE);
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(ExplorerState.AFTER_LINE_ADJUST);
 		}
 	}
 
-	private class BarcodeListener implements BarcodeRunnerListener {
+	private class BarcodeListener implements BarcodeScannerListener {
 		@Override
 		public void onStartBarcode() {
 			transition(ExplorerState.BEFORE_BARCODE);
@@ -763,64 +763,64 @@ public class ExplorerRunner extends StateMachine<ExplorerRunner, ExplorerRunner.
 
 	}
 
-	public enum ExplorerState implements State<ExplorerRunner, ExplorerState> {
+	public enum ExplorerState implements State<Explorer, ExplorerState> {
 		INIT {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.init();
 			}
 		},
 		NEXT_CYCLE {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.nextCycle();
 			}
 		},
 		NEXT_WAYPOINT {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.nextWaypoint();
 			}
 		},
 		BARCODE_ACTION {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.barcodeAction();
 			}
 		},
 		NAVIGATE {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.navigate();
 			}
 		},
 		CLEAR_BARCODE {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.clearBarcode();
 			}
 		},
 		BEFORE_TRAVEL {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.beforeTravel();
 			}
 		},
 		AFTER_LINE_ADJUST {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.afterLineAdjust();
 			}
 		},
 		BEFORE_BARCODE {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.beforeBarcode();
 			}
 		},
 		TRAVEL {
 			@Override
-			public void execute(ExplorerRunner explorer) {
+			public void execute(Explorer explorer) {
 				explorer.travel();
 			}
 		}

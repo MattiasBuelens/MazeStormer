@@ -1,7 +1,7 @@
 package mazestormer.controller;
 
 import mazestormer.barcode.ActionType;
-import mazestormer.barcode.BarcodeRunner;
+import mazestormer.barcode.BarcodeScanner;
 import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
@@ -16,7 +16,7 @@ public class BarcodeController extends SubController implements
 		IBarcodeController {
 
 	private Future<?> action;
-	private BarcodeRunner barcodeRunner;
+	private BarcodeScanner barcodeScanner;
 
 	private double scanTravelSpeed = 2; // [cm/sec]
 
@@ -92,26 +92,26 @@ public class BarcodeController extends SubController implements
 	@Override
 	public void startScan() {
 		// Prepare
-		barcodeRunner = new BarcodeRunner(getPlayer()) {
+		barcodeScanner = new BarcodeScanner(getPlayer()) {
 			@Override
 			protected void log(String message) {
 				BarcodeController.this.log(message);
 			}
 		};
-		barcodeRunner.addStateListener(new BarcodeListener());
-		barcodeRunner.setPerformAction(false);
-		barcodeRunner.setScanSpeed(getScanSpeed());
+		barcodeScanner.addStateListener(new BarcodeListener());
+		barcodeScanner.setPerformAction(false);
+		barcodeScanner.setScanSpeed(getScanSpeed());
 
 		// Start
 		getRobot().getPilot().forward();
-		barcodeRunner.start();
+		barcodeScanner.start();
 	}
 
 	@Override
 	public void stopScan() {
-		if (barcodeRunner != null) {
-			barcodeRunner.stop();
-			barcodeRunner = null;
+		if (barcodeScanner != null) {
+			barcodeScanner.stop();
+			barcodeScanner = null;
 		}
 	}
 
@@ -172,7 +172,7 @@ public class BarcodeController extends SubController implements
 	}
 
 	private class BarcodeListener extends
-			AbstractStateListener<BarcodeRunner.BarcodeState> {
+			AbstractStateListener<BarcodeScanner.BarcodeState> {
 
 		@Override
 		public void stateStarted() {
