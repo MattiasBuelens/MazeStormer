@@ -52,7 +52,7 @@ public class VirtualRobot implements ControllableRobot {
 		// Range scanner
 		rangeScanner = new VirtualRangeScanner(getWorld());
 		rangeDetector = new RangeScannerFeatureDetector(rangeScanner, sensorMaxDistance, new Point(0f, 0f));
-		rangeDetector.setPoseProvider(getWorldPoseProvider());
+		rangeDetector.setPoseProvider(getPoseProvider());
 
 		// Infrared sensor
 		infrared = new VirtualIRSensor(world);
@@ -103,10 +103,6 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public PoseProvider getPoseProvider() {
 		return poseProvider;
-	}
-
-	private PoseProvider getWorldPoseProvider() {
-		return getWorld().getLocalPlayer().getRobot().getPoseProvider();
 	}
 
 	@Override
