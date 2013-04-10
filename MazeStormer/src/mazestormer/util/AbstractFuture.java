@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -36,7 +37,7 @@ public class AbstractFuture<V> implements Future<V> {
 
 	@Override
 	public synchronized boolean cancel() {
-		return cancel(true);
+		return cancel(false);
 	}
 
 	@Override
@@ -109,8 +110,18 @@ public class AbstractFuture<V> implements Future<V> {
 	}
 
 	@Override
-	public void removeFutureListener(FutureListener<? super V> listener) {
-		listeners.remove(listener);
+	public void addListener(final Runnable listener, final Executor executor) {
+		addFutureListener(new FutureListener<V>() {
+			@Override
+			public void futureResolved(Future<? extends V> future) {
+				executor.execute(listener);
+			}
+
+			@Override
+			public void futureCancelled(Future<? extends V> future) {
+				executor.execute(listener);
+			}
+		});
 	}
 
 	private void fireResolved() {

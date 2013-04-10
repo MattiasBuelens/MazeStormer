@@ -8,8 +8,9 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
 import lejos.robotics.RegulatedMotor;
 import lejos.util.Delay;
-import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.RangeScannerListener;
+import mazestormer.util.Future;
+import mazestormer.util.ImmediateFuture;
 
 public class RotatingRangeScanner extends lejos.robotics.RotatingRangeScanner
 		implements ObservableRangeScanner {
@@ -61,6 +62,11 @@ public class RotatingRangeScanner extends lejos.robotics.RotatingRangeScanner
 		head.rotateTo(0);
 
 		return readings;
+	}
+
+	@Override
+	public Future<RangeReadings> getRangeValuesAsync() {
+		return new ImmediateFuture<RangeReadings>(getRangeValues());
 	}
 
 	@Override

@@ -6,26 +6,32 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import lejos.geom.Point;
 import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
-import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.util.Future;
+import mazestormer.util.GuavaFutures;
+
+import com.google.common.base.Function;
+import com.google.common.util.concurrent.Futures;
 
 /**
  * A range feature detector which uses a range scanner to locate objects.
  */
 public class RangeScannerFeatureDetector extends AbstractFeatureDetector implements RangeFeatureDetector {
 
-	private final RangeScanner scanner;
+	private final AsyncRangeScanner scanner;
 	private final Point offset;
 	private float maxDistance;
 	private PoseProvider pp = null;
 	private final List<RangeFeatureListener> listeners = new ArrayList<RangeFeatureListener>();
+	private final ReadingTransformer readingTransformer = new ReadingTransformer();
 
-	public RangeScannerFeatureDetector(RangeScanner scanner, float maxDistance, Point offset) {
+	public RangeScannerFeatureDetector(AsyncRangeScanner scanner, float maxDistance, Point offset) {
 		this.scanner = checkNotNull(scanner);
 		this.maxDistance = maxDistance;
 		this.offset = offset;
@@ -34,7 +40,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector impleme
 	/**
 	 * Get the range scanner used by this feature detector.
 	 */
-	public RangeScanner getScanner() {
+	public AsyncRangeScanner getScanner() {
 		return scanner;
 	}
 
@@ -69,55 +75,13 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector impleme
 
 	@Override
 	public RangeFeature scan() {
-		// Get the range readings
-		RangeReadings rawReadings = scanner.getRangeValues();
-		if (rawReadings == null)
+		try {
+			return scanAsync().get();
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Where should this be handled?
+			e.printStackTrace();
 			return null;
-
-		// Filter and sort the readings
-		Comparator<RangeReading> comparator = new ReadingRangeComparator();
-		RangeReadings readings = new RangeReadings(0);
-
-		for (RangeReading rawReading : rawReadings) {
-			// Only retain positive readings
-			if (rawReading.getRange() < 0)
-				continue;
-
-			// Change coordinate system from sensor with the origin in the
-			// rotation center of the sensor-servo to NXT with the origin in the
-			// rotation center of the robot
-			Point position = getOffset().pointAt(rawReading.getRange(), rawReading.getAngle());
-			float angle = (float) Math.toDegrees(position.angle());
-			float range = position.length();
-			RangeReading reading = new RangeReading(angle, range);
-
-			// Only retain readings smaller than the maximum distance
-			if (reading.getRange() <= getMaxDistance()) {
-				// Sort the filtered readings
-				int index = Collections.binarySearch(readings, reading, comparator);
-				if (index < 0) {
-					index = -index - 1;
-				}
-				readings.add(index, reading);
-			}
 		}
-
-		// Check to make sure it retrieved some readings
-		if (readings.isEmpty())
-			return null;
-
-		// Add current pose if pose provider available
-		RangeFeature feature;
-		if (pp != null) {
-			feature = new RangeFeature(readings, pp.getPose());
-		} else {
-			feature = new RangeFeature(readings);
-		}
-
-		// Trigger listeners
-		fireFeatureReceived(feature);
-
-		return feature;
 	}
 
 	/**
@@ -126,8 +90,24 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector impleme
 	 */
 	@Override
 	public RangeFeature scan(float[] angles) {
+		try {
+			return scanAsync(angles).get();
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Where should this be handled?
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	public Future<RangeFeature> scanAsync() {
+		return GuavaFutures.fromGuava(Futures.transform(scanner.getRangeValuesAsync(), readingTransformer));
+	}
+
+	@Override
+	public Future<RangeFeature> scanAsync(float[] angles) {
 		getScanner().setAngles(angles);
-		return scan();
+		return scanAsync();
 	}
 
 	@Override
@@ -144,6 +124,65 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector impleme
 		for (RangeFeatureListener listener : listeners) {
 			listener.featureReceived(feature);
 		}
+	}
+
+	/**
+	 * Transforms a range reading into a range feature.
+	 */
+	private class ReadingTransformer implements Function<RangeReadings, RangeFeature> {
+
+		@Override
+		public RangeFeature apply(RangeReadings rawReadings) {
+			// Check validity
+			if (rawReadings == null)
+				return null;
+
+			// Filter and sort the readings
+			Comparator<RangeReading> comparator = new ReadingRangeComparator();
+			RangeReadings readings = new RangeReadings(0);
+
+			for (RangeReading rawReading : rawReadings) {
+				// Only retain valid readings
+				if (rawReading.invalidReading())
+					continue;
+
+				// Change coordinate system from sensor with the origin in the
+				// rotation center of the sensor-servo to NXT with the origin in
+				// the rotation center of the robot
+				Point position = getOffset().pointAt(rawReading.getRange(), rawReading.getAngle());
+				float angle = (float) Math.toDegrees(position.angle());
+				float range = position.length();
+				RangeReading reading = new RangeReading(angle, range);
+
+				// Only retain readings smaller than the maximum distance
+				if (reading.getRange() <= getMaxDistance()) {
+					// Sort the filtered readings
+					int index = Collections.binarySearch(readings, reading, comparator);
+					if (index < 0) {
+						index = -index - 1;
+					}
+					readings.add(index, reading);
+				}
+			}
+
+			// Check to make sure it retrieved some readings
+			if (readings.isEmpty())
+				return null;
+
+			// Add current pose if pose provider available
+			RangeFeature feature;
+			if (pp != null) {
+				feature = new RangeFeature(readings, pp.getPose());
+			} else {
+				feature = new RangeFeature(readings);
+			}
+
+			// Trigger listeners
+			fireFeatureReceived(feature);
+
+			return feature;
+		}
+
 	}
 
 }

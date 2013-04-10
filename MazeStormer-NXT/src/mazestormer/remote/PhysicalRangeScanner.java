@@ -6,11 +6,13 @@ import lejos.robotics.RangeReadings;
 import mazestormer.command.Command;
 import mazestormer.command.CommandReplier;
 import mazestormer.command.ScanCommand;
+import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.report.RangeReadingReport;
 import mazestormer.report.Report;
 import mazestormer.report.ReportType;
-import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.RangeScannerListener;
+import mazestormer.util.Future;
+import mazestormer.util.ImmediateFuture;
 
 public class PhysicalRangeScanner extends NXTComponent implements
 		ObservableRangeScanner, RangeScannerListener {
@@ -35,6 +37,11 @@ public class PhysicalRangeScanner extends NXTComponent implements
 	@Override
 	public RangeReadings getRangeValues() {
 		return scanner.getRangeValues();
+	}
+
+	@Override
+	public Future<RangeReadings> getRangeValuesAsync() {
+		return new ImmediateFuture<RangeReadings>(getRangeValues());
 	}
 
 	@Override
