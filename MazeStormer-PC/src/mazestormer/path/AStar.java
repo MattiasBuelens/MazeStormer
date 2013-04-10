@@ -74,6 +74,9 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 				@SuppressWarnings("unchecked")
 				N neighbour = (N) neighborNode;
 				Point2D neighborPosition = neighbour.getPosition();
+				// Ignore invalid nodes
+				if (!isValidNode(neighbour))
+					continue;
 				// If neighbor position is in closed set, don't check it again
 				if (closedSet.contains(neighborPosition)) {
 					continue;
@@ -192,10 +195,10 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 	 * 
 	 * @param start
 	 *            The node to check.
-	 * @return True if and only if the given node is effective.
+	 * @return True if and only if the given node is effective and valid.
 	 */
 	protected boolean canHaveAsStart(N start) {
-		return start != null;
+		return start != null && isValidNode(start);
 	}
 
 	/**
@@ -232,8 +235,11 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 	 * 
 	 * @param target
 	 *            The node to check.
+	 * @return True if and only if the given node is effective and valid.
 	 */
-	protected abstract boolean canHaveAsTarget(N target);
+	protected boolean canHaveAsTarget(N target) {
+		return target != null && isValidNode(target);
+	}
 
 	/**
 	 * Variable registering the target node of this algorithm.
@@ -319,5 +325,13 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 	 * that position.
 	 */
 	private Map<Point2D, N> nodeMap = new HashMap<Point2D, N>();
+
+	/**
+	 * Check if the given node is a valid node.
+	 * 
+	 * @param node
+	 *            The node to check.
+	 */
+	public abstract boolean isValidNode(N node);
 
 }

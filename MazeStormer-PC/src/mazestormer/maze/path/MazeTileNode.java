@@ -68,17 +68,20 @@ public class MazeTileNode extends Node<Long> {
 	@Override
 	public Collection<? extends Node<Long>> getNeighbors() {
 		List<MazeTileNode> neighbors = new ArrayList<MazeTileNode>();
+		// Create neighbors in direction of open sides
 		for (Orientation direction : getTile().getOpenSides()) {
+			// Get neighbor tile if it exists
 			Tile neighborTile = getMaze().getNeighbor(getTile(), direction);
 			if (neighborTile == null)
 				continue;
+			// Create a neighbor node
 			MazeTileNode neighborNode = createNeighbor(neighborTile);
 			neighbors.add(neighborNode);
 		}
 		return neighbors;
 	}
 
-	private MazeTileNode createNeighbor(Tile neighborTile) {
+	protected MazeTileNode createNeighbor(Tile neighborTile) {
 		// Create the node
 		MazeTileNode neighborNode = new MazeTileNode(getMaze(), neighborTile.getPosition());
 		// Set the previous node

@@ -5,6 +5,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Tile;
 import mazestormer.path.AStar;
@@ -14,13 +17,30 @@ import mazestormer.util.LongPoint;
 public class MazeAStar extends AStar<MazeTileNode, Long> {
 
 	private final IMaze maze;
+	private final Predicate<Tile> tileValidator;
+
+	public MazeAStar(IMaze maze, LongPoint startPosition, LongPoint targetPosition, Predicate<Tile> tileValidator)
+			throws IllegalArgumentException {
+		this(maze, tileValidator);
+		setStart(new MazeTileNode(maze, startPosition));
+		setTarget(new MazeTileNode(maze, targetPosition));
+	}
 
 	public MazeAStar(IMaze maze, LongPoint startPosition, LongPoint targetPosition) throws IllegalArgumentException {
+		this(maze, null);
+		setStart(new MazeTileNode(maze, startPosition));
+		setTarget(new MazeTileNode(maze, targetPosition));
+	}
+
+	protected MazeAStar(IMaze maze, Predicate<Tile> tileValidator) throws IllegalArgumentException {
 		this.maze = checkNotNull(maze);
 		setOpenSet(new FibonacciQueue<MazeTileNode>());
 
-		setStart(new MazeTileNode(maze, startPosition));
-		setTarget(new MazeTileNode(maze, targetPosition));
+		if (tileValidator == null) {
+			this.tileValidator = Predicates.alwaysTrue();
+		} else {
+			this.tileValidator = tileValidator;
+		}
 	}
 
 	public final IMaze getMaze() {
@@ -46,14 +66,17 @@ public class MazeAStar extends AStar<MazeTileNode, Long> {
 
 	@Override
 	protected boolean canHaveAsTarget(MazeTileNode target) {
-		if (target == null)
-			return false;
-		return target.getMaze() == getMaze();
+		return super.canHaveAsTarget(target) && target.getMaze() == getMaze();
 	}
 
 	@Override
 	public boolean isTarget(MazeTileNode node) {
 		return node != null && node.equals(getTarget());
+	}
+
+	@Override
+	public boolean isValidNode(MazeTileNode node) {
+		return tileValidator.apply(node.getTile());
 	}
 
 }
