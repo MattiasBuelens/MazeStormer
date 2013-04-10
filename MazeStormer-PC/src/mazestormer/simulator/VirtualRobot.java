@@ -5,12 +5,12 @@ import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
+import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
-import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
@@ -52,7 +52,7 @@ public class VirtualRobot implements ControllableRobot {
 		// Range scanner
 		rangeScanner = new VirtualRangeScanner(getWorld());
 		rangeDetector = new RangeScannerFeatureDetector(rangeScanner, sensorMaxDistance, new Point(0f, 0f));
-		rangeDetector.setPoseProvider(getWorldPoseProvider());
+		rangeDetector.setPoseProvider(getPoseProvider());
 
 		// Infrared sensor
 		infrared = new VirtualIRSensor(world);
@@ -103,10 +103,6 @@ public class VirtualRobot implements ControllableRobot {
 	@Override
 	public PoseProvider getPoseProvider() {
 		return poseProvider;
-	}
-
-	private PoseProvider getWorldPoseProvider() {
-		return getWorld().getLocalPlayer().getRobot().getPoseProvider();
 	}
 
 	@Override

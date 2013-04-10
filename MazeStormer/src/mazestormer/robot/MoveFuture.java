@@ -64,7 +64,7 @@ public class MoveFuture extends AbstractFuture<Boolean> implements
 	}
 
 	@Override
-	public void futureResolved(Future<? extends Boolean> future) {
+	public void futureResolved(Future<? extends Boolean> future, Boolean result) {
 		unregister();
 	}
 

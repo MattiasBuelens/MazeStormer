@@ -9,10 +9,10 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
 import mazestormer.command.CommandType;
 import mazestormer.command.ScanCommand;
+import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.remote.MessageListener;
 import mazestormer.report.RangeReadingReport;
 import mazestormer.report.Report;
-import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.RangeScannerListener;
 import mazestormer.util.Future;
 
@@ -46,11 +46,16 @@ public class PhysicalRangeScanner extends PhysicalComponent implements Observabl
 	@Override
 	public RangeReadings getRangeValues() {
 		try {
-			return scanRequester.request(getAngles()).get(PhysicalRobot.requestTimeout, TimeUnit.MILLISECONDS);
+			return getRangeValuesAsync().get(PhysicalRobot.requestTimeout, TimeUnit.MILLISECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public Future<RangeReadings> getRangeValuesAsync() {
+		return scanRequester.request(getAngles());
 	}
 
 	@Override

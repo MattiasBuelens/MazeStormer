@@ -283,7 +283,7 @@ public class VirtualPilot implements Pilot {
 		// Start timer
 		float delay = getMoveDuration(move);
 		if (!Float.isInfinite(delay)) {
-			moveEndHandle = executor.schedule(new MoveEndRunner(move), (long) delay, TimeUnit.MILLISECONDS);
+			moveEndHandle = executor.schedule(new MoveEndAction(move), (long) delay, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -464,11 +464,11 @@ public class VirtualPilot implements Pilot {
 		}
 	}
 
-	private class MoveEndRunner implements Runnable {
+	private class MoveEndAction implements Runnable {
 
 		private final Move move;
 
-		public MoveEndRunner(Move move) {
+		public MoveEndAction(Move move) {
 			this.move = move;
 		}
 

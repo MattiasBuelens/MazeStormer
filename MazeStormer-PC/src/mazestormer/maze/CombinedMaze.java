@@ -275,11 +275,6 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
-	public final Mesh getMesh() {
-		return getTotalMaze().getMesh();
-	}
-
-	@Override
 	public final long getMinX() {
 		return getTotalMaze().getMinX();
 	}

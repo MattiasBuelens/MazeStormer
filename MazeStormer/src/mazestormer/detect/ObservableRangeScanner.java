@@ -1,8 +1,8 @@
-package mazestormer.robot;
+package mazestormer.detect;
 
-import lejos.robotics.RangeScanner;
+import mazestormer.robot.RangeScannerListener;
 
-public interface ObservableRangeScanner extends RangeScanner {
+public interface ObservableRangeScanner extends AsyncRangeScanner {
 
 	/**
 	 * Add a range scanner listener.

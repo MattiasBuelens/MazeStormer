@@ -14,14 +14,12 @@ import mazestormer.condition.Condition;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-public class PhysicalCommandBuilder extends ReportRequester<Void> implements
-		ConditionalCommandBuilder.CommandBuilder {
+public class PhysicalCommandBuilder extends ReportRequester<Void> implements ConditionalCommandBuilder.CommandBuilder {
 
 	private final ConditionalCommand command;
 	private final List<Runnable> actions = new ArrayList<Runnable>();
 
-	public PhysicalCommandBuilder(PhysicalCommunicator communicator,
-			CommandType type, Condition condition) {
+	public PhysicalCommandBuilder(PhysicalCommunicator communicator, CommandType type, Condition condition) {
 		super(communicator);
 		command = new ConditionalCommand(type, condition);
 		command.setRequestId(communicator.nextRequestId());
@@ -93,7 +91,7 @@ public class PhysicalCommandBuilder extends ReportRequester<Void> implements
 		}
 
 		@Override
-		public void futureResolved(Future<? extends Void> future) {
+		public void futureResolved(Future<? extends Void> future, Void result) {
 			if (future == this.future) {
 				trigger();
 			}

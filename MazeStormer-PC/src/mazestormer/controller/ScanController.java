@@ -30,7 +30,7 @@ public class ScanController extends SubController implements IScanController {
 		}
 
 		// Scan for readings
-		getRangeDetector().scan(angles);
+		getRangeDetector().scanAsync(angles);
 	}
 
 	@Override

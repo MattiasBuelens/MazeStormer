@@ -2,6 +2,7 @@ package mazestormer.robot;
 
 import lejos.geom.Point;
 import mazestormer.command.ConditionalCommandBuilder;
+import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 
 public interface ControllableRobot extends ConditionalCommandBuilder, Robot {

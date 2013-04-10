@@ -10,9 +10,11 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.maze.IMaze;
-import mazestormer.robot.ObservableRangeScanner;
 import mazestormer.robot.RangeScannerListener;
+import mazestormer.util.Future;
+import mazestormer.util.ImmediateFuture;
 import mazestormer.world.World;
 
 public class VirtualRangeScanner implements ObservableRangeScanner {
@@ -61,6 +63,11 @@ public class VirtualRangeScanner implements ObservableRangeScanner {
 			fireReadingReceived(reading);
 		}
 		return r;
+	}
+
+	@Override
+	public Future<RangeReadings> getRangeValuesAsync() {
+		return new ImmediateFuture<RangeReadings>(getRangeValues());
 	}
 
 	@Override
