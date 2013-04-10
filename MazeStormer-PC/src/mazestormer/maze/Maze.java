@@ -38,7 +38,6 @@ public class Maze implements IMaze {
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
-	private final Mesh mesh;
 	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(Target.class);
 	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
 
@@ -48,7 +47,6 @@ public class Maze implements IMaze {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
 		this.barLength = barLength;
-		this.mesh = new Mesh(this);
 
 		setOriginToDefault();
 	}
@@ -104,11 +102,6 @@ public class Maze implements IMaze {
 	@Override
 	public final void setOriginToDefault() {
 		setOrigin(getDefaultOrigin());
-	}
-
-	@Override
-	public final Mesh getMesh() {
-		return mesh;
 	}
 
 	private long minX = 0;
