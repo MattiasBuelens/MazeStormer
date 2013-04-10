@@ -103,7 +103,7 @@ public class AbstractFuture<V> implements Future<V> {
 
 		// Fire handlers on late listeners
 		if (isResolved()) {
-			listener.futureResolved(this);
+			listener.futureResolved(this, result);
 		} else if (isCancelled()) {
 			listener.futureCancelled(this);
 		}
@@ -113,7 +113,7 @@ public class AbstractFuture<V> implements Future<V> {
 	public void addListener(final Runnable listener, final Executor executor) {
 		addFutureListener(new FutureListener<V>() {
 			@Override
-			public void futureResolved(Future<? extends V> future) {
+			public void futureResolved(Future<? extends V> future, V result) {
 				executor.execute(listener);
 			}
 
@@ -126,7 +126,7 @@ public class AbstractFuture<V> implements Future<V> {
 
 	private void fireResolved() {
 		for (FutureListener<? super V> listener : listeners) {
-			listener.futureResolved(this);
+			listener.futureResolved(this, result);
 		}
 	}
 

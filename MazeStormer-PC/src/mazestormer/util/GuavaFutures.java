@@ -1,7 +1,5 @@
 package mazestormer.util;
 
-import java.util.concurrent.CancellationException;
-
 import com.google.common.util.concurrent.ForwardingListenableFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -21,7 +19,7 @@ public class GuavaFutures {
 		private final ListenableFuture<V> delegate;
 
 		public FutureFromGuava(ListenableFuture<V> delegate) {
-			this.delegate = delegate();
+			this.delegate = delegate;
 		}
 
 		@Override
@@ -39,14 +37,15 @@ public class GuavaFutures {
 			Futures.addCallback(delegate(), new FutureCallback<V>() {
 				@Override
 				public void onSuccess(V result) {
-					listener.futureResolved(FutureFromGuava.this);
+					if (isCancelled()) {
+						listener.futureCancelled(FutureFromGuava.this);
+					} else {
+						listener.futureResolved(FutureFromGuava.this, result);
+					}
 				}
 
 				@Override
 				public void onFailure(Throwable t) {
-					if (t instanceof CancellationException) {
-						listener.futureCancelled(FutureFromGuava.this);
-					}
 				}
 			});
 		}

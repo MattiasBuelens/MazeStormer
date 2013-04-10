@@ -10,8 +10,7 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-public class VirtualCommandBuilder implements
-		ConditionalCommandBuilder.CommandBuilder {
+public class VirtualCommandBuilder implements ConditionalCommandBuilder.CommandBuilder {
 
 	private final ControllableRobot robot;
 	private final ConditionFuture future;
@@ -130,7 +129,7 @@ public class VirtualCommandBuilder implements
 		}
 
 		@Override
-		public void futureResolved(Future<? extends Void> future) {
+		public void futureResolved(Future<? extends Void> future, Void result) {
 			if (future == this.future) {
 				trigger();
 			}

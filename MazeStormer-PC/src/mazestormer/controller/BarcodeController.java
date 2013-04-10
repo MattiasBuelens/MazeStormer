@@ -12,8 +12,7 @@ import mazestormer.state.AbstractStateListener;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-public class BarcodeController extends SubController implements
-		IBarcodeController {
+public class BarcodeController extends SubController implements IBarcodeController {
 
 	private Future<?> action;
 	private BarcodeScanner barcodeScanner;
@@ -41,8 +40,7 @@ public class BarcodeController extends SubController implements
 		// Post state
 		postActionState(BarcodeActionEvent.EventType.STARTED);
 		// Start action
-		this.action = getAction(actionType)
-				.performAction(getPlayer());
+		this.action = getAction(actionType).performAction(getPlayer());
 		this.action.addFutureListener(new ActionListener());
 	}
 
@@ -156,7 +154,7 @@ public class BarcodeController extends SubController implements
 	private class ActionListener implements FutureListener<Object> {
 
 		@Override
-		public void futureResolved(Future<? extends Object> future) {
+		public void futureResolved(Future<? extends Object> future, Object result) {
 			// Post state
 			postActionState(BarcodeActionEvent.EventType.STOPPED);
 		}
@@ -171,8 +169,7 @@ public class BarcodeController extends SubController implements
 
 	}
 
-	private class BarcodeListener extends
-			AbstractStateListener<BarcodeScanner.BarcodeState> {
+	private class BarcodeListener extends AbstractStateListener<BarcodeScanner.BarcodeState> {
 
 		@Override
 		public void stateStarted() {

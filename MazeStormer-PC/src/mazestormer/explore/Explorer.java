@@ -39,6 +39,8 @@ import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
+import mazestormer.util.Future;
+import mazestormer.util.FutureListener;
 
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Longs;
@@ -223,13 +225,30 @@ public class Explorer extends StateMachine<Explorer, Explorer.ExplorerState> imp
 		// This is the current tile of the robot
 		currentTile = queue.pollFirst();
 
-		// Scan and update current tile
 		if (!currentTile.isExplored()) {
-			log("Scan for edges at " + currentTile.getPosition());
-			scanAndUpdate(currentTile);
-			getMaze().setExplored(currentTile.getPosition());
+			// Scan for walls
+			transition(ExplorerState.SCAN);
+		} else {
+			// Go to next tile
+			transition(ExplorerState.GO_NEXT_TILE);
 		}
+	}
 
+	protected void scan() {
+		// Scan and update current tile
+		log("Scan for edges at " + currentTile.getPosition());
+		bindTransition(scanAndUpdate(currentTile), ExplorerState.AFTER_SCAN);
+	}
+
+	protected void afterScan() {
+		// Set as explored
+		getMaze().setExplored(currentTile.getPosition());
+
+		// Go to next tile
+		transition(ExplorerState.GO_NEXT_TILE);
+	}
+
+	protected void goToNext() {
 		// Create new paths to all neighbors
 		selectTiles(currentTile);
 
@@ -432,13 +451,40 @@ public class Explorer extends StateMachine<Explorer, Explorer.ExplorerState> imp
 
 	/**
 	 * Scan in the direction of *unknown* edges, and updates them accordingly.
+	 * 
+	 * @param tile
+	 *            The tile to update.
 	 */
-	private void scanAndUpdate(Tile tile) {
+	private Future<?> scanAndUpdate(final Tile tile) {
 		// Read from scanner
-		RangeFeature feature = getRobot().getRangeDetector().scan(getScanAngles(tile));
+		final Future<RangeFeature> future = getRobot().getRangeDetector().scanAsync(getScanAngles(tile));
+		// Process when received
+		future.addFutureListener(new FutureListener<RangeFeature>() {
+			@Override
+			public void futureResolved(Future<? extends RangeFeature> future, RangeFeature feature) {
+				updateTileEdges(tile, feature);
+			}
+
+			@Override
+			public void futureCancelled(Future<? extends RangeFeature> future) {
+				// Ignore
+			}
+		});
+		return future;
+	}
+
+	/**
+	 * Update the edges of a tile using the given detected features.
+	 * 
+	 * @param tile
+	 *            The tile to update.
+	 * @param feature
+	 *            The detected features.
+	 */
+	private void updateTileEdges(Tile tile, RangeFeature feature) {
 		// Place walls
 		if (feature != null) {
-			float relativeHeading = getMaze().toRelative(getPose().getHeading());
+			float relativeHeading = getMaze().toRelative(feature.getPose().getHeading());
 			for (RangeReading reading : feature.getRangeReadings()) {
 				Orientation orientation = angleToOrientation(reading.getAngle() + relativeHeading);
 				getMaze().setEdge(tile.getPosition(), orientation, EdgeType.WALL);
@@ -774,6 +820,24 @@ public class Explorer extends StateMachine<Explorer, Explorer.ExplorerState> imp
 			@Override
 			public void execute(Explorer explorer) {
 				explorer.nextCycle();
+			}
+		},
+		SCAN {
+			@Override
+			public void execute(Explorer explorer) {
+				explorer.scan();
+			}
+		},
+		AFTER_SCAN {
+			@Override
+			public void execute(Explorer explorer) {
+				explorer.afterScan();
+			}
+		},
+		GO_NEXT_TILE {
+			@Override
+			public void execute(Explorer explorer) {
+				explorer.goToNext();
 			}
 		},
 		NEXT_WAYPOINT {
