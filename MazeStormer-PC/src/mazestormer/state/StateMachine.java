@@ -2,7 +2,6 @@ package mazestormer.state;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import mazestormer.util.AbstractFuture;
@@ -245,29 +244,26 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 *            The next state.
 	 */
 	protected void bindTransition(final Future<?> future, final S nextState) {
+		// Register binding
+		addBinding(future);
+		// Listen for future completion
 		future.addFutureListener(new FutureListener<Object>() {
 			@Override
-			public void futureResolved(Future<?> future) {
-				try {
-					Object result = future.get();
-					if (result instanceof Boolean && !((Boolean) result).booleanValue()) {
-						// Interrupt, retry needed
-						pause();
-					} else {
-						// Successfully completed, transition
-						transition(nextState);
-					}
-				} catch (InterruptedException | ExecutionException cannotHappen) {
+			public void futureResolved(Future<? extends Object> future, Object result) {
+				if (result instanceof Boolean && !((Boolean) result).booleanValue()) {
+					// Interrupt, retry needed
+					pause();
+				} else {
+					// Successfully completed, transition
+					transition(nextState);
 				}
 			}
 
 			@Override
-			public void futureCancelled(Future<?> future) {
+			public void futureCancelled(Future<? extends Object> future) {
 				// Ignore
 			}
 		});
-		// Register binding
-		addBinding(future);
 	}
 
 	/**

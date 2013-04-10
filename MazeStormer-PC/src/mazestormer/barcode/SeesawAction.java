@@ -8,7 +8,7 @@ import java.util.List;
 
 import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
-import mazestormer.line.LineFinderRunner;
+import mazestormer.line.LineFinder;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
@@ -21,8 +21,7 @@ import mazestormer.state.State;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class SeesawAction extends
-		StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
+public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
 
 	private final GameRunner gameRunner;
 	private final int barcode;
@@ -113,8 +112,7 @@ public class SeesawAction extends
 	}
 
 	protected void findLine() {
-		LineFinderRunner lineFinder = new LineFinderRunner(
-				getControllableRobot()) {
+		LineFinder lineFinder = new LineFinder(getControllableRobot()) {
 			@Override
 			protected void log(String message) {
 				// log indien nodig
@@ -126,8 +124,7 @@ public class SeesawAction extends
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 
-	private class LineFinderListener extends
-			AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(SeesawState.RESUME_EXPLORING);
@@ -199,8 +196,7 @@ public class SeesawAction extends
 		PathFinder PF = new PathFinder(maze);
 
 		for (Tile tile : seesawTiles) {
-			if (tile.getSeesawBarcode().equals(currentSeesaw[0])
-					|| tile.getSeesawBarcode().equals(currentSeesaw[1])) {
+			if (tile.getSeesawBarcode().equals(currentSeesaw[0]) || tile.getSeesawBarcode().equals(currentSeesaw[1])) {
 				continue;
 			} else {
 				List<Tile> path = PF.findTilePath(currentTile, tile);
@@ -215,16 +211,14 @@ public class SeesawAction extends
 	private boolean containsSeesaw(List<Tile> path, Barcode[] seesaw) {
 		for (Tile tile : path) {
 			if (tile.isSeesaw()
-					&& (tile.getSeesawBarcode().equals(seesaw[0]) || tile
-							.getSeesawBarcode().equals(seesaw[1]))) {
+					&& (tile.getSeesawBarcode().equals(seesaw[0]) || tile.getSeesawBarcode().equals(seesaw[1]))) {
 				return false;
 			}
 		}
 		return true;
 	}
 
-	public enum SeesawState implements
-			State<SeesawAction, SeesawAction.SeesawState> {
+	public enum SeesawState implements State<SeesawAction, SeesawAction.SeesawState> {
 
 		INITIAL {
 

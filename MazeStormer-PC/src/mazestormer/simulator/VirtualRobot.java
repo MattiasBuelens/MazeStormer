@@ -1,18 +1,18 @@
 package mazestormer.simulator;
 
 import lejos.geom.Point;
-import lejos.robotics.RangeScanner;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
+import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
-import mazestormer.maze.IMaze;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.collision.CollisionObserver;
 import mazestormer.simulator.collision.VirtualCollisionDetector;
@@ -20,90 +20,93 @@ import mazestormer.world.World;
 
 public class VirtualRobot implements ControllableRobot {
 
-	private VirtualPilot pilot;
-	private CalibratedLightSensor light;
-	private RangeScanner scanner;
-	private RangeScannerFeatureDetector detector;
-	private VirtualIRSensor ir;
-	private SoundPlayer soundPlayer;
-	private PoseProvider poseProvider;
+	private final World world;
+
+	private final VirtualPilot pilot;
+	private final PoseProvider poseProvider;
+
+	private final CalibratedLightSensor light;
+	private final ObservableRangeScanner rangeScanner;
+	private final RangeScannerFeatureDetector rangeDetector;
+	private final VirtualIRSensor infrared;
+
+	private final SoundPlayer soundPlayer;
+
 	private final VirtualCollisionDetector collisionDetector;
 	private final CollisionObserver collisionObserver;
+
 	private final VirtualConditionResolvers conditionResolvers;
 
-	private final World world;
+	private final VirtualUpdateProducer updateProducer;
 
 	public VirtualRobot(World world) {
 		this.world = world;
 
-		this.collisionDetector = new VirtualCollisionDetector(world);
-		this.collisionObserver = new CollisionObserver(this);
+		// Pilot
+		pilot = new VirtualPilot(ControllableRobot.trackWidth);
+		poseProvider = new OdometryPoseProvider(pilot);
 
-		this.conditionResolvers = new VirtualConditionResolvers(this);
+		// Light sensor
+		light = new VirtualLightSensor(world);
+
+		// Range scanner
+		rangeScanner = new VirtualRangeScanner(getWorld());
+		rangeDetector = new RangeScannerFeatureDetector(rangeScanner, sensorMaxDistance, new Point(0f, 0f));
+		rangeDetector.setPoseProvider(getPoseProvider());
+
+		// Infrared sensor
+		infrared = new VirtualIRSensor(world);
+
+		// Sound player
+		soundPlayer = new VirtualSoundPlayer();
+
+		// Collision detector
+		collisionDetector = new VirtualCollisionDetector(world);
+		collisionObserver = new CollisionObserver(this);
+
+		// Conditional commands
+		conditionResolvers = new VirtualConditionResolvers(this);
+
+		// Updates
+		updateProducer = new VirtualUpdateProducer(this);
 	}
 
 	private World getWorld() {
 		return world;
 	}
 
-	private IMaze getMaze() {
-		return world.getMaze();
-	}
-
 	@Override
 	public Pilot getPilot() {
-		if (pilot == null) {
-			pilot = new VirtualPilot(ControllableRobot.trackWidth);
-		}
 		return pilot;
 	}
 
 	@Override
 	public CalibratedLightSensor getLightSensor() {
-		if (light == null) {
-			light = new VirtualLightSensor(getWorld());
-		}
 		return light;
 	}
 
-	// @Override
-	protected RangeScanner getRangeScanner() {
-		if (scanner == null) {
-			scanner = new VirtualRangeScanner(getWorld());
-		}
-		return scanner;
+	@Override
+	public ObservableRangeScanner getRangeScanner() {
+		return rangeScanner;
 	}
 
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
-		if (detector == null) {
-			detector = new RangeScannerFeatureDetector(getRangeScanner(), sensorMaxDistance, new Point(0f, 0f));
-			detector.setPoseProvider(getWorld().getLocalPlayer().getRobot().getPoseProvider());
-		}
-		return detector;
+		return rangeDetector;
 	}
 
 	@Override
 	public IRSensor getIRSensor() {
-		if (ir == null) {
-			ir = new VirtualIRSensor(world);
-		}
-		return ir;
+		return infrared;
 	}
 
 	@Override
 	public PoseProvider getPoseProvider() {
-		if (poseProvider == null) {
-			poseProvider = new OdometryPoseProvider(getPilot());
-		}
 		return poseProvider;
 	}
 
 	@Override
 	public SoundPlayer getSoundPlayer() {
-		if (soundPlayer == null) {
-			soundPlayer = new VirtualSoundPlayer();
-		}
 		return soundPlayer;
 	}
 
@@ -113,6 +116,16 @@ public class VirtualRobot implements ControllableRobot {
 
 	public CollisionObserver getCollisionObserver() {
 		return collisionObserver;
+	}
+
+	@Override
+	public void addUpdateListener(RobotUpdateListener listener) {
+		updateProducer.addUpdateListener(listener);
+	}
+
+	@Override
+	public void removeUpdateListener(RobotUpdateListener listener) {
+		updateProducer.removeUpdateListener(listener);
 	}
 
 	@Override

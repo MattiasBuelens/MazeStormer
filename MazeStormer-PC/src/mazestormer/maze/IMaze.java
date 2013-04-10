@@ -68,11 +68,6 @@ public interface IMaze {
 	public void setOriginToDefault();
 
 	/**
-	 * Get the mesh of this maze.
-	 */
-	public Mesh getMesh();
-
-	/**
 	 * Get the lowest X-coordinate of all tiles on this maze.
 	 */
 	public long getMinX();

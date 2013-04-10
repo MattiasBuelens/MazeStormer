@@ -12,12 +12,6 @@ public class LightReadReport extends RequestReport<Integer> {
 		super(type);
 	}
 
-	public LightReadReport(ReportType type, int requestId, int lightValue) {
-		this(type);
-		setRequestId(requestId);
-		setLightValue(lightValue);
-	}
-
 	public int getLightValue() {
 		return lightValue;
 	}

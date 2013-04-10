@@ -12,7 +12,7 @@ import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
-import mazestormer.explore.ExplorerRunner;
+import mazestormer.explore.Explorer;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -34,28 +34,25 @@ public class GameRunner implements GameListener {
 
 	private final Player player;
 	private final Game game;
-	private final ExplorerRunner explorerRunner;
+	private final Explorer explorer;
 
 	private final PositionReporter positionReporter = new PositionReporter();
 	private final TileReporter tileReporter = new TileReporter();
-	private final ScheduledExecutorService positionExecutor = Executors
-			.newSingleThreadScheduledExecutor(factory);
+	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder()
-			.setNameFormat("GameRunner-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
 
 	private int objectNumber;
 
 	public GameRunner(Player player, Game game) {
 		this.player = player;
-		this.explorerRunner = new ExplorerRunner(player) {
+		this.explorer = new Explorer(player) {
 			@Override
 			protected void log(String message) {
 				GameRunner.this.log(message);
 			}
 		};
-		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(
-				this));
+		explorer.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(this));
 
 		this.game = game;
 		game.addGameListener(this);
@@ -84,13 +81,12 @@ public class GameRunner implements GameListener {
 	public void setObjectTile() {
 		log("Object on next tile, set walls");
 
-		Tile currentTile = explorerRunner.getCurrentTile();
-		Tile nextTile = explorerRunner.getNextTile();
+		Tile currentTile = explorer.getCurrentTile();
+		Tile nextTile = explorer.getNextTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
 		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(),
-				new TileShape(TileType.DEAD_END, orientation));
+		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
 
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
@@ -101,15 +97,14 @@ public class GameRunner implements GameListener {
 	 *         seesaw-barcode.
 	 */
 	public Barcode[] getCurrentSeesawBarcodes() {
-		Tile currentTile = explorerRunner.getCurrentTile();
+		Tile currentTile = explorer.getCurrentTile();
 		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
-				.getOtherSeesawBarcode(seesawBarcode);
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
 		return new Barcode[] { seesawBarcode, otherBarcode };
 	}
-	
+
 	public Tile getCurrentTile() {
-		return explorerRunner.getCurrentTile();
+		return explorer.getCurrentTile();
 	}
 
 	public void setSeesawWalls() {
@@ -117,14 +112,13 @@ public class GameRunner implements GameListener {
 
 		IMaze maze = getMaze();
 
-		Tile currentTile = getCurrentTile();
-		Tile nextTile = explorerRunner.getNextTile();
+		Tile currentTile = explorer.getCurrentTile();
+		Tile nextTile = explorer.getNextTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
 		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
-				.getOtherSeesawBarcode(seesawBarcode);
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();
@@ -165,14 +159,14 @@ public class GameRunner implements GameListener {
 	public void afterObjectBarcode() {
 		log("Object found, go to next tile");
 		// Skip next tile
-		explorerRunner.skipNextTile();
+		explorer.skipNextTile();
 		// Create new path
-		explorerRunner.createPath();
+		explorer.createPath();
 		// Object found action resolves after this
 	}
 
 	public boolean isRunning() {
-		return explorerRunner.isRunning();
+		return explorer.isRunning();
 	}
 
 	private void startReporting() {
@@ -213,13 +207,13 @@ public class GameRunner implements GameListener {
 		// Start reporting
 		startReporting();
 		// Start
-		explorerRunner.start();
+		explorer.start();
 	}
 
 	@Override
 	public void onGamePaused() {
 		// Pause
-		explorerRunner.pause();
+		explorer.pause();
 		// Stop pilot
 		getRobot().getPilot().stop();
 		// Stop reporting
@@ -229,7 +223,7 @@ public class GameRunner implements GameListener {
 	@Override
 	public void onGameStopped() {
 		// Stop
-		explorerRunner.stop();
+		explorer.stop();
 		// Stop pilot
 		getRobot().getPilot().stop();
 		// Stop reporting

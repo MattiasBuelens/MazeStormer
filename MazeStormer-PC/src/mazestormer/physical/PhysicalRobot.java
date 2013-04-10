@@ -1,103 +1,127 @@
 package mazestormer.physical;
 
-import lejos.robotics.RangeScanner;
+import java.util.ArrayList;
+import java.util.List;
+
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
 import mazestormer.command.CommandType;
 import mazestormer.condition.Condition;
+import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.remote.MessageListener;
+import mazestormer.report.Report;
+import mazestormer.report.UpdateReport;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.RobotUpdate;
+import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
 
-public class PhysicalRobot extends PhysicalComponent implements
-		ControllableRobot {
+public class PhysicalRobot extends PhysicalComponent implements ControllableRobot {
 
 	/**
 	 * Timeout for synchronous requests.
 	 */
 	public static final int requestTimeout = 10000;
 
-	private PhysicalPilot pilot;
-	private PoseProvider poseProvider;
+	private final PhysicalPilot pilot;
+	private final PoseProvider poseProvider;
 
-	private PhysicalLightSensor light;
+	private final PhysicalLightSensor light;
+	private final ObservableRangeScanner rangeScanner;
+	private final RangeScannerFeatureDetector rangeDetector;
+	private final IRSensor infrared;
 
-	private RangeScanner scanner;
-	private RangeScannerFeatureDetector detector;
-	private IRSensor irSensor;
+	private final SoundPlayer soundPlayer;
 
-	private SoundPlayer soundPlayer;
+	private final UpdateReceiver updateReceiver;
+	private final List<RobotUpdateListener> updateListeners = new ArrayList<RobotUpdateListener>();
 
 	public PhysicalRobot(PhysicalCommunicator communicator) {
 		super(communicator);
+
+		// Updates
+		updateReceiver = new UpdateReceiver();
+		communicator.addListener(updateReceiver);
+
+		// Pilot
+		pilot = new PhysicalPilot(communicator);
+		addUpdateListener(pilot);
+		poseProvider = new OdometryPoseProvider(pilot);
+
+		// Light sensor
+		light = new PhysicalLightSensor(communicator);
+
+		// Range scanner
+		rangeScanner = new PhysicalRangeScanner(communicator);
+		rangeDetector = new RangeScannerFeatureDetector(rangeScanner, sensorMaxDistance, sensorPosition);
+		rangeDetector.setPoseProvider(poseProvider);
+
+		// Infrared sensor
+		infrared = new PhysicalIRSensor(communicator);
+
+		// Sound player
+		soundPlayer = new PhysicalSoundPlayer(communicator);
 	}
 
 	@Override
 	public Pilot getPilot() {
-		if (pilot == null) {
-			pilot = new PhysicalPilot(getCommunicator());
-		}
 		return pilot;
 	}
 
 	@Override
 	public CalibratedLightSensor getLightSensor() {
-		if (light == null) {
-			light = new PhysicalLightSensor(getCommunicator());
-		}
 		return light;
 	}
 
-	// @Override
-	protected RangeScanner getRangeScanner() {
-		if (scanner == null) {
-			scanner = new PhysicalRangeScanner(getCommunicator());
-		}
-		return scanner;
+	@Override
+	public ObservableRangeScanner getRangeScanner() {
+		return rangeScanner;
 	}
-	
+
 	@Override
 	public IRSensor getIRSensor() {
-		if (irSensor == null) {
-			irSensor = new PhysicalIRSensor(getCommunicator());
-		}
-		return irSensor;
+		return infrared;
 	}
 
 	@Override
 	public RangeFeatureDetector getRangeDetector() {
-		if (detector == null) {
-			detector = new RangeScannerFeatureDetector(getRangeScanner(),
-					sensorMaxDistance, sensorPosition);
-			detector.setPoseProvider(getPoseProvider());
-		}
-		return detector;
+		return rangeDetector;
 	}
 
 	@Override
 	public PoseProvider getPoseProvider() {
-		if (poseProvider == null) {
-			poseProvider = new OdometryPoseProvider(getPilot());
-		}
 		return poseProvider;
 	}
 
 	@Override
 	public SoundPlayer getSoundPlayer() {
-		if (soundPlayer == null) {
-			soundPlayer = new PhysicalSoundPlayer(getCommunicator());
-		}
 		return soundPlayer;
 	}
 
 	@Override
+	public void addUpdateListener(RobotUpdateListener listener) {
+		updateListeners.add(listener);
+	}
+
+	@Override
+	public void removeUpdateListener(RobotUpdateListener listener) {
+		updateListeners.remove(listener);
+	}
+
+	private void updateReceived(RobotUpdate update) {
+		for (RobotUpdateListener listener : updateListeners) {
+			listener.updateReceived(update);
+		}
+	}
+
+	@Override
 	public CommandBuilder when(Condition condition) {
-		PhysicalCommandBuilder builder = new PhysicalCommandBuilder(
-				getCommunicator(), CommandType.WHEN, condition);
+		PhysicalCommandBuilder builder = new PhysicalCommandBuilder(getCommunicator(), CommandType.WHEN, condition);
 		addMessageListener(builder);
 		return builder;
 	}
@@ -106,12 +130,22 @@ public class PhysicalRobot extends PhysicalComponent implements
 	public void terminate() {
 		// Terminate components
 		getPilot().terminate();
-		if (light != null)
-			light.terminate();
+		light.terminate();
 		// Stop all communications
 		getCommunicator().stop();
 		// Remove registered message listeners
 		super.terminate();
+	}
+
+	private class UpdateReceiver implements MessageListener<Report<?>> {
+
+		@Override
+		public void messageReceived(Report<?> message) {
+			if (message instanceof UpdateReport) {
+				updateReceived(((UpdateReport) message).getValue());
+			}
+		}
+
 	}
 
 }
