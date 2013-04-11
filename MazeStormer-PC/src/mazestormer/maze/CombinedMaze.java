@@ -403,6 +403,11 @@ public class CombinedMaze implements IMaze {
 	public Seesaw getOrCreateSeesaw(byte barcode) {
 		return getOrCreateSeesaw(new Barcode(barcode));
 	}
+	
+	@Override
+	public int getAmountOfSeesaws() {
+		return getTotalMaze().getAmountOfSeesaws();
+	}
 
 	@Override
 	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode) {
@@ -415,8 +420,8 @@ public class CombinedMaze implements IMaze {
 	}
 	
 	@Override
-	public Collection<Tile> getSeesawTiles() {
-		return getTotalMaze().getSeesawTiles();
+	public Collection<Tile> getSeesawBarcodeTiles() {
+		return getTotalMaze().getSeesawBarcodeTiles();
 	}
 
 	@Override

@@ -287,6 +287,11 @@ public interface IMaze {
 	public Seesaw getSeesaw(byte barcode);
 
 	/**
+	 * The amount of seesaws in the maze.
+	 */
+	public int getAmountOfSeesaws();
+
+	/**
 	 * Get or create the seesaw corresponding to the given seesaw barcode.
 	 * 
 	 * @param barcode
@@ -326,7 +331,7 @@ public interface IMaze {
 	 * 
 	 * @return A collection with all seesaw tiles.
 	 */
-	public Collection<Tile> getSeesawTiles();
+	public Collection<Tile> getSeesawBarcodeTiles();
 
 	/**
 	 * Set a tile as explored.
