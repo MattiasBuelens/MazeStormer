@@ -29,8 +29,6 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 	 */
 	public static final int requestTimeout = 10000;
 
-	private final World world;
-
 	private final PhysicalPilot pilot;
 	private final PoseProvider poseProvider;
 
@@ -44,11 +42,8 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 	private final UpdateReceiver updateReceiver;
 	private final List<RobotUpdateListener> updateListeners = new ArrayList<RobotUpdateListener>();
 
-	public PhysicalRobot(PhysicalCommunicator communicator) {
+	public PhysicalRobot(PhysicalCommunicator communicator, World world) {
 		super(communicator);
-
-		// TODO: De wereld moet nog toegevoegd worden op één of andere manier
-		world = null;
 
 		// Updates
 		updateReceiver = new UpdateReceiver();
@@ -68,7 +63,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 		rangeDetector.setPoseProvider(poseProvider);
 
 		// Infrared sensor
-		infrared = new ExtendedPhysicalIRSensor(getCommunicator(), getWorld());
+		infrared = new ExtendedPhysicalIRSensor(getCommunicator(), world);
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
@@ -87,10 +82,6 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 	@Override
 	public ObservableRangeScanner getRangeScanner() {
 		return rangeScanner;
-	}
-
-	private World getWorld() {
-		return this.world;
 	}
 
 	@Override
