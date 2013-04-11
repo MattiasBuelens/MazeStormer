@@ -142,10 +142,8 @@ public class GameRunner extends Controller implements GameListener {
 
 	public void afterObjectBarcode() {
 		log("Object found, go to next tile");
-		// Skip next tile
+		// Skip to next tile
 		getDriver().skipNextTile();
-		// Create new path
-		getDriver().createPath();
 		// Object found action resolves after this
 	}
 

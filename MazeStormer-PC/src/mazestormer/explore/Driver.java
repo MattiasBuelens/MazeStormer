@@ -222,6 +222,15 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	protected void goToNext() {
+		// Get and build path to next tile
+		buildNextPath();
+
+		// Follow path until before traveling
+		transition(ExplorerState.NEXT_WAYPOINT);
+	}
+
+	private void buildNextPath() {
+		// Get the next tile
 		nextTile = getMode().nextTile(currentTile);
 
 		// Check if done
@@ -232,10 +241,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 		// Create path to next tile
 		log("Go to tile (" + nextTile.getX() + ", " + nextTile.getY() + ")");
-		createPath();
-
-		// Follow path until before traveling
-		transition(ExplorerState.NEXT_WAYPOINT);
+		navigator.stop();
+		navigator.setPath(getPathFinder().findPath(getCurrentTile(), nextTile));
 	}
 
 	protected void nextWaypoint() {
@@ -563,21 +570,10 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	/**
-	 * Skip the next tile in the queue. Internal use only.
+	 * Skip to the next tile.
 	 */
 	public void skipNextTile() {
-		// Remove
-		// queue.pollFirst();
-		// Reset
-		// nextTile = queue.peekFirst();
-	}
-
-	/**
-	 * Create the path to the next tile. Internal use only.
-	 */
-	public void createPath() {
-		navigator.stop();
-		navigator.setPath(getPathFinder().findPath(getCurrentTile(), nextTile));
+		buildNextPath();
 	}
 
 	/**
