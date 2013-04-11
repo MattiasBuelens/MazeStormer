@@ -3,6 +3,7 @@ package mazestormer.infrared;
 import java.awt.geom.Point2D;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.util.ArrayUtils;
 
 public class RectangularEnvelope implements Envelope{
 	
@@ -58,15 +59,7 @@ public class RectangularEnvelope implements Envelope{
 	
 	private Point2D getClosestPointOnSegment(Point2D startOfSegment, Point2D endOfSegment, Point2D target) {
 		double u = getSegmentParameter(startOfSegment, endOfSegment, target);
-		if (u < 0) {
-			return startOfSegment;
-		}
-		if (u > 1) {
-			return endOfSegment;
-		}
-		double c_x = startOfSegment.getX() + u*(endOfSegment.getX()-startOfSegment.getX());
-		double c_y = startOfSegment.getY() + u*(endOfSegment.getY()-startOfSegment.getY());
-		return new Point2D.Double(c_x, c_y);
+		return getPointAtSegmentParameter(startOfSegment, endOfSegment, u);
 	}
 	
 	private double getSegmentParameter(Point2D startOfSegment, Point2D endOfSegment, Point2D target) {
@@ -97,5 +90,44 @@ public class RectangularEnvelope implements Envelope{
 		double new_x = x*Math.cos(angle) - y*Math.sin(angle);
 		double new_y = x*Math.sin(angle) + y*Math.cos(angle);
 		return new Point2D.Double(new_x, new_y);
+	}
+	
+	@Override
+	public Point2D[] getDiscretization(int depth)
+			throws IllegalArgumentException{
+		if (depth <= 0) {
+			throw new IllegalArgumentException("The given depth must be greater than zero.");
+		}
+		
+		Point2D[] tps = new Point2D.Double[4*depth];
+		Point2D[] cps = getCornerPoints();
+		double d = (1/ (double) depth);
+		
+		for (int j=0; j<4; j++) {
+			for (int i=0; i<depth; i++) {
+				tps[(int) (j*d+i)] = getPointAtSegmentParameter(cps[j], cps[(j+1)%4], d*i);
+			}
+		}
+		return tps;
+	}
+	
+	private Point2D getPointAtSegmentParameter(Point2D startOfSegment, Point2D endOfSegment, double segmentParameter) {
+		if (segmentParameter < 0) {
+			return startOfSegment;
+		}
+		if (segmentParameter > 1) {
+			return endOfSegment;
+		}
+		double c_x = startOfSegment.getX() + segmentParameter*(endOfSegment.getX()-startOfSegment.getX());
+		double c_y = startOfSegment.getY() + segmentParameter*(endOfSegment.getY()-startOfSegment.getY());
+		return new Point2D.Double(c_x, c_y);
+	}
+
+	@Override
+	public Point2D[] getCombination(Point2D target, int depth)
+			throws IllegalArgumentException {
+		Point2D[] dps = getDiscretization(depth);
+		Point2D[] cps = getClosestPoints(target);
+		return ArrayUtils.concat(dps, cps);
 	}
 }

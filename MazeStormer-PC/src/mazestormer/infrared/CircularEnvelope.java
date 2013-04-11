@@ -41,4 +41,18 @@ public class CircularEnvelope implements Envelope {
 		return (new RectangularEnvelope(getPoseProvider(), 2*getRadius(), 2*getRadius())).getClosestPoints(target);
 	}
 
+	@Override
+	public Point2D[] getDiscretization(int depth)
+			throws IllegalArgumentException {
+		// TODO: dummy implementation
+		return (new RectangularEnvelope(getPoseProvider(), 2*getRadius(), 2*getRadius())).getDiscretization(depth);
+	}
+
+	@Override
+	public Point2D[] getCombination(Point2D target, int depth)
+			throws IllegalArgumentException {
+		// TODO: dummy implementation
+		return (new RectangularEnvelope(getPoseProvider(), 2*getRadius(), 2*getRadius())).getCombination(target, depth);
+	}
+
 }
