@@ -103,6 +103,8 @@ public class WorldIRDetector implements IRSensor {
 		}
 		return detectedAngles.toArray(new Float[0]);
 	}
+	
+	private static final int DEPTH = 3;
 
 	private Float getDetectedAngle(Envelope envelope) {
 		Pose currentPose = getPoseProvider().getPose();
@@ -116,7 +118,7 @@ public class WorldIRDetector implements IRSensor {
 			Point2D currentPoint = new Point2D.Double(currentPose.getX(), currentPose.getY());
 
 			Point2D h_e = new Point2D.Double(Math.cos(currentPose.getHeading()), Math.sin(currentPose.getHeading()));
-			Point2D[] cps = envelope.getClosestPoints(currentPoint);
+			Point2D[] cps = envelope.getCombination(currentPoint, DEPTH);
 			Line2D[] edgeLines = getMaze().getEdgeLines().toArray(new Line2D.Double[0]);
 			for (int i = 0; i < cps.length && !isDetected; i++) {
 				Line2D l = new Line2D.Double(currentPoint, cps[i]);
