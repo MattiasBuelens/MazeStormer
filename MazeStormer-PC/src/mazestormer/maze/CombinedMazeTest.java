@@ -23,15 +23,15 @@ public class CombinedMazeTest {
 			+ "DeadEnd.S.V Corner.W Straight.E.03 DeadEnd.E.V";
 	// @formatter:on
 
-	private static Maze sourceMaze;
+	private static IMaze sourceMaze;
 
-	private Maze ownDiscoveredMaze = new Maze();
+	private IMaze ownDiscoveredMaze = new Maze();
 	private LongPoint[] ownDiscoveredPoints = { new LongPoint(0, 3), new LongPoint(1, 3), new LongPoint(2, 3),
 			new LongPoint(3, 3), new LongPoint(0, 2), new LongPoint(1, 2), new LongPoint(2, 2), new LongPoint(3, 2),
 			new LongPoint(0, 1), new LongPoint(2, 1), new LongPoint(3, 1), new LongPoint(0, 0) };
 	private TileTransform transformSourceToOwn = new TileTransform(new LongPoint(1, 2), 3);
 
-	private Maze partnersDiscoveredMaze = new Maze();
+	private IMaze partnersDiscoveredMaze = new Maze();
 	private LongPoint[] partnerDiscoveredPoints = { new LongPoint(0, 3), new LongPoint(1, 3), new LongPoint(2, 3),
 			new LongPoint(3, 3), new LongPoint(2, 2), new LongPoint(3, 2), new LongPoint(1, 1), new LongPoint(2, 1),
 			new LongPoint(3, 1), new LongPoint(1, 0), new LongPoint(2, 0), new LongPoint(3, 0) };
@@ -72,19 +72,19 @@ public class CombinedMazeTest {
 	public void testOwnDiscoveredMaze() {
 		// Test results
 		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).hasBarcode());
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue(), (byte) 1);
+		assertEquals(1, ownDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue());
 		assertTrue(ownDiscoveredMaze.getTileAt(new LongPoint(0, 2)).hasBarcode());
-		assertEquals(ownDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue(), (byte) 2);
+		assertEquals(2, ownDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue());
 	}
 
 	@Test
 	public void testPartnersDicoveredMaze() {
 		// Test results
 		assertTrue(partnersDiscoveredMaze.getTileAt(new LongPoint(0, 2)).hasBarcode());
-		assertEquals(partnersDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue(), (byte) 3);
+		assertEquals(3, partnersDiscoveredMaze.getTileAt(new LongPoint(0, 2)).getBarcode().getValue());
 
 		assertTrue(partnersDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).hasBarcode());
-		assertEquals(partnersDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue(), (byte) 2);
+		assertEquals(2, partnersDiscoveredMaze.getTileAt(new LongPoint(-1, 0)).getBarcode().getValue());
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class CombinedMazeTest {
 		System.out.println(Parser.stringify(partnersDiscoveredMaze));
 		System.out.println(Parser.stringify(combinedMaze));
 
-		Maze transformedSourceMaze = new Maze();
+		IMaze transformedSourceMaze = new Maze();
 		transformedSourceMaze.importTiles(sourceMaze.getTiles(), transformSourceToOwn.inverse());
 		System.out.println(Parser.stringify(transformedSourceMaze));
 	}
@@ -101,8 +101,8 @@ public class CombinedMazeTest {
 	/**
 	 * Parse the given source into a new maze.
 	 */
-	private static Maze parse(CharSequence source) throws ParseException {
-		Maze maze = new Maze();
+	private static IMaze parse(CharSequence source) throws ParseException {
+		IMaze maze = new Maze();
 		Parser parser = new Parser(maze);
 		parser.parse(source);
 		return maze;

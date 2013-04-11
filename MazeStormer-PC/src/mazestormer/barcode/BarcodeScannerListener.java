@@ -1,6 +1,6 @@
 package mazestormer.barcode;
 
-public interface BarcodeRunnerListener {
+public interface BarcodeScannerListener {
 
 	/**
 	 * Triggered when the start of a barcode was found.

@@ -1,6 +1,8 @@
 package mazestormer.util;
 
-public interface Future<V> extends java.util.concurrent.Future<V> {
+import com.google.common.util.concurrent.ListenableFuture;
+
+public interface Future<V> extends ListenableFuture<V> {
 
 	boolean cancel();
 
@@ -11,13 +13,5 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
 	 *            The future listener
 	 */
 	void addFutureListener(FutureListener<? super V> listener);
-
-	/**
-	 * Removes a future listener.
-	 * 
-	 * @param listener
-	 *            The future listener
-	 */
-	void removeFutureListener(FutureListener<? super V> listener);
 
 }

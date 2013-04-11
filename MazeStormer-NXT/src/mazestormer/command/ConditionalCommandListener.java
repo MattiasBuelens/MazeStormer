@@ -114,7 +114,7 @@ public abstract class ConditionalCommandListener extends
 
 		ConditionFuture future = futuresByCommand.get(command);
 		if (future != null)
-			future.cancel(true);
+			future.cancel();
 		unregister(command);
 	}
 
@@ -157,7 +157,7 @@ public abstract class ConditionalCommandListener extends
 	}
 
 	@Override
-	public void futureResolved(Future<? extends Void> future) {
+	public void futureResolved(Future<? extends Void> future, Void result) {
 		if (commandsByFuture.containsKey(future)) {
 			resolve(commandsByFuture.get(future));
 		}

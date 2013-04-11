@@ -21,6 +21,7 @@ public class Tile {
 	 * Exploration
 	 */
 	private boolean isExplored = false;
+	private boolean ignoreFlag = false;
 
 	/*
 	 * Barcode
@@ -30,9 +31,8 @@ public class Tile {
 	/*
 	 * Seesaw
 	 */
+	private Seesaw seesaw;
 	private Barcode seesawBarcode;
-	private boolean seesawOpen = false;
-	private Barcode otherSeesawBarcode;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -112,14 +112,19 @@ public class Tile {
 	}
 
 	public boolean isSeesaw() {
-		return getSeesawBarcode() != null;
+		return getSeesaw() != null;
+	}
+
+	public Seesaw getSeesaw() {
+		return seesaw;
 	}
 
 	public Barcode getSeesawBarcode() {
 		return seesawBarcode;
 	}
 
-	public void setSeesawBarcode(Barcode seesawBarcode) {
+	public void setSeesaw(Seesaw seesaw, Barcode seesawBarcode) {
+		this.seesaw = seesaw;
 		this.seesawBarcode = seesawBarcode;
 	}
 
@@ -130,23 +135,15 @@ public class Tile {
 	 * VirtualIRSensor.
 	 */
 	public boolean isSeesawOpen() {
-		return seesawOpen;
+		return seesaw.isOpen(seesawBarcode);
 	}
 
-	public void setSeesawOpen(boolean seesawOpen) {
-		this.seesawOpen = seesawOpen;
+	public boolean getIgnoreFlag() {
+		return this.ignoreFlag;
 	}
 
-	public void flipSeesaw() {
-		setSeesawOpen(!isSeesawOpen());
-	}
-
-	public Barcode getOtherSeesawBarcode() {
-		return this.otherSeesawBarcode;
-	}
-
-	public void setOtherSeesawBarcode(Barcode barcode) {
-		this.otherSeesawBarcode = barcode;
+	public void setIgnoreFlag(boolean flag) {
+		this.ignoreFlag = flag;
 	}
 
 	public TileShape getShape() {

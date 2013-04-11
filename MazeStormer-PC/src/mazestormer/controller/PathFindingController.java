@@ -7,9 +7,8 @@ import java.util.List;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
-import mazestormer.line.LineFinderRunner;
+import mazestormer.line.LineFinder;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.robot.ControllableRobot;
@@ -24,7 +23,7 @@ import mazestormer.util.LongPoint;
 
 public class PathFindingController extends SubController implements IPathFindingController {
 
-	private TileSequenceRunner runner;
+	private TileNavigator tileNavigator;
 
 	public PathFindingController(MainController mainController) {
 		super(mainController);
@@ -38,7 +37,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		return getMainController().getPlayer().getMaze();
 	}
 
-	private Maze getSourceMaze() {
+	private IMaze getSourceMaze() {
 		return getMainController().getWorld().getMaze();
 	}
 
@@ -53,8 +52,8 @@ public class PathFindingController extends SubController implements IPathFinding
 	@Override
 	public void startStepAction(long goalX, long goalY) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, true, false);
-		this.runner.start();
+		this.tileNavigator = new TileNavigator(getRobot(), getMaze(), goalTile, true, false);
+		this.tileNavigator.start();
 	}
 
 	@Override
@@ -65,15 +64,15 @@ public class PathFindingController extends SubController implements IPathFinding
 	@Override
 	public void startAction(long goalX, long goalY, boolean singleStep, boolean reposition) {
 		Tile goalTile = getMaze().getTileAt(new LongPoint(goalX, goalY));
-		this.runner = new TileSequenceRunner(getRobot(), getMaze(), goalTile, singleStep, reposition);
-		this.runner.start();
+		this.tileNavigator = new TileNavigator(getRobot(), getMaze(), goalTile, singleStep, reposition);
+		this.tileNavigator.start();
 	}
 
 	@Override
 	public void stopAction() {
-		if (this.runner != null) {
-			this.runner.stop();
-			this.runner = null;
+		if (this.tileNavigator != null) {
+			this.tileNavigator.stop();
+			this.tileNavigator = null;
 		}
 	}
 
@@ -126,11 +125,11 @@ public class PathFindingController extends SubController implements IPathFinding
 		}
 	}
 
-	public class TileSequenceRunner extends StateMachine<TileSequenceRunner, TileSequenceState> implements
+	public class TileNavigator extends StateMachine<TileNavigator, TileSequenceState> implements
 			StateListener<TileSequenceState>, NavigatorListener {
 
 		private final Robot robot;
-		private final LineFinderRunner lineFinder;
+		private final LineFinder lineFinder;
 		private final Navigator navigator;
 		private final PathFinder pathFinder;
 
@@ -139,8 +138,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		private boolean reposition;
 
 		/**
-		 * Create a new tile sequence runner with given robot, maze and goal
-		 * tile.
+		 * Create a new tile navigator with given robot, maze and goal tile.
 		 * 
 		 * @param robot
 		 *            The robot who must follow a tile sequence.
@@ -153,8 +151,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		 * @param reposition
 		 *            Whether to reposition the robot before navigating.
 		 */
-		public TileSequenceRunner(ControllableRobot robot, IMaze iMaze, Tile goal, boolean singleStep,
-				boolean reposition) {
+		public TileNavigator(ControllableRobot robot, IMaze iMaze, Tile goal, boolean singleStep, boolean reposition) {
 			this.robot = checkNotNull(robot);
 			addStateListener(this);
 
@@ -170,13 +167,13 @@ public class PathFindingController extends SubController implements IPathFinding
 			this.pathFinder = new PathFinder(iMaze);
 
 			// Line finder
-			this.lineFinder = new LineFinderRunner(getRobot()) {
+			this.lineFinder = new LineFinder(getRobot()) {
 				@Override
 				protected void log(String message) {
 					PathFindingController.this.log(message);
 				}
 			};
-			lineFinder.addStateListener(new AbstractStateListener<LineFinderRunner.LineFinderState>() {
+			lineFinder.addStateListener(new AbstractStateListener<LineFinder.LineFinderState>() {
 				@Override
 				public void stateFinished() {
 					transition(TileSequenceState.NAVIGATOR);
@@ -275,17 +272,17 @@ public class PathFindingController extends SubController implements IPathFinding
 
 	}
 
-	protected enum TileSequenceState implements State<TileSequenceRunner, TileSequenceState> {
+	protected enum TileSequenceState implements State<TileNavigator, TileSequenceState> {
 		LINE_FINDER {
 			@Override
-			public void execute(TileSequenceRunner runner) {
-				runner.startLineFinder();
+			public void execute(TileNavigator navigator) {
+				navigator.startLineFinder();
 			}
 		},
 		NAVIGATOR {
 			@Override
-			public void execute(TileSequenceRunner runner) {
-				runner.startNavigator();
+			public void execute(TileNavigator navigator) {
+				navigator.startNavigator();
 			}
 		}
 	}

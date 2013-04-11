@@ -16,9 +16,11 @@ import mazestormer.report.MoveReport;
 import mazestormer.report.Report;
 import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.RobotUpdate;
+import mazestormer.robot.RobotUpdateListener;
 import mazestormer.util.Future;
 
-public class PhysicalPilot extends PhysicalComponent implements Pilot {
+public class PhysicalPilot extends PhysicalComponent implements Pilot, RobotUpdateListener {
 
 	private boolean isMoving = false;
 	private double travelSpeed;
@@ -50,8 +52,7 @@ public class PhysicalPilot extends PhysicalComponent implements Pilot {
 
 	@Override
 	public void setAcceleration(int acceleration) {
-		send(new PilotParameterCommand(CommandType.SET_ACCELERATION,
-				acceleration));
+		send(new PilotParameterCommand(CommandType.SET_ACCELERATION, acceleration));
 	}
 
 	@Override
@@ -193,9 +194,8 @@ public class PhysicalPilot extends PhysicalComponent implements Pilot {
 	}
 
 	public void setMovement(Move move) {
-		movement = new Move(move.getMoveType(), move.getDistanceTraveled(),
-				move.getAngleTurned(), (float) getTravelSpeed(),
-				(float) getRotateSpeed(), isMoving());
+		movement = new Move(move.getMoveType(), move.getDistanceTraveled(), move.getAngleTurned(),
+				(float) getTravelSpeed(), (float) getRotateSpeed(), isMoving());
 	}
 
 	public void resetMovement() {
@@ -216,12 +216,17 @@ public class PhysicalPilot extends PhysicalComponent implements Pilot {
 			case MOVE_STOPPED:
 				movementStop(moveReport.getMove());
 				break;
-			case MOVEMENT:
-				setMovement(moveReport.getMove());
-				break;
 			default:
 				break;
 			}
+		}
+	}
+
+	@Override
+	public void updateReceived(RobotUpdate update) {
+		// Apply movement updates
+		if (update.hasMovement()) {
+			setMovement(update.getMovement());
 		}
 	}
 

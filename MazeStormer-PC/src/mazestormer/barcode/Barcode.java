@@ -111,7 +111,9 @@ public class Barcode {
 
 	@Override
 	public int hashCode() {
-		return getValue();
+		// Use a commutative operation on own value and reversed value
+		// Exclusive OR keeps things nicely scattered
+		return getValue() ^ reverse(getValue());
 	}
 
 }

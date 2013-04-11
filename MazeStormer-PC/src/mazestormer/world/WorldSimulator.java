@@ -5,9 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.barcode.Barcode;
 import mazestormer.maze.PoseTransform;
-import mazestormer.maze.Tile;
+import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
@@ -184,15 +183,10 @@ public class WorldSimulator {
 			// Nothing to do here
 		}
 
-		@Override
 		public void unlockedSeesaw(String playerID, int playerNumber, int barcode) {
 			// Flip this seesaw
-			Tile seesawTile = getWorld().getMaze().getSeesawTile(new Barcode((byte) barcode));
-			seesawTile.flipSeesaw();
-			// Flip the other side of the seesaw
-			Barcode otherBarcode = seesawTile.getOtherSeesawBarcode();
-			Tile otherSeesawTile = getWorld().getMaze().getSeesawTile(otherBarcode);
-			otherSeesawTile.flipSeesaw();
+			Seesaw seesaw = getWorld().getMaze().getOrCreateSeesaw((byte) barcode);
+			seesaw.flip();
 		}
 
 	}

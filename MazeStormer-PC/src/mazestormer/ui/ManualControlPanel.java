@@ -156,7 +156,7 @@ public class ManualControlPanel extends ViewPanel {
 	private void createMovePanel() {
 		movePanel = new JPanel();
 		add(movePanel, "cell 0 1,grow");
-		movePanel.setLayout(new MigLayout("", "[fill][grow,fill][]", "[fill][fill]"));
+		movePanel.setLayout(new MigLayout("", "[fill][65:65:65,grow,fill][]", "[fill][fill]"));
 
 		JButton btnTravel = new JButton();
 		btnTravel.setAction(travelAction);
