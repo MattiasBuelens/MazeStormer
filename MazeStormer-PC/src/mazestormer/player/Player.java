@@ -1,45 +1,22 @@
 package mazestormer.player;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import mazestormer.maze.IMaze;
 import mazestormer.robot.Robot;
 
-public abstract class Player implements PlayerIdentifier {
+public interface Player extends PlayerIdentifier {
 
-	private String playerID;
+	public void setPlayerID(String playerID);
 
-	private List<PlayerListener> listeners = new ArrayList<PlayerListener>();
+	public Robot getRobot();
 
-	@Override
-	public String getPlayerID() {
-		return this.playerID;
-	}
+	public IMaze getMaze();
 
-	public void setPlayerID(String playerID) {
-		String previousID = getPlayerID();
-		if (previousID != playerID) {
-			this.playerID = playerID;
-			for (PlayerListener listener : listeners) {
-				listener.playerRenamed(this, previousID, playerID);
-			}
-		}
-	}
+	public Logger getLogger();
 
-	public void addPlayerListener(PlayerListener listener) {
-		listeners.add(listener);
-	}
+	public void addPlayerListener(PlayerListener listener);
 
-	public void removePlayerListener(PlayerListener listener) {
-		listeners.remove(listener);
-	}
-
-	public abstract Robot getRobot();
-
-	public abstract IMaze getMaze();
-
-	public abstract Logger getLogger();
+	public void removePlayerListener(PlayerListener listener);
 
 }

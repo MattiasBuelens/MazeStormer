@@ -1,6 +1,8 @@
 package mazestormer.line;
 
+import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
 import mazestormer.state.AbstractStateListener;
 
@@ -8,35 +10,49 @@ public class LineAdjuster {
 
 	private Player player;
 
-	public LineAdjuster(Player player, LineFinderRunner lineFinderRunner) {
-		lineFinderRunner.addStateListener(new LineFinderListener());
+	public LineAdjuster(Player player, LineFinder lineFinder) {
 		this.player = player;
+
+		lineFinder.addStateListener(new LineFinderListener());
+	}
+
+	protected void log(String message) {
+		System.out.println(message);
+	}
+
+	private IMaze getMaze() {
+		return player.getMaze();
+	}
+
+	private PoseProvider getPoseProvider() {
+		return player.getRobot().getPoseProvider();
 	}
 
 	private void adjust() {
-		Pose pose = player.getRobot().getPoseProvider().getPose();
+		Pose pose = getMaze().toRelative(getPoseProvider().getPose());
 
-		// Rond orientatie af
+		// Round orientation
 		float newHeading = roundAngle(pose.getHeading());
 
-		// Zet 1 coordinaat just
+		// Fix one coordinate
 		float newX, newY;
-
 		if (newHeading == -90f || newHeading == 90f) {
 			newX = pose.getX();
-			newY = roundToMultipleOfForty(pose.getY());
+			newY = roundToTileSize(pose.getY());
 		} else {
-			newX = roundToMultipleOfForty(pose.getX());
+			newX = roundToTileSize(pose.getX());
 			newY = pose.getY();
 		}
 
-		Pose newPose = new Pose(newX, newY, newHeading);
-		System.out.println(newPose);
-		player.getRobot().getPoseProvider().setPose(newPose);
+		// Adjust pose
+		Pose newPose = getMaze().toAbsolute(new Pose(newX, newY, newHeading));
+		getPoseProvider().setPose(newPose);
+		log("Adjusted pose: " + newPose);
 	}
 
-	private float roundToMultipleOfForty(float coordinate) {
-		return Math.round(coordinate / 40f) * 40f;
+	private float roundToTileSize(float coordinate) {
+		final float tileSize = getMaze().getTileSize();
+		return Math.round(coordinate / tileSize) * tileSize;
 	}
 
 	/**
@@ -73,7 +89,7 @@ public class LineAdjuster {
 		return angle;
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinderRunner.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			adjust();

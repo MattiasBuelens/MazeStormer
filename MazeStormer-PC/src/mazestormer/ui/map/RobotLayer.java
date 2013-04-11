@@ -26,8 +26,7 @@ public class RobotLayer extends TransformLayer {
 		if (getDocument() != null) {
 			// Import to document
 			if (element == null) {
-				element = (Element) getDocument().importNode(
-						getRobot().getDocumentElement(), true);
+				element = (Element) getDocument().importNode(getRobot().getDocumentElement(), true);
 			}
 			// Return imported element
 			return element;
@@ -42,9 +41,7 @@ public class RobotLayer extends TransformLayer {
 		return 1000;
 	}
 
-	private static final URL robotUrl = RobotLayer.class
-			.getResource("/res/images/robot.svg");
-
+	private static final URL robotUrl = RobotLayer.class.getResource("/res/images/robot.svg");
 	private static SVGDocument robot;
 
 	public static SVGDocument getRobot() {

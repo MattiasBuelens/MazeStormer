@@ -10,7 +10,7 @@ import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 
-public class FileUtils {
+public final class FileUtils {
 
 	private FileUtils() {
 	}

@@ -2,8 +2,8 @@ package mazestormer.controller;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
+import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.player.Player;
-import mazestormer.ui.map.MazeLayer;
 import mazestormer.ui.map.RangesLayer;
 
 import com.google.common.eventbus.Subscribe;
@@ -11,21 +11,14 @@ import com.google.common.eventbus.Subscribe;
 public class PlayerMapController extends MapController implements IPlayerMapController {
 
 	private final Player player;
-
-	private RangesLayer rangesLayer;
+	private final RangesLayer rangesLayer;
 
 	public PlayerMapController(MainController mainController, Player player) {
 		super(mainController);
 
+		// Player
 		this.player = player;
-
 		addPlayer(player);
-
-		// Source maze
-//		if (mainController.getPlayer().getPlayerID().equals(player.getPlayerID())) {
-//			MazeLayer sourceLayer = addMaze(mainController.getWorld().getMaze(), "Source maze", 1);
-//			sourceLayer.setOpacity(0.5f);
-//		}
 
 		// Discovered maze
 		addMaze(player.getMaze(), "Discovered maze", 2);
@@ -33,8 +26,6 @@ public class PlayerMapController extends MapController implements IPlayerMapCont
 		// Ranges
 		rangesLayer = new RangesLayer("Detected ranges");
 		addLayer(rangesLayer);
-
-		resetMap();
 	}
 
 	private Player getPlayer() {
@@ -58,6 +49,13 @@ public class PlayerMapController extends MapController implements IPlayerMapCont
 			getPlayer().getMaze().clear();
 			// Clear detected ranges
 			clearRanges();
+		}
+	}
+
+	@Subscribe
+	public void rangeFeatureDetected(RangeFeatureDetectEvent e) {
+		if (getPlayer().equals(e.getPlayer())) {
+			rangesLayer.addRangeFeature(e.getFeature());
 		}
 	}
 

@@ -1,6 +1,5 @@
 package mazestormer.game;
 
-import java.util.EnumSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -13,12 +12,13 @@ import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
-import mazestormer.explore.ExplorerRunner;
-import mazestormer.maze.Edge.EdgeType;
-import mazestormer.maze.AbstractMazeListener;
+import mazestormer.explore.Explorer;
+import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.maze.TileShape;
+import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
@@ -34,10 +34,10 @@ public class GameRunner implements GameListener {
 
 	private final Player player;
 	private final Game game;
-	private final ExplorerRunner explorerRunner;
+	private final Explorer explorer;
 
-	private final PositionReporter positionReporter;
-	private final PositionPublisher positionPublisher;
+	private final PositionReporter positionReporter = new PositionReporter();
+	private final TileReporter tileReporter = new TileReporter();
 	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
@@ -46,83 +46,90 @@ public class GameRunner implements GameListener {
 
 	public GameRunner(Player player, Game game) {
 		this.player = player;
-		this.explorerRunner = new ExplorerRunner(player) {
+		this.explorer = new Explorer(player) {
 			@Override
 			protected void log(String message) {
 				GameRunner.this.log(message);
 			}
 		};
-		explorerRunner.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(this));
+		explorer.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(this));
 
 		this.game = game;
 		game.addGameListener(this);
-
-		this.positionReporter = new PositionReporter();
-		this.positionPublisher = new PositionPublisher();
 	}
 
 	protected void log(String message) {
 		System.out.println(message);
 	}
 
+	private Player getPlayer() {
+		return player;
+	}
+
 	private ControllableRobot getRobot() {
-		return (ControllableRobot) player.getRobot();
+		return (ControllableRobot) getPlayer().getRobot();
+	}
+
+	private IMaze getMaze() {
+		return getPlayer().getMaze();
 	}
 
 	public int getObjectNumber() {
 		return objectNumber;
 	}
 
-	public void setWallsOnNextTile() {
+	public void setObjectTile() {
 		log("Object on next tile, set walls");
 
-		// Set all unknown edges to walls
-		Tile nextTile = explorerRunner.getNextTile();
-		EnumSet<Orientation> unknownSides = nextTile.getUnknownSides();
-		for (Orientation side : unknownSides) {
-			explorerRunner.getMaze().setEdge(nextTile.getPosition(), side, EdgeType.WALL);
-		}
+		Tile currentTile = explorer.getCurrentTile();
+		Tile nextTile = explorer.getNextTile();
+		Orientation orientation = currentTile.orientationTo(nextTile);
+
+		// Make next tile a dead end
+		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
+
+		// Mark as explored
+		getMaze().setExplored(nextTile.getPosition());
 	}
 
 	public void setSeesawWalls() {
-		log("Seesaw on next tiles, set seesaw & barcode");
+		log("Seesaw on next tiles, set seesaw and barcode");
 
-		// Set all unknown edges to walls or open
-		Tile currentTile = explorerRunner.getCurrentTile();
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Tile nextTile = explorerRunner.getNextTile();
+		IMaze maze = getMaze();
 
+		Tile currentTile = explorer.getCurrentTile();
+		Tile nextTile = explorer.getNextTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
+		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
-		IMaze maze = player.getMaze();
-
-		LongPoint nextTilePosition = nextTile.getPosition();
-
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-
-		nextTilePosition = orientation.shift(nextTilePosition);
-
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
-
-		nextTilePosition = orientation.shift(nextTilePosition);
-
-		maze.setEdge(nextTilePosition, orientation.rotateClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation.rotateCounterClockwise(), EdgeType.WALL);
-		maze.setEdge(nextTilePosition, orientation, EdgeType.OPEN);
+		Barcode seesawBarcode = currentTile.getBarcode();
 		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
+
+		// Seesaw
+		LongPoint nextTilePosition = nextTile.getPosition();
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, seesawBarcode);
+
+		// Seesaw
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, otherBarcode);
+
+		// Other seesaw barcode
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setBarcode(nextTilePosition, otherBarcode);
+
+		// TODO Do we need to mark seesaw tiles as explored here?
 	}
 
-	public void objectFound() {
-		log("Report own object found");
+	public void objectFound(int teamNumber) {
+		log("Own object found, join team #" + teamNumber);
 		// Report object found
 		game.objectFound();
-		// Done
-		stopGame();
+		// Join team
+		game.joinTeam(teamNumber);
+		// TODO Start working together
 	}
 
 	public void onSeesaw(int barcode) {
@@ -137,31 +144,28 @@ public class GameRunner implements GameListener {
 	public void afterObjectBarcode() {
 		log("Object found, go to next tile");
 		// Skip next tile
-		explorerRunner.skipNextTile();
+		explorer.skipNextTile();
 		// Create new path
-		explorerRunner.createPath();
+		explorer.createPath();
 		// Object found action resolves after this
 	}
 
 	public boolean isRunning() {
-		return explorerRunner.isRunning();
+		return explorer.isRunning();
 	}
 
-	private void stopGame() {
-		// Stop
-		explorerRunner.stop();
-		// Stop pilot
-		getRobot().getPilot().stop();
-		// Stop reporting
-		stopPositionReport();
-	}
-
-	private void startPositionReport() {
+	private void startReporting() {
+		// Position
 		getRobot().getPilot().addMoveListener(positionReporter);
+		// Tiles
+		getPlayer().getMaze().addListener(tileReporter);
 	}
 
-	private void stopPositionReport() {
+	private void stopReporting() {
+		// Position
 		getRobot().getPilot().removeMoveListener(positionReporter);
+		// Tiles
+		getPlayer().getMaze().addListener(tileReporter);
 	}
 
 	@Override
@@ -185,25 +189,30 @@ public class GameRunner implements GameListener {
 		// Reset player pose
 		// TODO Do not reset when resuming from paused game?
 		getRobot().getPoseProvider().setPose(new Pose());
-		// Start
-		explorerRunner.start();
 		// Start reporting
-		startPositionReport();
+		startReporting();
+		// Start
+		explorer.start();
 	}
 
 	@Override
 	public void onGamePaused() {
 		// Pause
-		explorerRunner.pause();
+		explorer.pause();
 		// Stop pilot
 		getRobot().getPilot().stop();
 		// Stop reporting
-		stopPositionReport();
+		stopReporting();
 	}
 
 	@Override
 	public void onGameStopped() {
-		stopGame();
+		// Stop
+		explorer.stop();
+		// Stop pilot
+		getRobot().getPilot().stop();
+		// Stop reporting
+		stopReporting();
 	}
 
 	@Override
@@ -220,44 +229,51 @@ public class GameRunner implements GameListener {
 	public void onObjectFound(String playerID) {
 	}
 
+	@Override
+	public void onPartnerConnected(Player partner) {
+		// Send own maze
+		game.sendOwnTiles();
+	}
+
+	@Override
+	public void onPartnerDisconnected(Player partner) {
+	}
+
 	private class PositionReporter implements MoveListener {
 
 		private ScheduledFuture<?> task;
 
 		@Override
 		public void moveStarted(Move event, MoveProvider mp) {
-			if (task == null) {
-				// Start publishing
-				task = positionExecutor.scheduleWithFixedDelay(positionPublisher, 0, updateFrequency,
-						TimeUnit.MILLISECONDS);
-			}
+			if (task != null)
+				return;
+
+			// Start publishing
+			task = positionExecutor.scheduleWithFixedDelay(new Runnable() {
+				@Override
+				public void run() {
+					game.updatePosition(getRobot().getPoseProvider().getPose());
+				}
+			}, 0, updateFrequency, TimeUnit.MILLISECONDS);
 		}
 
 		@Override
 		public void moveStopped(Move event, MoveProvider mp) {
-			if (task != null) {
-				// Stop publishing
-				task.cancel(false);
-				task = null;
-			}
+			if (task == null)
+				return;
+
+			// Stop publishing
+			task.cancel(false);
+			task = null;
 		}
 
 	}
 
-	private class PositionPublisher implements Runnable {
-
-		@Override
-		public void run() {
-			game.updatePosition(getRobot().getPoseProvider().getPose());
-		}
-
-	}
-
-	private class TileReporter extends AbstractMazeListener {
+	private class TileReporter extends DefaultMazeListener {
 
 		@Override
 		public void tileExplored(Tile tile) {
-			game.sendTile(tile);
+			game.sendTiles(tile);
 		}
 
 	}

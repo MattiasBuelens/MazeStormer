@@ -9,16 +9,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
-import mazestormer.infrared.Model;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
@@ -33,23 +30,25 @@ public class Maze implements IMaze {
 	private final float edgeSize;
 	private final float barLength;
 
-	private Pose origin = new Pose();
-	private PoseTransform originTransform = new PoseTransform(origin);
+	private Pose origin;
+	private PoseTransform originTransform;
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
 	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
-	private final Mesh mesh;
-	private Map<Target, Tile> targets = new EnumMap<Target, Tile>(Target.class);
+	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(Target.class);
 	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
+
+	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
 
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
 		this.barLength = barLength;
-		this.mesh = new Mesh(this);
+
+		setOriginToDefault();
 	}
 
 	public Maze(float tileSize, float edgeSize) {
@@ -64,77 +63,70 @@ public class Maze implements IMaze {
 		this(defaultTileSize);
 	}
 
-	/**
-	 * Get the size of a tile in this maze.
-	 */
-	public float getTileSize() {
+	@Override
+	public final float getTileSize() {
 		return tileSize;
 	}
 
-	/**
-	 * Get the size of an edge in this maze.
-	 */
-	public float getEdgeSize() {
+	@Override
+	public final float getEdgeSize() {
 		return edgeSize;
 	}
 
-	/**
-	 * Get the length of a bar in this maze.
-	 */
-	public float getBarLength() {
+	@Override
+	public final float getBarLength() {
 		return barLength;
 	}
 
-	/**
-	 * Get the pose of the robot at the bottom left corner of the origin tile,
-	 * i.e. the tile at {@code (0, 0)}.
-	 * 
-	 * This pose is used to translate between the absolute pose of the robot and
-	 * its relative pose on the maze.
-	 */
-	public Pose getOrigin() {
+	@Override
+	public final Pose getOrigin() {
 		return origin;
 	}
 
-	/**
-	 * Set the pose of the robot at the bottom left corner of the origin tile.
-	 * 
-	 * @param origin
-	 *            The new origin pose.
-	 */
-	public void setOrigin(Pose origin) {
+	@Override
+	public final Pose getDefaultOrigin() {
+		Pose origin = new Pose();
+		origin.setLocation(getTileCenter(new LongPoint(0, 0)).reverse());
+		origin.setHeading(0f);
+		return origin;
+	}
+
+	@Override
+	public final void setOrigin(Pose origin) {
 		this.origin = origin;
 		this.originTransform = new PoseTransform(origin);
 
 		fireMazeOriginChanged();
 	}
 
-	/**
-	 * Get the mesh of this maze.
-	 */
-	public Mesh getMesh() {
-		return mesh;
+	@Override
+	public final void setOriginToDefault() {
+		setOrigin(getDefaultOrigin());
 	}
 
-	public int getNumberOfTiles() {
-		return tiles.values().size();
+	private long minX = 0;
+	private long maxX = 0;
+	private long minY = 0;
+	private long maxY = 0;
+
+	@Override
+	public final long getMinX() {
+		return this.minX;
 	}
 
-	/**
-	 * Get the tile at the given tile position.
-	 * 
-	 * @param tilePosition
-	 *            The tile position.
-	 */
-	public Tile getTileAt(LongPoint tilePosition) {
-		checkNotNull(tilePosition);
-		// Try to get tile
-		Tile tile = tiles.get(tilePosition);
-		if (tile == null) {
-			// Create tile
-			tile = createTile(tilePosition);
-		}
-		return tile;
+	@Override
+	public final long getMaxX() {
+		return this.maxX;
+	}
+
+	@Override
+	public final long getMinY() {
+		return this.minY;
+	}
+
+	@Override
+	public final long getMaxY() {
+		return this.maxY;
 	}
 
 	private Tile createTile(LongPoint tilePosition) {
@@ -158,27 +150,6 @@ public class Maze implements IMaze {
 		return tile;
 	}
 
-	private long minX = 0;
-	private long maxX = 0;
-	private long minY = 0;
-	private long maxY = 0;
-
-	public long getMinX() {
-		return this.minX;
-	}
-
-	public long getMaxX() {
-		return this.maxX;
-	}
-
-	public long getMinY() {
-		return this.minY;
-	}
-
-	public long getMaxY() {
-		return this.maxY;
-	}
-
 	private void updateMinMax(Tile newTile) {
 		this.minX = Math.min(getMinX(), newTile.getX());
 		this.maxX = Math.max(getMaxX(), newTile.getX());
@@ -186,47 +157,109 @@ public class Maze implements IMaze {
 		this.maxY = Math.max(getMaxY(), newTile.getY());
 	}
 
-	/**
-	 * Get the tile at the given tile position.
-	 * 
-	 * @param tilePosition
-	 *            The tile position.
-	 */
+	@Override
+	public Tile getTileAt(LongPoint tilePosition) {
+		checkNotNull(tilePosition);
+		// Try to get tile
+		Tile tile = tiles.get(tilePosition);
+		if (tile == null) {
+			// Create tile
+			tile = createTile(tilePosition);
+		}
+		return tile;
+	}
+
+	@Override
 	public Tile getTileAt(Point2D tilePosition) {
 		checkNotNull(tilePosition);
 		return getTileAt(new LongPoint(tilePosition));
 	}
 
+	@Override
 	public Tile getNeighbor(Tile tile, Orientation direction) {
 		LongPoint neighborPosition = direction.shift(tile.getPosition());
 		return tiles.get(neighborPosition);
 	}
 
+	@Override
 	public Tile getOrCreateNeighbor(Tile tile, Orientation direction) {
 		LongPoint neighborPosition = direction.shift(tile.getPosition());
 		return getTileAt(neighborPosition);
 	}
 
-	/**
-	 * Get all tiles on this maze.
-	 */
+	@Override
 	public Collection<Tile> getTiles() {
 		return Collections.unmodifiableCollection(tiles.values());
 	}
 
-	/**
-	 * Set an edge on this maze.
-	 * 
-	 * @param tilePosition
-	 *            The tile position.
-	 * @param orientation
-	 *            The edge orientation.
-	 * @param type
-	 *            The edge type.
-	 */
+	@Override
+	public int getNumberOfTiles() {
+		return getTiles().size();
+	}
+
+	@Override
+	public Collection<Tile> getExploredTiles() {
+		List<Tile> exploredTiles = new ArrayList<Tile>();
+		for (Tile tile : getTiles()) {
+			if (tile.isExplored()) {
+				exploredTiles.add(tile);
+			}
+		}
+		return exploredTiles;
+	}
+
+	@Override
+	public void importTile(Tile tile) {
+		importTile(tile, TileTransform.getIdentity());
+	}
+
+	@Override
+	public void importTile(Tile tile, TileTransform tileTransform) {
+		LongPoint tilePosition = tileTransform.transform(tile.getPosition());
+		// Edges
+		for (Orientation orientation : Orientation.values()) {
+			// Get edge type
+			EdgeType edgeType = tile.getEdgeAt(orientation).getType();
+			// Ignore unknown edges
+			if (edgeType == EdgeType.UNKNOWN)
+				continue;
+			// Place edge
+			setEdge(tilePosition, tileTransform.transform(orientation), edgeType);
+		}
+		// Barcode
+		if (tile.hasBarcode()) {
+			setBarcode(tilePosition, tile.getBarcode());
+		}
+		// Explored
+		if (tile.isExplored()) {
+			setExplored(tilePosition);
+		}
+		// Seesaw
+		if (tile.isSeesaw()) {
+			setSeesaw(tilePosition, tile.getSeesawBarcode());
+		}
+	}
+
+	@Override
+	public void importTiles(Iterable<Tile> tiles) {
+		importTiles(tiles, TileTransform.getIdentity());
+	}
+
+	@Override
+	public void importTiles(Iterable<Tile> tiles, TileTransform tileTransform) {
+		for (Tile tile : tiles) {
+			importTile(tile, tileTransform);
+		}
+	}
+
+	@Override
 	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type) {
 		Tile tile = getTileAt(tilePosition);
 		Edge edge = tile.getEdgeAt(orientation);
+
+		// Set edge
+		if (edge.getType() == type)
+			return;
 		edge.setType(type);
 
 		// Fire edge changed event
@@ -239,26 +272,30 @@ public class Maze implements IMaze {
 		}
 	}
 
-	/**
-	 * Set the barcode of a tile.
-	 * 
-	 * @param position
-	 *            The tile position.
-	 * @param barcode
-	 *            The barcode.
-	 * 
-	 * @throws IllegalStateException
-	 *             If the tile at the given position does not accept barcodes.
-	 */
+	@Override
+	public void setTileShape(LongPoint tilePosition, TileShape shape) {
+		for (Orientation orientation : shape.getType().getWalls(shape.getOrientation())) {
+			setEdge(tilePosition, orientation, EdgeType.WALL);
+		}
+		for (Orientation orientation : shape.getType().getOpenings(shape.getOrientation())) {
+			setEdge(tilePosition, orientation, EdgeType.OPEN);
+		}
+	}
+
+	@Override
 	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
-		// Set barcode
 		Tile tile = getTileAt(position);
+
+		// Set barcode
+		if (tile.hasBarcode() && tile.getBarcode().equals(barcode))
+			return;
 		tile.setBarcode(barcode);
 
 		// Fire tile changed event
 		fireTileChanged(tile);
 	}
 
+	@Override
 	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException {
 		setBarcode(position, new Barcode(barcode));
 	}
@@ -268,7 +305,7 @@ public class Maze implements IMaze {
 		checkNotNull(barcode);
 
 		for (Tile tile : tiles.values()) {
-			if (tile.getBarcode().equals(barcode)) {
+			if (tile.hasBarcode() && tile.getBarcode().equals(barcode)) {
 				return tile;
 			}
 		}
@@ -282,19 +319,77 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setExplored(LongPoint position) {
-		Tile tile = getTileAt(position);
-		if (!tile.isExplored()) {
-			// Set explored
-			tile.setExplored();
-			// Fire tile explored event
-			fireTileExplored(tile);
-		}
+	public Seesaw getSeesaw(Barcode barcode) {
+		return seesaws.get(barcode);
 	}
 
-	/**
-	 * Clear this maze, removing all tiles and edges.
-	 */
+	@Override
+	public Seesaw getSeesaw(byte barcode) {
+		return getSeesaw(new Barcode(barcode));
+	}
+
+	@Override
+	public Seesaw getOrCreateSeesaw(Barcode barcode) {
+		checkNotNull(barcode);
+
+		Seesaw seesaw = getSeesaw(barcode);
+		if (seesaw == null) {
+			seesaw = new Seesaw(barcode);
+			registerSeesaw(seesaw);
+		}
+		return seesaw;
+	}
+
+	@Override
+	public Seesaw getOrCreateSeesaw(byte barcode) {
+		return getOrCreateSeesaw(new Barcode(barcode));
+	}
+
+	@Override
+	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode) {
+		Tile tile = getTileAt(tilePosition);
+
+		// Set seesaw
+		if (tile.isSeesaw() && tile.getSeesawBarcode().equals(seesawBarcode))
+			return;
+		tile.setSeesaw(getOrCreateSeesaw(seesawBarcode), seesawBarcode);
+
+		// Fire tile changed event
+		fireTileChanged(tile);
+	}
+
+	private void registerSeesaw(Seesaw seesaw) {
+		seesaws.put(seesaw.getLowestBarcode(), seesaw);
+		seesaws.put(seesaw.getHighestBarcode(), seesaw);
+	}
+
+	@Override
+	public Tile getSeesawTile(Barcode barcode) {
+		checkNotNull(barcode);
+
+		for (Tile tile : tiles.values()) {
+			if (tile.isSeesaw() && tile.getSeesawBarcode().equals(barcode)) {
+				return tile;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void setExplored(LongPoint position) {
+		Tile tile = getTileAt(position);
+
+		// Set explored
+		if (tile.isExplored())
+			return;
+		tile.setExplored();
+
+		// Fire tile explored event
+		fireTileExplored(tile);
+	}
+
+	@Override
 	public void clear() {
 		tiles.clear();
 		lines.clear();
@@ -302,17 +397,13 @@ public class Maze implements IMaze {
 		fireMazeCleared();
 	}
 
-	/**
-	 * Add a maze listener.
-	 */
+	@Override
 	public void addListener(MazeListener listener) {
 		checkNotNull(listener);
 		listeners.add(listener);
 	}
 
-	/**
-	 * Remove a maze listener.
-	 */
+	@Override
 	public void removeListener(MazeListener listener) {
 		checkNotNull(listener);
 		listeners.remove(listener);
@@ -358,123 +449,68 @@ public class Maze implements IMaze {
 		}
 	}
 
-	/**
-	 * Get the absolute position in robot coordinates of the given relative
-	 * position in map coordinates.
-	 * 
-	 * @param relativePosition
-	 *            The relative position.
-	 */
+	@Override
 	public Point toAbsolute(Point relativePosition) {
 		checkNotNull(relativePosition);
 		return originTransform.transform(relativePosition);
 	}
 
-	/**
-	 * Get the absolute heading in robot coordinates of the given relative
-	 * heading in map coordinates.
-	 * 
-	 * @param relativeHeading
-	 *            The relative heading.
-	 */
+	@Override
 	public float toAbsolute(float relativeHeading) {
 		return originTransform.transform(relativeHeading);
 	}
 
-	/**
-	 * Get the absolute pose in robot coordinates of the given relative pose in
-	 * map coordinates.
-	 * 
-	 * @param relativePose
-	 *            The relative pose.
-	 */
+	@Override
 	public Pose toAbsolute(Pose relativePose) {
 		checkNotNull(relativePose);
 		return originTransform.transform(relativePose);
 	}
 
-	/**
-	 * Get the relative position in map coordinates of the given absolute
-	 * position in robot coordinates.
-	 * 
-	 * @param absolutePosition
-	 *            The absolute position.
-	 */
+	@Override
 	public Point toRelative(Point absolutePosition) {
 		checkNotNull(absolutePosition);
 		return originTransform.inverseTransform(absolutePosition);
 	}
 
-	/**
-	 * Get the relative heading in map coordinates of the given absolute heading
-	 * in robot coordinates.
-	 * 
-	 * @param absoluteHeading
-	 *            The absolute heading.
-	 */
+	@Override
 	public float toRelative(float absoluteHeading) {
 		return originTransform.inverseTransform(absoluteHeading);
 	}
 
-	/**
-	 * Get the relative pose in map coordinates of the given absolute pose in
-	 * robot coordinates.
-	 * 
-	 * @param absolutePose
-	 *            The absolute pose.
-	 */
+	@Override
 	public Pose toRelative(Pose absolutePose) {
 		checkNotNull(absolutePose);
 		return originTransform.inverseTransform(absolutePose);
 	}
 
-	/**
-	 * Get the position in tile coordinates of the given relative position in
-	 * map coordinates.
-	 * 
-	 * @param relativePosition
-	 *            The relative position.
-	 */
+	@Override
 	public Point toTile(Point relativePosition) {
 		double x = relativePosition.getX() / getTileSize();
 		double y = relativePosition.getY() / getTileSize();
 		return new Point((float) x, (float) y);
 	}
 
-	/**
-	 * Get the relative position in map coordinates of the bottom left corner of
-	 * the given tile position.
-	 * 
-	 * @param tilePosition
-	 *            The tile position.
-	 */
+	@Override
 	public Point fromTile(Point tilePosition) {
 		return tilePosition.multiply(getTileSize());
 	}
 
-	/**
-	 * Get a collection of all edges as lines, in relative coordinates.
-	 */
+	@Override
+	public Point getTileCenter(LongPoint tilePosition) {
+		return fromTile(tilePosition.toPoint().add(new Point(0.5f, 0.5f)));
+	}
+
+	@Override
 	public Collection<Line> getEdgeLines() {
 		return Collections.unmodifiableCollection(lines.values());
 	}
 
-	/**
-	 * Get the line of an edge, in relative coordinates.
-	 * 
-	 * @param edge
-	 *            The edge.
-	 */
+	@Override
 	public Line getEdgeLine(Edge edge) {
 		return createEdgeLine(edge);
 	}
 
-	/**
-	 * Get the boundaries of an edge, in relative coordinates.
-	 * 
-	 * @param edge
-	 *            The edge.
-	 */
+	@Override
 	public Rectangle2D getEdgeBounds(Edge edge) {
 		// Get edge line
 		Line line = getEdgeLine(edge);
@@ -517,15 +553,7 @@ public class Maze implements IMaze {
 		return new Line(p1.x, p1.y, p2.x, p2.y);
 	}
 
-	/**
-	 * Get a list of bar rectangles representing the barcode from the given
-	 * tile, in tile coordinates relative to the tile position.
-	 * 
-	 * @param tile
-	 *            The tile with barcode.
-	 * @return A list of rectangles with an odd number of bars, starting and
-	 *         ending with the bounds of a terminating black bar.
-	 */
+	@Override
 	public List<Rectangle2D> getBarcodeBars(Tile tile) {
 		if (!tile.hasBarcode())
 			return Collections.emptyList();
@@ -558,44 +586,40 @@ public class Maze implements IMaze {
 		return bars;
 	}
 
+	@Override
 	public Tile getTarget(Target target) {
-		return targets.get(target);
+		return getTileAt(targets.get(target));
 	}
 
+	@Override
 	public void setTarget(Target target, Tile tile) {
 		checkNotNull(target);
 		checkNotNull(tile);
-		targets.put(target, tile);
+		targets.put(target, tile.getPosition());
 	}
 
+	@Override
 	public Pose getStartPose(int playerNumber) {
 		return startPoses.get(playerNumber);
 	}
 
+	@Override
 	public void setStartPose(int playerNumber, Pose pose) {
 		startPoses.put(playerNumber, checkNotNull(pose));
 	}
 
+	@Override
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
 		// Center on tile
-		Point centerPosition = tilePosition.toPoint().add(new Point(0.5f, 0.5f));
-		Point position = fromTile(centerPosition);
-		float angle = orientation.getAngle();
+		Point relativePosition = getTileCenter(tilePosition);
+		float relativeAngle = orientation.getAngle();
 		// Create and set pose
 		Pose pose = new Pose();
-		pose.setLocation(position);
-		pose.setHeading(angle);
+		pose.setLocation(relativePosition);
+		pose.setHeading(relativeAngle);
 		// Transform to absolute coordinates
 		pose = toAbsolute(pose);
 		setStartPose(playerNumber, pose);
 	}
 
-	public Tile getSeesawTile(Barcode barcode) {
-		for (Tile tile : tiles.values()) {
-			if (tile.isSeesaw() && tile.getSeesawBarcode().equals(barcode)) {
-				return tile;
-			}
-		}
-		return null;
-	}
 }

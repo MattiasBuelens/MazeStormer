@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mazestormer.infrared.Model;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.RelativePlayer;
@@ -19,7 +21,7 @@ import mazestormer.player.RelativePlayer;
 public class World {
 
 	private final AbsolutePlayer localPlayer;
-	private final Maze maze = new Maze();
+	private final IMaze maze = new Maze();
 	private final Logger logger;
 	private final Map<String, AbsolutePlayer> players = new HashMap<String, AbsolutePlayer>();
 	private final List<WorldListener> listeners = new ArrayList<WorldListener>();
@@ -36,7 +38,7 @@ public class World {
 		this(new AbsolutePlayer(localPlayer));
 	}
 
-	public Maze getMaze() {
+	public IMaze getMaze() {
 		return maze;
 	}
 
@@ -59,7 +61,8 @@ public class World {
 	public void addPlayer(AbsolutePlayer player) {
 		players.put(player.getPlayerID(), player);
 		addModel(player.getIRRobot());
-		
+
+		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerAdded(player);
 		}
@@ -67,12 +70,31 @@ public class World {
 
 	public void removePlayer(AbsolutePlayer player) {
 		players.remove(player.getPlayerID());
-		
-		//TODO: de oude robot zijn ir robot kan nog steeds in de set aanwezig zijn
+
+		// TODO: de oude robot zijn ir robot kan nog steeds in de set aanwezig zijn
 		removeModel(player.getIRRobot());
-		
+
+		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerRemoved(player);
+		}
+	}
+
+	/**
+	 * Remove all non-local players.
+	 */
+	public void removeOtherPlayers() {
+		Iterator<AbsolutePlayer> it = players.values().iterator();
+		while (it.hasNext()) {
+			AbsolutePlayer player = it.next();
+			if (player != getLocalPlayer()) {
+				// Remove
+				it.remove();
+				// Call listeners
+				for (WorldListener listener : listeners) {
+					listener.playerRemoved(player);
+				}
+			}
 		}
 	}
 
@@ -83,7 +105,7 @@ public class World {
 		// Set and add with new name
 		player.setPlayerID(newPlayerID);
 		players.put(newPlayerID, player);
-
+		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerRenamed(player);
 		}
@@ -100,40 +122,40 @@ public class World {
 	public Logger getLogger() {
 		return logger;
 	}
-	
+
 	// TODO: Objects and ir circuits need to be added after parsing
-	
+
 	private final Set<Model> models = new HashSet<Model>();
-	
+
 	public void addModel(Model model) {
 		this.models.add(model);
 	}
-	
+
 	public void removeModel(Model model) {
 		this.models.remove(model);
 	}
-	
+
 	public Set<Model> getModels() {
 		return Collections.unmodifiableSet(this.models);
 	}
-	
-    public <T extends Model> Set<T> getAllStrictModelsClass(Class<T> clazz) {
-       Set<T> temp = new HashSet<T>();
-       for(Model model : this.models) {
-    	   if (model.getClass() == clazz) {
-    		   temp.add(clazz.cast(model));
-    	   }
-        }
-        return Collections.unmodifiableSet(temp);
-    }
-    
-    public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType){
-    	Set<T> temp = new HashSet<T>();
-        for(Model model : this.models) {
-     	   if (modelType.isInstance(model)) {
-     		   temp.add(modelType.cast(model));
-     	   }
-         }
-         return Collections.unmodifiableSet(temp);
-    }
+
+	public <T extends Model> Set<T> getAllStrictModelsClass(Class<T> clazz) {
+		Set<T> temp = new HashSet<T>();
+		for (Model model : this.models) {
+			if (model.getClass() == clazz) {
+				temp.add(clazz.cast(model));
+			}
+		}
+		return Collections.unmodifiableSet(temp);
+	}
+
+	public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType) {
+		Set<T> temp = new HashSet<T>();
+		for (Model model : this.models) {
+			if (modelType.isInstance(model)) {
+				temp.add(modelType.cast(model));
+			}
+		}
+		return Collections.unmodifiableSet(temp);
+	}
 }

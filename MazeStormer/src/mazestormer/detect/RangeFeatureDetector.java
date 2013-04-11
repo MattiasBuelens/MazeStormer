@@ -2,6 +2,7 @@ package mazestormer.detect;
 
 import lejos.robotics.objectdetection.FeatureDetector;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.util.Future;
 
 public interface RangeFeatureDetector extends FeatureDetector {
 
@@ -26,6 +27,12 @@ public interface RangeFeatureDetector extends FeatureDetector {
 	public RangeFeature scan();
 
 	/**
+	 * Performs a single scan for an object and returns the results
+	 * asynchronously.
+	 */
+	public Future<RangeFeature> scanAsync();
+
+	/**
 	 * Performs a single scan for an object at the given angles and returns the
 	 * results. If an object is not detected, this method returns <b>null</b>.
 	 * 
@@ -35,5 +42,29 @@ public interface RangeFeatureDetector extends FeatureDetector {
 	 * @see {@link #scan()}
 	 */
 	public RangeFeature scan(float[] angles);
+
+	/**
+	 * Performs a single scan for an object at the given angles and returns the
+	 * results asynchronously.
+	 * 
+	 * @param angles
+	 *            The angles to scan at.
+	 * @see {@link #scanAsync()}
+	 */
+	public Future<RangeFeature> scanAsync(float[] angles);
+
+	/**
+	 * Add a range feature listener.
+	 * 
+	 * @param listener
+	 */
+	public void addListener(RangeFeatureListener listener);
+
+	/**
+	 * Remove a range feature listener.
+	 * 
+	 * @param listener
+	 */
+	public void removeListener(RangeFeatureListener listener);
 
 }

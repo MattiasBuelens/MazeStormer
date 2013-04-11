@@ -15,13 +15,13 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
-			Orientation.class);
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
 
 	/*
 	 * Exploration
 	 */
 	private boolean isExplored = false;
+	private boolean ignoreFlag = false;
 
 	/*
 	 * Barcode
@@ -31,9 +31,8 @@ public class Tile {
 	/*
 	 * Seesaw
 	 */
+	private Seesaw seesaw;
 	private Barcode seesawBarcode;
-	private boolean seesawOpen = false;
-	private Barcode otherSeesawBarcode;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -82,7 +81,11 @@ public class Tile {
 	}
 
 	public void setExplored() {
-		isExplored = true;
+		setExplored(true);
+	}
+
+	private void setExplored(boolean isExplored) {
+		this.isExplored = isExplored;
 	}
 
 	public boolean hasBarcode() {
@@ -95,8 +98,7 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException(
-					"Tile type does not support barcodes.");
+			throw new IllegalStateException("Tile type does not support barcodes.");
 		this.barcode = barcode;
 	}
 
@@ -110,14 +112,19 @@ public class Tile {
 	}
 
 	public boolean isSeesaw() {
-		return getSeesawBarcode() != null;
+		return getSeesaw() != null;
+	}
+
+	public Seesaw getSeesaw() {
+		return seesaw;
 	}
 
 	public Barcode getSeesawBarcode() {
 		return seesawBarcode;
 	}
 
-	public void setSeesawBarcode(Barcode seesawBarcode) {
+	public void setSeesaw(Seesaw seesaw, Barcode seesawBarcode) {
+		this.seesaw = seesaw;
 		this.seesawBarcode = seesawBarcode;
 	}
 
@@ -128,23 +135,15 @@ public class Tile {
 	 * VirtualIRSensor.
 	 */
 	public boolean isSeesawOpen() {
-		return seesawOpen;
+		return seesaw.isOpen(seesawBarcode);
 	}
 
-	public void setSeesawOpen(boolean seesawOpen) {
-		this.seesawOpen = seesawOpen;
+	public boolean getIgnoreFlag() {
+		return this.ignoreFlag;
 	}
 
-	public void flipSeesaw() {
-		setSeesawOpen(!isSeesawOpen());
-	}
-
-	public Barcode getOtherSeesawBarcode() {
-		return this.otherSeesawBarcode;
-	}
-
-	public void setOtherSeesawBarcode(Barcode barcode) {
-		this.otherSeesawBarcode = barcode;
+	public void setIgnoreFlag(boolean flag) {
+		this.ignoreFlag = flag;
 	}
 
 	public TileShape getShape() {
@@ -173,75 +172,6 @@ public class Tile {
 
 	public EnumSet<Orientation> getUnknownSides() {
 		return getSidesByType(EdgeType.UNKNOWN);
-	}
-
-	// TODO: maak methode om een geroteerde kopie van deze tegel terug te geven
-
-	/**
-	 * Returns a copy of this tile that was rotated n*90° counterclockwise,
-	 * where n is the given number of rotations.
-	 * 
-	 * @param amount
-	 *            The amount of times there should be rotated.
-	 */
-	public Tile getCopyRotatedClockwise(int amount) {
-		// create a copy of this tile
-		Tile tile = this.getCopy();
-
-		// rotate the edges
-		for (Orientation orientation : Orientation.values()) {
-			tile.setEdge(orientation,
-					this.getEdgeAt(orientation.rotateCounterClockwise(amount))
-							.getType());
-		}
-		return tile;
-	}
-
-	/**
-	 * Returns a new tile that has the same location, barcode and edges.
-	 * 
-	 * @return
-	 */
-	public Tile getCopy() {
-		// create tile at right position
-		Tile tile = new Tile(this.getPosition());
-
-		if (this.hasBarcode()) {
-			// set the barcode to an identical barcode
-			tile.setBarcode(new Barcode(this.getBarcode().getValue()));
-		}
-
-		// set the types of the edges
-		for (Orientation orientation : Orientation.values()) {
-			tile.setEdge(orientation, this.getEdgeAt(orientation).getType());
-		}
-		
-		// set the explored-flag
-		if (this.isExplored)
-			tile.setExplored();
-
-		return tile;
-	}
-
-	public void updateTile(Tile otherTile) {
-		if (otherTile.hasBarcode()) {
-			// set the barcode to an identical barcode
-			this.setBarcode(new Barcode(this.getBarcode().getValue()));
-		}
-
-		// set the types of the edges
-		for (Orientation orientation : Orientation.values()) {
-			this.setEdge(orientation, otherTile.getEdgeAt(orientation)
-					.getType());
-		}
-
-		// set the explored-flag
-		if (otherTile.isExplored) {
-			this.setExplored();
-		} else {
-			this.isExplored = false;
-		}
-
 	}
 
 }

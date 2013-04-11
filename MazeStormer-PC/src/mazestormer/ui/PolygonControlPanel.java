@@ -76,8 +76,8 @@ public class PolygonControlPanel extends ViewPanel {
 	}
 
 	private void createNbSides() {
-		nbSidesModel = new SpinnerNumberModel(new Integer(2), new Integer(2),
-				null, new Integer(1));
+		nbSidesModel = new SpinnerNumberModel(Integer.valueOf(2), Integer.valueOf(2),
+				null, Integer.valueOf(1));
 
 		JLabel lblNbSides = new JLabel("Number of sides");
 		container.add(lblNbSides, "cell 0 0,grow");

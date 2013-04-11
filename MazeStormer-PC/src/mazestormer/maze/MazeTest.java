@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class MazeTest {
 
-	private Maze maze;
+	private IMaze maze;
 
 	@Before
 	public void setup() {

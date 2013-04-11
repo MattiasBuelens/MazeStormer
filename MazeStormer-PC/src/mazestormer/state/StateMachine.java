@@ -2,7 +2,6 @@ package mazestormer.state;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import mazestormer.util.AbstractFuture;
@@ -245,29 +244,26 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 *            The next state.
 	 */
 	protected void bindTransition(final Future<?> future, final S nextState) {
+		// Register binding
+		addBinding(future);
+		// Listen for future completion
 		future.addFutureListener(new FutureListener<Object>() {
 			@Override
-			public void futureResolved(Future<?> future) {
-				try {
-					Object result = future.get();
-					if (result instanceof Boolean && !((Boolean) result).booleanValue()) {
-						// Interrupt, retry needed
-						pause();
-					} else {
-						// Successfully completed, transition
-						transition(nextState);
-					}
-				} catch (InterruptedException | ExecutionException cannotHappen) {
+			public void futureResolved(Future<? extends Object> future, Object result) {
+				if (result instanceof Boolean && !((Boolean) result).booleanValue()) {
+					// Interrupt, retry needed
+					pause();
+				} else {
+					// Successfully completed, transition
+					transition(nextState);
 				}
 			}
 
 			@Override
-			public void futureCancelled(Future<?> future) {
+			public void futureCancelled(Future<? extends Object> future) {
 				// Ignore
 			}
 		});
-		// Register binding
-		addBinding(future);
 	}
 
 	/**
@@ -351,7 +347,7 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		return (M) this;
 	}
 
-	protected class StateFuture<T extends State<?, ?>> extends AbstractFuture<Boolean> implements StateListener<T> {
+	public static class StateFuture<T extends State<?, ?>> extends AbstractFuture<Boolean> implements StateListener<T> {
 
 		private final T checkState;
 
@@ -390,6 +386,46 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 				resolve(true);
 			}
 		}
+
+	}
+
+	public static abstract class FinishFuture<T extends State<?, ?>> extends AbstractFuture<Void> implements
+			StateListener<T> {
+
+		@Override
+		public void stateStarted() {
+		}
+
+		@Override
+		public void stateStopped() {
+			// Failed
+			cancel();
+		}
+
+		@Override
+		public void stateFinished() {
+			if (isFinished()) {
+				// Success
+				resolve(null);
+			} else {
+				// Failed
+				cancel();
+			}
+		}
+
+		@Override
+		public void statePaused(T currentState, boolean onTransition) {
+		}
+
+		@Override
+		public void stateResumed(T currentState) {
+		}
+
+		@Override
+		public void stateTransitioned(T nextState) {
+		}
+
+		public abstract boolean isFinished();
 
 	}
 

@@ -2,7 +2,7 @@ package mazestormer.maze.parser;
 
 import java.text.ParseException;
 
-public class DimensionToken implements Token {
+public final class DimensionToken implements Token {
 
 	private final long value;
 

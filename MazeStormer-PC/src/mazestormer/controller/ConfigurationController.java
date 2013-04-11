@@ -8,7 +8,7 @@ import java.text.ParseException;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.connect.RobotType;
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.parser.FileUtils;
 import mazestormer.maze.parser.Parser;
 import mazestormer.robot.Pilot;
@@ -101,7 +101,7 @@ public class ConfigurationController extends SubController implements
 
 	@Override
 	public void loadMaze(String mazeFilePath) {
-		Maze maze = getMainController().getWorld().getMaze();
+		IMaze maze = getMainController().getWorld().getMaze();
 		CharSequence contents;
 		try {
 			contents = FileUtils.load(mazeFilePath);

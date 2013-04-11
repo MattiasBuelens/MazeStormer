@@ -1,11 +1,11 @@
 package mazestormer.ui.map;
 
 import java.awt.Rectangle;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.batik.dom.AbstractDocument;
 import org.w3c.dom.Element;
@@ -13,12 +13,10 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGRect;
 import org.w3c.dom.svg.SVGSVGElement;
 
-public class MapDocument {
+public class MapDocument extends MapElement {
 
 	private SVGDocument document;
-
-	private SortedMap<MapLayer, Element> layers = new TreeMap<MapLayer, Element>(
-			new MapLayer.ZIndexComparator());
+	private Map<MapLayer, Element> layers = new HashMap<MapLayer, Element>();
 
 	public MapDocument() {
 		document = SVGUtils.createSVGDocument();
@@ -38,13 +36,19 @@ public class MapDocument {
 	}
 
 	public void addLayer(MapLayer layer) {
+		if (layers.containsKey(layer)) {
+			throw new IllegalArgumentException("Already added layer: " + layer.getName());
+		}
 		layers.put(layer, null);
-		buildLayers();
+		invokeBuildLayers();
 	}
 
 	public void removeLayer(MapLayer layer) {
+		if (!layers.containsKey(layer)) {
+			throw new IllegalArgumentException("Already removed layer: " + layer.getName());
+		}
 		layers.remove(layer);
-		buildLayers();
+		invokeBuildLayers();
 	}
 
 	protected void buildLayers() {
@@ -52,17 +56,28 @@ public class MapDocument {
 		Element root = document.getDocumentElement();
 		// Remove previous elements
 		SVGUtils.removeChildNodes(root);
+		// Sort layers on z-index
+		MapLayer[] sortedLayers = layers.keySet().toArray(new MapLayer[0]);
+		Arrays.sort(sortedLayers, new MapLayer.ZIndexComparator());
 		// Add elements
-		for (Map.Entry<MapLayer, Element> entry : layers.entrySet()) {
-			Element layerElement = entry.getValue();
+		for (MapLayer layer : sortedLayers) {
+			Element layerElement = layers.get(layer);
 			if (layerElement == null) {
 				// Create layer element
-				MapLayer layer = entry.getKey();
 				layerElement = layer.build((AbstractDocument) document);
-				entry.setValue(layerElement);
+				layers.put(layer, layerElement);
 			}
 			root.appendChild(layerElement);
 		}
+	}
+
+	protected void invokeBuildLayers() {
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				buildLayers();
+			}
+		});
 	}
 
 	/**

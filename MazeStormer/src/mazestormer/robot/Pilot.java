@@ -7,11 +7,6 @@ import mazestormer.util.Future;
 public interface Pilot extends RotateMoveController {
 
 	/**
-	 * The frequency of movement reports, in milliseconds.
-	 */
-	public static final long movementReportFrequency = 100;
-
-	/**
 	 * Starts the robot turning left (counter-clockwise).
 	 */
 	public void rotateLeft();

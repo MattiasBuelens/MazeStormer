@@ -10,10 +10,10 @@ import mazestormer.maze.PoseTransform;
 import mazestormer.robot.Robot;
 import mazestormer.world.IRDelegate;
 
-public class AbsolutePlayer extends Player {
+public class AbsolutePlayer implements Player {
 
 	private final RelativePlayer delegate;
-	private PoseTransform transform = new PoseTransform();
+	private PoseTransform transform = PoseTransform.getIdentity();
 
 	private final Robot robot;
 	private final IRDelegate irDelegate;
@@ -66,6 +66,16 @@ public class AbsolutePlayer extends Player {
 	@Override
 	public Logger getLogger() {
 		return delegate().getLogger();
+	}
+
+	@Override
+	public void addPlayerListener(PlayerListener listener) {
+		delegate().addPlayerListener(listener);
+	}
+
+	@Override
+	public void removePlayerListener(PlayerListener listener) {
+		delegate().removePlayerListener(listener);
 	}
 
 	public void setRelativePose(Pose pose) {

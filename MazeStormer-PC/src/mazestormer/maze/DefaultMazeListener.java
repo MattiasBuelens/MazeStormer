@@ -2,7 +2,7 @@ package mazestormer.maze;
 
 import lejos.robotics.navigation.Pose;
 
-public abstract class AbstractMazeListener implements MazeListener {
+public class DefaultMazeListener implements MazeListener {
 
 	@Override
 	public void tileAdded(Tile tile) {

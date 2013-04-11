@@ -4,9 +4,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Comparator;
 
-import mazestormer.ui.map.event.MapLayerHandler;
-import mazestormer.util.AbstractEventSource;
-
 import org.apache.batik.dom.AbstractDocument;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGStylableElement;
@@ -16,16 +13,20 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.css.CSSStyleDeclaration;
+import org.w3c.dom.svg.SVGDescElement;
 
-public abstract class MapLayer extends AbstractEventSource implements
-		SVGConstants, CSSConstants {
+public abstract class MapLayer extends MapElement implements SVGConstants, CSSConstants {
 
 	private final String name;
 
 	private Element element;
 	private boolean isVisible;
 
+	private String tooltipText;
+	private SVGDescElement tooltip;
+
 	private Document document;
+	private MapLayerHandler mapLayerHandler;
 
 	public MapLayer(String name) {
 		this.name = name;
@@ -65,11 +66,32 @@ public abstract class MapLayer extends AbstractEventSource implements
 		update();
 	}
 
+	public String getTooltipText() {
+		return tooltipText;
+	}
+
+	public void setTooltipText(String tooltipText) {
+		this.tooltipText = tooltipText;
+	}
+
+	public MapLayerHandler getMapLayerHandler() {
+		return mapLayerHandler;
+	}
+
+	public void setMapLayerHandler(MapLayerHandler mapLayerHandler) {
+		this.mapLayerHandler = mapLayerHandler;
+		setMapHandler(mapLayerHandler);
+	}
+
 	protected void update() {
+		updateVisibility();
+		updateTooltip();
+	}
+
+	private void updateVisibility() {
 		Element element = getElement();
 		if (element != null && element instanceof SVGStylableElement) {
-			final String displayValue = isVisible() ? CSS_INLINE_VALUE
-					: CSS_NONE_VALUE;
+			final String displayValue = isVisible() ? CSS_INLINE_VALUE : CSS_NONE_VALUE;
 			final SVGStylableElement styleElement = (SVGStylableElement) element;
 
 			invokeDOMChange(new Runnable() {
@@ -82,12 +104,35 @@ public abstract class MapLayer extends AbstractEventSource implements
 		}
 	}
 
-	protected void invokeDOMChange(Runnable request) {
-		if(getMapLayerHandler() == null) {
-			request.run();
-		} else {
-			getMapLayerHandler().requestDOMChange(request);
-		}
+	private void updateTooltip() {
+		final Element element = getElement();
+		if (element == null)
+			return;
+
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				// Create tooltip if needed
+				if (tooltip == null) {
+					tooltip = (SVGDescElement) createElement(SVG_DESC_TAG);
+				}
+				final String text = getTooltipText();
+				if (text == null) {
+					// Remove tooltip
+					if (tooltip.getParentNode() != null) {
+						tooltip.getParentNode().removeChild(tooltip);
+					}
+					tooltip = null;
+				} else {
+					// Set tooltip text
+					tooltip.setTextContent(text);
+					// Add tooltip
+					if (tooltip.getParentNode() == null) {
+						element.appendChild(tooltip);
+					}
+				}
+			}
+		});
 	}
 
 	public Element build(AbstractDocument document) {
@@ -121,14 +166,4 @@ public abstract class MapLayer extends AbstractEventSource implements
 		}
 
 	}
-	
-	public void setMapLayerHandler(MapLayerHandler mapLayerHandler) {
-		this.mapLayerHandler = mapLayerHandler;
-	}
-	
-	private MapLayerHandler getMapLayerHandler() {
-		return this.mapLayerHandler;
-	}
-	
-	private MapLayerHandler mapLayerHandler;
 }

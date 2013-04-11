@@ -2,7 +2,7 @@ package mazestormer.controller;
 
 import mazestormer.connect.ConnectEvent;
 import mazestormer.line.LineFinderEvent;
-import mazestormer.line.LineFinderRunner;
+import mazestormer.line.LineFinder;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.state.AbstractStateListener;
@@ -12,7 +12,7 @@ import com.google.common.eventbus.Subscribe;
 public class LineFinderController extends SubController implements
 		ILineFinderController {
 
-	private LineFinderRunner runner;
+	private LineFinder lineFinder;
 
 	public LineFinderController(MainController mainController) {
 		super(mainController);
@@ -39,21 +39,21 @@ public class LineFinderController extends SubController implements
 
 	@Override
 	public void startSearching() {
-		runner = new LineFinderRunner(getRobot()) {
+		lineFinder = new LineFinder(getRobot()) {
 			@Override
 			protected void log(String message) {
 				LineFinderController.this.log(message);
 			}
 		};
-		runner.addStateListener(new LineFinderListener());
-		runner.start();
+		lineFinder.addStateListener(new LineFinderListener());
+		lineFinder.start();
 	}
 
 	@Override
 	public void stopSearching() {
-		if (runner != null) {
-			runner.stop();
-			runner = null;
+		if (lineFinder != null) {
+			lineFinder.stop();
+			lineFinder = null;
 		}
 	}
 
@@ -62,7 +62,7 @@ public class LineFinderController extends SubController implements
 	}
 
 	private class LineFinderListener extends
-			AbstractStateListener<LineFinderRunner.LineFinderState> {
+			AbstractStateListener<LineFinder.LineFinderState> {
 
 		@Override
 		public void stateStarted() {
