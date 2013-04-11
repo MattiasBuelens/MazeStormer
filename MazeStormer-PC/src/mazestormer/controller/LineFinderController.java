@@ -1,16 +1,15 @@
 package mazestormer.controller;
 
 import mazestormer.connect.ConnectEvent;
-import mazestormer.line.LineFinderEvent;
 import mazestormer.line.LineFinder;
+import mazestormer.line.LineFinderEvent;
+import mazestormer.player.Player;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.ControllableRobot;
 import mazestormer.state.AbstractStateListener;
 
 import com.google.common.eventbus.Subscribe;
 
-public class LineFinderController extends SubController implements
-		ILineFinderController {
+public class LineFinderController extends SubController implements ILineFinderController {
 
 	private LineFinder lineFinder;
 
@@ -18,16 +17,12 @@ public class LineFinderController extends SubController implements
 		super(mainController);
 	}
 
-	private ControllableRobot getRobot() {
-		return getMainController().getControllableRobot();
+	private Player getPlayer() {
+		return getMainController().getPlayer();
 	}
 
 	private CalibratedLightSensor getLightSensor() {
 		return getMainController().getControllableRobot().getLightSensor();
-	}
-
-	private void log(String logText) {
-		getMainController().getPlayer().getLogger().info(logText);
 	}
 
 	@Subscribe
@@ -39,12 +34,7 @@ public class LineFinderController extends SubController implements
 
 	@Override
 	public void startSearching() {
-		lineFinder = new LineFinder(getRobot()) {
-			@Override
-			protected void log(String message) {
-				LineFinderController.this.log(message);
-			}
-		};
+		lineFinder = new LineFinder(getPlayer());
 		lineFinder.addStateListener(new LineFinderListener());
 		lineFinder.start();
 	}
@@ -61,8 +51,7 @@ public class LineFinderController extends SubController implements
 		postEvent(new LineFinderEvent(eventType));
 	}
 
-	private class LineFinderListener extends
-			AbstractStateListener<LineFinder.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
 
 		@Override
 		public void stateStarted() {

@@ -1,19 +1,23 @@
 package mazestormer.line;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.logging.Level;
+
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
+import mazestormer.player.Player;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Pilot;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class LineFinder extends
-		StateMachine<LineFinder, LineFinder.LineFinderState>
-		implements StateListener<LineFinder.LineFinderState> {
+public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderState> implements
+		StateListener<LineFinder.LineFinderState> {
 
 	/*
 	 * Constants
@@ -34,46 +38,52 @@ public class LineFinder extends
 	 * Settings
 	 */
 
-	private final ControllableRobot robot;
+	private final Player player;
 	private double originalTravelSpeed;
 	private double originalRotateSpeed;
-	
+
 	/*
 	 * State
 	 */
 
 	private volatile double lineWidth;
 
-	public LineFinder(ControllableRobot robot) {
-		this.robot = checkNotNull(robot);
+	public LineFinder(Player player) {
+		this.player = checkNotNull(player);
 		addStateListener(this);
 	}
 
 	protected void log(String message) {
-		System.out.println(message);
+		player.getLogger().log(Level.FINE, message);
+	}
+
+	private ControllableRobot getRobot() {
+		return (ControllableRobot) player.getRobot();
+	}
+
+	private Pilot getPilot() {
+		return getRobot().getPilot();
 	}
 
 	private Future<Void> onLine() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_GREATER_THAN, threshold);
-		return robot.when(condition).stop().build();
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
+		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> offLine() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_SMALLER_THAN, threshold);
-		return robot.when(condition).stop().build();
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, threshold);
+		return getRobot().when(condition).stop().build();
 	}
 
 	protected void findLineStart() {
 		// Save original speeds
-		originalTravelSpeed = robot.getPilot().getTravelSpeed();
-		originalRotateSpeed = robot.getPilot().getRotateSpeed();
+		originalTravelSpeed = getPilot().getTravelSpeed();
+		originalRotateSpeed = getPilot().getRotateSpeed();
 
 		// Travel forward until on line
 		log("Start looking for line.");
-		robot.getPilot().setTravelSpeed(fastTravelSpeed);
-		robot.getPilot().forward();
+		getPilot().setTravelSpeed(fastTravelSpeed);
+		getPilot().forward();
 		bindTransition(onLine(), LineFinderState.FIND_LINE_END);
 	}
 
@@ -81,8 +91,8 @@ public class LineFinder extends
 		log("On line, start looking for end of line.");
 
 		// Travel forward until off line
-		robot.getPilot().setTravelSpeed(slowTravelSpeed);
-		robot.getPilot().forward();
+		getPilot().setTravelSpeed(slowTravelSpeed);
+		getPilot().forward();
 
 		bindTransition(offLine(), LineFinderState.ROTATE_CENTER);
 	}
@@ -90,30 +100,27 @@ public class LineFinder extends
 	protected void rotateCenter() {
 		log("Off line, positioning robot on line edge.");
 
-		lineWidth = robot.getPilot().getMovement().getDistanceTraveled();
-		double centerOffset = ControllableRobot.sensorOffset
-				- robot.getLightSensor().getSensorRadius();
+		lineWidth = getPilot().getMovement().getDistanceTraveled();
+		double centerOffset = ControllableRobot.sensorOffset - getRobot().getLightSensor().getSensorRadius();
 		log("Line width: " + lineWidth);
 		log("Offset from center: " + centerOffset);
 
 		// Travel forward to center robot on end of line
-		robot.getPilot().setTravelSpeed(fastTravelSpeed);
-		bindTransition(robot.getPilot().travelComplete(centerOffset),
-				LineFinderState.ROTATE_FIXED);
+		getPilot().setTravelSpeed(fastTravelSpeed);
+		bindTransition(getPilot().travelComplete(centerOffset), LineFinderState.ROTATE_FIXED);
 	}
 
 	protected void rotateFixed() {
 		// Rotate fixed angle
-		robot.getPilot().setRotateSpeed(fastRotateSpeed);
-		bindTransition(robot.getPilot().rotateComplete(fastRotateAngle),
-				LineFinderState.ROTATE_UNTIL_LINE);
+		getPilot().setRotateSpeed(fastRotateSpeed);
+		bindTransition(getPilot().rotateComplete(fastRotateAngle), LineFinderState.ROTATE_UNTIL_LINE);
 	}
 
 	protected void rotateUntilLine() {
 		// Rotate until on line again
 		log("Start looking for line again.");
-		robot.getPilot().setRotateSpeed(slowRotateSpeed);
-		robot.getPilot().rotateRight();
+		getPilot().setRotateSpeed(slowRotateSpeed);
+		getPilot().rotateRight();
 
 		bindTransition(onLine(), LineFinderState.POSITION_PERPENDICULAR);
 	}
@@ -127,17 +134,15 @@ public class LineFinder extends
 
 		// Position perpendicular to line
 		double angle = 90d + sensorAngle;
-		robot.getPilot().setRotateSpeed(fastRotateSpeed);
-		bindTransition(robot.getPilot().rotateComplete(angle),
-				LineFinderState.POSITION_CENTER);
+		getPilot().setRotateSpeed(fastRotateSpeed);
+		bindTransition(getPilot().rotateComplete(angle), LineFinderState.POSITION_CENTER);
 	}
 
 	protected void positionCenter() {
 		// Position robot center on center of line
 		log("Positioning on center of line.");
 		double offset = -lineWidth / 2;
-		bindTransition(robot.getPilot().travelComplete(offset),
-				LineFinderState.FINISH);
+		bindTransition(getPilot().travelComplete(offset), LineFinderState.FINISH);
 	}
 
 	/**
@@ -163,8 +168,7 @@ public class LineFinder extends
 	 * </p>
 	 */
 	private double getSensorAngle() {
-		return 2 * Math.asin(robot.getLightSensor().getSensorRadius()
-				/ (2 * ControllableRobot.sensorOffset));
+		return 2 * Math.asin(getRobot().getLightSensor().getSensorRadius() / (2 * ControllableRobot.sensorOffset));
 	}
 
 	@Override
@@ -176,10 +180,10 @@ public class LineFinder extends
 	@Override
 	public void stateStopped() {
 		// Stop pilot
-		robot.getPilot().stop();
+		getPilot().stop();
 		// Restore original speeds
-		robot.getPilot().setTravelSpeed(originalTravelSpeed);
-		robot.getPilot().setRotateSpeed(originalRotateSpeed);
+		getPilot().setTravelSpeed(originalTravelSpeed);
+		getPilot().setRotateSpeed(originalRotateSpeed);
 	}
 
 	@Override
@@ -200,8 +204,7 @@ public class LineFinder extends
 	public void stateTransitioned(LineFinderState nextState) {
 	}
 
-	public enum LineFinderState implements
-			State<LineFinder, LineFinderState> {
+	public enum LineFinderState implements State<LineFinder, LineFinderState> {
 		FIND_LINE_START {
 			@Override
 			public void execute(LineFinder finder) {

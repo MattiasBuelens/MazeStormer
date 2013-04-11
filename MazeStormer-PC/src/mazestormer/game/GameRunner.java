@@ -5,14 +5,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
+import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
-import mazestormer.explore.Explorer;
+import mazestormer.explore.ControlMode;
+import mazestormer.explore.ExploreControlMode;
+import mazestormer.explore.Controller;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -25,16 +29,16 @@ import mazestormer.util.LongPoint;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class GameRunner implements GameListener {
+public class GameRunner extends Controller implements GameListener {
 
 	/**
 	 * The frequency of position updates.
 	 */
 	private static final long updateFrequency = 2000; // in ms
 
-	private final Player player;
 	private final Game game;
-	private final Explorer explorer;
+
+	private final ControlMode exploreMode;
 
 	private final PositionReporter positionReporter = new PositionReporter();
 	private final TileReporter tileReporter = new TileReporter();
@@ -45,25 +49,20 @@ public class GameRunner implements GameListener {
 	private int objectNumber;
 
 	public GameRunner(Player player, Game game) {
-		this.player = player;
-		this.explorer = new Explorer(player) {
-			@Override
-			protected void log(String message) {
-				GameRunner.this.log(message);
-			}
-		};
-		explorer.setBarcodeMapping(new TeamTreasureTrekBarcodeMapping(this));
+		super(player);
 
+		// Game
 		this.game = game;
 		game.addGameListener(this);
+
+		// Modes
+		BarcodeMapping mapping = new TeamTreasureTrekBarcodeMapping(this);
+		exploreMode = new ExploreControlMode(player, mapping);
+		setStartMode(exploreMode);
 	}
 
 	protected void log(String message) {
-		System.out.println(message);
-	}
-
-	private Player getPlayer() {
-		return player;
+		getPlayer().getLogger().log(Level.INFO, message);
 	}
 
 	private ControllableRobot getRobot() {
@@ -81,8 +80,8 @@ public class GameRunner implements GameListener {
 	public void setObjectTile() {
 		log("Object on next tile, set walls");
 
-		Tile currentTile = explorer.getCurrentTile();
-		Tile nextTile = explorer.getNextTile();
+		Tile currentTile = getDriver().getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
 		// Make next tile a dead end
@@ -97,8 +96,8 @@ public class GameRunner implements GameListener {
 
 		IMaze maze = getMaze();
 
-		Tile currentTile = explorer.getCurrentTile();
-		Tile nextTile = explorer.getNextTile();
+		Tile currentTile = getDriver().getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
@@ -144,14 +143,14 @@ public class GameRunner implements GameListener {
 	public void afterObjectBarcode() {
 		log("Object found, go to next tile");
 		// Skip next tile
-		explorer.skipNextTile();
+		getDriver().skipNextTile();
 		// Create new path
-		explorer.createPath();
+		getDriver().createPath();
 		// Object found action resolves after this
 	}
 
 	public boolean isRunning() {
-		return explorer.isRunning();
+		return getDriver().isRunning();
 	}
 
 	private void startReporting() {
@@ -191,14 +190,14 @@ public class GameRunner implements GameListener {
 		getRobot().getPoseProvider().setPose(new Pose());
 		// Start reporting
 		startReporting();
-		// Start
-		explorer.start();
+		// Start explorer
+		start();
 	}
 
 	@Override
 	public void onGamePaused() {
-		// Pause
-		explorer.pause();
+		// Pause explorer
+		getDriver().pause();
 		// Stop pilot
 		getRobot().getPilot().stop();
 		// Stop reporting
@@ -207,8 +206,8 @@ public class GameRunner implements GameListener {
 
 	@Override
 	public void onGameStopped() {
-		// Stop
-		explorer.stop();
+		// Stop explorer
+		stop();
 		// Stop pilot
 		getRobot().getPilot().stop();
 		// Stop reporting

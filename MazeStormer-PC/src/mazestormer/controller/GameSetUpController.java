@@ -71,12 +71,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getWorld());
 
-		runner = new GameRunner(localPlayer, game) {
-			@Override
-			protected void log(String message) {
-				logTo(localPlayer, message);
-			}
-		};
+		runner = new GameRunner(localPlayer, game);
 	}
 
 	@Override
