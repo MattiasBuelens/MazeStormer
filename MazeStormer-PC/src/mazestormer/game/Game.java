@@ -16,6 +16,7 @@ import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
+import mazestormer.robot.Robot;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
@@ -38,11 +39,16 @@ public class Game {
 	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
-
 		this.handler = new Handler();
-		
-		// TODO Insert robot details
-		peno.htttp.PlayerDetails player = new peno.htttp.PlayerDetails(localPlayer.getPlayerID(), PlayerType.PHYSICAL, 0, 0);
+
+		// Gather player details
+		String playerID = localPlayer.getPlayerID();
+		// TODO Determine robot type
+		PlayerType playerType = PlayerType.PHYSICAL;
+		double width = localPlayer.getRobot().getWidth();
+		double height = localPlayer.getRobot().getHeight();
+		peno.htttp.PlayerDetails player = new peno.htttp.PlayerDetails(playerID, playerType, width, height);
+
 		this.client = new PlayerClient(connection, this.handler, id, player);
 	}
 
@@ -235,8 +241,11 @@ public class Game {
 		if (hasPartner())
 			return;
 
+		// Create robot to track partner's position
+		// Note: the size of the partner's robot are not important
+		Robot partnerRobot = new ObservableRobot(0, 0);
 		// Create partner
-		RelativePlayer partner = new RelativePlayer(partnerID, new ObservableRobot(), new Maze());
+		RelativePlayer partner = new RelativePlayer(partnerID, partnerRobot, new Maze());
 		partnerPlayer = partner;
 		// Set partner maze
 		getLocalMaze().setPartnerMaze(partner.getMaze());
