@@ -11,6 +11,7 @@ import mazestormer.line.LineFinder;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
+import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.NavigatorListener;
@@ -29,12 +30,16 @@ public class PathFindingController extends SubController implements IPathFinding
 		super(mainController);
 	}
 
+	private Player getPlayer() {
+		return getMainController().getPlayer();
+	}
+
 	private ControllableRobot getRobot() {
 		return getMainController().getControllableRobot();
 	}
 
 	private IMaze getMaze() {
-		return getMainController().getPlayer().getMaze();
+		return getPlayer().getMaze();
 	}
 
 	private IMaze getSourceMaze() {
@@ -42,7 +47,7 @@ public class PathFindingController extends SubController implements IPathFinding
 	}
 
 	private void log(String logText) {
-		getMainController().getPlayer().getLogger().info(logText);
+		getPlayer().getLogger().info(logText);
 	}
 
 	private void postState(PathFinderEvent.EventType eventType) {
@@ -142,7 +147,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		 * 
 		 * @param robot
 		 *            The robot who must follow a tile sequence.
-		 * @param iMaze
+		 * @param maze
 		 *            The maze the robot is positioned in.
 		 * @param goal
 		 *            The target tile.
@@ -151,7 +156,7 @@ public class PathFindingController extends SubController implements IPathFinding
 		 * @param reposition
 		 *            Whether to reposition the robot before navigating.
 		 */
-		public TileNavigator(ControllableRobot robot, IMaze iMaze, Tile goal, boolean singleStep, boolean reposition) {
+		public TileNavigator(ControllableRobot robot, IMaze maze, Tile goal, boolean singleStep, boolean reposition) {
 			this.robot = checkNotNull(robot);
 			addStateListener(this);
 
@@ -164,15 +169,10 @@ public class PathFindingController extends SubController implements IPathFinding
 			navigator.addNavigatorListener(this);
 
 			// Path finder
-			this.pathFinder = new PathFinder(iMaze);
+			this.pathFinder = new PathFinder(maze);
 
 			// Line finder
-			this.lineFinder = new LineFinder(getRobot()) {
-				@Override
-				protected void log(String message) {
-					PathFindingController.this.log(message);
-				}
-			};
+			this.lineFinder = new LineFinder(getPlayer());
 			lineFinder.addStateListener(new AbstractStateListener<LineFinder.LineFinderState>() {
 				@Override
 				public void stateFinished() {

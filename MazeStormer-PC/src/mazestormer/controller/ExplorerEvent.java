@@ -1,6 +1,5 @@
-package mazestormer.explore;
+package mazestormer.controller;
 
-import mazestormer.controller.ActionEvent;
 
 public class ExplorerEvent extends ActionEvent {
 

@@ -65,11 +65,11 @@ public class StateController extends SubController implements IStateController {
 	}
 
 	@Subscribe
-	protected void logMove(MoveEvent event) {
+	public void logMove(MoveEvent event) {
 		if (event.getEventType() == MoveEvent.EventType.STARTED) {
-			getLogger().fine("Move started: " + event.getMove().toString());
+			getLogger().finest("Move started: " + event.getMove().toString());
 		} else {
-			getLogger().fine("Move stopped: " + event.getMove().toString());
+			getLogger().finest("Move stopped: " + event.getMove().toString());
 		}
 	}
 

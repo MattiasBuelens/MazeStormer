@@ -31,10 +31,6 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		return getMainController().getControllableRobot();
 	}
 
-	private void log(String logText) {
-		getMainController().getPlayer().getLogger().info(logText);
-	}
-
 	@Override
 	public void startAction(ActionType actionType) {
 		// Post state
@@ -90,12 +86,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 	@Override
 	public void startScan() {
 		// Prepare
-		barcodeScanner = new BarcodeScanner(getPlayer()) {
-			@Override
-			protected void log(String message) {
-				BarcodeController.this.log(message);
-			}
-		};
+		barcodeScanner = new BarcodeScanner(getPlayer());
 		barcodeScanner.addStateListener(new BarcodeListener());
 		barcodeScanner.setPerformAction(false);
 		barcodeScanner.setScanSpeed(getScanSpeed());

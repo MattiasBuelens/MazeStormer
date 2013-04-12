@@ -117,15 +117,16 @@ public class SeesawAction extends
 	}
 
 	protected void findLine() {
-		LineFinder lineFinder = new LineFinder(getControllableRobot()) {
+		LineFinder lineFinder = new LineFinder(player) {
 			@Override
 			protected void log(String message) {
 				// log indien nodig
+				super.log(message);
 			}
 		};
 
-		@SuppressWarnings("unused")
-		LineAdjuster lineAdjuster = new LineAdjuster(player, lineFinder);
+		LineAdjuster lineAdjuster = new LineAdjuster(player);
+		lineAdjuster.bind(lineFinder);
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 

@@ -1,7 +1,7 @@
 package mazestormer.controller;
 
-import mazestormer.explore.ExplorerEvent;
 import mazestormer.explore.Explorer;
+import mazestormer.explore.Driver;
 import mazestormer.player.Player;
 import mazestormer.state.AbstractStateListener;
 
@@ -34,28 +34,19 @@ public class ExplorerController extends SubController implements IExplorerContro
 		return getMainController().getPlayer();
 	}
 
-	private void log(String logText) {
-		getMainController().getPlayer().getLogger().info(logText);
-	}
-
 	private void postState(ExplorerEvent.EventType eventType) {
 		postEvent(new ExplorerEvent(eventType));
 	}
 
 	@Override
 	public void startExploring() {
-		explorer = new Explorer(getPlayer()) {
-			@Override
-			protected void log(String message) {
-				ExplorerController.this.log(message);
-			}
-		};
+		explorer = new Explorer(getPlayer());
 		// Set parameters
-		explorer.setLineAdjustEnabled(isLineAdjustEnabled());
-		explorer.setLineAdjustInterval(getLineAdjustInterval());
-		explorer.setScanSpeed(getBarcodeController().getScanSpeed());
+		explorer.getDriver().setLineAdjustEnabled(isLineAdjustEnabled());
+		explorer.getDriver().setLineAdjustInterval(getLineAdjustInterval());
+		explorer.getDriver().setScanSpeed(getBarcodeController().getScanSpeed());
 		// Start
-		explorer.addStateListener(new ExplorerListener());
+		explorer.getDriver().addStateListener(new ExplorerListener());
 		explorer.start();
 	}
 
@@ -76,7 +67,7 @@ public class ExplorerController extends SubController implements IExplorerContro
 	public void setLineAdjustEnabled(boolean isEnabled) {
 		isLineAdjustEnabled = isEnabled;
 		if (explorer != null) {
-			explorer.setLineAdjustEnabled(isEnabled);
+			explorer.getDriver().setLineAdjustEnabled(isEnabled);
 		}
 	}
 
@@ -89,11 +80,11 @@ public class ExplorerController extends SubController implements IExplorerContro
 	public void setLineAdjustInterval(int interval) {
 		lineAdjustInterval = interval;
 		if (explorer != null) {
-			explorer.setLineAdjustInterval(interval);
+			explorer.getDriver().setLineAdjustInterval(interval);
 		}
 	}
 
-	private class ExplorerListener extends AbstractStateListener<Explorer.ExplorerState> {
+	private class ExplorerListener extends AbstractStateListener<Driver.ExplorerState> {
 
 		@Override
 		public void stateStarted() {

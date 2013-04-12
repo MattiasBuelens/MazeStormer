@@ -17,8 +17,8 @@ public class PathFinder {
 
 	private final IMaze maze;
 
-	public PathFinder(IMaze iMaze) {
-		this.maze = iMaze;
+	public PathFinder(IMaze maze) {
+		this.maze = maze;
 	}
 
 	public final IMaze getMaze() {

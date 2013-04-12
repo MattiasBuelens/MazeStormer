@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.logging.Level;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.condition.Condition;
@@ -22,8 +23,7 @@ import mazestormer.util.Future;
 import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 
-public class BarcodeScanner extends
-		StateMachine<BarcodeScanner, BarcodeScanner.BarcodeState> implements
+public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.BarcodeState> implements
 		StateListener<BarcodeScanner.BarcodeState>, BarcodeScannerListener {
 
 	/*
@@ -107,7 +107,7 @@ public class BarcodeScanner extends
 	}
 
 	protected void log(String message) {
-		System.out.println(message);
+		player.getLogger().log(Level.FINE, message);
 	}
 
 	public void addBarcodeListener(BarcodeScannerListener listener) {
@@ -125,8 +125,7 @@ public class BarcodeScanner extends
 	@Override
 	public void onEndBarcode(byte barcode) {
 		// Log
-		String paddedBarcode = Strings.padStart(
-				Integer.toBinaryString(barcode), Barcode.getNbValueBars(), '0');
+		String paddedBarcode = Strings.padStart(Integer.toBinaryString(barcode), Barcode.getNbValueBars(), '0');
 		log("Scanned barcode: " + paddedBarcode);
 
 		// Action
@@ -148,21 +147,18 @@ public class BarcodeScanner extends
 	}
 
 	private Future<Void> onFirstBlack() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> onWhiteToBlack() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_SMALLER_THAN,
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
 				Threshold.WHITE_BLACK.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
 
 	private Future<Void> onBlackToWhite() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_GREATER_THAN,
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
 				Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
@@ -190,8 +186,7 @@ public class BarcodeScanner extends
 		getRobot().getPilot().setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
 		// travel(- START_BAR_LENGTH / 2);
-		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()),
-				BarcodeState.STROKE_START);
+		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()), BarcodeState.STROKE_START);
 	}
 
 	protected void strokeStart() {
@@ -229,8 +224,7 @@ public class BarcodeScanner extends
 			nextStrokeBlack = foundBlack;
 		}
 
-		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1)
-				* getBarLength()) {
+		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1) * getBarLength()) {
 			// Iterate
 			if (nextStrokeBlack) {
 				transition(BarcodeState.FIND_STROKE_BLACK);
@@ -259,8 +253,7 @@ public class BarcodeScanner extends
 				// TODO Check with start offset
 				// at = Math.max((distance - START_BAR_LENGTH) / barLength,
 				// 0);
-				at = Math.max((distance - getStartOffset() - barLength)
-						/ barLength, 0);
+				at = Math.max((distance - getStartOffset() - barLength) / barLength, 0);
 			} else {
 				at = Math.max(distance / barLength, 1);
 			}

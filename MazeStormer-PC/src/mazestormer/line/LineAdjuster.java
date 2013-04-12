@@ -1,5 +1,7 @@
 package mazestormer.line;
 
+import java.util.logging.Level;
+
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.IMaze;
@@ -8,16 +10,18 @@ import mazestormer.state.AbstractStateListener;
 
 public class LineAdjuster {
 
-	private Player player;
+	private final Player player;
 
-	public LineAdjuster(Player player, LineFinder lineFinder) {
+	public LineAdjuster(Player player) {
 		this.player = player;
+	}
 
+	public void bind(LineFinder lineFinder) {
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 
 	protected void log(String message) {
-		System.out.println(message);
+		player.getLogger().log(Level.FINE, message);
 	}
 
 	private IMaze getMaze() {
