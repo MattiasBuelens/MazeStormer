@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.command.CommandTools;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
+import mazestormer.player.CommandTools;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;

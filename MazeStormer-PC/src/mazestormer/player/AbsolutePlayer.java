@@ -4,7 +4,6 @@ import java.util.logging.Logger;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
-import mazestormer.command.CommandTools;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
 import mazestormer.robot.Robot;

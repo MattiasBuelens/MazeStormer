@@ -9,12 +9,12 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.command.CommandTools;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
+import mazestormer.player.CommandTools;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;

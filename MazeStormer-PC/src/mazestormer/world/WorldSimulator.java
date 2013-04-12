@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
-import mazestormer.command.CommandTools;
 import mazestormer.maze.PoseTransform;
 import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
+import mazestormer.player.CommandTools;
 import peno.htttp.DisconnectReason;
 import peno.htttp.SpectatorClient;
 import peno.htttp.SpectatorHandler;
