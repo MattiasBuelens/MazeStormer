@@ -96,14 +96,14 @@ public class GameRunner extends Controller implements GameListener {
 	 *         seesaw-barcode.
 	 */
 	public Barcode[] getCurrentSeesawBarcodes() {
-		Tile currentTile = explorer.getCurrentTile();
+		Tile currentTile = getDriver().getCurrentTile();
 		Barcode seesawBarcode = currentTile.getBarcode();
 		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
 		return new Barcode[] { seesawBarcode, otherBarcode };
 	}
 
 	public Tile getCurrentTile() {
-		return explorer.getCurrentTile();
+		return getDriver().getCurrentTile();
 	}
 
 	public void setSeesawWalls() {
