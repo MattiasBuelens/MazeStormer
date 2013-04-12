@@ -1,8 +1,8 @@
 package mazestormer.controller;
 
-import mazestormer.explore.Explorer;
-import mazestormer.explore.Driver;
-import mazestormer.player.Player;
+import mazestormer.command.CommandTools;
+import mazestormer.command.Explorer;
+import mazestormer.controlMode.Driver;
 import mazestormer.state.AbstractStateListener;
 
 public class ExplorerController extends SubController implements IExplorerController {
@@ -30,7 +30,7 @@ public class ExplorerController extends SubController implements IExplorerContro
 		return getMainController().cheatControl();
 	}
 
-	private Player getPlayer() {
+	private CommandTools getPlayer() {
 		return getMainController().getPlayer();
 	}
 

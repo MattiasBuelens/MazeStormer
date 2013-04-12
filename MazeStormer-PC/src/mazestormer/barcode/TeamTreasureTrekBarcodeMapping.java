@@ -3,7 +3,7 @@ package mazestormer.barcode;
 import java.util.HashMap;
 import java.util.Map;
 
-import mazestormer.game.GameRunner;
+import mazestormer.command.GamePlayer;
 
 public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 
@@ -20,11 +20,11 @@ public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 		barcodeMapping.put(new Barcode((byte) 21), new Barcode((byte) 19));
 	}
 
-	public TeamTreasureTrekBarcodeMapping(GameRunner gameRunner) {
+	public TeamTreasureTrekBarcodeMapping(GamePlayer gameRunner) {
 		createActions(gameRunner);
 	}
 
-	private void createActions(GameRunner gameRunner) {
+	private void createActions(GamePlayer gameRunner) {
 		actions[0] = new ObjectFoundAction(0, 0, gameRunner);
 		actions[1] = new ObjectFoundAction(1, 0, gameRunner);
 		actions[2] = new ObjectFoundAction(2, 0, gameRunner);

@@ -9,6 +9,7 @@ import java.util.ListIterator;
 import java.util.logging.Level;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.command.CommandTools;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
@@ -39,7 +40,7 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	 * Settings
 	 */
 
-	private final Player player;
+	private final CommandTools player;
 	private boolean performAction;
 	private double scanSpeed = 2; // cm/sec
 	private double originalTravelSpeed;
@@ -55,7 +56,7 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 	private final List<BarcodeScannerListener> listeners = new ArrayList<BarcodeScannerListener>();
 
-	public BarcodeScanner(Player player) {
+	public BarcodeScanner(CommandTools player) {
 		this.player = checkNotNull(player);
 
 		addBarcodeListener(this);

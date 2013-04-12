@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.command.CommandTools;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
-import mazestormer.player.RelativePlayer;
 
 public class World {
 
@@ -31,7 +31,7 @@ public class World {
 		logger.setLevel(Level.ALL);
 	}
 
-	public World(RelativePlayer localPlayer) {
+	public World(CommandTools localPlayer) {
 		this(new AbsolutePlayer(localPlayer));
 	}
 
@@ -51,7 +51,7 @@ public class World {
 		return players.get(playerID);
 	}
 
-	public void addPlayer(RelativePlayer player) {
+	public void addPlayer(CommandTools player) {
 		addPlayer(new AbsolutePlayer(player));
 	}
 

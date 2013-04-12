@@ -1,7 +1,8 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import mazestormer.game.GameRunner;
+import mazestormer.command.CommandTools;
+import mazestormer.command.GamePlayer;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.player.Player;
@@ -14,17 +15,17 @@ import mazestormer.util.Future;
 
 public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
 
-	private final GameRunner gameRunner;
+	private final GamePlayer gameRunner;
 	private final int barcode;
 	private Player player;
 
-	public SeesawAction(GameRunner gameRunner, int barcode) {
+	public SeesawAction(GamePlayer gameRunner, int barcode) {
 		this.gameRunner = gameRunner;
 		this.barcode = barcode;
 	}
 
 	@Override
-	public Future<?> performAction(Player player) {
+	public Future<?> performAction(CommandTools player) {
 		checkNotNull(player);
 		this.player = player;
 		stop(); // indien nog niet gestopt.
@@ -40,7 +41,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		return future;
 	}
 
-	private GameRunner getGameRunner() {
+	private GamePlayer getGameRunner() {
 		return this.gameRunner;
 	}
 

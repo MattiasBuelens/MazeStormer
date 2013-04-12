@@ -1,15 +1,17 @@
-package mazestormer.explore;
+package mazestormer.command;
 
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.ExplorerBarcodeMapping;
-import mazestormer.player.Player;
+import mazestormer.controlMode.ControlMode;
+import mazestormer.controlMode.ExploreControlMode;
+import mazestormer.controlMode.FinishControlMode;
 
-public class Explorer extends Controller {
+public class Explorer extends Commander {
 
 	private final ControlMode exploreMode;
 	private final ControlMode finishMode;
 
-	public Explorer(Player player) {
+	public Explorer(CommandTools player) {
 		super(player);
 
 		// Modes

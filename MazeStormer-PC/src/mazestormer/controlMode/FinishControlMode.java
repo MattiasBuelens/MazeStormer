@@ -1,4 +1,4 @@
-package mazestormer.explore;
+package mazestormer.controlMode;
 
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.BarcodeSpeed;

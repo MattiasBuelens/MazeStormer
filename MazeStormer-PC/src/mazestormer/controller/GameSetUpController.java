@@ -2,10 +2,10 @@ package mazestormer.controller;
 
 import java.io.IOException;
 
+import mazestormer.command.CommandTools;
 import mazestormer.game.ConnectionMode;
 import mazestormer.game.Game;
 import mazestormer.game.GameListener;
-import mazestormer.game.GameRunner;
 import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.world.World;
@@ -19,7 +19,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	private Connection connection;
 	private Game game;
 	private WorldSimulator worldSimulator;
-	private GameRunner runner;
 
 	public GameSetUpController(MainController mainController) {
 		super(mainController);
@@ -62,7 +61,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private void createGame(ConnectionMode connectionMode, String gameID) throws IOException {
-		final Player localPlayer = getMainController().getPlayer();
+		final CommandTools localPlayer = getMainController().getPlayer();
 
 		connection = connectionMode.newConnection();
 
@@ -70,8 +69,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		game.addGameListener(new Listener());
 
 		worldSimulator = new WorldSimulator(connection, gameID, localPlayer, getWorld());
-
-		runner = new GameRunner(localPlayer, game);
 	}
 
 	@Override

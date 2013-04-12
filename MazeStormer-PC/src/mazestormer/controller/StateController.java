@@ -7,10 +7,10 @@ import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.objectdetection.RangeFeature;
+import mazestormer.command.CommandTools;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.detect.RangeFeatureListener;
-import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.RangeScannerListener;
@@ -30,7 +30,7 @@ public class StateController extends SubController implements IStateController {
 		super(mainController);
 	}
 
-	private RelativePlayer getPlayer() {
+	private CommandTools getPlayer() {
 		return getMainController().getPlayer();
 	}
 

@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.command.CommandTools;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
@@ -15,7 +16,6 @@ import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
-import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
@@ -60,7 +60,7 @@ public class MainController implements IMainController {
 
 	private final World world;
 
-	private RelativePlayer personalPlayer;
+	private CommandTools personalPlayer;
 	public static final String defaultPlayerName = "Brons";
 
 	/*
@@ -96,7 +96,7 @@ public class MainController implements IMainController {
 
 		// Player and world
 		IMaze personalMaze = new CombinedMaze();
-		this.personalPlayer = new RelativePlayer(defaultPlayerName, null, personalMaze);
+		this.personalPlayer = new CommandTools(defaultPlayerName, null, personalMaze);
 		this.world = new World(personalPlayer);
 		gameControl().addPlayer(personalPlayer);
 
@@ -356,7 +356,7 @@ public class MainController implements IMainController {
 	 * Player
 	 */
 
-	public RelativePlayer getPlayer() {
+	public CommandTools getPlayer() {
 		return personalPlayer;
 	}
 

@@ -1,6 +1,6 @@
 package mazestormer.barcode;
 
-import mazestormer.player.Player;
+import mazestormer.command.CommandTools;
 import mazestormer.util.Future;
 
 public interface IAction {
@@ -15,6 +15,6 @@ public interface IAction {
 	 * 			If the given robot is not valid.
 	 * 			| robot != null
 	 */
-	public abstract Future<?> performAction(Player player);
+	public abstract Future<?> performAction(CommandTools player);
 
 }

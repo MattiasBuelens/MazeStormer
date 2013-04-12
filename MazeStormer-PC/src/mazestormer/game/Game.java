@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.command.CommandTools;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
-import mazestormer.player.RelativePlayer;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
@@ -232,7 +232,7 @@ public class Game {
 			return;
 
 		// Create partner
-		RelativePlayer partner = new RelativePlayer(partnerID, new ObservableRobot(), new Maze());
+		CommandTools partner = new CommandTools(partnerID, new ObservableRobot(), new Maze());
 		partnerPlayer = partner;
 		// Set partner maze
 		getLocalMaze().setPartnerMaze(partner.getMaze());

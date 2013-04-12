@@ -1,4 +1,4 @@
-package mazestormer.explore;
+package mazestormer.controlMode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -18,6 +18,8 @@ import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.BarcodeScanner;
 import mazestormer.barcode.BarcodeScannerListener;
+import mazestormer.command.CommandTools;
+import mazestormer.command.Commander;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.maze.Edge.EdgeType;
@@ -27,7 +29,6 @@ import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
-import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.Navigator.NavigatorState;
@@ -50,8 +51,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	/*
 	 * Settings
 	 */
-	private final Player player;
-	private Controller controller;
+	private final CommandTools player;
+	private Commander controller;
 
 	/*
 	 * Subroutines
@@ -90,7 +91,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 */
 	private AtomicBoolean shouldLineAdjust = new AtomicBoolean(false);
 
-	public Driver(Player player, Controller controller) {
+	public Driver(CommandTools player, Commander controller) {
 		this.player = checkNotNull(player);
 		this.controller = checkNotNull(controller);
 		addStateListener(this);
@@ -122,7 +123,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Getters and setters
 	 */
 
-	protected final Controller getController() {
+	protected final Commander getController() {
 		return controller;
 	}
 

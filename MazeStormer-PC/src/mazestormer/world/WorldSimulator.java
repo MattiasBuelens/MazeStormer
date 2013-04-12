@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.command.CommandTools;
 import mazestormer.maze.PoseTransform;
 import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
-import mazestormer.player.RelativePlayer;
 import peno.htttp.DisconnectReason;
 import peno.htttp.SpectatorClient;
 import peno.htttp.SpectatorHandler;
@@ -59,8 +59,8 @@ public class WorldSimulator {
 	private synchronized AbsolutePlayer getOrAddPlayer(String playerID) {
 		AbsolutePlayer player = getWorld().getPlayer(playerID);
 		if (player == null) {
-			RelativePlayer relativePlayer = new RelativePlayer(playerID, new ObservableRobot(), null);
-			player = new AbsolutePlayer(relativePlayer);
+			CommandTools commandTools = new CommandTools(playerID, new ObservableRobot(), null);
+			player = new AbsolutePlayer(commandTools);
 			getWorld().addPlayer(player);
 		}
 		return player;

@@ -1,4 +1,4 @@
-package mazestormer.game;
+package mazestormer.command;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -14,9 +14,10 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
-import mazestormer.explore.ControlMode;
-import mazestormer.explore.ExploreControlMode;
-import mazestormer.explore.Controller;
+import mazestormer.controlMode.ControlMode;
+import mazestormer.controlMode.ExploreControlMode;
+import mazestormer.game.Game;
+import mazestormer.game.GameListener;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -29,7 +30,7 @@ import mazestormer.util.LongPoint;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class GameRunner extends Controller implements GameListener {
+public class GamePlayer extends Commander implements GameListener {
 
 	/**
 	 * The frequency of position updates.
@@ -48,7 +49,7 @@ public class GameRunner extends Controller implements GameListener {
 
 	private int objectNumber;
 
-	public GameRunner(Player player, Game game) {
+	public GamePlayer(CommandTools player, Game game) {
 		super(player);
 
 		// Game

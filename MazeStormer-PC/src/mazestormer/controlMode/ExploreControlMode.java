@@ -1,4 +1,4 @@
-package mazestormer.explore;
+package mazestormer.controlMode;
 
 import java.util.Collections;
 import java.util.Comparator;

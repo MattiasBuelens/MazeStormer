@@ -4,26 +4,27 @@ import java.util.logging.Logger;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.command.CommandTools;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
 import mazestormer.robot.Robot;
 
 public class AbsolutePlayer implements Player {
 
-	private final RelativePlayer delegate;
+	private final CommandTools delegate;
 	private PoseTransform transform = PoseTransform.getIdentity();
 
 	private final Robot robot;
 	private final PoseProvider poseProvider;
 
-	public AbsolutePlayer(RelativePlayer player) {
+	public AbsolutePlayer(CommandTools player) {
 		this.delegate = player;
 
 		this.robot = new AbsoluteRobot();
 		this.poseProvider = new AbsolutePoseProvider();
 	}
 
-	public RelativePlayer delegate() {
+	public CommandTools delegate() {
 		return delegate;
 	}
 

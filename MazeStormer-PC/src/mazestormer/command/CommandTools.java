@@ -1,14 +1,15 @@
-package mazestormer.player;
+package mazestormer.command;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mazestormer.maze.IMaze;
+import mazestormer.player.AbstractPlayer;
 import mazestormer.robot.Robot;
 
-public class RelativePlayer extends AbstractPlayer {
+public class CommandTools extends AbstractPlayer {
 
-	public RelativePlayer(String playerID, Robot robot, IMaze maze) {
+	public CommandTools(String playerID, Robot robot, IMaze maze) {
 		// Set player identifier
 		setPlayerID(playerID);
 		// Set robot

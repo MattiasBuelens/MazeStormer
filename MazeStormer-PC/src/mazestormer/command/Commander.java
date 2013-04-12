@@ -1,23 +1,25 @@
-package mazestormer.explore;
+package mazestormer.command;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import mazestormer.controlMode.ControlMode;
+import mazestormer.controlMode.Driver;
 import mazestormer.player.Player;
 
 /**
  * Commands and controls a driver through the maze.
  */
-public abstract class Controller {
+public abstract class Commander {
 
-	private final Player player;
+	private final CommandTools player;
 	private final Driver driver;
 
 	private ControlMode currentMode;
 	private ControlMode startMode;
 	private final Map<ControlMode, ControlMode> bindings = new HashMap<>();
 
-	public Controller(Player player) {
+	public Commander(CommandTools player) {
 		this.player = player;
 		this.driver = new Driver(player, this);
 	}

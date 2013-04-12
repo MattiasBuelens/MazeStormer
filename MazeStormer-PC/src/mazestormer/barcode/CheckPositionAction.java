@@ -1,14 +1,14 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import mazestormer.player.Player;
+import mazestormer.command.CommandTools;
 import mazestormer.robot.Robot;
 import mazestormer.util.Future;
 
 public class CheckPositionAction implements IAction {
 
 	@Override
-	public Future<?> performAction(Player player) {
+	public Future<?> performAction(CommandTools player) {
 		checkNotNull(player);
 		Robot robot = player.getRobot();
 		checkNotNull(robot);
