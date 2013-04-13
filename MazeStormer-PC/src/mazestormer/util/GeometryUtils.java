@@ -1,0 +1,44 @@
+package mazestormer.util;
+
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+
+public final class GeometryUtils {
+
+	private GeometryUtils() {
+	}
+
+	public static Coordinate toCoordinate(Point2D point) {
+		return new Coordinate(point.getX(), point.getY());
+	}
+
+	public static Point toGeometry(Point2D point, GeometryFactory geomFact) {
+		return geomFact.createPoint(toCoordinate(point));
+	}
+
+	public static LineString toGeometry(Line2D line, GeometryFactory geomFact) {
+		final Coordinate[] coords = new Coordinate[2];
+		coords[0] = toCoordinate(line.getP1());
+		coords[1] = toCoordinate(line.getP2());
+		return geomFact.createLineString(coords);
+	}
+
+	public static Polygon toGeometry(Rectangle2D rect, GeometryFactory geomFact) {
+		final double x = rect.getX(), y = rect.getY(), w = rect.getWidth(), h = rect.getHeight();
+		final Coordinate[] coords = new Coordinate[5];
+		coords[0] = new Coordinate(x, y);
+		coords[1] = new Coordinate(x + w, y);
+		coords[2] = new Coordinate(x + w, y + h);
+		coords[3] = new Coordinate(x, y + h);
+		coords[4] = coords[0];
+		return geomFact.createPolygon(coords);
+	}
+
+}

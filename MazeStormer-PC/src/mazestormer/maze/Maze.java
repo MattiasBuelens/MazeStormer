@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
@@ -34,7 +36,6 @@ public class Maze implements IMaze {
 	private PoseTransform originTransform;
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
-	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
@@ -43,10 +44,15 @@ public class Maze implements IMaze {
 
 	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
 
+	private final EdgeGeometry edgeGeometry;
+
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
 		this.barLength = barLength;
+
+		this.edgeGeometry = new EdgeGeometry(this);
+		addListener(edgeGeometry);
 
 		setOriginToDefault();
 	}
@@ -264,7 +270,6 @@ public class Maze implements IMaze {
 
 		// Fire edge changed event
 		fireEdgeChanged(edge);
-		updateEdgeLine(edge);
 
 		// Fire tile changed events
 		for (LongPoint touchingPosition : edge.getTouching()) {
@@ -392,7 +397,6 @@ public class Maze implements IMaze {
 	@Override
 	public void clear() {
 		tiles.clear();
-		lines.clear();
 		targets.clear();
 		fireMazeCleared();
 	}
@@ -501,8 +505,8 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public Collection<Line> getEdgeLines() {
-		return Collections.unmodifiableCollection(lines.values());
+	public Geometry getEdgeGeometry() {
+		return edgeGeometry.getGeometry();
 	}
 
 	@Override
@@ -524,16 +528,6 @@ public class Maze implements IMaze {
 
 		// Return bounding box
 		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX() - p1.getX(), p2.getY() - p1.getY());
-	}
-
-	private void updateEdgeLine(Edge edge) {
-		if (edge.getType() == EdgeType.WALL) {
-			// Add line
-			lines.put(edge, createEdgeLine(edge));
-		} else {
-			// Remove line
-			lines.remove(edge);
-		}
 	}
 
 	private Line createEdgeLine(Edge edge) {

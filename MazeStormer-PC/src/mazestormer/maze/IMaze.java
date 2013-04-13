@@ -5,6 +5,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.List;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
@@ -417,9 +419,9 @@ public interface IMaze {
 	public Point getTileCenter(LongPoint tilePosition);
 
 	/**
-	 * Get a collection of all edges as lines, in relative coordinates.
+	 * Get the edges as a geometry.
 	 */
-	public Collection<Line> getEdgeLines();
+	public Geometry getEdgeGeometry();
 
 	/**
 	 * Get the line of an edge, in relative coordinates.

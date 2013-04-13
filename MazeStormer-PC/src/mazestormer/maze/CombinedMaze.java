@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
@@ -476,8 +478,8 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
-	public Collection<Line> getEdgeLines() {
-		return getTotalMaze().getEdgeLines();
+	public Geometry getEdgeGeometry() {
+		return getTotalMaze().getEdgeGeometry();
 	}
 
 	@Override
