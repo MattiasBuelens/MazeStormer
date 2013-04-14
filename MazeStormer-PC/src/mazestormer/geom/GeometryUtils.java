@@ -55,5 +55,9 @@ public final class GeometryUtils {
 
 		return geomFact.createPolygon(coords);
 	}
+	
+	public static Polygon emptyPolygon(GeometryFactory geomFact) {
+		return geomFact.createPolygon(null, null);
+	}
 
 }

@@ -50,7 +50,7 @@ public class EdgeGeometry extends DefaultMazeListener {
 	 * Reset the geometry.
 	 */
 	private final void reset() {
-		geom = geomFact.createPolygon(null, null);
+		geom = GeometryUtils.emptyPolygon(geomFact);
 	}
 
 	@Override
