@@ -14,8 +14,7 @@ import mazestormer.maze.parser.Parser;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
 
-public class ConfigurationController extends SubController implements
-		IConfigurationController {
+public class ConfigurationController extends SubController implements IConfigurationController {
 
 	private RobotType robotType;
 	private ControlMode controlMode;
@@ -94,7 +93,7 @@ public class ConfigurationController extends SubController implements
 			postEvent(new StopEvent());
 		}
 	}
-	
+
 	private void postState(ConfigurationEvent.EventType eventType) {
 		postEvent(new ConfigurationEvent(eventType));
 	}

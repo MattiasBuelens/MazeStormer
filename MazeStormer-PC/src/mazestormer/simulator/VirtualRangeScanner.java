@@ -14,10 +14,10 @@ import lejos.robotics.RangeReadings;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.detect.ObservableRangeScanner;
+import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.IMaze;
 import mazestormer.robot.RangeScannerListener;
 import mazestormer.util.Future;
-import mazestormer.util.GeometryUtils;
 import mazestormer.util.ImmediateFuture;
 import mazestormer.world.World;
 

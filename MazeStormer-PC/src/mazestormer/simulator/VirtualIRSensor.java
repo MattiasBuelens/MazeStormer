@@ -14,6 +14,8 @@ import mazestormer.player.AbsolutePlayer;
 import mazestormer.robot.IRSensor;
 import mazestormer.world.World;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 public class VirtualIRSensor implements IRSensor {
 
 	private World world;
@@ -55,6 +57,12 @@ public class VirtualIRSensor implements IRSensor {
 
 		Pose currentPose = getPoseProvider().getPose();
 		Tile currentTile = getTileAt(currentPose);
+
+		// TODO Re-implement using visibility polygon
+		// Point viewPoint = getMaze().toRelative(currentPose.getLocation());
+		// Coordinate viewCoord = GeometryUtils.toCoordinate(viewPoint);
+		// Polygon inner = getMaze().getSurroundingGeometry(viewPoint);
+		// Geometry visPoly = new VisibilityPolygon(inner, viewCoord).build();
 
 		// Check if IR scan is allowed in x or y direction.
 		float currentAngle = currentPose.getHeading();

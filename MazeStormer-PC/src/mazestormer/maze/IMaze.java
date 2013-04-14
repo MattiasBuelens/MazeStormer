@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -422,6 +423,14 @@ public interface IMaze {
 	 * Get the edges as a geometry.
 	 */
 	public Geometry getEdgeGeometry();
+
+	/**
+	 * Get the polygon surrounding the given relative position.
+	 * 
+	 * @param relativePosition
+	 *            The relative position.
+	 */
+	public Polygon getSurroundingGeometry(Point2D relativePosition);
 
 	/**
 	 * Get the line of an edge, in relative coordinates.

@@ -2,8 +2,8 @@ package mazestormer.maze;
 
 import java.awt.geom.Rectangle2D;
 
+import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.Edge.EdgeType;
-import mazestormer.util.GeometryUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;

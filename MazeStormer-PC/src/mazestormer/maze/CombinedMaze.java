@@ -8,14 +8,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * A class that contains the observed maze of the player that uses it, as well
@@ -480,6 +481,11 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public Geometry getEdgeGeometry() {
 		return getTotalMaze().getEdgeGeometry();
+	}
+
+	@Override
+	public Polygon getSurroundingGeometry(Point2D relativePosition) {
+		return getTotalMaze().getSurroundingGeometry(relativePosition);
 	}
 
 	@Override

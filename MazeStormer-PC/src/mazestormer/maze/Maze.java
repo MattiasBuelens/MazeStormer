@@ -12,14 +12,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
+import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class Maze implements IMaze {
 
@@ -507,6 +510,24 @@ public class Maze implements IMaze {
 	@Override
 	public Geometry getEdgeGeometry() {
 		return edgeGeometry.getGeometry();
+	}
+
+	@Override
+	public Polygon getSurroundingGeometry(Point2D relativePosition) {
+		Geometry edges = getEdgeGeometry();
+		GeometryFactory geomFact = edges.getFactory();
+		Geometry point = geomFact.createPoint(GeometryUtils.toCoordinate(relativePosition));
+		// Get the inner geometry
+		Geometry inner = edges.getEnvelope().difference(edges);
+		// Find the polygon containing the given point
+		for (int i = 0; i < inner.getNumGeometries(); i++) {
+			Polygon innerPolygon = (Polygon) inner.getGeometryN(i);
+			if (innerPolygon.contains(point)) {
+				return innerPolygon;
+			}
+		}
+		// Point not found inside geometry
+		return null;
 	}
 
 	@Override
