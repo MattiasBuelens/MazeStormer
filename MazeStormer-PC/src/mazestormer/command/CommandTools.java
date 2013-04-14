@@ -1,9 +1,10 @@
-package mazestormer.player;
+package mazestormer.command;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mazestormer.maze.IMaze;
+import mazestormer.player.AbstractPlayer;
 import mazestormer.robot.Robot;
 
 public class CommandTools extends AbstractPlayer {

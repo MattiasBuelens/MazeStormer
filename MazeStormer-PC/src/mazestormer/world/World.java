@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.command.CommandTools;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
-import mazestormer.player.CommandTools;
 
 public class World {
 

@@ -1,8 +1,8 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import mazestormer.command.CommandTools;
 import mazestormer.maze.IMaze;
-import mazestormer.player.CommandTools;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 

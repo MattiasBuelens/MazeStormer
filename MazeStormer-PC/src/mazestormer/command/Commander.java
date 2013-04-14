@@ -6,7 +6,6 @@ import java.util.Map;
 import mazestormer.controlMode.ControlMode;
 import mazestormer.controlMode.Driver;
 import mazestormer.player.Player;
-import mazestormer.player.CommandTools;
 
 /**
  * Commands and controls a driver through the maze.

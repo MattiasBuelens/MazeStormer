@@ -5,7 +5,6 @@ import mazestormer.barcode.ExplorerBarcodeMapping;
 import mazestormer.controlMode.ControlMode;
 import mazestormer.controlMode.ExploreControlMode;
 import mazestormer.controlMode.FinishControlMode;
-import mazestormer.player.CommandTools;
 
 public class Explorer extends Commander {
 

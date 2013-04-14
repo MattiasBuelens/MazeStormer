@@ -1,11 +1,11 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import mazestormer.command.CommandTools;
 import mazestormer.command.GamePlayer;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.player.Player;
-import mazestormer.player.CommandTools;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.state.AbstractStateListener;

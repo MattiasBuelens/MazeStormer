@@ -2,11 +2,11 @@ package mazestormer.controller;
 
 import java.io.IOException;
 
+import mazestormer.command.CommandTools;
 import mazestormer.game.ConnectionMode;
 import mazestormer.game.Game;
 import mazestormer.game.GameListener;
 import mazestormer.player.Player;
-import mazestormer.player.CommandTools;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.world.World;
 import mazestormer.world.WorldSimulator;

@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.command.CommandTools;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
@@ -15,7 +16,6 @@ import mazestormer.connect.Connector;
 import mazestormer.connect.RobotType;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
-import mazestormer.player.CommandTools;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;

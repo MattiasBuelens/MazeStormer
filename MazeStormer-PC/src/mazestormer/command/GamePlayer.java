@@ -25,7 +25,6 @@ import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
 import mazestormer.player.Player;
-import mazestormer.player.CommandTools;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
 

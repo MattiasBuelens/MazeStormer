@@ -1,6 +1,6 @@
 package mazestormer.barcode;
 
-import mazestormer.player.CommandTools;
+import mazestormer.command.CommandTools;
 import mazestormer.util.Future;
 
 public interface IAction {
