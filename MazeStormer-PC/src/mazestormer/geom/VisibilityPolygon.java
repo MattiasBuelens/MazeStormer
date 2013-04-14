@@ -84,9 +84,11 @@ public class VisibilityPolygon {
 	private Geometry build(LinearRing ring) {
 		Geometry result = GeometryUtils.emptyPolygon(factory);
 		Coordinate[] coords = ring.getCoordinates();
-		// i = vertex index
-		// j = next vertex index
-		for (int i = 0; i < coords.length; ++i) {
+		// The first and last vertices are equal in a closed ring
+		// so make sure to not treat those as an edge
+		for (int i = 0; i < coords.length - 1; ++i) {
+			// i = vertex index
+			// j = next vertex index
 			final int j = (i + 1) % coords.length;
 			LineSegment edge = new LineSegment(coords[i], coords[j]);
 			result = result.union(getVisibleRegion(edge));
