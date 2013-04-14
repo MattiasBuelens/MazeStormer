@@ -2,6 +2,11 @@ package mazestormer.geom;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import com.google.common.math.DoubleMath;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -9,6 +14,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -67,22 +74,25 @@ public class VisibilityPolygon {
 	 */
 	public Geometry build() {
 		// Exterior shell
-		Geometry result = build(polygon.getExteriorRing());
+		Collection<Geometry> regions = build(polygon.getExteriorRing());
 		// Interior holes
 		for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
-			result = result.union(build(polygon.getInteriorRingN(i)));
+			regions.addAll(build(polygon.getInteriorRingN(i)));
 		}
+		// Combine and simplify
+		Geometry result = factory.buildGeometry(regions);
+		result = GeometryUtils.removeCollinear(result);
 		return result;
 	}
 
 	/**
-	 * Compute the visible region from the view point on the given ring.
+	 * Compute the visible regions from the view point on the given ring.
 	 * 
 	 * @param ring
 	 *            The ring.
 	 */
-	private Geometry build(LinearRing ring) {
-		Geometry result = GeometryUtils.emptyPolygon(factory);
+	private Collection<Geometry> build(LinearRing ring) {
+		List<Geometry> regions = new ArrayList<Geometry>();
 		Coordinate[] coords = ring.getCoordinates();
 		// The first and last vertices are equal in a closed ring
 		// so make sure to not treat those as an edge
@@ -91,24 +101,24 @@ public class VisibilityPolygon {
 			// j = next vertex index
 			final int j = (i + 1) % coords.length;
 			LineSegment edge = new LineSegment(coords[i], coords[j]);
-			result = result.union(getVisibleRegion(edge));
+			regions.addAll(getVisibleRegions(edge));
 		}
-		return result;
+		return regions;
 	}
 
 	/**
-	 * Compute the visible region from the view point on the given ring.
+	 * Compute the visible regions from the view point on the given ring.
 	 * 
 	 * @param ring
 	 *            The ring.
 	 * @see #build(LinearRing)
 	 */
-	private Geometry build(LineString ring) {
-		if (!ring.isClosed())
-			throw new IllegalArgumentException("Ring must be closed.");
-		if (!ring.isSimple())
-			throw new IllegalArgumentException("Ring must be simple.");
-		return build(factory.createLinearRing(ring.getCoordinateSequence()));
+	private Collection<Geometry> build(LineString ring) {
+		if (ring instanceof LinearRing) {
+			return build((LinearRing) ring);
+		} else {
+			return build(factory.createLinearRing(ring.getCoordinateSequence()));
+		}
 	}
 
 	/**
@@ -116,31 +126,55 @@ public class VisibilityPolygon {
 	 * 
 	 * @param screen
 	 *            The line segment on which to project.
-	 * @return The region containing all points visible between the view point
+	 * @return The regions containing all points visible between the view point
 	 *         and the edge.
 	 */
-	private Geometry getVisibleRegion(LineSegment screen) {
+	private Collection<Geometry> getVisibleRegions(LineSegment screen) {
 		// Start with all points between view point and screen
-		Geometry result = getViewingTriangle(screen);
+		Geometry view = getViewingTriangle(screen);
 		// Find collisions with polygon
-		Geometry collisions = result.difference(polygon);
-		// Iterate over colliding polygons
-		for (int i = 0; i < collisions.getNumGeometries(); ++i) {
-			Polygon collision = (Polygon) collisions.getGeometryN(i);
-			// Ignore empty collisions
-			if (collision.isEmpty())
+		Geometry collisions = view.difference(polygon);
+		// Exit if no collisions
+		if (collisions.isEmpty()) {
+			return Collections.singleton(view);
+		}
+		// Remove blocked segments
+		Geometry blocked = getProjections(collisions, screen);
+		Geometry visible = screen.toGeometry(factory);
+		visible = visible.difference(blocked);
+		// Exit if empty
+		if (visible.isEmpty()) {
+			return Collections.emptySet();
+		}
+		// Build triangles
+		return buildViewingTriangles(visible);
+	}
+
+	/**
+	 * Get the projections of all polygons in the given {@link Polygon} or
+	 * {@link MultiPolygon} onto the given screen.
+	 * 
+	 * @param polygons
+	 *            The polygons to project.
+	 * @param screen
+	 *            The line segment on which to project.
+	 * @return The projected line strings.
+	 * @see #project(Polygon, LineSegment)
+	 */
+	private Geometry getProjections(Geometry polygons, LineSegment screen) {
+		List<LineString> projections = new ArrayList<LineString>();
+		// Iterate over polygons
+		for (int i = 0; i < polygons.getNumGeometries(); ++i) {
+			Polygon polygon = (Polygon) polygons.getGeometryN(i);
+			// Ignore empty polygons
+			if (polygon.isEmpty())
 				continue;
 			// Project polygon on edge
-			LineSegment projectedLine = project(collision, screen);
-			// Subtract projection from result
-			Geometry projection = getViewingTriangle(projectedLine);
-			result = result.difference(projection);
-			// Exit if area too small
-			if (DoubleMath.fuzzyEquals(result.getArea(), 0d, TOLERANCE)) {
-				return GeometryUtils.emptyPolygon(factory);
-			}
+			LineString projectedLine = project(polygon, screen).toGeometry(factory);
+			// Store projection
+			projections.add(projectedLine);
 		}
-		return result;
+		return factory.createMultiLineString(GeometryFactory.toLineStringArray(projections));
 	}
 
 	/**
@@ -173,6 +207,31 @@ public class VisibilityPolygon {
 		Coordinate minCoord = screen.pointAlong(minFraction);
 		Coordinate maxCoord = screen.pointAlong(maxFraction);
 		return new LineSegment(minCoord, maxCoord);
+	}
+
+	/**
+	 * Build the viewing triangles from the view point to all segments of the
+	 * given {@link LineString} or {@link MultiLineString}.
+	 * 
+	 * @param lineStrings
+	 *            The (visible) line strings.
+	 * @return A collection of viewing triangles.
+	 * @see #getViewingTriangle(LineSegment)
+	 */
+	private Collection<Geometry> buildViewingTriangles(Geometry lineStrings) {
+		List<Geometry> triangles = new ArrayList<Geometry>();
+		for (int i = 0; i < lineStrings.getNumGeometries(); ++i) {
+			Geometry line = lineStrings.getGeometryN(i);
+			// Add viewing triangle
+			Coordinate[] coords = line.getCoordinates();
+			assert (coords.length == 2);
+			Polygon triangle = getViewingTriangle(coords[0], coords[1]);
+			// Ignore too small triangles
+			if (!DoubleMath.fuzzyEquals(triangle.getArea(), 0d, TOLERANCE)) {
+				triangles.add(triangle);
+			}
+		}
+		return triangles;
 	}
 
 	/**

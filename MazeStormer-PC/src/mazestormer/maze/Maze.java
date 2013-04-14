@@ -516,14 +516,15 @@ public class Maze implements IMaze {
 	public Polygon getSurroundingGeometry(Point2D relativePosition) {
 		Geometry edges = getEdgeGeometry();
 		GeometryFactory geomFact = edges.getFactory();
-		Geometry point = geomFact.createPoint(GeometryUtils.toCoordinate(relativePosition));
+		Geometry point = GeometryUtils.toGeometry(relativePosition, geomFact);
 		// Get the inner geometry
 		Geometry inner = edges.getEnvelope().difference(edges);
 		// Find the polygon containing the given point
 		for (int i = 0; i < inner.getNumGeometries(); i++) {
 			Polygon innerPolygon = (Polygon) inner.getGeometryN(i);
 			if (innerPolygon.contains(point)) {
-				return innerPolygon;
+				// Simplify result
+				return GeometryUtils.removeCollinear(innerPolygon);
 			}
 		}
 		// Point not found inside geometry
