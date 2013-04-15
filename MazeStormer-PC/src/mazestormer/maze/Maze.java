@@ -20,11 +20,9 @@ import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class Maze implements IMaze {
 
@@ -515,21 +513,13 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public Polygon getSurroundingGeometry(Point2D relativePosition, double range) {
+	public Polygon getSurroundingGeometry(Point2D relativePosition) {
 		Geometry edges = getEdgeGeometry();
 		GeometryFactory geomFact = edges.getFactory();
 		Geometry point = GeometryUtils.toGeometry(relativePosition, geomFact);
 
-		// Create envelope
-		GeometricShapeFactory factory = new GeometricShapeFactory();
-		Coordinate centre = GeometryUtils.toCoordinate(relativePosition);
-		factory.setCentre(centre);
-		factory.setWidth(2 * range);
-		factory.setHeight(2 * range);
-		Polygon envelope = factory.createRectangle();
-
 		// Get the inner geometry
-		Geometry inner = envelope.difference(edges);
+		Geometry inner = edges.getEnvelope().difference(edges);
 
 		// Find the polygon containing the given point
 		for (int i = 0; i < inner.getNumGeometries(); i++) {

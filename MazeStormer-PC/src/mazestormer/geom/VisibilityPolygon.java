@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.math.DoubleMath;
@@ -73,48 +74,88 @@ public class VisibilityPolygon {
 	 * Compute the visibility region.
 	 */
 	public Geometry build() {
-		// Exterior shell
-		Collection<Geometry> regions = build(polygon.getExteriorRing());
-		// Interior holes
-		for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
-			regions.addAll(build(polygon.getInteriorRingN(i)));
-		}
-		// Combine and simplify
-		Geometry result = factory.buildGeometry(regions);
-		result = GeometryUtils.removeCollinear(result);
-		return result;
+		// Collect line segments
+		List<LineSegment> segments = collect(polygon);
+
+		// Execute projections
+		Collection<Geometry> regions = getVisibleRegions(segments);
+
+		// Combine and simplyify
+		return combine(regions);
 	}
 
 	/**
-	 * Compute the visible regions from the view point on the given ring.
+	 * Collect line segments from the given polygon.
+	 * 
+	 * @param polygon
+	 *            The polygon.
+	 * @return All line segments of the polygon.
+	 */
+	public static List<LineSegment> collect(Polygon polygon) {
+		List<LineSegment> segments = new ArrayList<LineSegment>(polygon.getNumPoints());
+		// Exterior shell
+		segments.addAll(collect(polygon.getExteriorRing()));
+		// Interior holes
+		for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
+			segments.addAll(collect(polygon.getInteriorRingN(i)));
+		}
+		return segments;
+	}
+
+	/**
+	 * Collect line segments from the given ring.
 	 * 
 	 * @param ring
 	 *            The ring.
+	 * @return All line segments of the ring.
 	 */
-	protected Collection<Geometry> build(LinearRing ring) {
-		List<Geometry> regions = new ArrayList<Geometry>();
+	public static List<LineSegment> collect(LinearRing ring) {
 		Coordinate[] coords = ring.getCoordinates();
 		// The first and last vertices are equal in a closed ring
 		// so make sure to not treat those as an edge
-		for (int i = 0; i < coords.length - 1; ++i) {
+		int numPoints = coords.length - 1;
+		List<LineSegment> segments = new ArrayList<LineSegment>(numPoints);
+		for (int i = 0; i < numPoints; ++i) {
 			// i = vertex index
 			// j = next vertex index
 			final int j = (i + 1) % coords.length;
 			LineSegment edge = new LineSegment(coords[i], coords[j]);
-			regions.addAll(getVisibleRegions(edge));
+			segments.add(edge);
 		}
-		return regions;
+		return segments;
 	}
 
 	/**
-	 * Compute the visible regions from the view point on the given ring.
+	 * Collect line segments from the given ring.
 	 * 
 	 * @param ring
 	 *            The ring.
-	 * @see #build(LinearRing)
+	 * @return All line segments of the ring.
 	 */
-	protected Collection<Geometry> build(LineString ring) {
-		return build(toLinearRing(ring));
+	public static List<LineSegment> collect(LineString ring) {
+		return collect(toLinearRing(ring));
+	}
+
+	public static LinearRing toLinearRing(LineString string) {
+		if (string instanceof LinearRing) {
+			return (LinearRing) string;
+		} else {
+			return string.getFactory().createLinearRing(string.getCoordinateSequence());
+		}
+	}
+
+	/**
+	 * Get the visible region between the view point and the given edges.
+	 * 
+	 * @param edges
+	 *            The edges on which to project.
+	 */
+	protected Collection<Geometry> getVisibleRegions(List<LineSegment> edges) {
+		List<Geometry> regions = new LinkedList<Geometry>();
+		for (LineSegment segment : edges) {
+			regions.addAll(getVisibleRegions(segment));
+		}
+		return regions;
 	}
 
 	/**
@@ -158,9 +199,10 @@ public class VisibilityPolygon {
 	 * @see #project(Polygon, LineSegment)
 	 */
 	protected Geometry getProjections(Geometry polygons, LineSegment screen) {
-		List<LineString> projections = new ArrayList<LineString>();
+		int numGeometries = polygons.getNumGeometries();
+		List<LineString> projections = new ArrayList<LineString>(numGeometries);
 		// Iterate over polygons
-		for (int i = 0; i < polygons.getNumGeometries(); ++i) {
+		for (int i = 0; i < numGeometries; ++i) {
 			Polygon polygon = (Polygon) polygons.getGeometryN(i);
 			// Ignore empty polygons
 			if (polygon.isEmpty())
@@ -215,8 +257,9 @@ public class VisibilityPolygon {
 	 * @see #getViewingTriangle(LineSegment)
 	 */
 	protected Collection<Geometry> buildViewingTriangles(Geometry lineStrings) {
-		List<Geometry> triangles = new ArrayList<Geometry>();
-		for (int i = 0; i < lineStrings.getNumGeometries(); ++i) {
+		int numGeometries = lineStrings.getNumGeometries();
+		List<Geometry> triangles = new ArrayList<Geometry>(numGeometries);
+		for (int i = 0; i < numGeometries; ++i) {
 			Geometry line = lineStrings.getGeometryN(i);
 			// Add viewing triangle
 			Coordinate[] coords = line.getCoordinates();
@@ -257,12 +300,16 @@ public class VisibilityPolygon {
 		return getViewingTriangle(edge.getCoordinate(0), edge.getCoordinate(1));
 	}
 
-	protected LinearRing toLinearRing(LineString string) {
-		if (string instanceof LinearRing) {
-			return (LinearRing) string;
-		} else {
-			return factory.createLinearRing(string.getCoordinateSequence());
-		}
+	/**
+	 * Combine the given visible regions into one geometry.
+	 * 
+	 * @param regions
+	 *            The visible regions.
+	 */
+	protected Geometry combine(Collection<Geometry> regions) {
+		Geometry result = factory.buildGeometry(regions);
+		result = GeometryUtils.removeCollinear(result);
+		return result;
 	}
 
 }

@@ -429,10 +429,8 @@ public interface IMaze {
 	 * 
 	 * @param relativePosition
 	 *            The relative position.
-	 * @param range
-	 *            The maximum range.
 	 */
-	public Polygon getSurroundingGeometry(Point2D relativePosition, double range);
+	public Polygon getSurroundingGeometry(Point2D relativePosition);
 
 	/**
 	 * Get the line of an edge, in relative coordinates.
