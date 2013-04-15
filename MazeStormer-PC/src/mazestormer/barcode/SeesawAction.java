@@ -1,12 +1,6 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-
 import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
@@ -125,17 +119,16 @@ public class SeesawAction extends
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 
-	protected void goToOtherSeesaw() {
-		Collection<Tile> reachableSeesawBarcodeTiles = reachableSeesawBarcodeTiles();
-		Tile shortestTile;
-		int shortestPathLength = Integer.MAX_VALUE;
-		for (Tile tile : reachableSeesawBarcodeTiles) {
-			List<Tile> path = PF.findTilePathWithoutSeesaws(getCurrentTile(), tile);
-			if (path.size() < shortestPathLength)
-				shortestTile = tile;
-		}
-		// shortestPath is now the path the navigator should follow.
-
+	/**
+	 * @return true if there are still tiles to explore without traversing a
+	 *         seesaw.
+	 */
+	private boolean hasUnexploredTiles() {
+		IMaze maze = getMaze();
+		for (Tile tile : maze.getUnexploredTiles())
+			if (!tile.belongsToSeesaw())
+				return true;
+		return false;
 	}
 
 	private class LineFinderListener extends
@@ -168,52 +161,6 @@ public class SeesawAction extends
 	private boolean isSeesawOpen() {
 		IRSensor ir = getControllableRobot().getIRSensor();
 		return !ir.hasReading();
-	}
-
-	/**
-	 * @return true if there are still tiles to explore without traversing a
-	 *         seesaw.
-	 */
-	private boolean hasUnexploredTiles() {
-		IMaze maze = getMaze();
-		for (Tile tile : maze.getUnexploredTiles())
-			if (!tile.belongsToSeesaw())
-				return true;
-		return false;
-	}
-
-	/**
-	 * @return true if there are more than one seesaws discovered in the maze.
-	 */
-	private boolean moreThanOneSeesaw() {
-		return getMaze().getAmountOfSeesaws() > 1;
-	}
-
-	/**
-	 * @return A collection with barcode tiles belonging to a seesaw, to which
-	 *         you can go without crossing the seesaw you're currently standing
-	 *         at.
-	 */
-	private Collection<Tile> reachableSeesawBarcodeTiles() {
-
-		Collection<Tile> tiles = new HashSet<>();
-		Tile currentTile = getCurrentTile();
-		Barcode[] currentSeesaw = getGameRunner().getCurrentSeesawBarcodes();
-		IMaze maze = getMaze();
-		Collection<Tile> seesawBarcodeTiles = maze.getSeesawBarcodeTiles();
-
-		for (Tile tile : seesawBarcodeTiles) {
-			if (tile.getSeesawBarcode().equals(currentSeesaw[0])
-					|| tile.getSeesawBarcode().equals(currentSeesaw[1])) {
-				continue;
-			} else {
-				List<Tile> path = PF.findTilePathWithoutSeesaws(currentTile, tile);
-				if (!path.isEmpty())
-					tiles.add(tile);
-			}
-		}
-
-		return tiles;
 	}
 
 	public enum SeesawState implements
@@ -268,14 +215,6 @@ public class SeesawAction extends
 				input.resumeExploring();
 			}
 
-		},
-
-		GO_TO_OTHER_SEESAW {
-
-			@Override
-			public void execute(SeesawAction input) {
-				input.goToOtherSeesaw();
-			}
 		}
 
 	}

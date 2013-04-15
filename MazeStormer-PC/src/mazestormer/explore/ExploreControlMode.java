@@ -1,11 +1,16 @@
 package mazestormer.explore;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
+import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
@@ -34,7 +39,9 @@ public class ExploreControlMode extends ControlMode {
 
 		// Queue depleted
 		if (queue.isEmpty()) {
-			return null;
+			if (getBarcodeMapping() instanceof TeamTreasureTrekBarcodeMapping) {
+				return getClosestSeesawBarcodeTile(currentTile);
+			} else return null;
 		}
 
 		// Sort queue
@@ -48,6 +55,61 @@ public class ExploreControlMode extends ControlMode {
 		return nextTile;
 	}
 
+	/**
+	 * @return null if there is no reachable seesaw barcode tile
+	 */
+	private Tile getClosestSeesawBarcodeTile(Tile currentTile) {
+		Collection<Tile> reachableSeesawBarcodeTiles = reachableSeesawBarcodeTiles(currentTile);
+		Tile shortestTile = null;
+		int shortestPathLength = Integer.MAX_VALUE;
+		for (Tile tile : reachableSeesawBarcodeTiles) {
+			List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
+					currentTile, tile);
+			if (path.size() < shortestPathLength)
+				shortestTile = tile;
+		}
+		return shortestTile;
+
+	}
+
+	/**
+	 * @return A collection with barcode tiles belonging to a seesaw, to which
+	 *         you can go without crossing the seesaw you're currently standing
+	 *         at.
+	 */
+	private Collection<Tile> reachableSeesawBarcodeTiles(Tile currentTile) {
+
+		Collection<Tile> tiles = new HashSet<>();
+		Barcode[] currentSeesaw = getCurrentSeesawBarcodes(currentTile);
+		IMaze maze = getMaze();
+		Collection<Tile> seesawBarcodeTiles = maze.getSeesawBarcodeTiles();
+
+		for (Tile tile : seesawBarcodeTiles) {
+			if (tile.getSeesawBarcode().equals(currentSeesaw[0])
+					|| tile.getSeesawBarcode().equals(currentSeesaw[1])) {
+				continue;
+			} else {
+				List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
+						currentTile, tile);
+				if (!path.isEmpty())
+					tiles.add(tile);
+			}
+		}
+
+		return tiles;
+	}
+
+	private Barcode[] getCurrentSeesawBarcodes(Tile currentTile) {
+		if (!currentTile.hasBarcode())
+			return null;
+		Barcode barcode = currentTile.getBarcode();
+		if (!TeamTreasureTrekBarcodeMapping.isSeesawBarcode(barcode))
+			return null;
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
+				.getOtherSeesawBarcode(barcode);
+		return new Barcode[] { barcode, otherBarcode };
+	}
+
 	@Override
 	public boolean isBarcodeActionEnabled() {
 		return true;
@@ -57,7 +119,7 @@ public class ExploreControlMode extends ControlMode {
 	 * Add tiles to the queue if the edge in its direction is open and it is not
 	 * explored yet.
 	 */
-	private void selectTiles(Tile tile) {
+	protected void selectTiles(Tile tile) {
 		for (Orientation direction : tile.getOpenSides()) {
 			Tile neighborTile = getMaze().getOrCreateNeighbor(tile, direction);
 			// Reject the new paths with loops
@@ -72,7 +134,7 @@ public class ExploreControlMode extends ControlMode {
 	 * Compares tiles based on their Manhattan distance to a given reference
 	 * tile.
 	 */
-	public class ClosestTileComparator implements Comparator<Tile> {
+	private class ClosestTileComparator implements Comparator<Tile> {
 
 		private final Tile referenceTile;
 

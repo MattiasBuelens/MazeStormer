@@ -94,18 +94,6 @@ public class GameRunner extends Controller implements GameListener {
 		getMaze().setExplored(nextTile.getPosition());
 	}
 
-	/**
-	 * @return both barcodes of the seesaw if the robot is standing on a
-	 *         seesaw-barcode.
-	 */
-	public Barcode[] getCurrentSeesawBarcodes() {
-		Tile currentTile = getDriver().getCurrentTile();
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
-				.getOtherSeesawBarcode(seesawBarcode);
-		return new Barcode[] { seesawBarcode, otherBarcode };
-	}
-
 	public Tile getCurrentTile() {
 		return getDriver().getCurrentTile();
 	}
