@@ -5,10 +5,10 @@ import java.io.IOException;
 import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
-import mazestormer.connect.RobotType;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.world.ModelType;
 
 public class NXTLineFinder {
 
@@ -17,7 +17,7 @@ public class NXTLineFinder {
 
 
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.PHYSICAL);
+				.getConnector(ModelType.PHYSICAL);
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");
 		connector.connect(context);

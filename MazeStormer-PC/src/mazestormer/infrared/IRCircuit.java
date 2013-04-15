@@ -2,8 +2,9 @@ package mazestormer.infrared;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.world.ModelType;
 
-public class IRCircuit implements VirtualIRSource {
+public class IRCircuit implements IRSource {
 
 	private final PoseProvider staticPoseProvider;
 	private final Envelope envelope;
@@ -14,7 +15,7 @@ public class IRCircuit implements VirtualIRSource {
 	
 	public IRCircuit(Pose pose) {
 		this.staticPoseProvider = new StaticPoseProvider(pose);
-		this.envelope = new RectangularEnvelope(this.staticPoseProvider, HEIGHT, WIDTH);
+		this.envelope = new RectangularEnvelope(HEIGHT, WIDTH);
 	}
 
 	@Override
@@ -30,5 +31,10 @@ public class IRCircuit implements VirtualIRSource {
 	@Override
 	public PoseProvider getPoseProvider() {
 		return this.staticPoseProvider;
+	}
+
+	@Override
+	public ModelType getModelType() {
+		return ModelType.VIRTUAL;
 	}
 }

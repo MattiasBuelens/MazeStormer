@@ -3,12 +3,12 @@ package mazestormer.player;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
-import mazestormer.robot.Robot;
 
 public class RelativePlayer extends AbstractPlayer {
 
-	public RelativePlayer(String playerID, Robot robot, IMaze maze) {
+	public RelativePlayer(String playerID, IRRobot robot, IMaze maze) {
 		// Set player identifier
 		setPlayerID(playerID);
 		// Set robot
@@ -23,7 +23,7 @@ public class RelativePlayer extends AbstractPlayer {
 	}
 
 	@Override
-	public void setRobot(Robot robot) {
+	public void setRobot(IRRobot robot) {
 		super.setRobot(robot);
 	}
 

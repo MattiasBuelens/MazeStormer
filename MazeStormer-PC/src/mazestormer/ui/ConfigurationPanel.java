@@ -18,8 +18,8 @@ import javax.swing.border.TitledBorder;
 
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ControlMode;
-import mazestormer.connect.RobotType;
 import mazestormer.controller.IConfigurationController;
+import mazestormer.world.ModelType;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;
@@ -41,7 +41,7 @@ public class ConfigurationPanel extends ViewPanel {
 	private JButton btnDisconnect;
 	private JButton btnStop;
 
-	private ComboBoxModel<RobotType> robotTypeModel;
+	private ComboBoxModel<ModelType> robotTypeModel;
 	private ComboBoxModel<ControlMode> controlModeModel;
 
 	private final Action connectAction = new ConnectAction();
@@ -89,12 +89,12 @@ public class ConfigurationPanel extends ViewPanel {
 	}
 
 	private void createRobotType() {
-		robotTypeModel = new DefaultComboBoxModel<RobotType>(RobotType.values());
+		robotTypeModel = new DefaultComboBoxModel<ModelType>(ModelType.values());
 
 		JLabel lblType = new JLabel("Robot type");
 		container.add(lblType, "cell 0 0,grow");
 
-		JComboBox<RobotType> cmbType = new JComboBox<RobotType>();
+		JComboBox<ModelType> cmbType = new JComboBox<ModelType>();
 		cmbType.setModel(robotTypeModel);
 		container.add(cmbType, "cell 1 0,grow");
 
@@ -150,7 +150,7 @@ public class ConfigurationPanel extends ViewPanel {
 	}
 
 	public void connect() {
-		RobotType robotType = (RobotType) robotTypeModel.getSelectedItem();
+		ModelType robotType = (ModelType) robotTypeModel.getSelectedItem();
 		controller.connect(robotType);
 		setControlMode();
 	}

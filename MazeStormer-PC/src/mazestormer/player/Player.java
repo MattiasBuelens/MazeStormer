@@ -2,14 +2,14 @@ package mazestormer.player;
 
 import java.util.logging.Logger;
 
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
-import mazestormer.robot.Robot;
 
 public interface Player extends PlayerIdentifier {
 
 	public void setPlayerID(String playerID);
 
-	public Robot getRobot();
+	public IRRobot getRobot();
 
 	public IMaze getMaze();
 

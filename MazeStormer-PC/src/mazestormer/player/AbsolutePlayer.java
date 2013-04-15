@@ -4,26 +4,25 @@ import java.util.logging.Logger;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
 import mazestormer.robot.Robot;
-import mazestormer.world.IRDelegate;
+import mazestormer.world.ModelType;
 
 public class AbsolutePlayer implements Player {
 
 	private final RelativePlayer delegate;
 	private PoseTransform transform = PoseTransform.getIdentity();
 
-	private final Robot robot;
-	private final IRDelegate irDelegate;
+	private final IRRobot robot;
 	private final PoseProvider poseProvider;
 
 	public AbsolutePlayer(RelativePlayer player) {
 		this.delegate = player;
 
 		this.robot = new AbsoluteRobot();
-		this.irDelegate = new IRDelegate(this.delegate);
 		this.poseProvider = new AbsolutePoseProvider();
 	}
 
@@ -50,12 +49,8 @@ public class AbsolutePlayer implements Player {
 	}
 
 	@Override
-	public Robot getRobot() {
+	public IRRobot getRobot() {
 		return robot;
-	}
-	
-	public IRRobot getIRRobot() {
-		return this.irDelegate.getIRRobot();
 	}
 
 	@Override
@@ -82,11 +77,26 @@ public class AbsolutePlayer implements Player {
 		delegate().getRobot().getPoseProvider().setPose(pose);
 	}
 
-	private class AbsoluteRobot implements Robot {
+	private class AbsoluteRobot implements Robot, IRRobot {
 
 		@Override
 		public PoseProvider getPoseProvider() {
 			return poseProvider;
+		}
+
+		@Override
+		public boolean isEmitting() {
+			return delegate().getRobot().isEmitting();
+		}
+
+		@Override
+		public Envelope getEnvelope() {
+			return delegate().getRobot().getEnvelope();
+		}
+
+		@Override
+		public ModelType getModelType() {
+			return delegate().getRobot().getModelType();
 		}
 
 	}

@@ -2,57 +2,49 @@ package mazestormer.infrared;
 
 import java.awt.geom.Point2D;
 
-import lejos.robotics.localization.PoseProvider;
+import lejos.robotics.navigation.Pose;
 
 public class CircularEnvelope implements Envelope {
-	
-	private final PoseProvider poseProvider;
+
 	private double radius;
-	
-	public CircularEnvelope(PoseProvider poseProvider, double radius)
-			throws NullPointerException, IllegalArgumentException {
-		if (poseProvider == null) {
-			throw new NullPointerException("The given pose provider may not refer the null reference.");
-		}
+
+	public CircularEnvelope(double radius) throws IllegalArgumentException {
 		if (radius == 0) {
-			throw new IllegalArgumentException("The given radius and width may not be equal to zero.");
+			throw new IllegalArgumentException(
+					"The given radius and width may not be equal to zero.");
 		}
-		
-		this.poseProvider = poseProvider;
 		setRadius(radius);
 	}
 
-	@Override
-	public PoseProvider getPoseProvider() {
-		return this.poseProvider;
-	}
-	
 	public double getRadius() {
 		return this.radius;
 	}
-	
-	public void setRadius(double radius) {
+
+	private void setRadius(double radius) {
 		this.radius = Math.abs(radius);
 	}
 
 	@Override
-	public Point2D[] getClosestPoints(Point2D target) {
+	public Point2D[] getClosestPoints(Pose pose, Point2D target) {
 		// TODO: dummy implementation
-		return (new RectangularEnvelope(getPoseProvider(), 2*getRadius(), 2*getRadius())).getClosestPoints(target);
+		return (new RectangularEnvelope(2 * getRadius(), 2 * getRadius()))
+				.getClosestPoints(pose, target);
 	}
 
 	@Override
-	public Point2D[] getDiscretization(int depth)
+	public Point2D[] getDiscretization(Pose pose, int depth)
 			throws IllegalArgumentException {
 		// TODO: dummy implementation
-		return (new RectangularEnvelope(getPoseProvider(), 2*getRadius(), 2*getRadius())).getDiscretization(depth);
+		return (new RectangularEnvelope(2 * getRadius(), 2 * getRadius()))
+				.getDiscretization(pose, depth);
 	}
 
 	@Override
-	public Point2D[] getCombination(Point2D target, int depth)
+	public Point2D[] getCombination(Pose pose, Point2D target, int depth)
 			throws IllegalArgumentException {
 		// TODO: dummy implementation
-		return (new RectangularEnvelope(getPoseProvider(), 2*getRadius(), 2*getRadius())).getCombination(target, depth);
+		return (new RectangularEnvelope(2 * getRadius(), 2 * getRadius()))
+				.getCombination(pose, target, depth);
 	}
 
 }

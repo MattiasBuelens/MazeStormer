@@ -10,6 +10,9 @@ import mazestormer.condition.Condition;
 import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.infrared.Envelope;
+import mazestormer.infrared.IRRobot;
+import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.remote.MessageListener;
 import mazestormer.report.Report;
 import mazestormer.report.UpdateReport;
@@ -20,9 +23,10 @@ import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdate;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
+import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
-public class PhysicalRobot extends PhysicalComponent implements ControllableRobot {
+public class PhysicalRobot extends PhysicalComponent implements ControllableRobot, IRRobot {
 
 	/**
 	 * Timeout for synchronous requests.
@@ -41,6 +45,8 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 
 	private final UpdateReceiver updateReceiver;
 	private final List<RobotUpdateListener> updateListeners = new ArrayList<RobotUpdateListener>();
+	
+	private final Envelope envelope;
 
 	public PhysicalRobot(PhysicalCommunicator communicator, World world) {
 		super(communicator);
@@ -67,6 +73,9 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
+		
+		//TODO
+		this.envelope = new RectangularEnvelope(0+EXTERNAL_ZONE, 0+EXTERNAL_ZONE);
 	}
 
 	@Override
@@ -147,6 +156,21 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 			}
 		}
 
+	}
+	
+	@Override
+	public boolean isEmitting() {
+		return true;
+	}
+
+	@Override
+	public Envelope getEnvelope() {
+		return this.envelope;
+	}
+
+	@Override
+	public ModelType getModelType() {
+		return ModelType.PHYSICAL;
 	}
 
 }

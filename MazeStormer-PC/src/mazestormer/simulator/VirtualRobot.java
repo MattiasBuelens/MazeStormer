@@ -8,6 +8,9 @@ import mazestormer.condition.ConditionFuture;
 import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.infrared.Envelope;
+import mazestormer.infrared.IRRobot;
+import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
@@ -16,9 +19,10 @@ import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.collision.CollisionObserver;
 import mazestormer.simulator.collision.VirtualCollisionDetector;
+import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
-public class VirtualRobot implements ControllableRobot {
+public class VirtualRobot implements ControllableRobot, IRRobot {
 
 	private final World world;
 
@@ -38,6 +42,8 @@ public class VirtualRobot implements ControllableRobot {
 	private final VirtualConditionResolvers conditionResolvers;
 
 	private final VirtualUpdateProducer updateProducer;
+	
+	private final Envelope envelope;
 
 	public VirtualRobot(World world) {
 		this.world = world;
@@ -69,6 +75,9 @@ public class VirtualRobot implements ControllableRobot {
 
 		// Updates
 		updateProducer = new VirtualUpdateProducer(this);
+		
+		//TODO
+		this.envelope = new RectangularEnvelope(0+EXTERNAL_ZONE, 0+EXTERNAL_ZONE);
 	}
 
 	private World getWorld() {
@@ -141,4 +150,18 @@ public class VirtualRobot implements ControllableRobot {
 		conditionResolvers.terminate();
 	}
 
+	@Override
+	public boolean isEmitting() {
+		return true;
+	}
+
+	@Override
+	public Envelope getEnvelope() {
+		return this.envelope;
+	}
+
+	@Override
+	public ModelType getModelType() {
+		return ModelType.VIRTUAL;
+	}
 }

@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mazestormer.infrared.Model;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
@@ -60,7 +59,6 @@ public class World {
 
 	public void addPlayer(AbsolutePlayer player) {
 		players.put(player.getPlayerID(), player);
-		addModel(player.getIRRobot());
 
 		// Call listeners
 		for (WorldListener listener : listeners) {
@@ -70,9 +68,6 @@ public class World {
 
 	public void removePlayer(AbsolutePlayer player) {
 		players.remove(player.getPlayerID());
-
-		// TODO: de oude robot zijn ir robot kan nog steeds in de set aanwezig zijn
-		removeModel(player.getIRRobot());
 
 		// Call listeners
 		for (WorldListener listener : listeners) {

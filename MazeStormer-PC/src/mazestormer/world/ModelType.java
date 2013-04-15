@@ -1,6 +1,6 @@
-package mazestormer.connect;
+package mazestormer.world;
 
-public enum RobotType {
+public enum ModelType {
 	PHYSICAL {
 		@Override
 		public String toString() {

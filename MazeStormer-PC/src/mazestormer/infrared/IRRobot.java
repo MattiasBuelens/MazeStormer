@@ -1,6 +1,8 @@
 package mazestormer.infrared;
 
-public interface IRRobot extends IRSource{
+import mazestormer.robot.Robot;
+
+public interface IRRobot extends Robot, IRSource {
 
 	public static final double EXTERNAL_ZONE = 0;
 }
