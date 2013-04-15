@@ -83,14 +83,13 @@ public class ExploreControlMode extends ControlMode {
 			return Integer.compare(leftDistance, rightDistance);
 		}
 
-		// TODO This won't work if there exist longer paths around a seesaw!!!
 		public int shortestPathLength(Tile startTile, Tile endTile) {
 			List<Tile> path = getPathFinder().findTilePath(startTile, endTile);
-			for (Tile tile : path) {
+			/*for (Tile tile : path) {
 				if (tile.getIgnoreFlag()) {
 					return Integer.MAX_VALUE;
 				}
-			}
+			}*/
 			return path.size();
 		}
 
