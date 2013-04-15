@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.infrared.IRRobot;
+import mazestormer.infrared.IRSource;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
@@ -141,7 +143,7 @@ public class World {
 				temp.add(clazz.cast(model));
 			}
 		}
-		return Collections.unmodifiableSet(temp);
+		return Collections.unmodifiableSet(getRobots(temp));
 	}
 
 	public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType) {
@@ -151,6 +153,17 @@ public class World {
 				temp.add(modelType.cast(model));
 			}
 		}
-		return Collections.unmodifiableSet(temp);
+		return Collections.unmodifiableSet(getRobots(temp));
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Model> Set<T> getRobots(Set<T> irs) {
+		if (IRRobot.class == irs.getClass().getComponentType() 
+				|| IRRobot.class.isInstance(irs.getClass().getComponentType())) {
+			for(AbsolutePlayer player : players.values()) {
+				irs.add(((T) player.getRobot()));
+			}
+		}
+		return irs;
 	}
 }
