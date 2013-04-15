@@ -60,6 +60,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	protected void scan() {
 		boolean seesawOpen = false;
 		// TODO vraag aan IRSensor (matthias)
+		// TODO en waar is de vraag?
 		if (seesawOpen) {
 			transition(SeesawState.ONWARDS);
 		} else {
@@ -116,6 +117,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	protected void waitAndScan() {
 		boolean seesawOpen = false;
 		// TODO vraag aan IRSensor (matthias)
+		// TODO en waar is de vraag?
 		if (seesawOpen)
 			transition(SeesawState.ONWARDS);
 		else {

@@ -1,6 +1,7 @@
 package mazestormer.connect;
 
 import static com.google.common.base.Preconditions.checkState;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.simulator.VirtualRobot;
@@ -8,10 +9,10 @@ import mazestormer.world.World;
 
 public class VirtualConnector implements Connector {
 
-	private ControllableRobot robot;
+	private ControllablePCRobot robot;
 
 	@Override
-	public ControllableRobot getRobot() throws IllegalStateException {
+	public ControllablePCRobot getRobot() throws IllegalStateException {
 		checkState(isConnected());
 		return robot;
 	}
@@ -29,8 +30,8 @@ public class VirtualConnector implements Connector {
 		robot = createRobot(context.getWorld());
 	}
 
-	private static ControllableRobot createRobot(World world) {
-		ControllableRobot robot = new VirtualRobot(world);
+	private static ControllablePCRobot createRobot(World world) {
+		ControllablePCRobot robot = new VirtualRobot(world);
 		// Set default speeds
 		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(ControllableRobot.travelSpeed);

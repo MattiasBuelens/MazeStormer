@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
@@ -57,6 +60,7 @@ public class World {
 
 	public void addPlayer(AbsolutePlayer player) {
 		players.put(player.getPlayerID(), player);
+
 		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerAdded(player);
@@ -65,6 +69,7 @@ public class World {
 
 	public void removePlayer(AbsolutePlayer player) {
 		players.remove(player.getPlayerID());
+
 		// Call listeners
 		for (WorldListener listener : listeners) {
 			listener.playerRemoved(player);
@@ -114,4 +119,50 @@ public class World {
 		return logger;
 	}
 
+	// TODO: MM Objects and ir circuits need to be added after parsing
+
+	private final Set<Model> models = new HashSet<Model>();
+
+	public void addModel(Model model) {
+		this.models.add(model);
+	}
+
+	public void removeModel(Model model) {
+		this.models.remove(model);
+	}
+
+	public Set<Model> getModels() {
+		return Collections.unmodifiableSet(this.models);
+	}
+
+	public <T extends Model> Set<T> getAllStrictModelsClass(Class<T> clazz) {
+		Set<T> temp = new HashSet<T>();
+		for (Model model : this.models) {
+			if (model.getClass() == clazz) {
+				temp.add(clazz.cast(model));
+			}
+		}
+		return Collections.unmodifiableSet(getRobots(temp));
+	}
+
+	public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType) {
+		Set<T> temp = new HashSet<T>();
+		for (Model model : this.models) {
+			if (modelType.isInstance(model)) {
+				temp.add(modelType.cast(model));
+			}
+		}
+		return Collections.unmodifiableSet(getRobots(temp));
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Model> Set<T> getRobots(Set<T> irs) {
+		if (IRRobot.class == irs.getClass().getComponentType() 
+				|| IRRobot.class.isInstance(irs.getClass().getComponentType())) {
+			for(AbsolutePlayer player : players.values()) {
+				irs.add(((T) player.getRobot()));
+			}
+		}
+		return irs;
+	}
 }
