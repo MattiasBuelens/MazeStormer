@@ -30,11 +30,12 @@ public class VisibilityPolygonTest {
 
 	@Before
 	public void getSurroundingGeometry() {
-		LongPoint tilePoint = new LongPoint(3, 5);
-		Point viewPoint = maze.getTileCenter(tilePoint);
+		final LongPoint tilePoint = new LongPoint(3, 5);
+		final double range = 60d;
 
+		Point viewPoint = maze.getTileCenter(tilePoint);
 		viewCoord = GeometryUtils.toCoordinate(viewPoint);
-		inner = maze.getSurroundingGeometry(viewPoint);
+		inner = maze.getSurroundingGeometry(viewPoint, range);
 
 		System.out.println(inner.toText());
 	}
