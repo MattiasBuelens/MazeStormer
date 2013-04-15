@@ -26,11 +26,11 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class VisibilityPolygon {
 
-	private final Polygon polygon;
-	private final Coordinate viewCoord;
-	private final GeometryFactory factory;
+	protected final Polygon polygon;
+	protected final Coordinate viewCoord;
+	protected final GeometryFactory factory;
 
-	private static final double TOLERANCE = 1e-5d;
+	protected static final double TOLERANCE = 1e-5d;
 
 	/**
 	 * Create a new visibility polygon construction.
@@ -91,7 +91,7 @@ public class VisibilityPolygon {
 	 * @param ring
 	 *            The ring.
 	 */
-	private Collection<Geometry> build(LinearRing ring) {
+	protected Collection<Geometry> build(LinearRing ring) {
 		List<Geometry> regions = new ArrayList<Geometry>();
 		Coordinate[] coords = ring.getCoordinates();
 		// The first and last vertices are equal in a closed ring
@@ -113,12 +113,8 @@ public class VisibilityPolygon {
 	 *            The ring.
 	 * @see #build(LinearRing)
 	 */
-	private Collection<Geometry> build(LineString ring) {
-		if (ring instanceof LinearRing) {
-			return build((LinearRing) ring);
-		} else {
-			return build(factory.createLinearRing(ring.getCoordinateSequence()));
-		}
+	protected Collection<Geometry> build(LineString ring) {
+		return build(toLinearRing(ring));
 	}
 
 	/**
@@ -129,7 +125,7 @@ public class VisibilityPolygon {
 	 * @return The regions containing all points visible between the view point
 	 *         and the edge.
 	 */
-	private Collection<Geometry> getVisibleRegions(LineSegment screen) {
+	protected Collection<Geometry> getVisibleRegions(LineSegment screen) {
 		// Start with all points between view point and screen
 		Geometry view = getViewingTriangle(screen);
 		// Find collisions with polygon
@@ -161,7 +157,7 @@ public class VisibilityPolygon {
 	 * @return The projected line strings.
 	 * @see #project(Polygon, LineSegment)
 	 */
-	private Geometry getProjections(Geometry polygons, LineSegment screen) {
+	protected Geometry getProjections(Geometry polygons, LineSegment screen) {
 		List<LineString> projections = new ArrayList<LineString>();
 		// Iterate over polygons
 		for (int i = 0; i < polygons.getNumGeometries(); ++i) {
@@ -186,7 +182,7 @@ public class VisibilityPolygon {
 	 *            The screen on which to project.
 	 * @return The section of the screen containing the projection.
 	 */
-	private LineSegment project(Polygon polygon, LineSegment screen) {
+	protected LineSegment project(Polygon polygon, LineSegment screen) {
 		double minFraction = 1.0, maxFraction = 0.0;
 		// Only check exterior shell, interior holes don't matter for projection
 		Coordinate[] coords = polygon.getExteriorRing().getCoordinates();
@@ -218,7 +214,7 @@ public class VisibilityPolygon {
 	 * @return A collection of viewing triangles.
 	 * @see #getViewingTriangle(LineSegment)
 	 */
-	private Collection<Geometry> buildViewingTriangles(Geometry lineStrings) {
+	protected Collection<Geometry> buildViewingTriangles(Geometry lineStrings) {
 		List<Geometry> triangles = new ArrayList<Geometry>();
 		for (int i = 0; i < lineStrings.getNumGeometries(); ++i) {
 			Geometry line = lineStrings.getGeometryN(i);
@@ -244,7 +240,7 @@ public class VisibilityPolygon {
 	 *            The right vertex of the edge.
 	 * @return A triangle connecting the view point to the two given vertices.
 	 */
-	private Polygon getViewingTriangle(Coordinate leftVertex, Coordinate rightVertex) {
+	protected Polygon getViewingTriangle(Coordinate leftVertex, Coordinate rightVertex) {
 		return factory.createPolygon(new Coordinate[] { viewCoord, leftVertex, rightVertex, viewCoord });
 	}
 
@@ -257,8 +253,16 @@ public class VisibilityPolygon {
 	 * @return A triangle connecting the view point to the given edge.
 	 * @see #getViewingTriangle(Coordinate, Coordinate)
 	 */
-	private Polygon getViewingTriangle(LineSegment edge) {
+	protected Polygon getViewingTriangle(LineSegment edge) {
 		return getViewingTriangle(edge.getCoordinate(0), edge.getCoordinate(1));
+	}
+
+	protected LinearRing toLinearRing(LineString string) {
+		if (string instanceof LinearRing) {
+			return (LinearRing) string;
+		} else {
+			return factory.createLinearRing(string.getCoordinateSequence());
+		}
 	}
 
 }
