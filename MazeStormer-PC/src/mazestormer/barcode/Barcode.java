@@ -16,6 +16,10 @@ public class Barcode {
 		this.barWidths = Collections.unmodifiableList(getWidths(value));
 	}
 
+	public Barcode(int value) {
+		this((byte) value);
+	}
+
 	public byte getValue() {
 		return value;
 	}

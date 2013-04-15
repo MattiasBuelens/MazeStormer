@@ -23,7 +23,8 @@ import mazestormer.util.Future;
 import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 
-public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.BarcodeState> implements
+public class BarcodeScanner extends
+		StateMachine<BarcodeScanner, BarcodeScanner.BarcodeState> implements
 		StateListener<BarcodeScanner.BarcodeState>, BarcodeScannerListener {
 
 	/*
@@ -125,17 +126,14 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	@Override
 	public void onEndBarcode(byte barcode) {
 		// Log
-		String paddedBarcode = Strings.padStart(Integer.toBinaryString(barcode), Barcode.getNbValueBars(), '0');
+		String paddedBarcode = Strings.padStart(
+				Integer.toBinaryString(barcode), Barcode.getNbValueBars(), '0');
 		log("Scanned barcode: " + paddedBarcode);
 
 		// Action
 		if (performsAction()) {
-			performAction(barcode);
+			performAction(new Barcode(barcode));
 		}
-	}
-
-	public Future<?> performAction(byte barcode) {
-		return performAction(getMapping().getAction(barcode));
 	}
 
 	public Future<?> performAction(Barcode barcode) {
@@ -147,18 +145,21 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	}
 
 	private Future<Void> onFirstBlack() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+		Condition condition = new LightCompareCondition(
+				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> onWhiteToBlack() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
+		Condition condition = new LightCompareCondition(
+				ConditionType.LIGHT_SMALLER_THAN,
 				Threshold.WHITE_BLACK.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
 
 	private Future<Void> onBlackToWhite() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
+		Condition condition = new LightCompareCondition(
+				ConditionType.LIGHT_GREATER_THAN,
 				Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
@@ -186,7 +187,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 		getRobot().getPilot().setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
 		// travel(- START_BAR_LENGTH / 2);
-		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()), BarcodeState.STROKE_START);
+		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()),
+				BarcodeState.STROKE_START);
 	}
 
 	protected void strokeStart() {
@@ -224,7 +226,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			nextStrokeBlack = foundBlack;
 		}
 
-		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1) * getBarLength()) {
+		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1)
+				* getBarLength()) {
 			// Iterate
 			if (nextStrokeBlack) {
 				transition(BarcodeState.FIND_STROKE_BLACK);
@@ -253,7 +256,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 				// TODO Check with start offset
 				// at = Math.max((distance - START_BAR_LENGTH) / barLength,
 				// 0);
-				at = Math.max((distance - getStartOffset() - barLength) / barLength, 0);
+				at = Math.max((distance - getStartOffset() - barLength)
+						/ barLength, 0);
 			} else {
 				at = Math.max(distance / barLength, 1);
 			}
