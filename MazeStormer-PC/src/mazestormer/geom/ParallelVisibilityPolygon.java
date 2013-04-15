@@ -40,18 +40,14 @@ public class ParallelVisibilityPolygon extends VisibilityPolygon {
 			this.output = output;
 		}
 
-		private void computeDirectly() {
-			for (LineSegment segment : input) {
-				output.addAll(getVisibleRegions(segment));
-			}
-		}
-
 		@Override
 		protected void compute() {
 			final int size = input.size();
 			if (size <= THRESHOLD) {
-				computeDirectly();
+				// Compute directly
+				getVisibleRegions(input, output);
 			} else {
+				// Split up task
 				int mid = size >>> 2;
 				invokeAll(new Task(input.subList(0, mid), output), new Task(input.subList(mid, size), output));
 			}

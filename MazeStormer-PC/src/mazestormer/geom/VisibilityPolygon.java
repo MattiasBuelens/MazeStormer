@@ -152,10 +152,22 @@ public class VisibilityPolygon {
 	 */
 	protected Collection<Geometry> getVisibleRegions(List<LineSegment> edges) {
 		List<Geometry> regions = new LinkedList<Geometry>();
+		getVisibleRegions(edges, regions);
+		return regions;
+	}
+
+	/**
+	 * Get the visible region between the view point and the given edges.
+	 * 
+	 * @param edges
+	 *            The edges on which to project.
+	 * @param regions
+	 *            The regions collection receiving the output.
+	 */
+	protected final void getVisibleRegions(List<LineSegment> edges, Collection<Geometry> regions) {
 		for (LineSegment segment : edges) {
 			regions.addAll(getVisibleRegions(segment));
 		}
-		return regions;
 	}
 
 	/**
