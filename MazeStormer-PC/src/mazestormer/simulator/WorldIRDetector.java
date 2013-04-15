@@ -95,7 +95,7 @@ public class WorldIRDetector implements IRSensor {
 	}
 
 	private Float[] getDetectedIRAngles() {
-		// TODO: MM seesaw troubles
+		// TODO: MM add wall for each seesaw
 
 		List<Float> detectedAngles = new ArrayList<Float>();
 
