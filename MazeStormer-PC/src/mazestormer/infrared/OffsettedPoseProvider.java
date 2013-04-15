@@ -63,7 +63,7 @@ public class OffsettedPoseProvider implements PoseProvider {
 	
 	public enum Module {
 		// TODO: MM adding values
-		IR_SENSOR(0,0), RANGE_SCANNER(0,0), LIGHT_SENSOR(0,0);
+		IR_SENSOR(0,0), RANGE_SCANNER(0,0), LIGHT_SENSOR(0,0), ITEM(0,0);
 		
 		private final float radius;
 		private final float angleToHeading;
