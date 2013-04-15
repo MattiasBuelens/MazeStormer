@@ -76,8 +76,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
 		
-		//TODO
-		this.envelope = new RectangularEnvelope(0+EXTERNAL_ZONE, 0+EXTERNAL_ZONE);
+		this.envelope = new RectangularEnvelope(BRONS_HEIGHT+EXTERNAL_ZONE, BRONS_WIDTH+EXTERNAL_ZONE);
 	}
 
 	@Override

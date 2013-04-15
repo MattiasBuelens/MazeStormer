@@ -118,7 +118,7 @@ public class World {
 		return logger;
 	}
 
-	// TODO: Objects and ir circuits need to be added after parsing
+	// TODO: MM Objects and ir circuits need to be added after parsing
 
 	private final Set<Model> models = new HashSet<Model>();
 

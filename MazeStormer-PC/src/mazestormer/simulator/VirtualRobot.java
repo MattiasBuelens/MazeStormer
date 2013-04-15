@@ -79,8 +79,7 @@ public class VirtualRobot implements ControllablePCRobot, IRRobot {
 		// Updates
 		updateProducer = new VirtualUpdateProducer(this);
 		
-		//TODO
-		this.envelope = new RectangularEnvelope(0+EXTERNAL_ZONE, 0+EXTERNAL_ZONE);
+		this.envelope = new RectangularEnvelope(BRONS_HEIGHT+EXTERNAL_ZONE, BRONS_WIDTH+EXTERNAL_ZONE);
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import mazestormer.world.World;
 
 public abstract class WorldIRSensor implements IRSensor {
 	
-	// TODO: add radius
+	// TODO: MM add radius
 	public static final double RADIUS = 0;
 	public static final float ANGLE = (float) Math.toDegrees(120);
 	
@@ -16,7 +16,6 @@ public abstract class WorldIRSensor implements IRSensor {
 
 	protected WorldIRSensor(World world, IRDetectionMode mode) {
 		this.world = world;
-		//TODO: values?
 		this.wird = new WorldIRDetector(getWorld(), getPoseProvider(), RADIUS, ANGLE, mode);
 	}
 

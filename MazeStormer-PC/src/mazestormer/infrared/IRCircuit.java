@@ -9,7 +9,7 @@ public class IRCircuit implements IRSource {
 	private final PoseProvider staticPoseProvider;
 	private final Envelope envelope;
 	
-	//TODO: cm's?
+	//TODO: MM cm's?
 	public static final double HEIGHT = 0;
 	public static final double WIDTH = 0;
 	
