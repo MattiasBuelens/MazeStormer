@@ -15,15 +15,14 @@ public class ObservableRobot implements IRRobot {
 	private final double width;
 	private final double height;
 
-	public ObservableRobot(ModelType modelType, double width, double height) {
+	public ObservableRobot(ModelType modelType, double height, double width) {
 		poseProvider = new ObservePoseProvider();
 		this.modelType = modelType;
 		this.width = width;
 		this.height = height;
 
-		// TODO
-		this.envelope = new RectangularEnvelope(0 + EXTERNAL_ZONE,
-				0 + EXTERNAL_ZONE);
+		this.envelope = new RectangularEnvelope(this.height + EXTERNAL_ZONE,
+				this.width + EXTERNAL_ZONE);
 	}
 
 	@Override

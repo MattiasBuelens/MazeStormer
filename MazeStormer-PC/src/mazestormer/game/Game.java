@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
@@ -16,7 +17,6 @@ import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
-import mazestormer.robot.Robot;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
@@ -243,7 +243,7 @@ public class Game {
 
 		// Create robot to track partner's position
 		// Note: the size of the partner's robot are not important
-		Robot partnerRobot = new ObservableRobot(0, 0);
+		IRRobot partnerRobot = new ObservableRobot(null, 0, 0);
 		// Create partner
 		RelativePlayer partner = new RelativePlayer(partnerID, partnerRobot, new Maze());
 		partnerPlayer = partner;

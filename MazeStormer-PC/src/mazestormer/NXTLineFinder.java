@@ -53,7 +53,7 @@ public class NXTLineFinder {
 
 		int value;
 
-		double angle1 = 0, angle2 = 0;
+		// double angle1 = 0, angle2 = 0;
 
 		while (true) {
 			value = light.getLightValue();

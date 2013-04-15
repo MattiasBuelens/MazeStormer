@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.PoseTransform;
 import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
-import mazestormer.robot.Robot;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerDetails;
 import peno.htttp.SpectatorClient;
@@ -62,8 +62,7 @@ public class WorldSimulator {
 		String playerID = playerDetails.getPlayerID();
 		AbsolutePlayer player = getWorld().getPlayer(playerID);
 		if (player == null) {
-			// TODO Set up player's type
-			Robot robot = new ObservableRobot(playerDetails.getWidth(), playerDetails.getHeight());
+			IRRobot robot = new ObservableRobot(ModelType.toModelType(playerDetails.getType()), playerDetails.getHeight(), playerDetails.getWidth());
 			RelativePlayer relativePlayer = new RelativePlayer(playerID, robot, null);
 			player = new AbsolutePlayer(relativePlayer);
 			getWorld().addPlayer(player);
