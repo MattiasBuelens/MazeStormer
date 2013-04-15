@@ -41,7 +41,11 @@ public class ExploreControlMode extends ControlMode {
 		Collections.sort(queue, new ClosestTileComparator(currentTile));
 
 		// Go to next tile
-		return queue.pollFirst();
+		Tile nextTile = queue.pollFirst();
+		while (nextTile.isExplored())
+			nextTile = queue.pollFirst();
+
+		return nextTile;
 	}
 
 	@Override
@@ -85,11 +89,10 @@ public class ExploreControlMode extends ControlMode {
 
 		public int shortestPathLength(Tile startTile, Tile endTile) {
 			List<Tile> path = getPathFinder().findTilePath(startTile, endTile);
-			/*for (Tile tile : path) {
-				if (tile.getIgnoreFlag()) {
-					return Integer.MAX_VALUE;
-				}
-			}*/
+			/*
+			 * for (Tile tile : path) { if (tile.getIgnoreFlag()) { return
+			 * Integer.MAX_VALUE; } }
+			 */
 			return path.size();
 		}
 

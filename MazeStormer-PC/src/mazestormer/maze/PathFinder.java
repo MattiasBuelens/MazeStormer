@@ -93,13 +93,21 @@ public class PathFinder {
 	 *         empty list. Take a look at the findTilePath doc for more
 	 *         information ;)
 	 */
-	public List<Tile> findPathWithoutSeesaws(Tile startTile, Tile goalTile) {
+	public List<Tile> findTilePathWithoutSeesaws(Tile startTile, Tile goalTile) {
 		return findTilePath(startTile, goalTile, new Predicate<Tile>() {
 			@Override
 			public boolean apply(Tile tile) {
 				return !tile.isSeesaw();
 			}
 		});
+	}
+
+	public List<Waypoint> findPathWithoutSeesaws(Tile startTile, Tile goalTile) {
+		List<Tile> tiles = findTilePathWithoutSeesaws(startTile, goalTile);
+		List<Waypoint> waypoints = new ArrayList<>();
+		for (Tile tile : tiles)
+			waypoints.add(toWaypoint(tile));
+		return waypoints;
 	}
 
 	/**

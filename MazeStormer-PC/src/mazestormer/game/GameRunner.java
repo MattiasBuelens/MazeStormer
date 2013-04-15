@@ -42,9 +42,11 @@ public class GameRunner extends Controller implements GameListener {
 
 	private final PositionReporter positionReporter = new PositionReporter();
 	private final TileReporter tileReporter = new TileReporter();
-	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
+	private final ScheduledExecutorService positionExecutor = Executors
+			.newSingleThreadScheduledExecutor(factory);
 
-	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
+	private static final ThreadFactory factory = new ThreadFactoryBuilder()
+			.setNameFormat("GameRunner-%d").build();
 
 	private int objectNumber;
 
@@ -85,7 +87,8 @@ public class GameRunner extends Controller implements GameListener {
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
 		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
+		getMaze().setTileShape(nextTile.getPosition(),
+				new TileShape(TileType.DEAD_END, orientation));
 
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
@@ -98,7 +101,8 @@ public class GameRunner extends Controller implements GameListener {
 	public Barcode[] getCurrentSeesawBarcodes() {
 		Tile currentTile = getDriver().getCurrentTile();
 		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
+				.getOtherSeesawBarcode(seesawBarcode);
 		return new Barcode[] { seesawBarcode, otherBarcode };
 	}
 
@@ -117,24 +121,34 @@ public class GameRunner extends Controller implements GameListener {
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
 		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
+		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping
+				.getOtherSeesawBarcode(seesawBarcode);
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();
 		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setSeesaw(nextTilePosition, seesawBarcode);
+		maze.setExplored(nextTilePosition);
 
 		// Seesaw
 		nextTilePosition = orientation.shift(nextTilePosition);
 		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setSeesaw(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
 
 		// Other seesaw barcode
 		nextTilePosition = orientation.shift(nextTilePosition);
 		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setBarcode(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
+		System.out.println(nextTilePosition + ": flag "
+				+ maze.getTileAt(nextTilePosition).isExplored());
 
-		// TODO Do we need to mark seesaw tiles as explored here?
+		// We mark the tiles explored here to avoid getUnexploredTiles to return
+		// tiles of a seesaw. This method is used to see whether we have to
+		// drive over a seesaw or not. If getUnexploredTiles only has those
+		// seesaw tiles, it will think the current island is undiscovered and
+		// the robot will just stand still.
 	}
 
 	public void objectFound(int teamNumber) {
@@ -160,6 +174,14 @@ public class GameRunner extends Controller implements GameListener {
 		// Skip to next tile
 		getDriver().skipNextTile();
 		// Object found action resolves after this
+	}
+
+	public void afterSeesawBarcode() {
+		Tile currentTile = getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
+		if (currentTile.isNeighbour(nextTile) && nextTile.isSeesaw()
+				&& currentTile.getBarcode().equals(nextTile.getSeesawBarcode()))
+			getDriver().skipNextTile();
 	}
 
 	public boolean isRunning() {

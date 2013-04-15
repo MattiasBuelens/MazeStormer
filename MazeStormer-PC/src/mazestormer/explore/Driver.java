@@ -44,8 +44,8 @@ import com.google.common.primitives.Floats;
 /**
  * Drives the robot in an unknown maze.
  */
-public class Driver extends StateMachine<Driver, Driver.ExplorerState> implements StateListener<Driver.ExplorerState>,
-		NavigatorListener {
+public class Driver extends StateMachine<Driver, Driver.ExplorerState>
+		implements StateListener<Driver.ExplorerState>, NavigatorListener {
 
 	/*
 	 * Settings
@@ -96,7 +96,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		addStateListener(this);
 
 		// Navigator
-		this.navigator = new Navigator(getRobot().getPilot(), getRobot().getPoseProvider());
+		this.navigator = new Navigator(getRobot().getPilot(), getRobot()
+				.getPoseProvider());
 		navigator.addNavigatorListener(this);
 		navigator.pauseAt(Navigator.NavigatorState.TRAVEL);
 
@@ -209,7 +210,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	protected void scan() {
 		// Scan and update current tile
-		log("Scan for edges at (" + currentTile.getX() + ", " + currentTile.getY() + ")");
+		log("Scan for edges at (" + currentTile.getX() + ", "
+				+ currentTile.getY() + ")");
 		bindTransition(scanAndUpdate(currentTile), ExplorerState.AFTER_SCAN);
 	}
 
@@ -242,7 +244,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		// Create path to next tile
 		log("Go to tile (" + nextTile.getX() + ", " + nextTile.getY() + ")");
 		navigator.stop();
-		navigator.setPath(getPathFinder().findPath(getCurrentTile(), nextTile));
+		navigator.setPath(getPathFinder().findPathWithoutSeesaws(
+				getCurrentTile(), nextTile));
 	}
 
 	protected void nextWaypoint() {
@@ -260,14 +263,17 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		Tile currentTile = getCurrentTile();
 		// Skip barcodes when traveling to checkpoint or goal
 		if (isBarcodeActionEnabled() && currentTile.hasBarcode()) {
-			log("Performing barcode action for (" + currentTile.getX() + ", " + currentTile.getY() + ")");
+			log("Performing barcode action for (" + currentTile.getX() + ", "
+					+ currentTile.getY() + ")");
 			// Pause navigator
 			// Note: Cannot interrupt report state
 			if (navigator.getState() != NavigatorState.REPORT) {
 				navigator.pause();
 			}
 			// Resume when action is done
-			bindTransition(barcodeScanner.performAction(currentTile.getBarcode()), ExplorerState.NAVIGATE);
+			bindTransition(
+					barcodeScanner.performAction(currentTile.getBarcode()),
+					ExplorerState.NAVIGATE);
 		} else {
 			// No action, just continue
 			transition(ExplorerState.NAVIGATE);
@@ -291,7 +297,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 			// Travel off barcode
 			double clearDistance = getBarcodeClearingDistance();
 			log("Travel off barcode: " + String.format("%.02f", clearDistance));
-			bindTransition(getRobot().getPilot().travelComplete(clearDistance), ExplorerState.BEFORE_TRAVEL);
+			bindTransition(getRobot().getPilot().travelComplete(clearDistance),
+					ExplorerState.BEFORE_TRAVEL);
 		} else {
 			// No barcode
 			transition(ExplorerState.BEFORE_TRAVEL);
@@ -335,7 +342,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	protected void afterBarcode(byte barcode) {
-		log("Barcode read, placing on: (" + nextTile.getX() + ", " + nextTile.getY() + ")");
+		log("Barcode read, placing on: (" + nextTile.getX() + ", "
+				+ nextTile.getY() + ")");
 		// Set barcode on tile
 		setBarcodeTile(nextTile, barcode);
 		// Travel
@@ -385,7 +393,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		Orientation heading = angleToOrientation(relativeHeading);
 
 		// Make straight tile
-		getMaze().setTileShape(tile.getPosition(), new TileShape(TileType.STRAIGHT, heading));
+		getMaze().setTileShape(tile.getPosition(),
+				new TileShape(TileType.STRAIGHT, heading));
 		// Set barcode
 		getMaze().setBarcode(tile.getPosition(), barcode);
 		// Mark as explored
@@ -400,11 +409,13 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 */
 	private Future<?> scanAndUpdate(final Tile tile) {
 		// Read from scanner
-		final Future<RangeFeature> future = getRobot().getRangeDetector().scanAsync(getScanAngles(tile));
+		final Future<RangeFeature> future = getRobot().getRangeDetector()
+				.scanAsync(getScanAngles(tile));
 		// Process when received
 		future.addFutureListener(new FutureListener<RangeFeature>() {
 			@Override
-			public void futureResolved(Future<? extends RangeFeature> future, RangeFeature feature) {
+			public void futureResolved(Future<? extends RangeFeature> future,
+					RangeFeature feature) {
 				updateTileEdges(tile, feature);
 			}
 
@@ -427,10 +438,13 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	private void updateTileEdges(Tile tile, RangeFeature feature) {
 		// Place walls
 		if (feature != null) {
-			float relativeHeading = getMaze().toRelative(feature.getPose().getHeading());
+			float relativeHeading = getMaze().toRelative(
+					feature.getPose().getHeading());
 			for (RangeReading reading : feature.getRangeReadings()) {
-				Orientation orientation = angleToOrientation(reading.getAngle() + relativeHeading);
-				getMaze().setEdge(tile.getPosition(), orientation, EdgeType.WALL);
+				Orientation orientation = angleToOrientation(reading.getAngle()
+						+ relativeHeading);
+				getMaze().setEdge(tile.getPosition(), orientation,
+						EdgeType.WALL);
 			}
 		}
 		// Replace unknown edges with openings
@@ -449,7 +463,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 		for (Orientation direction : tile.getUnknownSides()) {
 			// Get absolute angle relative to positive X (east) direction
-			float angle = getMaze().toAbsolute(Orientation.EAST.angleTo(direction));
+			float angle = getMaze().toAbsolute(
+					Orientation.EAST.angleTo(direction));
 			list.add(normalize(angle - heading));
 		}
 
@@ -468,7 +483,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		Waypoint nextWaypoint = navigator.getCurrentTarget();
 
 		// Get traveling line
-		Line line = new Line(currentWaypoint.x, currentWaypoint.y, nextWaypoint.x, nextWaypoint.y);
+		Line line = new Line(currentWaypoint.x, currentWaypoint.y,
+				nextWaypoint.x, nextWaypoint.y);
 		float angle = currentWaypoint.angleTo(nextWaypoint);
 
 		// Get target position to clear barcode
@@ -634,7 +650,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	@Override
-	public void navigatorPaused(NavigatorState currentState, Pose pose, boolean onTransition) {
+	public void navigatorPaused(NavigatorState currentState, Pose pose,
+			boolean onTransition) {
 		// Only respond to pauses on transitions
 		if (!onTransition)
 			return;
@@ -664,7 +681,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		transition(ExplorerState.NEXT_CYCLE);
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
+	private class LineFinderListener extends
+			AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(ExplorerState.AFTER_LINE_ADJUST);

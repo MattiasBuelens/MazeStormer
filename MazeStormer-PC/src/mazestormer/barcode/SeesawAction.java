@@ -98,15 +98,10 @@ public class SeesawAction extends
 	}
 
 	protected void scan() {
-		if (hasUnexploredTiles())
-			transition(SeesawState.RESUME_EXPLORING);
-		else if (isSeesawOpen())
+		if (!hasUnexploredTiles() && isSeesawOpen())
 			transition(SeesawState.ONWARDS);
-		else if (moreThanOneSeesaw()
-				&& !reachableSeesawBarcodeTiles().isEmpty())
-			transition(SeesawState.GO_TO_OTHER_SEESAW);
 		else
-			transition(SeesawState.WAIT_AND_SCAN);
+			transition(SeesawState.RESUME_EXPLORING);
 	}
 
 	protected void onwards() {
@@ -132,15 +127,14 @@ public class SeesawAction extends
 
 	protected void goToOtherSeesaw() {
 		Collection<Tile> reachableSeesawBarcodeTiles = reachableSeesawBarcodeTiles();
-		List<Tile> shortestPath;
+		Tile shortestTile;
 		int shortestPathLength = Integer.MAX_VALUE;
 		for (Tile tile : reachableSeesawBarcodeTiles) {
-			List<Tile> path = PF.findPathWithoutSeesaws(getCurrentTile(), tile);
+			List<Tile> path = PF.findTilePathWithoutSeesaws(getCurrentTile(), tile);
 			if (path.size() < shortestPathLength)
-				shortestPath = path;
+				shortestTile = tile;
 		}
 		// shortestPath is now the path the navigator should follow.
-		
 
 	}
 
@@ -166,8 +160,9 @@ public class SeesawAction extends
 	}
 
 	protected void resumeExploring() {
-		// TODO Implement seesaw action
-		stop(); // stops this seesaw action
+		// removes the next tile (the seesaw) off the queue.
+		getGameRunner().afterSeesawBarcode();
+		finish();
 	}
 
 	private boolean isSeesawOpen() {
@@ -212,7 +207,7 @@ public class SeesawAction extends
 					|| tile.getSeesawBarcode().equals(currentSeesaw[1])) {
 				continue;
 			} else {
-				List<Tile> path = PF.findPathWithoutSeesaws(currentTile, tile);
+				List<Tile> path = PF.findTilePathWithoutSeesaws(currentTile, tile);
 				if (!path.isEmpty())
 					tiles.add(tile);
 			}

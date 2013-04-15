@@ -194,4 +194,9 @@ public class Tile {
 		return getSidesByType(EdgeType.UNKNOWN);
 	}
 
+	public boolean isNeighbour(Tile tile) {
+		return Math.abs(this.getX() - tile.getX())
+				+ Math.abs(this.getY() - tile.getY()) == 1;
+	}
+
 }
