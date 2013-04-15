@@ -12,6 +12,7 @@ import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRRobot;
 import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.robot.CalibratedLightSensor;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
@@ -22,7 +23,7 @@ import mazestormer.simulator.collision.VirtualCollisionDetector;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
-public class VirtualRobot implements ControllableRobot, IRRobot {
+public class VirtualRobot implements ControllablePCRobot, IRRobot {
 
 	private final World world;
 

@@ -17,7 +17,7 @@ import mazestormer.remote.MessageListener;
 import mazestormer.report.Report;
 import mazestormer.report.UpdateReport;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdate;
@@ -26,7 +26,7 @@ import mazestormer.robot.SoundPlayer;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
-public class PhysicalRobot extends PhysicalComponent implements ControllableRobot, IRRobot {
+public class PhysicalRobot extends PhysicalComponent implements ControllablePCRobot, IRRobot {
 
 	/**
 	 * Timeout for synchronous requests.

@@ -15,7 +15,7 @@ import mazestormer.connect.Connector;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
 import mazestormer.player.RelativePlayer;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
@@ -307,9 +307,9 @@ public class MainController implements IMainController {
 	 * Robot
 	 */
 
-	public ControllableRobot getControllableRobot() throws IllegalStateException {
+	public ControllablePCRobot getControllableRobot() throws IllegalStateException {
 		checkState(isConnected());
-		ControllableRobot r = connector.getRobot();
+		ControllablePCRobot r = connector.getRobot();
 		getPlayer().setRobot(r);
 		return r;
 	}

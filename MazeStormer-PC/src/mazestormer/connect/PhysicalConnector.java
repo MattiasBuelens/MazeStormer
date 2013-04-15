@@ -12,6 +12,7 @@ import mazestormer.command.CommandType;
 import mazestormer.command.ShutdownCommand;
 import mazestormer.physical.PhysicalCommunicator;
 import mazestormer.physical.PhysicalRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.world.World;
@@ -20,10 +21,10 @@ public class PhysicalConnector implements Connector {
 
 	private NXTConnector connector;
 	private PhysicalCommunicator communicator;
-	private ControllableRobot robot;
+	private ControllablePCRobot robot;
 
 	@Override
-	public ControllableRobot getRobot() throws IllegalStateException {
+	public ControllablePCRobot getRobot() throws IllegalStateException {
 		checkState(isConnected());
 		return robot;
 	}
@@ -53,8 +54,8 @@ public class PhysicalConnector implements Connector {
 		communicator.start();
 	}
 
-	private static ControllableRobot createRobot(PhysicalCommunicator communicator, World world) {
-		ControllableRobot robot = new PhysicalRobot(communicator, world);
+	private static ControllablePCRobot createRobot(PhysicalCommunicator communicator, World world) {
+		ControllablePCRobot robot = new PhysicalRobot(communicator, world);
 		// Set default speeds
 		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(ControllableRobot.travelSpeed);

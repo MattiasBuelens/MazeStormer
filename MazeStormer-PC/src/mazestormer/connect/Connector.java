@@ -1,10 +1,10 @@
 package mazestormer.connect;
 
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 
 public interface Connector {
 
-	public ControllableRobot getRobot();
+	public ControllablePCRobot getRobot();
 
 	public boolean isConnected();
 
