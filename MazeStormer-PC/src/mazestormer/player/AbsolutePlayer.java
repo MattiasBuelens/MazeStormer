@@ -8,7 +8,6 @@ import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
-import mazestormer.robot.Robot;
 import mazestormer.world.ModelType;
 
 public class AbsolutePlayer implements Player {
@@ -26,7 +25,7 @@ public class AbsolutePlayer implements Player {
 		this.poseProvider = new AbsolutePoseProvider();
 	}
 
-	public RelativePlayer delegate() {
+	protected final RelativePlayer delegate() {
 		return delegate;
 	}
 
@@ -77,7 +76,7 @@ public class AbsolutePlayer implements Player {
 		delegate().getRobot().getPoseProvider().setPose(pose);
 	}
 
-	private class AbsoluteRobot implements Robot, IRRobot {
+	private class AbsoluteRobot implements IRRobot {
 
 		@Override
 		public PoseProvider getPoseProvider() {
@@ -99,24 +98,35 @@ public class AbsolutePlayer implements Player {
 			return delegate().getRobot().getModelType();
 		}
 
+		@Override
+		public double getWidth() {
+			return delegate().getRobot().getWidth();
+		}
+
+		@Override
+		public double getHeight() {
+			return delegate().getRobot().getHeight();
+		}
+
 	}
 
 	private class AbsolutePoseProvider implements PoseProvider {
 
 		@Override
 		public Pose getPose() {
-			if (delegate.getRobot() == null) {
+			if (delegate().getRobot() == null) {
 				return new Pose();
 			}
 
-			Pose relativePose = delegate.getRobot().getPoseProvider().getPose();
+			Pose relativePose = delegate().getRobot().getPoseProvider()
+					.getPose();
 			return transform.transform(relativePose);
 		}
 
 		@Override
 		public void setPose(Pose pose) {
 			Pose relativePose = transform.inverseTransform(pose);
-			delegate.getRobot().getPoseProvider().setPose(relativePose);
+			delegate().getRobot().getPoseProvider().setPose(relativePose);
 		}
 
 	}

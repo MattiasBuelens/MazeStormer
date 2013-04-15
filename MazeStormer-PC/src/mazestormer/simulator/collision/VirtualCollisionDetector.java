@@ -9,13 +9,12 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
+import mazestormer.robot.Robot;
 import mazestormer.world.World;
 
 public class VirtualCollisionDetector {
 
 	private final World world;
-	private static final float ROBOT_WIDTH = 8.0f;
-	private static final float ROBOT_HEIGHT = 15.0f;
 
 	public VirtualCollisionDetector(World world) {
 		this.world = world;
@@ -25,8 +24,12 @@ public class VirtualCollisionDetector {
 		return this.world;
 	}
 
+	private Robot getRobot() {
+		return getWorld().getLocalPlayer().getRobot();
+	}
+
 	private PoseProvider getPoseProvider() {
-		return getWorld().getLocalPlayer().getRobot().getPoseProvider();
+		return getRobot().getPoseProvider();
 	}
 
 	private IMaze getMaze() {
@@ -54,10 +57,11 @@ public class VirtualCollisionDetector {
 		float heading = pose.getHeading();
 
 		// The distance from the center of the robot to a corner.
-		float distanceToCorners = (float) Math.sqrt(Math.pow(ROBOT_WIDTH / 2, 2) + Math.pow(ROBOT_HEIGHT / 2, 2));
+		float distanceToCorners = (float) Math.sqrt(Math.pow(getRobot().getWidth() / 2, 2)
+				+ Math.pow(getRobot().getHeight() / 2, 2));
 		// The angle between the axle over the width, and the line to the front
 		// right corner.
-		float angle = (float) Math.atan2(ROBOT_HEIGHT / 2, ROBOT_WIDTH / 2);
+		float angle = (float) Math.atan2(getRobot().getHeight() / 2, getRobot().getWidth() / 2);
 		angle = (float) Math.toDegrees(angle);
 
 		corners.add(center.pointAt(distanceToCorners, heading - 90 + angle));

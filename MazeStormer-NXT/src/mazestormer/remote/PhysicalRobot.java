@@ -26,6 +26,8 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 
 	private final PhysicalPilot pilot;
 	private final PoseProvider poseProvider;
+	private final double width = robotWidth;
+	private final double height = robotHeight;
 
 	private final PhysicalLightSensor light;
 	private final PhysicalRangeScanner scanner;
@@ -65,6 +67,16 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		// Start reporting updates
 		updateReporter = new UpdateReporter(communicator, this);
 		updateReporter.start();
+	}
+
+	@Override
+	public double getWidth() {
+		return width;
+	}
+
+	@Override
+	public double getHeight() {
+		return height;
 	}
 
 	@Override

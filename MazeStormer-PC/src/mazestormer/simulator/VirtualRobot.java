@@ -28,6 +28,8 @@ public class VirtualRobot implements ControllableRobot, IRRobot {
 
 	private final VirtualPilot pilot;
 	private final PoseProvider poseProvider;
+	private final double width = robotWidth;
+	private final double height = robotHeight;
 
 	private final CalibratedLightSensor light;
 	private final ObservableRangeScanner rangeScanner;
@@ -78,6 +80,16 @@ public class VirtualRobot implements ControllableRobot, IRRobot {
 		
 		//TODO
 		this.envelope = new RectangularEnvelope(0+EXTERNAL_ZONE, 0+EXTERNAL_ZONE);
+	}
+
+	@Override
+	public double getWidth() {
+		return width;
+	}
+
+	@Override
+	public double getHeight() {
+		return height;
 	}
 
 	private World getWorld() {
