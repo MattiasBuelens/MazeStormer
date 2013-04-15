@@ -131,8 +131,7 @@ public class WorldIRDetector implements IRSensor {
 					Math.cos(currentPose.getHeading()), Math.sin(currentPose
 							.getHeading()));
 			Point2D[] cps = envelope.getCombination(currentPose, otherPoint, DEPTH);
-			Line2D[] edgeLines = getMaze().getEdgeLines().toArray(
-					new Line2D.Double[0]);
+			Line2D[] edgeLines = /*getMaze().getEdgeLines().toArray(*/new Line2D.Double[0]/*)*/;
 			for (int i = 0; i < cps.length && !isDetected; i++) {
 				Line2D l = new Line2D.Double(currentPoint, cps[i]);
 

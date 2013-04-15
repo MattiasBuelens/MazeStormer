@@ -19,6 +19,10 @@ public class ParallelVisibilityPolygon extends VisibilityPolygon {
 		super(polygon, viewCoord);
 	}
 
+	public static Geometry build(Polygon polygon, Coordinate viewCoord) {
+		return new ParallelVisibilityPolygon(polygon, viewCoord).build();
+	}
+
 	@Override
 	protected Collection<Geometry> getVisibleRegions(List<LineSegment> edges) {
 		Collection<Geometry> regions = new ConcurrentLinkedQueue<Geometry>();

@@ -25,6 +25,8 @@ public class VisibilityPolygonTest {
 	private Polygon inner;
 	private Coordinate viewCoord;
 
+	private final Stopwatch stopwatch = new Stopwatch();
+
 	public static void main(String[] args) throws Exception {
 		setUpBeforeClass();
 		VisibilityPolygonTest test = new VisibilityPolygonTest();
@@ -52,24 +54,30 @@ public class VisibilityPolygonTest {
 
 	@Test
 	public void sequentialVisibilityPolygon() {
-		Stopwatch stopwatch = new Stopwatch();
-		stopwatch.start();
-		Geometry visPoly = new VisibilityPolygon(inner, viewCoord).build();
-		stopwatch.stop();
-
+		start();
+		Geometry visPoly = VisibilityPolygon.build(inner, viewCoord);
 		System.out.println(visPoly.toText());
-		System.out.println("Sequential: " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " ms");
+		System.out.print("Sequential: ");
+		stop();
 	}
 
 	@Test
 	public void parallelVisibilityPolygon() {
-		Stopwatch stopwatch = new Stopwatch();
-		stopwatch.start();
-		Geometry visPoly = new ParallelVisibilityPolygon(inner, viewCoord).build();
-		stopwatch.stop();
-
+		start();
+		Geometry visPoly = ParallelVisibilityPolygon.build(inner, viewCoord);
 		System.out.println(visPoly.toText());
-		System.out.println("Parallel: " + stopwatch.elapsed(TimeUnit.MILLISECONDS) + " ms");
+		System.out.print("Parallel: ");
+		stop();
+	}
+
+	private void start() {
+		stopwatch.reset();
+		stopwatch.start();
+	}
+
+	private void stop() {
+		stopwatch.stop();
+		System.out.println(stopwatch.elapsed(TimeUnit.MILLISECONDS) + " ms");
 	}
 
 }
