@@ -13,6 +13,7 @@ import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
+import mazestormer.barcode.IAction;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ControlMode;
 import mazestormer.explore.ExploreControlMode;
@@ -225,7 +226,7 @@ public class GameRunner extends Controller implements GameListener {
 	@Override
 	public void onObjectFound(String playerID) {
 	}
-
+	
 	@Override
 	public void onPartnerConnected(Player partner) {
 		// Send own maze
