@@ -126,9 +126,9 @@ public abstract class PointVisibility {
 	 * @return The projected line strings.
 	 * @see #project(Polygon, LineSegment)
 	 */
-	protected Geometry getProjections(Geometry polygons, LineSegment screen) {
+	protected MultiLineString getProjections(Geometry polygons, LineSegment screen) {
 		int numGeometries = polygons.getNumGeometries();
-		List<Geometry> projections = new ArrayList<Geometry>(numGeometries);
+		List<LineString> projections = new ArrayList<LineString>();
 		// Iterate over polygons
 		for (int i = 0; i < numGeometries; ++i) {
 			Polygon polygon = (Polygon) polygons.getGeometryN(i);
@@ -136,12 +136,12 @@ public abstract class PointVisibility {
 			if (polygon.isEmpty())
 				continue;
 			// Project polygon on edge
-			MultiLineString projectedLine = project(polygon, screen);
+			List<LineString> projectedLines = project(polygon, screen);
 			// Store projection
-			projections.add(projectedLine);
+			projections.addAll(projectedLines);
 		}
 		// Combine projections
-		return factory.buildGeometry(projections);
+		return factory.createMultiLineString(GeometryFactory.toLineStringArray(projections));
 	}
 
 	/**
@@ -153,7 +153,7 @@ public abstract class PointVisibility {
 	 *            The screen on which to project.
 	 * @return The section of the screen containing the projection.
 	 */
-	protected MultiLineString project(Polygon polygon, LineSegment screen) {
+	protected List<LineString> project(Polygon polygon, LineSegment screen) {
 		// Only check exterior shell, interior holes don't matter for projection
 		List<LineSegment> segments = collect(toLinearRing(polygon.getExteriorRing()));
 		List<LineString> projectedSegments = new ArrayList<LineString>(segments.size());
@@ -164,8 +164,7 @@ public abstract class PointVisibility {
 			LineString projectedSegment = new LineSegment(leftVertex, rightVertex).toGeometry(factory);
 			projectedSegments.add(projectedSegment);
 		}
-		// Combine projections
-		return factory.createMultiLineString(GeometryFactory.toLineStringArray(projectedSegments));
+		return projectedSegments;
 	}
 
 	protected Coordinate project(Coordinate point, LineSegment screen) {
@@ -204,6 +203,25 @@ public abstract class PointVisibility {
 	 */
 	protected Polygon getViewingTriangle(LineSegment edge) {
 		return getViewingTriangle(edge.getCoordinate(0), edge.getCoordinate(1));
+	}
+
+	/**
+	 * Reduce the amount of segments of a {@link MultiLineString}.
+	 * 
+	 * @param multiLineString
+	 *            The {@link MultiLineString} to reduce.
+	 */
+	protected MultiLineString reduceMultiLineString(MultiLineString multiLineString) {
+		// Union
+		Geometry reduced = multiLineString.union();
+		// Make appropriate result
+		if (reduced instanceof MultiLineString) {
+			return (MultiLineString) reduced;
+		} else if (reduced instanceof LineString) {
+			return factory.createMultiLineString(new LineString[] { (LineString) reduced });
+		} else {
+			throw new RuntimeException("Unexpected segments combination result type: " + reduced.getClass());
+		}
 	}
 
 }

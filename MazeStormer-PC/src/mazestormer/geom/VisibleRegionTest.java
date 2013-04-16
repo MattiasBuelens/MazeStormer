@@ -56,7 +56,7 @@ public class VisibleRegionTest {
 		factory.setCentre(toCoordinate(new LongPoint(3, 5)));
 		factory.setSize(30);
 		factory.setRotation(Math.PI / 4d);
-		subject = factory.createRectangle();
+		subject = factory.createCircle();
 	}
 
 	@Test

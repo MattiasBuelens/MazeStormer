@@ -10,6 +10,7 @@ import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
@@ -141,9 +142,8 @@ public class VisibilityPolygon extends PointVisibility {
 			return screenGeom;
 		}
 		// Get and process projections
-		Geometry blocked = getProjections(collisions, screen);
-		blocked = GeometryPrecisionReducer.reduce(blocked, new PrecisionModel(1e3));
-		blocked = blocked.union();
+		MultiLineString blocked = getProjections(collisions, screen);
+		blocked = (MultiLineString) GeometryPrecisionReducer.reduce(blocked, new PrecisionModel(1e3));
 		// Return blocked segments
 		return screenGeom.difference(blocked);
 	}

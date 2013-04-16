@@ -13,9 +13,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
-import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 public class VisibleRegion extends PointVisibility {
 
@@ -77,7 +76,7 @@ public class VisibleRegion extends PointVisibility {
 
 	protected Collection<Geometry> getBlockedRegions(LineSegment screen, double collisionSize) {
 		// Find invisible segment parts
-		Geometry blocked = getBlockedSegments(screen);
+		MultiLineString blocked = getBlockedSegments(screen);
 		// Exit if empty
 		if (blocked.isEmpty()) {
 			return Collections.emptySet();
@@ -93,32 +92,25 @@ public class VisibleRegion extends PointVisibility {
 	 *            The line segment on which to project.
 	 * @return The segments invisible from the view point and the edge.
 	 */
-	protected Geometry getBlockedSegments(LineSegment screen) {
+	protected MultiLineString getBlockedSegments(LineSegment screen) {
 		// Start with all points between view point and screen
 		Geometry view = getViewingTriangle(screen);
 		// Find collisions with polygon
 		Geometry collisions = view.intersection(walls);
 		// Exit if no collisions
 		if (collisions.isEmpty()) {
-			return GeometryUtils.emptyPolygon(factory);
+			return factory.createMultiLineString(null);
 		}
-		// Process projections
-		Geometry blocked = getProjections(collisions, screen);
-		blocked = GeometryPrecisionReducer.reduce(blocked, new PrecisionModel(1e3));
-		blocked = blocked.union();
-		// Return blocked segments
-		return blocked;
+		// Get and process projections
+		MultiLineString blocked = getProjections(collisions, screen);
+		return reduceMultiLineString(blocked);
 	}
 
-	protected Collection<Geometry> buildCollidingTriangles(Geometry lineStrings, double size) {
+	protected Collection<Geometry> buildCollidingTriangles(MultiLineString lineStrings, double size) {
 		int numGeometries = lineStrings.getNumGeometries();
 		List<Geometry> triangles = new ArrayList<Geometry>(numGeometries);
 		for (int i = 0; i < numGeometries; ++i) {
 			Geometry line = lineStrings.getGeometryN(i);
-			// TODO What to do with point intersections?
-			if (line.getDimension() < 1) {
-				continue;
-			}
 			// Add colliding triangle
 			Coordinate[] coords = line.getCoordinates();
 			assert (coords.length == 2);
@@ -143,10 +135,7 @@ public class VisibleRegion extends PointVisibility {
 	}
 
 	private Geometry combine(Collection<Geometry> regions) {
-		// Union all regions
-		// Geometry result =
-		// factory.createGeometryCollection(GeometryFactory.toGeometryArray(regions));
-		// result = result.union();
+		// Combine regions
 		Geometry result = factory.buildGeometry(regions);
 		result = GeometryUtils.removeCollinear(result);
 		return result;
