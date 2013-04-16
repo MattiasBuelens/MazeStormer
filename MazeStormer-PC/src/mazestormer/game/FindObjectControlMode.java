@@ -8,6 +8,7 @@ import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.ObjectFoundAction;
 import mazestormer.barcode.SeesawAction;
+import mazestormer.explore.Commander;
 import mazestormer.explore.ControlMode;
 import mazestormer.explore.Driver;
 import mazestormer.maze.Tile;
@@ -15,9 +16,8 @@ import mazestormer.player.Player;
 
 public class FindObjectControlMode extends ControlMode{
 
-	public FindObjectControlMode(Player player) {
-		super(player, new FindObjectBarcodeMapping());
-		// TODO Auto-generated constructor stub
+	public FindObjectControlMode(Player player, Commander commander) {
+		super(player, commander);
 	}
 
 	@Override
@@ -44,9 +44,9 @@ public class FindObjectControlMode extends ControlMode{
 		return false;
 	}
 	
-	private static class FindObjectBarcodeMapping implements BarcodeMapping{
+	private class FindObjectBarcodeMapping implements BarcodeMapping{
 
-		private static final Map<Barcode,Class<?>> barcodeTypeMapping = new HashMap<Barcode, Class<?>>(){
+		private final Map<Barcode,Class<?>> barcodeTypeMapping = new HashMap<Barcode, Class<?>>(){
 			private static final long serialVersionUID = 1L;
 			{
 				put(new Barcode(0), ObjectFoundAction.class);
@@ -71,7 +71,7 @@ public class FindObjectControlMode extends ControlMode{
 			Class<?> foundBarcodeType = barcodeTypeMapping.get(barcode);
 			// objectbarcode
 			if(foundBarcodeType.equals(ObjectFoundAction.class)) {
-				if(getObjectNumberFromBarcode(barcode).equals(getCommander().getObjectNumber())){
+				if(getObjectNumberFromBarcode(barcode) == ((GameRunner) getCommander()).getObjectNumber()){
 					// indien eigen barcode: return ObjectBarcodeAction;
 					return new ObjectFoundAction(); // eigen voorwerp wordt opgepikt
 				}
@@ -110,13 +110,19 @@ public class FindObjectControlMode extends ControlMode{
 		}
 		
 		
-		private static int getObjectNumberFromBarcode(Barcode objectBarcode){
+		private int getObjectNumberFromBarcode(Barcode objectBarcode){
 			return (objectBarcode.getValue() % 4);
 		}
 		
-		private static int getTeamNumberFromBarcode(Barcode objectBarcode){
+		private int getTeamNumberFromBarcode(Barcode objectBarcode){
 			return objectBarcode.getValue() - (objectBarcode.getValue() % 4);
 		}
+	}
+
+	@Override
+	public BarcodeMapping getBarcodeMapping() {
+		// TODO
+		return null;
 	}
 
 }

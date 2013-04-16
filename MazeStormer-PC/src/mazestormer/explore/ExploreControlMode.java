@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import mazestormer.barcode.BarcodeMapping;
+import mazestormer.barcode.ExplorerBarcodeMapping;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
@@ -13,9 +14,10 @@ import mazestormer.player.Player;
 public class ExploreControlMode extends ControlMode {
 
 	private final LinkedList<Tile> queue = new LinkedList<Tile>();
+	private static final BarcodeMapping mapping = new ExplorerBarcodeMapping();
 
-	public ExploreControlMode(Player player, BarcodeMapping mapping) {
-		super(player, mapping);
+	public ExploreControlMode(Player player, Commander commander) {
+		super(player, commander);
 	}
 
 	@Override
@@ -94,6 +96,11 @@ public class ExploreControlMode extends ControlMode {
 			return path.size();
 		}
 
+	}
+	
+	@Override
+	public BarcodeMapping getBarcodeMapping() {
+		return mapping;
 	}
 
 }

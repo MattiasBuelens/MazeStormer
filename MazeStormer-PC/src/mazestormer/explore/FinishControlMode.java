@@ -2,6 +2,7 @@ package mazestormer.explore;
 
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.BarcodeSpeed;
+import mazestormer.barcode.ExplorerBarcodeMapping;
 import mazestormer.maze.IMaze.Target;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
@@ -9,8 +10,11 @@ import mazestormer.robot.ControllableRobot;
 
 public class FinishControlMode extends ControlMode {
 
-	public FinishControlMode(Player player, BarcodeMapping mapping) {
-		super(player, mapping);
+
+	private static final BarcodeMapping mapping = new ExplorerBarcodeMapping();
+	
+	public FinishControlMode(Player player, Commander commander) {
+		super(player, commander);
 	}
 
 	@Override
@@ -50,6 +54,11 @@ public class FinishControlMode extends ControlMode {
 	@Override
 	public boolean isBarcodeActionEnabled() {
 		return false;
+	}
+
+	@Override
+	public BarcodeMapping getBarcodeMapping() {
+		return mapping;
 	}
 
 }

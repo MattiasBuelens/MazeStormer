@@ -4,7 +4,7 @@ import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.ExplorerBarcodeMapping;
 import mazestormer.player.Player;
 
-public class Explorer extends Controller {
+public class Explorer extends Commander {
 
 	private final ControlMode exploreMode;
 	private final ControlMode finishMode;
@@ -14,8 +14,8 @@ public class Explorer extends Controller {
 
 		// Modes
 		BarcodeMapping mapping = new ExplorerBarcodeMapping();
-		exploreMode = new ExploreControlMode(player, mapping);
-		finishMode = new FinishControlMode(player, mapping);
+		exploreMode = new ExploreControlMode(player, this);
+		finishMode = new FinishControlMode(player, this);
 
 		setStartMode(exploreMode);
 		bind(exploreMode, finishMode);
