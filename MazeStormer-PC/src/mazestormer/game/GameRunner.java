@@ -14,7 +14,6 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
-import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.explore.ControlMode;
 import mazestormer.explore.ExploreControlMode;
 import mazestormer.explore.Controller;
@@ -39,7 +38,7 @@ public class GameRunner extends Controller implements GameListener {
 
 	private final Game game;
 
-	private final ControlMode exploreMode;
+	private final ControlMode findObjectMode;
 
 	private final PositionReporter positionReporter = new PositionReporter();
 	private final TileReporter tileReporter = new TileReporter();
@@ -57,9 +56,8 @@ public class GameRunner extends Controller implements GameListener {
 		game.addGameListener(this);
 
 		// Modes
-		BarcodeMapping mapping = new TeamTreasureTrekBarcodeMapping(this);
-		exploreMode = new ExploreControlMode(player, mapping);
-		setStartMode(exploreMode);
+		findObjectMode = new FindObjectControlMode(player);
+		setStartMode(findObjectMode);
 	}
 
 	protected void log(String message) {
@@ -92,6 +90,7 @@ public class GameRunner extends Controller implements GameListener {
 		getMaze().setExplored(nextTile.getPosition());
 	}
 
+	// TODO Dit moet naar de findObjectControlMode
 	public void setSeesawWalls() {
 		log("Seesaw on next tiles, set seesaw and barcode");
 
