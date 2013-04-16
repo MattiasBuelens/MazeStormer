@@ -8,9 +8,9 @@ import mazestormer.condition.ConditionFuture;
 import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.infrared.CircularEnvelope;
 import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRRobot;
-import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
@@ -79,7 +79,7 @@ public class VirtualRobot implements ControllablePCRobot, IRRobot {
 		// Updates
 		updateProducer = new VirtualUpdateProducer(this);
 		
-		this.envelope = new RectangularEnvelope(BRONS_HEIGHT+EXTERNAL_ZONE, BRONS_WIDTH+EXTERNAL_ZONE);
+		this.envelope = new CircularEnvelope(EXTERNAL_ZONE);
 	}
 
 	@Override

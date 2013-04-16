@@ -10,9 +10,9 @@ import mazestormer.condition.Condition;
 import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.infrared.CircularEnvelope;
 import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRRobot;
-import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.remote.MessageListener;
 import mazestormer.report.Report;
 import mazestormer.report.UpdateReport;
@@ -76,7 +76,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
 		
-		this.envelope = new RectangularEnvelope(BRONS_HEIGHT+EXTERNAL_ZONE, BRONS_WIDTH+EXTERNAL_ZONE);
+		this.envelope = new CircularEnvelope(EXTERNAL_ZONE);
 	}
 
 	@Override

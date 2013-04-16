@@ -9,13 +9,11 @@ public class IRCircuit implements IRSource {
 	private final PoseProvider staticPoseProvider;
 	private final Envelope envelope;
 	
-	//TODO: MM cm's?
-	public static final double HEIGHT = 0;
-	public static final double WIDTH = 0;
+	public static final double RADIUS = 80.0;
 	
 	public IRCircuit(Pose pose) {
 		this.staticPoseProvider = new StaticPoseProvider(pose);
-		this.envelope = new RectangularEnvelope(HEIGHT, WIDTH);
+		this.envelope = new CircularEnvelope(RADIUS);
 	}
 
 	@Override

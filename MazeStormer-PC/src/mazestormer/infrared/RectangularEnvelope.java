@@ -5,7 +5,8 @@ import java.awt.geom.Point2D;
 import lejos.robotics.navigation.Pose;
 import mazestormer.util.ArrayUtils;
 
-public class RectangularEnvelope implements Envelope {
+@Deprecated
+public class RectangularEnvelope {
 
 	private double height;
 	private double width;
@@ -37,7 +38,6 @@ public class RectangularEnvelope implements Envelope {
 		this.width = Math.abs(width);
 	}
 
-	@Override
 	public Point2D[] getClosestPoints(Pose pose, Point2D target) {
 		Point2D[] tps = new Point2D.Double[4];
 		Point2D[] cps = getCornerPoints(pose);
@@ -91,7 +91,6 @@ public class RectangularEnvelope implements Envelope {
 		return new Point2D.Double(new_x, new_y);
 	}
 
-	@Override
 	public Point2D[] getDiscretization(Pose pose, int depth)
 			throws IllegalArgumentException {
 		if (depth <= 0) {
@@ -127,7 +126,6 @@ public class RectangularEnvelope implements Envelope {
 		return new Point2D.Double(c_x, c_y);
 	}
 
-	@Override
 	public Point2D[] getCombination(Pose pose, Point2D target, int depth)
 			throws IllegalArgumentException {
 		Point2D[] dps = getDiscretization(pose, depth);

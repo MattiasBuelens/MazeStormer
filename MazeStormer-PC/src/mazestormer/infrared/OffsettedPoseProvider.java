@@ -45,7 +45,7 @@ public class OffsettedPoseProvider implements PoseProvider {
 		return new Pose(x,y,h);
 	}
 	
-	private Pose toRelative(Pose p) {
+	public Pose toRelative(Pose p) {
 		float h = p.getHeading();
 		float r_x = p.getX() - (float) (getRadius() * Math.cos(h));
 		float r_y = p.getY() - (float) (getRadius() * Math.sin(h));
@@ -62,7 +62,7 @@ public class OffsettedPoseProvider implements PoseProvider {
 	}
 	
 	public enum Module {
-		IR_SENSOR(13,0), RANGE_SCANNER(6,0), LIGHT_SENSOR(9,0), ITEM(8, (float) Math.PI);
+		IR_SENSOR(13,0), RANGE_SCANNER(6,0), LIGHT_SENSOR(9,0), ITEM(8, (float) Math.PI), CENTER(0,0);
 		
 		private final float radius;
 		private final float angleToHeading;

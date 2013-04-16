@@ -1,9 +1,9 @@
 package mazestormer.observable;
 
 import lejos.robotics.localization.PoseProvider;
+import mazestormer.infrared.CircularEnvelope;
 import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRRobot;
-import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.world.ModelType;
 
 public class ObservableRobot implements IRRobot {
@@ -21,8 +21,7 @@ public class ObservableRobot implements IRRobot {
 		this.width = width;
 		this.height = height;
 
-		this.envelope = new RectangularEnvelope(this.height + EXTERNAL_ZONE,
-				this.width + EXTERNAL_ZONE);
+		this.envelope = new CircularEnvelope(EXTERNAL_ZONE);
 	}
 
 	@Override
