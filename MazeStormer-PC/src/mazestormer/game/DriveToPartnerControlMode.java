@@ -12,17 +12,17 @@ import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.util.LongPoint;
 
-public class DriveToTeamMateControlMode extends ControlMode {
+public class DriveToPartnerControlMode extends ControlMode {
 	
 	AbsolutePlayer teamMate;
 	MazeAStar mazeAStar;
 
-	protected DriveToTeamMateControlMode(Player player,
+	protected DriveToPartnerControlMode(Player player,
 			BarcodeMapping barcodeMapping) {
 		super(player, barcodeMapping);
 	}
 	
-	public DriveToTeamMateControlMode(Player player, BarcodeMapping barcodeMapping, AbsolutePlayer teamMate){
+	public DriveToPartnerControlMode(Player player, BarcodeMapping barcodeMapping, AbsolutePlayer teamMate){
 		this(player, barcodeMapping);
 		this.teamMate = teamMate;
 	}
