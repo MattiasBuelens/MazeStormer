@@ -6,6 +6,7 @@ import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
@@ -52,22 +53,6 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		return getControllableRobot().getPilot();
 	}
 
-	protected void initial() {
-		getGameRunner().setSeesawWalls();
-		transition(SeesawState.SCAN);
-	}
-
-	protected void scan() {
-		boolean seesawOpen = false;
-		// TODO vraag aan IRSensor (matthias)
-		if (seesawOpen) {
-			transition(SeesawState.ONWARDS);
-		} else {
-			// TODO opvragen of we moeten hervatten of wait and scan?
-			transition(SeesawState.RESUME_EXPLORING);
-		}
-	}
-
 	/**
 	 * <ol>
 	 * <li>rijd vooruit tot aan een bruin-zwart overgang (van de barcode aan de
@@ -86,6 +71,22 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	 *       in de observedMaze. de eerste tegel, de tegels van de wip en de
 	 *       tegel na de wip staan niet meer in de queue
 	 */
+	protected void initial() {
+		getGameRunner().setSeesawWalls();
+		transition(SeesawState.SCAN);
+	}
+
+	protected void scan() {
+		boolean seesawOpen = false;
+		// TODO vraag aan IRSensor (matthias)
+		if (seesawOpen) {
+			transition(SeesawState.ONWARDS);
+		} else {
+			// TODO opvragen of we moeten hervatten of wait and scan?
+			transition(SeesawState.RESUME_EXPLORING);
+		}
+	}
+
 	protected void onwards() {
 		// TODO Implement seesaw action
 		getGameRunner().onSeesaw(barcode);
@@ -114,21 +115,6 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		}
 	}
 
-	protected void waitAndScan() {
-		boolean seesawOpen = false;
-		// TODO vraag aan IRSensor (matthias)
-		if (seesawOpen)
-			transition(SeesawState.ONWARDS);
-		else {
-			try {
-				Thread.sleep(5000);
-				transition(SeesawState.WAIT_AND_SCAN);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	/**
 	 * <ol>
 	 * <li>informatie over wip aan het ontdekte doolhof toevoegen</li>
@@ -145,8 +131,14 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	 *       tegels staat nog in de queue
 	 */
 	protected void resumeExploring() {
-		// TODO Implement seesaw action
-		stop(); // stops this seesaw action
+		// removes the next tile (the seesaw) off the queue.
+		getGameRunner().afterSeesawBarcode();
+		finish();
+	}
+	
+	private boolean isSeesawOpen() {
+		IRSensor ir = getControllableRobot().getIRSensor();
+		return !ir.hasReading();
 	}
 
 	public enum SeesawState implements State<SeesawAction, SeesawAction.SeesawState> {
@@ -180,15 +172,6 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 			@Override
 			public void execute(SeesawAction input) {
 				input.findLine();
-			}
-
-		},
-
-		WAIT_AND_SCAN {
-
-			@Override
-			public void execute(SeesawAction input) {
-				input.waitAndScan();
 			}
 
 		},
