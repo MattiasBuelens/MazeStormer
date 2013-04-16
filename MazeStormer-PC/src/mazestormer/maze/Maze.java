@@ -18,6 +18,7 @@ import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
+import mazestormer.util.ArrayUtils;
 import mazestormer.util.LongPoint;
 
 public class Maze implements IMaze {
@@ -623,12 +624,12 @@ public class Maze implements IMaze {
 		setStartPose(playerNumber, pose);
 	}
 	
-	// TODO MM: walls map
-	
+	@Override
 	public Line2D[] getAllLines() {
-		return null;
+		return ArrayUtils.concat(getEdgeLines().toArray(new Line2D.Double[0]), getSeesawLines());
 	}
 	
+	@Override
 	public Line2D[] getSeesawLines() {
 		double d = 0.2;
 		List<Line2D> lines = new ArrayList<Line2D>();

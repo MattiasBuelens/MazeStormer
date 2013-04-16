@@ -1,5 +1,6 @@
 package mazestormer.maze;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
@@ -501,4 +502,8 @@ public interface IMaze {
 	 *            The start orientation.
 	 */
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation);
+	
+	public Line2D[] getAllLines();
+	
+	public Line2D[] getSeesawLines();
 }
