@@ -5,7 +5,6 @@ import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
@@ -22,7 +21,6 @@ public class SeesawAction extends
 	private final GameRunner gameRunner;
 	private final int barcode;
 	private Player player;
-	private PathFinder PF;
 
 	public SeesawAction(GameRunner gameRunner, int barcode) {
 		this.gameRunner = gameRunner;
@@ -33,7 +31,6 @@ public class SeesawAction extends
 	public Future<?> performAction(Player player) {
 		checkNotNull(player);
 		this.player = player;
-		this.PF = new PathFinder(getMaze());
 		stop(); // indien nog niet gestopt.
 
 		// Resolve when finished
@@ -49,10 +46,6 @@ public class SeesawAction extends
 
 	private GameRunner getGameRunner() {
 		return this.gameRunner;
-	}
-
-	private Tile getCurrentTile() {
-		return this.getGameRunner().getCurrentTile();
 	}
 
 	private ControllableRobot getControllableRobot() {
