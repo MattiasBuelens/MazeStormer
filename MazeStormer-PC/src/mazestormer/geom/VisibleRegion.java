@@ -14,38 +14,17 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineSegment;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class VisibleRegion extends PointVisibility {
 
 	protected final Geometry obstacles;
 	protected final Polygon subject;
 
-	/**
-	 * The default precision of the geometry, as a power of ten.
-	 * 
-	 * <p>
-	 * For example, {@code 1e3} preserves 3 decimals of precision.
-	 * </p>
-	 */
-	private static final double PRECISION_SCALE = 1e3d;
-
-	public VisibleRegion(Geometry obstacles, Polygon subject, Coordinate viewCoord, GeometryFactory geomFact)
-			throws IllegalArgumentException {
-		super(checkNotNull(geomFact), checkNotNull(viewCoord));
+	public VisibleRegion(Geometry obstacles, Polygon subject, Coordinate viewCoord) throws NullPointerException {
+		super(checkNotNull(obstacles).getFactory(), checkNotNull(viewCoord));
 		this.obstacles = checkNotNull(obstacles);
 		this.subject = checkNotNull(subject);
-	}
-
-	public VisibleRegion(Geometry obstacles, Polygon subject, Coordinate viewCoord, double precisionScale)
-			throws IllegalArgumentException {
-		this(obstacles, subject, viewCoord, new GeometryFactory(new PrecisionModel(precisionScale)));
-	}
-
-	public VisibleRegion(Geometry obstacles, Polygon subject, Coordinate viewCoord) throws IllegalArgumentException {
-		this(obstacles, subject, viewCoord, PRECISION_SCALE);
 	}
 
 	public static Geometry build(Geometry obstacles, Polygon subject, Coordinate viewCoord) {
@@ -95,6 +74,7 @@ public class VisibleRegion extends PointVisibility {
 		}
 	}
 
+	// TODO Change to visible regions again?
 	protected Collection<Geometry> getCollidingRegions(LineSegment screen, double collisionSize) {
 		// Find invisible segment parts
 		Geometry blocked = getBlockedSegments(obstacles, screen);
@@ -133,6 +113,10 @@ public class VisibleRegion extends PointVisibility {
 		List<Geometry> triangles = new ArrayList<Geometry>(numGeometries);
 		for (int i = 0; i < numGeometries; ++i) {
 			Geometry line = lineStrings.getGeometryN(i);
+			// TODO What to do with point intersections?
+			if (line.getDimension() < 1) {
+				continue;
+			}
 			// Add colliding triangle
 			Coordinate[] coords = line.getCoordinates();
 			assert (coords.length == 2);
@@ -149,11 +133,9 @@ public class VisibleRegion extends PointVisibility {
 		// Scale left vertex
 		LineSegment leftSegment = new LineSegment(viewCoord, leftVertex);
 		leftVertex = leftSegment.pointAlong(size / leftSegment.getLength());
-		factory.getPrecisionModel().makePrecise(leftVertex);
 		// Scale right vertex
 		LineSegment rightSegment = new LineSegment(viewCoord, rightVertex);
 		rightVertex = rightSegment.pointAlong(size / rightSegment.getLength());
-		factory.getPrecisionModel().makePrecise(rightVertex);
 		// Return triangle
 		return getViewingTriangle(leftVertex, rightVertex);
 	}
@@ -166,15 +148,8 @@ public class VisibleRegion extends PointVisibility {
 	}
 
 	private Geometry produceResult(Geometry colliding) {
-		// Copy into own precision model
-		LinearRing shell = toLinearRing(subject.getExteriorRing());
-		LinearRing[] holes = new LinearRing[subject.getNumInteriorRing()];
-		for (int i = 0; i < holes.length; ++i) {
-			holes[i] = toLinearRing(subject.getInteriorRingN(i));
-		}
-		Polygon preciseSubject = factory.createPolygon(shell, holes);
 		// Return non-obscured portions of subject
-		return preciseSubject.difference(colliding);
+		return subject.difference(colliding);
 	}
 
 }

@@ -16,6 +16,8 @@ import com.google.common.base.Stopwatch;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class VisibleRegionTest {
@@ -33,42 +35,50 @@ public class VisibleRegionTest {
 		new Parser(maze).parse(FileUtils.load(mazeFilePath));
 		// Get edge geometry
 		obstacles = maze.getEdgeGeometry();
+		System.out.println("Maze:");
 		System.out.println(obstacles.toText());
+		System.out.println();
 	}
 
 	@Before
 	public void createSubject() {
 		GeometricShapeFactory factory = new GeometricShapeFactory(obstacles.getFactory());
-		factory.setNumPoints(4);
+		factory.setNumPoints(100);
 		factory.setCentre(toCoordinate(new LongPoint(3, 5)));
 		factory.setSize(30);
-		subject = factory.createRectangle();
+		subject = factory.createCircle();
 	}
 
 	@Test
 	public void fullyVisible() {
-		start();
-		Coordinate viewCoord = toCoordinate(new LongPoint(4, 5));
-		Geometry visibleSubject = VisibleRegion.build(obstacles, subject, viewCoord);
-		System.out.println("Full: " + visibleSubject.toText());
-		stop();
+		test("sequential full", new LongPoint(4, 5), false);
+		test("parallel full", new LongPoint(4, 5), true);
 	}
 
 	@Test
 	public void partiallyVisible() {
-		start();
-		Coordinate viewCoord = toCoordinate(new LongPoint(4, 4));
-		Geometry visibleSubject = VisibleRegion.build(obstacles, subject, viewCoord);
-		System.out.println("Partial: " + visibleSubject.toText());
-		stop();
+		test("sequential partial", new LongPoint(4, 4), false);
+		test("parallel partial", new LongPoint(4, 4), true);
 	}
 
 	@Test
 	public void invisible() {
+		test("sequential invisible", new LongPoint(5, 5), false);
+		test("parallel invisible", new LongPoint(5, 5), true);
+	}
+
+	private void test(String name, LongPoint viewPoint, boolean isParallel) {
+		Geometry visibleSubject;
+		Coordinate viewCoord = toCoordinate(viewPoint);
+
 		start();
-		Coordinate viewCoord = toCoordinate(new LongPoint(5, 5));
-		Geometry visibleSubject = VisibleRegion.build(obstacles, subject, viewCoord);
-		System.out.println("Invisible: " + visibleSubject.toText());
+		if (isParallel) {
+			visibleSubject = ParallelVisibleRegion.build(obstacles, subject, viewCoord);
+		} else {
+			visibleSubject = VisibleRegion.build(obstacles, subject, viewCoord);
+		}
+		visibleSubject = GeometryPrecisionReducer.reduce(visibleSubject, new PrecisionModel(100d));
+		System.out.println(name + ": " + visibleSubject.toText());
 		stop();
 	}
 

@@ -7,9 +7,16 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.geom.VisibleRegion;
 import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRSource;
 import mazestormer.maze.IMaze;
@@ -26,8 +33,7 @@ public class WorldIRDetector implements IRSensor {
 	private final World world;
 	private final IRDetectionMode mode;
 
-	public WorldIRDetector(World world, PoseProvider poseProvider,
-			double radius, float range, IRDetectionMode mode) {
+	public WorldIRDetector(World world, PoseProvider poseProvider, double radius, float range, IRDetectionMode mode) {
 		this.world = world;
 		this.poseProvider = poseProvider;
 		this.mode = mode;
@@ -99,10 +105,9 @@ public class WorldIRDetector implements IRSensor {
 
 		List<Float> detectedAngles = new ArrayList<Float>();
 
-		for (IRSource irs : getWorld().getAllModelsClass(
-				IRSource.class)) {
-			Float result = (irs.isEmitting() && getMode().getDetectionSet().contains(irs.getModelType())) ? getDetectedAngle(irs
-					.getEnvelope(), irs.getPoseProvider()) : Float.NaN;
+		for (IRSource irs : getWorld().getAllModelsClass(IRSource.class)) {
+			float result = (irs.isEmitting() && getMode().getDetectionSet().contains(irs.getModelType())) ? getDetectedAngle(
+					irs.getEnvelope(), irs.getPoseProvider()) : Float.NaN;
 			if (!Float.isNaN(result)) {
 				detectedAngles.add(result);
 			}
@@ -112,7 +117,7 @@ public class WorldIRDetector implements IRSensor {
 
 	private static final int DEPTH = 3;
 
-	private Float getDetectedAngle(Envelope envelope, PoseProvider poseProvider) {
+	private float getDetectedAngle(Envelope envelope, PoseProvider poseProvider) {
 		Pose currentPose = getPoseProvider().getPose();
 		Pose otherPose = poseProvider.getPose();
 
@@ -120,18 +125,13 @@ public class WorldIRDetector implements IRSensor {
 		double angle = 0;
 		// Avoids self-detection
 		// Avoids not-detectable joy-riding objects
-		if (!((currentPose.getX() == otherPose.getX()) && (currentPose.getY() == otherPose
-				.getY()))) {
-			Point2D currentPoint = new Point2D.Double(currentPose.getX(),
-					currentPose.getY());
-			Point2D otherPoint = new Point2D.Double(otherPose.getX(),
-					otherPose.getY());
+		if (!((currentPose.getX() == otherPose.getX()) && (currentPose.getY() == otherPose.getY()))) {
+			Point2D currentPoint = new Point2D.Double(currentPose.getX(), currentPose.getY());
+			Point2D otherPoint = new Point2D.Double(otherPose.getX(), otherPose.getY());
 
-			Point2D h_e = new Point2D.Double(
-					Math.cos(currentPose.getHeading()), Math.sin(currentPose
-							.getHeading()));
+			Point2D h_e = new Point2D.Double(Math.cos(currentPose.getHeading()), Math.sin(currentPose.getHeading()));
 			Point2D[] cps = envelope.getCombination(currentPose, otherPoint, DEPTH);
-			Line2D[] edgeLines = /*getMaze().getEdgeLines().toArray(*/new Line2D.Double[0]/*)*/;
+			Line2D[] edgeLines = /* getMaze().getEdgeLines().toArray( */new Line2D.Double[0]/* ) */;
 			for (int i = 0; i < cps.length && !isDetected; i++) {
 				Line2D l = new Line2D.Double(currentPoint, cps[i]);
 
@@ -160,14 +160,36 @@ public class WorldIRDetector implements IRSensor {
 		double cp1 = center.distance(p1);
 		double cp2 = center.distance(p2);
 		double p1p2 = p1.distance(p2);
-		return Math.acos((cp1 * cp1 + cp2 * cp2 - p1p2 * p1p2)
-				/ (2 * cp1 * cp2));
+		return Math.acos((cp1 * cp1 + cp2 * cp2 - p1p2 * p1p2) / (2 * cp1 * cp2));
+	}
+
+	// TODO Replace implementation to use this method
+	private float getDetectedAngle(Geometry obstacles, Polygon subject, Point viewPoint) {
+		// Get the visible part of the subject
+		Geometry visibleSubject = VisibleRegion.build(obstacles, subject, viewPoint.getCoordinate());
+
+		// Exit if invisible
+		if (visibleSubject.isEmpty()) {
+			return Float.NaN;
+		}
+
+		// Get the ray to the nearest visible point
+		Coordinate[] nearestPoints = DistanceOp.nearestPoints(viewPoint, visibleSubject);
+		LineSegment ray = new LineSegment(nearestPoints[0], nearestPoints[1]);
+
+		if (ray.getLength() <= getRadius()) {
+			// Return viewing angle
+			return (float) ray.angle();
+		} else {
+			// Out of range
+			return Float.NaN;
+		}
 	}
 
 	public enum IRDetectionMode {
 
-		VIRTUAL(ImmutableSet.of(ModelType.VIRTUAL, ModelType.PHYSICAL)), SEMI_PHYSICAL(
-				ImmutableSet.of(ModelType.VIRTUAL));
+		VIRTUAL(ImmutableSet.of(ModelType.VIRTUAL, ModelType.PHYSICAL)), SEMI_PHYSICAL(ImmutableSet
+				.of(ModelType.VIRTUAL));
 
 		private Set<ModelType> detectionSet;
 

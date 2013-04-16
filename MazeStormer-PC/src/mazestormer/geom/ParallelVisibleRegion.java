@@ -11,22 +11,23 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ParallelVisibilityPolygon extends VisibilityPolygon {
+public class ParallelVisibleRegion extends VisibleRegion {
 
 	private static final int THRESHOLD = 8;
 
-	public ParallelVisibilityPolygon(Polygon polygon, Coordinate viewCoord) throws NullPointerException {
-		super(polygon, viewCoord);
+	public ParallelVisibleRegion(Geometry obstacles, Polygon subject, Coordinate viewCoord)
+			throws IllegalArgumentException {
+		super(obstacles, subject, viewCoord);
 	}
 
-	public static Geometry build(Polygon polygon, Coordinate viewCoord) {
-		return new ParallelVisibilityPolygon(polygon, viewCoord).build();
+	public static Geometry build(Geometry obstacles, Polygon subject, Coordinate viewCoord) {
+		return new ParallelVisibleRegion(obstacles, subject, viewCoord).build();
 	}
 
 	@Override
-	protected Collection<Geometry> getVisibleRegions(List<LineSegment> edges) {
+	protected Collection<Geometry> getCollidingRegions(List<LineSegment> edges, double collisionSize) {
 		Collection<Geometry> regions = new ConcurrentLinkedQueue<Geometry>();
-		Task task = new Task(edges, regions);
+		Task task = new Task(edges, regions, collisionSize);
 		ForkJoinPool pool = new ForkJoinPool();
 		pool.invoke(task);
 		return regions;
@@ -39,9 +40,12 @@ public class ParallelVisibilityPolygon extends VisibilityPolygon {
 		private final List<LineSegment> input;
 		private final Collection<Geometry> output;
 
-		public Task(List<LineSegment> input, Collection<Geometry> output) {
+		private final double collisionSize;
+
+		public Task(List<LineSegment> input, Collection<Geometry> output, double collisionSize) {
 			this.input = input;
 			this.output = output;
+			this.collisionSize = collisionSize;
 		}
 
 		@Override
@@ -49,12 +53,12 @@ public class ParallelVisibilityPolygon extends VisibilityPolygon {
 			final int size = input.size();
 			if (size <= THRESHOLD) {
 				// Compute directly
-				getVisibleRegions(input, output);
+				getCollidingRegions(input, output, collisionSize);
 			} else {
 				// Split up task
 				int mid = size >>> 2;
-				Task leftTask = new Task(input.subList(0, mid), output);
-				Task rightTask = new Task(input.subList(mid, size), output);
+				Task leftTask = new Task(input.subList(0, mid), output, collisionSize);
+				Task rightTask = new Task(input.subList(mid, size), output, collisionSize);
 				invokeAll(leftTask, rightTask);
 			}
 		}
