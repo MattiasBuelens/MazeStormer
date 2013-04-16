@@ -4,8 +4,8 @@ import mazestormer.robot.Robot;
 
 public interface IRRobot extends Robot, IRSource {
 
-	// TODO: MM
-	public static final double EXTERNAL_ZONE = 0;
-	public static final double BRONS_HEIGHT = 0;
-	public static final double BRONS_WIDTH = 0;
+	// in cm
+	public static final double EXTERNAL_ZONE = 5.0;
+	public static final double BRONS_HEIGHT = 21.0;
+	public static final double BRONS_WIDTH = 9.0;
 }
