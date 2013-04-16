@@ -8,12 +8,13 @@ import mazestormer.explore.Driver;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Tile;
 import mazestormer.maze.path.MazeAStar;
+import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.util.LongPoint;
 
 public class DriveToTeamMateControlMode extends ControlMode {
 	
-	Player teamMate;
+	AbsolutePlayer teamMate;
 	MazeAStar mazeAStar;
 
 	protected DriveToTeamMateControlMode(Player player,
@@ -21,7 +22,7 @@ public class DriveToTeamMateControlMode extends ControlMode {
 		super(player, barcodeMapping);
 	}
 	
-	public DriveToTeamMateControlMode(Player player, BarcodeMapping barcodeMapping, Player teamMate){
+	public DriveToTeamMateControlMode(Player player, BarcodeMapping barcodeMapping, AbsolutePlayer teamMate){
 		this(player, barcodeMapping);
 		this.teamMate = teamMate;
 	}
@@ -46,7 +47,7 @@ public class DriveToTeamMateControlMode extends ControlMode {
 		//TODO: nachecken; kloppen de positions? (tile vs in cm)
 		Point teamMateLocation = maze.toTile(teamMatePose.getLocation());
 		//TODO:
-		maze.getTileCenter(maze.getTileAt(tilePosition).getPosition());
+		//maze.getTileCenter(maze.getTileAt(tilePosition).getPosition());
 		LongPoint teamMateLocation2 = new LongPoint((long)teamMateLocation.getX(), (long)teamMateLocation.getY());
 
 		//Calculate shortest path to team mate

@@ -84,6 +84,11 @@ public class TileTransform {
 		}
 	}
 
+	public PoseTransform toPoseTransform(){
+		//TODO: Implementeren Mattias, aub
+		return null;
+	}
+	
 	/**
 	 * Create a transformation for a system with the given translation and
 	 * number of rotation.
@@ -106,5 +111,4 @@ public class TileTransform {
 	public static TileTransform getIdentity() {
 		return IDENTITY;
 	}
-
 }

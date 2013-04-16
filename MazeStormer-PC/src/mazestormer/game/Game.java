@@ -10,10 +10,12 @@ import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.CombinedMaze;
+import mazestormer.maze.CombinedMazeListener;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
+import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
 import peno.htttp.Callback;
@@ -28,11 +30,14 @@ public class Game {
 	private final String id;
 
 	private final Player localPlayer;
-	private Player partnerPlayer;
+	private RelativePlayer partnerPlayer;
+	private AbsolutePlayer absolutePartnerPlayer;
 
 	private final PlayerClient client;
 	private final Handler handler;
 	private final List<GameListener> listeners = new ArrayList<GameListener>();
+	
+	private final CombinedMazeListener combinedMazeListener;
 
 	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
@@ -40,6 +45,7 @@ public class Game {
 
 		this.handler = new Handler();
 		this.client = new PlayerClient(connection, this.handler, id, localPlayer.getPlayerID());
+		this.combinedMazeListener = new Listener();
 	}
 
 	public void addGameListener(GameListener listener) {
@@ -216,7 +222,15 @@ public class Game {
 		return partnerPlayer != null;
 	}
 
-	public Player getPartner() {
+	public AbsolutePlayer getAbsolutePartner(){
+		if(absolutePartnerPlayer == null){
+			throw new IllegalStateException("No absolute partner yet");
+		}
+		
+		return absolutePartnerPlayer;
+	}
+	
+	public RelativePlayer getPartner() {
 		if (!hasPartner()) {
 			throw new IllegalStateException("Partner still unknown.");
 		}
@@ -270,6 +284,15 @@ public class Game {
 		getLocalMaze().clear();
 	}
 
+	private class Listener implements CombinedMazeListener{
+
+		@Override
+		public void mazeMerged() {
+			absolutePartnerPlayer = new AbsolutePlayer(getPartner());
+			absolutePartnerPlayer.setTransform(getLocalMaze().getTileTransform().toPoseTransform());
+		}
+	}
+	
 	private class Handler implements PlayerHandler {
 
 		@Override
@@ -287,6 +310,9 @@ public class Game {
 			for (GameListener listener : listeners) {
 				listener.onGameStarted();
 			}
+			
+			//Add listener to combined maze
+			getLocalMaze().addCombinedMazeListener(combinedMazeListener);
 		}
 
 		@Override
@@ -294,6 +320,9 @@ public class Game {
 			for (GameListener listener : listeners) {
 				listener.onGameStopped();
 			}
+			
+			//Remove listener from combined maze
+			getLocalMaze().removeCombinedListenerListener(combinedMazeListener);
 		}
 
 		@Override
@@ -370,5 +399,4 @@ public class Game {
 		}
 
 	}
-
 }
