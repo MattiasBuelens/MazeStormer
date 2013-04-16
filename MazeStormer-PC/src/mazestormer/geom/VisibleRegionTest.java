@@ -23,30 +23,40 @@ import com.vividsolutions.jts.util.GeometricShapeFactory;
 public class VisibleRegionTest {
 
 	private static final IMaze maze = new Maze();
-	private static Geometry obstacles;
+	private static Geometry walls;
 
 	private Polygon subject;
 	private final Stopwatch stopwatch = new Stopwatch();
+
+	public static void main(String[] args) throws Exception {
+		setUpBeforeClass();
+		VisibleRegionTest test = new VisibleRegionTest();
+		test.createSubject();
+		test.fullyVisible();
+		test.partiallyVisible();
+		test.invisible();
+	}
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		// Parse maze
 		String mazeFilePath = VisibilityPolygonTest.class.getResource("/res/mazes/Semester2_Demo2.txt").getPath();
 		new Parser(maze).parse(FileUtils.load(mazeFilePath));
-		// Get edge geometry
-		obstacles = maze.getEdgeGeometry();
-		System.out.println("Maze:");
-		System.out.println(obstacles.toText());
+		// Walls
+		walls = maze.getEdgeGeometry();
+		System.out.println("Maze walls:");
+		System.out.println(walls.toText());
 		System.out.println();
 	}
 
 	@Before
 	public void createSubject() {
-		GeometricShapeFactory factory = new GeometricShapeFactory(obstacles.getFactory());
-		factory.setNumPoints(100);
+		GeometricShapeFactory factory = new GeometricShapeFactory();
+		factory.setNumPoints(30);
 		factory.setCentre(toCoordinate(new LongPoint(3, 5)));
 		factory.setSize(30);
-		subject = factory.createCircle();
+		factory.setRotation(Math.PI / 4d);
+		subject = factory.createRectangle();
 	}
 
 	@Test
@@ -73,12 +83,12 @@ public class VisibleRegionTest {
 
 		start();
 		if (isParallel) {
-			visibleSubject = ParallelVisibleRegion.build(obstacles, subject, viewCoord);
+			visibleSubject = ParallelVisibleRegion.build(walls, subject, viewCoord);
 		} else {
-			visibleSubject = VisibleRegion.build(obstacles, subject, viewCoord);
+			visibleSubject = VisibleRegion.build(walls, subject, viewCoord);
 		}
 		visibleSubject = GeometryPrecisionReducer.reduce(visibleSubject, new PrecisionModel(100d));
-		System.out.println(name + ": " + visibleSubject.toText());
+		System.out.println(name + ":\t" + visibleSubject.toText());
 		stop();
 	}
 

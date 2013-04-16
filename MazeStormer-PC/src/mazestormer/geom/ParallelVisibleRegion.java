@@ -25,7 +25,7 @@ public class ParallelVisibleRegion extends VisibleRegion {
 	}
 
 	@Override
-	protected Collection<Geometry> getCollidingRegions(List<LineSegment> edges, double collisionSize) {
+	protected Collection<Geometry> getBlockedRegions(List<LineSegment> edges, double collisionSize) {
 		Collection<Geometry> regions = new ConcurrentLinkedQueue<Geometry>();
 		Task task = new Task(edges, regions, collisionSize);
 		ForkJoinPool pool = new ForkJoinPool();
@@ -53,7 +53,7 @@ public class ParallelVisibleRegion extends VisibleRegion {
 			final int size = input.size();
 			if (size <= THRESHOLD) {
 				// Compute directly
-				getCollidingRegions(input, output, collisionSize);
+				getBlockedRegions(input, output, collisionSize);
 			} else {
 				// Split up task
 				int mid = size >>> 2;

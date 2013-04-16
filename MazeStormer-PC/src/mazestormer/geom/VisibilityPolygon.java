@@ -12,6 +12,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 /**
  * Computes the visibility polygon from a view point inside a {@link Polygon}.
@@ -122,6 +124,8 @@ public class VisibilityPolygon extends PointVisibility {
 	/**
 	 * Get the visible segments on the screen.
 	 * 
+	 * @param obstacles
+	 *            The obstacles.
 	 * @param screen
 	 *            The line segment on which to project.
 	 * @return The segments visible from the view point and the edge.
@@ -130,14 +134,17 @@ public class VisibilityPolygon extends PointVisibility {
 		Geometry screenGeom = screen.toGeometry(factory);
 		// Start with all points between view point and screen
 		Geometry view = getViewingTriangle(screen);
-		// Find collisions with polygon
+		// Find collisions within view
 		Geometry collisions = view.difference(polygon);
 		// Exit if no collisions
 		if (collisions.isEmpty()) {
 			return screenGeom;
 		}
-		// Remove blocked segments
+		// Get and process projections
 		Geometry blocked = getProjections(collisions, screen);
+		blocked = GeometryPrecisionReducer.reduce(blocked, new PrecisionModel(1e3));
+		blocked = blocked.union();
+		// Return blocked segments
 		return screenGeom.difference(blocked);
 	}
 

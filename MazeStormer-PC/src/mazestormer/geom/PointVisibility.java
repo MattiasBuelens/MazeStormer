@@ -128,7 +128,7 @@ public abstract class PointVisibility {
 	 */
 	protected Geometry getProjections(Geometry polygons, LineSegment screen) {
 		int numGeometries = polygons.getNumGeometries();
-		List<LineString> projections = new ArrayList<LineString>(numGeometries);
+		List<Geometry> projections = new ArrayList<Geometry>(numGeometries);
 		// Iterate over polygons
 		for (int i = 0; i < numGeometries; ++i) {
 			Polygon polygon = (Polygon) polygons.getGeometryN(i);
@@ -136,11 +136,12 @@ public abstract class PointVisibility {
 			if (polygon.isEmpty())
 				continue;
 			// Project polygon on edge
-			LineString projectedLine = project(polygon, screen).toGeometry(factory);
+			MultiLineString projectedLine = project(polygon, screen);
 			// Store projection
 			projections.add(projectedLine);
 		}
-		return factory.createMultiLineString(GeometryFactory.toLineStringArray(projections));
+		// Combine projections
+		return factory.buildGeometry(projections);
 	}
 
 	/**
@@ -152,31 +153,30 @@ public abstract class PointVisibility {
 	 *            The screen on which to project.
 	 * @return The section of the screen containing the projection.
 	 */
-	protected LineSegment project(Polygon polygon, LineSegment screen) {
-		double minFraction = 1.0, maxFraction = 0.0;
+	protected MultiLineString project(Polygon polygon, LineSegment screen) {
 		// Only check exterior shell, interior holes don't matter for projection
-		Coordinate[] coords = polygon.getExteriorRing().getCoordinates();
-		for (Coordinate coord : coords) {
+		List<LineSegment> segments = collect(toLinearRing(polygon.getExteriorRing()));
+		List<LineString> projectedSegments = new ArrayList<LineString>(segments.size());
+		for (LineSegment segment : segments) {
 			// Project vertex onto screen
-			LineSegment ray = new LineSegment(viewCoord, coord);
-			Coordinate projection = screen.lineIntersection(ray);
-			// If lines overlap
-			if (projection == null) {
-				projection = viewCoord;
-			}
-			double fraction = screen.projectionFactor(projection);
-			// Update minimum and maximum
-			if (fraction < minFraction) {
-				minFraction = fraction;
-			}
-			if (fraction > maxFraction) {
-				maxFraction = fraction;
-			}
+			Coordinate leftVertex = project(segment.getCoordinate(0), screen);
+			Coordinate rightVertex = project(segment.getCoordinate(1), screen);
+			LineString projectedSegment = new LineSegment(leftVertex, rightVertex).toGeometry(factory);
+			projectedSegments.add(projectedSegment);
 		}
-		// Produce line segment as a section of the screen
-		Coordinate minCoord = screen.pointAlong(minFraction);
-		Coordinate maxCoord = screen.pointAlong(maxFraction);
-		return new LineSegment(minCoord, maxCoord);
+		// Combine projections
+		return factory.createMultiLineString(GeometryFactory.toLineStringArray(projectedSegments));
+	}
+
+	protected Coordinate project(Coordinate point, LineSegment screen) {
+		// Project vertex onto screen
+		LineSegment ray = new LineSegment(viewCoord, point);
+		Coordinate projection = screen.lineIntersection(ray);
+		// If lines overlap
+		if (projection == null) {
+			projection = point;
+		}
+		return projection;
 	}
 
 	/**

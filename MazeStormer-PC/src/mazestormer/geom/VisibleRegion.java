@@ -12,38 +12,39 @@ import com.google.common.math.DoubleMath;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 public class VisibleRegion extends PointVisibility {
 
-	protected final Geometry obstacles;
+	protected final Geometry walls;
 	protected final Polygon subject;
 
-	public VisibleRegion(Geometry obstacles, Polygon subject, Coordinate viewCoord) throws NullPointerException {
-		super(checkNotNull(obstacles).getFactory(), checkNotNull(viewCoord));
-		this.obstacles = checkNotNull(obstacles);
+	public VisibleRegion(Geometry walls, Polygon subject, Coordinate viewCoord) throws NullPointerException {
+		super(checkNotNull(walls).getFactory(), checkNotNull(viewCoord));
+		this.walls = checkNotNull(walls);
 		this.subject = checkNotNull(subject);
 	}
 
-	public static Geometry build(Geometry obstacles, Polygon subject, Coordinate viewCoord) {
-		return new VisibleRegion(obstacles, subject, viewCoord).build();
+	public static Geometry build(Geometry walls, Polygon subject, Coordinate viewCoord) {
+		return new VisibleRegion(walls, subject, viewCoord).build();
 	}
 
 	public Geometry build() {
-		// Get size needed for colliding regions to pass through all geometry
+		// Get size needed for visible regions to pass through all geometry
 		double collisionSize = getCollisionSize(subject);
 
 		// Collect line segments
 		List<LineSegment> segments = collect(subject);
 
-		// Find colliding regions
-		Collection<Geometry> collidingRegions = getCollidingRegions(segments, collisionSize);
+		// Find blocked regions
+		Collection<Geometry> blockedRegions = getBlockedRegions(segments, collisionSize);
 
 		// Combine and produce result
-		Geometry colliding = combine(collidingRegions);
-		return produceResult(colliding);
+		Geometry blocked = combine(blockedRegions);
+		return produceResult(blocked);
 	}
 
 	/**
@@ -62,22 +63,21 @@ public class VisibleRegion extends PointVisibility {
 		return Math.sqrt(w * w + h * h);
 	}
 
-	protected Collection<Geometry> getCollidingRegions(List<LineSegment> edges, double collisionSize) {
+	protected Collection<Geometry> getBlockedRegions(List<LineSegment> edges, double collisionSize) {
 		List<Geometry> regions = new LinkedList<Geometry>();
-		getCollidingRegions(edges, regions, collisionSize);
+		getBlockedRegions(edges, regions, collisionSize);
 		return regions;
 	}
 
-	protected final void getCollidingRegions(List<LineSegment> edges, Collection<Geometry> regions, double collisionSize) {
+	protected final void getBlockedRegions(List<LineSegment> edges, Collection<Geometry> regions, double collisionSize) {
 		for (LineSegment segment : edges) {
-			regions.addAll(getCollidingRegions(segment, collisionSize));
+			regions.addAll(getBlockedRegions(segment, collisionSize));
 		}
 	}
 
-	// TODO Change to visible regions again?
-	protected Collection<Geometry> getCollidingRegions(LineSegment screen, double collisionSize) {
+	protected Collection<Geometry> getBlockedRegions(LineSegment screen, double collisionSize) {
 		// Find invisible segment parts
-		Geometry blocked = getBlockedSegments(obstacles, screen);
+		Geometry blocked = getBlockedSegments(screen);
 		// Exit if empty
 		if (blocked.isEmpty()) {
 			return Collections.emptySet();
@@ -93,19 +93,21 @@ public class VisibleRegion extends PointVisibility {
 	 *            The line segment on which to project.
 	 * @return The segments invisible from the view point and the edge.
 	 */
-	protected Geometry getBlockedSegments(Geometry obstacles, LineSegment screen) {
+	protected Geometry getBlockedSegments(LineSegment screen) {
 		// Start with all points between view point and screen
 		Geometry view = getViewingTriangle(screen);
 		// Find collisions with polygon
-		Geometry collisions = view.intersection(obstacles);
+		Geometry collisions = view.intersection(walls);
 		// Exit if no collisions
 		if (collisions.isEmpty()) {
 			return GeometryUtils.emptyPolygon(factory);
 		}
-		// Return blocked segments
-		Geometry screenGeom = screen.toGeometry(factory);
+		// Process projections
 		Geometry blocked = getProjections(collisions, screen);
-		return screenGeom.intersection(blocked);
+		blocked = GeometryPrecisionReducer.reduce(blocked, new PrecisionModel(1e3));
+		blocked = blocked.union();
+		// Return blocked segments
+		return blocked;
 	}
 
 	protected Collection<Geometry> buildCollidingTriangles(Geometry lineStrings, double size) {
@@ -142,14 +144,17 @@ public class VisibleRegion extends PointVisibility {
 
 	private Geometry combine(Collection<Geometry> regions) {
 		// Union all regions
-		Geometry result = factory.createGeometryCollection(GeometryFactory.toGeometryArray(regions));
-		result = result.union();
+		// Geometry result =
+		// factory.createGeometryCollection(GeometryFactory.toGeometryArray(regions));
+		// result = result.union();
+		Geometry result = factory.buildGeometry(regions);
+		result = GeometryUtils.removeCollinear(result);
 		return result;
 	}
 
-	private Geometry produceResult(Geometry colliding) {
+	private Geometry produceResult(Geometry blocked) {
 		// Return non-obscured portions of subject
-		return subject.difference(colliding);
+		return subject.difference(blocked);
 	}
 
 }
