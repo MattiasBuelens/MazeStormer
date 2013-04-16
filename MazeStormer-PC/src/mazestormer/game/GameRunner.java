@@ -20,6 +20,7 @@ import mazestormer.explore.Controller;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
@@ -102,7 +103,7 @@ public class GameRunner extends Controller implements GameListener {
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
 		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = TeamTreasureTrekBarcodeMapping.getOtherSeesawBarcode(seesawBarcode);
+		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();

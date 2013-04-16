@@ -37,7 +37,7 @@ public class Seesaw {
 		this(barcode, getOtherBarcode(barcode));
 	}
 	
-	private static Barcode getOtherBarcode(Barcode barcode) {
+	public static Barcode getOtherBarcode(Barcode barcode) {
 		return otherBarcode.get(barcode);
 	}
 
