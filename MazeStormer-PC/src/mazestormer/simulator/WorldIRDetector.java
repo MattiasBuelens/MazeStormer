@@ -68,8 +68,6 @@ public class WorldIRDetector implements IRSensor {
 	}
 
 	private float detect() {
-		// TODO: MM add wall for each seesaw
-
 		List<Float> detectedAngles = new ArrayList<Float>();
 
 		for (IRSource irs : getWorld().getAllModelsClass(
@@ -100,16 +98,16 @@ public class WorldIRDetector implements IRSensor {
 			Point2D h_e = new Point2D.Double(
 					Math.cos(currentPose.getHeading()), Math.sin(currentPose
 							.getHeading()));
-			Point2D[] cps = envelope.getDiscretization(otherPose, DEPTH);
+			Point2D[] cpsi = envelope.getInternalDiscretization(otherPose, DEPTH);
 			Line2D[] edgeLines = getMaze().getAllLines();
-			for (int i = 0; i < cps.length; i++) {
-				Line2D l = new Line2D.Double(currentPoint, cps[i]);
+			for (int i = 0; i < cpsi.length; i++) {
+				Line2D l = new Line2D.Double(currentPoint, cpsi[i]);
 
-				if (l.getP1().distance(l.getP2()) > envelope.getRadius()) {
+				if (l.getP1().distance(l.getP2()) > envelope.getExternalRadius()) {
 					continue;
 				}
 
-				double angle = getAngle(cps[i], currentPoint, h_e);
+				double angle = getAngle(cpsi[i], currentPoint, h_e);
 				if (angle > getRange() || angle < (-1) * getRange()) {
 					continue;
 				}

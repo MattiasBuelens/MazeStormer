@@ -15,7 +15,7 @@ public class IRBall implements IRSource {
 	
 	public IRBall(Pose pose) {
 		this.staticPoseProvider = new StaticPoseProvider(pose);
-		this.envelope = new CircularEnvelope(INTERNAL_RADIUS+EXTERNAL_RADIUS);
+		this.envelope = new CircularEnvelope(INTERNAL_RADIUS, EXTERNAL_RADIUS);
 	}
 
 	@Override

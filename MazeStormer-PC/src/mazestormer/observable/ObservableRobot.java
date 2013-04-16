@@ -21,7 +21,7 @@ public class ObservableRobot implements IRRobot {
 		this.width = width;
 		this.height = height;
 
-		this.envelope = new CircularEnvelope(EXTERNAL_ZONE);
+		this.envelope = new CircularEnvelope(INTERNAL_RADIUS, EXTERNAL_RADIUS);
 	}
 
 	@Override
