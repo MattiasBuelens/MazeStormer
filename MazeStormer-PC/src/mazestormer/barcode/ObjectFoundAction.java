@@ -3,7 +3,6 @@ package mazestormer.barcode;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
-import mazestormer.game.GameRunner;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
@@ -15,30 +14,9 @@ public class ObjectFoundAction extends
 		StateMachine<ObjectFoundAction, ObjectFoundAction.ObjectFoundState>
 		implements IAction {
 
-	private final GameRunner gameRunner;
-	private final int foundObjectNumber;
-	private final int foundTeamNumber;
 	private Player player;
 
 	private static int threshold = 85;
-
-	public ObjectFoundAction(int fon, int ftn, GameRunner gameRunner) {
-		this.foundObjectNumber = fon;
-		this.foundTeamNumber = ftn;
-		this.gameRunner = gameRunner;
-	}
-
-	public int getFoundObjectNumber() {
-		return foundObjectNumber;
-	}
-
-	public int getFoundTeamNumber() {
-		return foundTeamNumber;
-	}
-
-	private GameRunner getGameRunner() {
-		return gameRunner;
-	}
 
 	private ControllableRobot getControllableRobot() {
 		return (ControllableRobot) player.getRobot();
@@ -67,30 +45,12 @@ public class ObjectFoundAction extends
 
 		// Start from the initial state
 		start();
-		transition(ObjectFoundState.INITIAL);
+		transition(ObjectFoundState.OWN_OBJECT);
 
 		return future;
 	}
 
-	/**
-	 * States
-	 */
-
-	protected void initial() {
-		getGameRunner().setObjectTile();
-
-		// Determine owner
-		if (getGameRunner().getObjectNumber() == getFoundObjectNumber()) {
-			transition(ObjectFoundState.OWN_OBJECT);
-		} else {
-			transition(ObjectFoundState.DONE);
-		}
-
-	}
-
 	protected void ownObject() {
-		// Publish
-		getGameRunner().objectFound(getFoundTeamNumber());
 		// Forward until white line
 		bindTransition(onLine(), ObjectFoundState.FIRST_LINE);
 		getPilot().forward();
@@ -120,22 +80,12 @@ public class ObjectFoundAction extends
 	}
 
 	protected void done() {
-		// Prepare game runner
-		getGameRunner().afterObjectBarcode();
 		// Finished
 		finish();
 	}
 
 	public enum ObjectFoundState implements
 			State<ObjectFoundAction, ObjectFoundAction.ObjectFoundState> {
-		INITIAL {
-			@Override
-			public void execute(ObjectFoundAction objectFoundAction) {
-				objectFoundAction.initial();
-			}
-
-		},
-
 		OWN_OBJECT {
 			@Override
 			public void execute(ObjectFoundAction objectFoundAction) {
@@ -189,7 +139,7 @@ public class ObjectFoundAction extends
 
 		@Override
 		public boolean isFinished() {
-			return getGameRunner().isRunning();
+			return true;
 		}
 
 	}
