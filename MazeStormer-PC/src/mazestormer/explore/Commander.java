@@ -8,7 +8,7 @@ import mazestormer.player.Player;
 /**
  * Commands and controls a driver through the maze.
  */
-public abstract class Controller {
+public abstract class Commander {
 
 	private final Player player;
 	private final Driver driver;
@@ -17,7 +17,7 @@ public abstract class Controller {
 	private ControlMode startMode;
 	private final Map<ControlMode, ControlMode> bindings = new HashMap<>();
 
-	public Controller(Player player) {
+	public Commander(Player player) {
 		this.player = player;
 		this.driver = new Driver(player, this);
 	}

@@ -12,12 +12,12 @@ public abstract class ControlMode {
 
 	private final Player player;
 	private final PathFinder pathFinder;
-	private final BarcodeMapping barcodeMapping;
+	private final Commander commander;
 
-	public ControlMode(Player player, BarcodeMapping barcodeMapping) {
+	public ControlMode(Player player, Commander commander) {
 		this.player = player;
 		this.pathFinder = new PathFinder(getMaze());
-		this.barcodeMapping = barcodeMapping;
+		this.commander = commander;
 	}
 
 	protected Player getPlayer() {
@@ -39,13 +39,15 @@ public abstract class ControlMode {
 	public abstract Tile nextTile(Tile currentTile);
 
 	public abstract boolean isBarcodeActionEnabled();
+	
+	public abstract BarcodeMapping getBarcodeMapping();
 
 	public PathFinder getPathFinder() {
 		return pathFinder;
 	}
 
-	public BarcodeMapping getBarcodeMapping() {
-		return barcodeMapping;
+	public Commander getCommander() {
+		return commander;
 	}
 
 }

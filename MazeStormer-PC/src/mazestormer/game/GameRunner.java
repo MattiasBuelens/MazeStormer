@@ -16,7 +16,7 @@ import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
 import mazestormer.explore.ControlMode;
 import mazestormer.explore.ExploreControlMode;
-import mazestormer.explore.Controller;
+import mazestormer.explore.Commander;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -29,7 +29,7 @@ import mazestormer.util.LongPoint;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class GameRunner extends Controller implements GameListener {
+public class GameRunner extends Commander implements GameListener {
 
 	/**
 	 * The frequency of position updates.
@@ -56,7 +56,7 @@ public class GameRunner extends Controller implements GameListener {
 		game.addGameListener(this);
 
 		// Modes
-		findObjectMode = new FindObjectControlMode(player);
+		findObjectMode = new FindObjectControlMode(player, this);
 		setStartMode(findObjectMode);
 	}
 

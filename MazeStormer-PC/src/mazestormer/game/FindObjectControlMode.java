@@ -4,6 +4,7 @@ import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
+import mazestormer.explore.Commander;
 import mazestormer.explore.ControlMode;
 import mazestormer.explore.Driver;
 import mazestormer.maze.Tile;
@@ -11,8 +12,8 @@ import mazestormer.player.Player;
 
 public class FindObjectControlMode extends ControlMode{
 
-	public FindObjectControlMode(Player player, BarcodeMapping barcodeMapping) {
-		super(player, barcodeMapping);
+	public FindObjectControlMode(Player player, Commander commander) {
+		super(player, commander);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -50,6 +51,12 @@ public class FindObjectControlMode extends ControlMode{
 			return null;
 		}
 		
+	}
+
+	@Override
+	public BarcodeMapping getBarcodeMapping() {
+		// TODO
+		return null;
 	}
 
 }

@@ -51,7 +51,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Settings
 	 */
 	private final Player player;
-	private Controller controller;
+	private Commander controller;
 
 	/*
 	 * Subroutines
@@ -90,7 +90,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 */
 	private AtomicBoolean shouldLineAdjust = new AtomicBoolean(false);
 
-	public Driver(Player player, Controller controller) {
+	public Driver(Player player, Commander controller) {
 		this.player = checkNotNull(player);
 		this.controller = checkNotNull(controller);
 		addStateListener(this);
@@ -122,7 +122,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Getters and setters
 	 */
 
-	protected final Controller getController() {
+	protected final Commander getController() {
 		return controller;
 	}
 
