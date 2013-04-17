@@ -23,7 +23,7 @@ import mazestormer.simulator.collision.VirtualCollisionDetector;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
-public class VirtualRobot implements ControllablePCRobot, IRRobot {
+public class VirtualRobot implements ControllablePCRobot {
 
 	private final World world;
 

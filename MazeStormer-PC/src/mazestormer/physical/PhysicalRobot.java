@@ -26,7 +26,7 @@ import mazestormer.robot.SoundPlayer;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
-public class PhysicalRobot extends PhysicalComponent implements ControllablePCRobot, IRRobot {
+public class PhysicalRobot extends PhysicalComponent implements ControllablePCRobot {
 
 	/**
 	 * Timeout for synchronous requests.
