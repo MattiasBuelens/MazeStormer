@@ -87,7 +87,7 @@ public class VisibleRegionTest {
 		} else {
 			visibleSubject = VisibleRegion.build(walls, subject, viewCoord);
 		}
-		visibleSubject = GeometryPrecisionReducer.reduce(visibleSubject, new PrecisionModel(100d));
+		visibleSubject = GeometryPrecisionReducer.reduce(visibleSubject, new PrecisionModel(1e3));
 		System.out.println(name + ":\t" + visibleSubject.toText());
 		stop();
 	}

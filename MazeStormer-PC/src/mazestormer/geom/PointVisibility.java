@@ -128,7 +128,7 @@ public abstract class PointVisibility {
 	 */
 	protected MultiLineString getProjections(Geometry polygons, LineSegment screen) {
 		int numGeometries = polygons.getNumGeometries();
-		List<LineString> projections = new ArrayList<LineString>();
+		MultiFractionSegment projectedSegments = new MultiFractionSegment();
 		// Iterate over polygons
 		for (int i = 0; i < numGeometries; ++i) {
 			Polygon polygon = (Polygon) polygons.getGeometryN(i);
@@ -136,12 +136,19 @@ public abstract class PointVisibility {
 			if (polygon.isEmpty())
 				continue;
 			// Project polygon on edge
-			List<LineString> projectedLines = project(polygon, screen);
+			List<FractionSegment> projected = project(polygon, screen);
 			// Store projection
-			projections.addAll(projectedLines);
+			projectedSegments.addSegments(projected);
 		}
-		// Combine projections
-		return factory.createMultiLineString(GeometryFactory.toLineStringArray(projections));
+		// Create line segments along screen
+		List<LineSegment> projections = projectedSegments.combine().segmentsAlong(screen);
+		// Make line strings
+		LineString[] projectedLines = new LineString[projections.size()];
+		for (int i = 0; i < projectedLines.length; ++i) {
+			projectedLines[i] = projections.get(i).toGeometry(factory);
+		}
+		// Combine line strings
+		return factory.createMultiLineString(projectedLines);
 	}
 
 	/**
@@ -151,31 +158,31 @@ public abstract class PointVisibility {
 	 *            The polygon to project.
 	 * @param screen
 	 *            The screen on which to project.
-	 * @return The section of the screen containing the projection.
+	 * @return The segments of the screen containing the projection.
 	 */
-	protected List<LineString> project(Polygon polygon, LineSegment screen) {
+	protected List<FractionSegment> project(Polygon polygon, LineSegment screen) {
 		// Only check exterior shell, interior holes don't matter for projection
 		List<LineSegment> segments = collect(toLinearRing(polygon.getExteriorRing()));
-		List<LineString> projectedSegments = new ArrayList<LineString>(segments.size());
+		List<FractionSegment> projectedSegments = new ArrayList<FractionSegment>(segments.size());
 		for (LineSegment segment : segments) {
 			// Project vertex onto screen
-			Coordinate leftVertex = project(segment.getCoordinate(0), screen);
-			Coordinate rightVertex = project(segment.getCoordinate(1), screen);
-			LineString projectedSegment = new LineSegment(leftVertex, rightVertex).toGeometry(factory);
+			double leftFraction = project(segment.getCoordinate(0), screen);
+			double rightFraction = project(segment.getCoordinate(1), screen);
+			FractionSegment projectedSegment = new FractionSegment(leftFraction, rightFraction);
 			projectedSegments.add(projectedSegment);
 		}
 		return projectedSegments;
 	}
 
-	protected Coordinate project(Coordinate point, LineSegment screen) {
+	protected double project(Coordinate point, LineSegment screen) {
 		// Project vertex onto screen
 		LineSegment ray = new LineSegment(viewCoord, point);
 		Coordinate projection = screen.lineIntersection(ray);
 		// If lines overlap
 		if (projection == null) {
-			projection = point;
+			return 1d;
 		}
-		return projection;
+		return screen.projectionFactor(projection);
 	}
 
 	/**
