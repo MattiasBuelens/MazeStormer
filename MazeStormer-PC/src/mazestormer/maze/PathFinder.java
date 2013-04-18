@@ -3,6 +3,8 @@ package mazestormer.maze;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Predicate;
+
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
@@ -54,18 +56,58 @@ public class PathFinder {
 	 * @param goalTile
 	 *            The goal tile.
 	 * @return An ordered list of tiles. The starting tile is
-	 *         <strong>not</strong> included.
+	 *         <strong>not</strong> included. An empty list if there is no path.
 	 */
 	public List<Tile> findTilePath(Tile startTile, Tile goalTile) {
+		return this.findTilePath(startTile, goalTile, null);
+	}
+
+	/**
+	 * Finds the shortest path, ignores tiles specified by the tileValidator
+	 * 
+	 * @param startTile
+	 *            The start tile.
+	 * @param goalTile
+	 *            The goal tile
+	 * @param tileValidator
+	 *            A validator which should evaluate to true if the given tile is
+	 *            valid.
+	 * @return An ordered list of tiles. The starting tile is
+	 *         <strong>not</strong> included. An empty list if there is no path.
+	 */
+	public List<Tile> findTilePath(Tile startTile, Tile goalTile,
+			Predicate<Tile> tileValidator) {
 		// Get path of tiles
-		MazeAStar astar = new MazeAStar(getMaze(), startTile.getPosition(), goalTile.getPosition());
+		MazeAStar astar = new MazeAStar(getMaze(), startTile.getPosition(),
+				goalTile.getPosition(), tileValidator);
 		List<Tile> tiles = astar.findPath();
 		// Skip starting tile
-		if (tiles == null || tiles.size() <= 1) {
+		if (tiles == null || tiles.size() <= 1)
 			return new ArrayList<Tile>();
-		} else {
+		else
 			return tiles.subList(1, tiles.size());
-		}
+	}
+
+	/**
+	 * @return A path without seesaws in it if there is any, else it returns an
+	 *         empty list. Take a look at the findTilePath doc for more
+	 *         information ;)
+	 */
+	public List<Tile> findTilePathWithoutSeesaws(Tile startTile, Tile goalTile) {
+		return findTilePath(startTile, goalTile, new Predicate<Tile>() {
+			@Override
+			public boolean apply(Tile tile) {
+				return !tile.isSeesaw();
+			}
+		});
+	}
+
+	public List<Waypoint> findPathWithoutSeesaws(Tile startTile, Tile goalTile) {
+		List<Tile> tiles = findTilePathWithoutSeesaws(startTile, goalTile);
+		List<Waypoint> waypoints = new ArrayList<>();
+		for (Tile tile : tiles)
+			waypoints.add(toWaypoint(tile));
+		return waypoints;
 	}
 
 	/**
@@ -104,5 +146,4 @@ public class PathFinder {
 		// Create way point
 		return new Waypoint(absolutePosition.getX(), absolutePosition.getY());
 	}
-
 }

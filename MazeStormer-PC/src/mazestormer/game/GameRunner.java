@@ -73,6 +73,10 @@ public class GameRunner extends Commander implements GameListener {
 	public int getObjectNumber() {
 		return objectNumber;
 	}
+	
+	public Tile getCurrentTile() {
+		return getDriver().getCurrentTile();
+	}
 
 	public void setObjectTile() {
 		log("Object on next tile, set walls");
@@ -106,18 +110,19 @@ public class GameRunner extends Commander implements GameListener {
 		LongPoint nextTilePosition = nextTile.getPosition();
 		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setSeesaw(nextTilePosition, seesawBarcode);
+		maze.setExplored(nextTilePosition);
 
 		// Seesaw
 		nextTilePosition = orientation.shift(nextTilePosition);
 		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setSeesaw(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
 
 		// Other seesaw barcode
 		nextTilePosition = orientation.shift(nextTilePosition);
 		maze.setTileShape(nextTilePosition, tileShape);
 		maze.setBarcode(nextTilePosition, otherBarcode);
-
-		// TODO Do we need to mark seesaw tiles as explored here?
+		maze.setExplored(nextTilePosition);
 	}
 
 	public void objectFound(int teamNumber) {
