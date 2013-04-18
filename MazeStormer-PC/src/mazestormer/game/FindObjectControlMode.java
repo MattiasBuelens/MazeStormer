@@ -15,9 +15,16 @@ import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 
 public class FindObjectControlMode extends ControlMode{
+	
+	private FindObjectBarcodeMapping findObjectBarcodeMapping = new FindObjectBarcodeMapping();
 
 	public FindObjectControlMode(Player player, Commander commander) {
 		super(player, commander);
+	}
+	
+	@Override
+	public GameRunner getCommander() {
+		return (GameRunner) super.getCommander();
 	}
 
 	@Override
@@ -71,8 +78,10 @@ public class FindObjectControlMode extends ControlMode{
 			Class<?> foundBarcodeType = barcodeTypeMapping.get(barcode);
 			// objectbarcode
 			if(foundBarcodeType.equals(ObjectFoundAction.class)) {
-				if(getObjectNumberFromBarcode(barcode) == ((GameRunner) getCommander()).getObjectNumber()){
-					// indien eigen barcode: return ObjectBarcodeAction;
+				if(getObjectNumberFromBarcode(barcode) == (getCommander()).getObjectNumber()){
+					// indien eigen barcode:
+					getCommander().objectFound(getTeamNumberFromBarcode(barcode));
+					// return ObjectBarcodeAction;
 					return new ObjectFoundAction(); // eigen voorwerp wordt opgepikt
 				}
 					// verwijder volgende tegels uit queue
@@ -121,8 +130,7 @@ public class FindObjectControlMode extends ControlMode{
 
 	@Override
 	public BarcodeMapping getBarcodeMapping() {
-		// TODO
-		return null;
+		return findObjectBarcodeMapping;
 	}
 
 }
