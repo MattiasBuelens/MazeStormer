@@ -11,6 +11,7 @@ import mazestormer.player.Player;
 public abstract class ControlMode {
 
 	private final Player player;
+	private final Driver driver;
 	private final PathFinder pathFinder;
 	private final Commander commander;
 
@@ -18,7 +19,12 @@ public abstract class ControlMode {
 		this.player = player;
 		this.pathFinder = new PathFinder(getMaze());
 		this.commander = commander;
+		this.driver = commander.getDriver();
 	}
+	
+	/*
+	 * Getters
+	 */
 
 	protected Player getPlayer() {
 		return player;
@@ -28,9 +34,29 @@ public abstract class ControlMode {
 		return getPlayer().getMaze();
 	}
 
+	public PathFinder getPathFinder() {
+		return pathFinder;
+	}
+
+	public Commander getCommander() {
+		return commander;
+	}
+	
+	public final Driver getDriver() {
+		return driver;
+	}
+
+	/*
+	 * Algemeen geldige methodes
+	 */
+	
 	protected void log(String message) {
 		getPlayer().getLogger().log(Level.INFO, message);
 	}
+	
+	/*
+	 * Abstracte methodes
+	 */
 
 	public abstract void takeControl(Driver driver);
 
@@ -41,13 +67,5 @@ public abstract class ControlMode {
 	public abstract boolean isBarcodeActionEnabled();
 	
 	public abstract BarcodeMapping getBarcodeMapping();
-
-	public PathFinder getPathFinder() {
-		return pathFinder;
-	}
-
-	public Commander getCommander() {
-		return commander;
-	}
 
 }

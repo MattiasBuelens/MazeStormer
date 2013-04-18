@@ -6,13 +6,19 @@ import java.util.Map;
 import mazestormer.player.Player;
 
 /**
- * Commands and controls a driver through the maze.
+ * Uses different controlmodes to achieve an objective.
  */
 public abstract class Commander {
 
+	/*
+	 * Data
+	 */
 	private final Player player;
 	private final Driver driver;
 
+	/*
+	 * Control Modes (and bindings)
+	 */
 	private ControlMode currentMode;
 	private ControlMode startMode;
 	private final Map<ControlMode, ControlMode> bindings = new HashMap<>();
@@ -22,13 +28,21 @@ public abstract class Commander {
 		this.driver = new Driver(player, this);
 	}
 
+	/*
+	 * Getters
+	 */
+	
 	public final Player getPlayer() {
 		return player;
 	}
-
-	public final Driver getDriver() {
+	
+	public Driver getDriver() {
 		return driver;
 	}
+	
+	/*
+	 * Control mode management
+	 */
 
 	public final ControlMode getMode() {
 		return currentMode;
@@ -60,16 +74,6 @@ public abstract class Commander {
 		this.startMode = startMode;
 	}
 
-	protected void start() {
-		setMode(getStartMode());
-		getDriver().start();
-	}
-
-	protected void stop() {
-		getDriver().stop();
-		releaseControl();
-	}
-
 	public final void bind(ControlMode previous, ControlMode next) {
 		bindings.put(previous, next);
 	}
@@ -82,6 +86,26 @@ public abstract class Commander {
 			releaseControl();
 			return false;
 		}
+	}
+
+	/*
+	 * Objective management
+	 */
+
+	/**
+	 * Starts persuing the objective of this commander.
+	 */
+	protected void start() {
+		setMode(getStartMode());
+		getDriver().start();
+	}
+	
+	/**
+	 * Stops persuing the objective of this commander.
+	 */
+	protected void stop() {
+		getDriver().stop();
+		releaseControl();
 	}
 
 }

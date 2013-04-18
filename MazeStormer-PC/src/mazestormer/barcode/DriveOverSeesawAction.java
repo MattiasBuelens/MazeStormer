@@ -11,8 +11,8 @@ import mazestormer.state.State;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class SeesawAction extends
-		StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
+public class DriveOverSeesawAction extends
+		StateMachine<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> implements IAction {
 
 	private Player player;
 
@@ -91,12 +91,12 @@ public class SeesawAction extends
 	}
 
 	public enum SeesawState implements
-			State<SeesawAction, SeesawAction.SeesawState> {
+			State<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> {
 
 		ONWARDS {
 
 			@Override
-			public void execute(SeesawAction input) {
+			public void execute(DriveOverSeesawAction input) {
 				input.onwards();
 			}
 		},
@@ -104,7 +104,7 @@ public class SeesawAction extends
 		FIND_LINE {
 
 			@Override
-			public void execute(SeesawAction input) {
+			public void execute(DriveOverSeesawAction input) {
 				input.findLine();
 			}
 
@@ -113,7 +113,7 @@ public class SeesawAction extends
 		RESUME_EXPLORING {
 
 			@Override
-			public void execute(SeesawAction input) {
+			public void execute(DriveOverSeesawAction input) {
 				input.resumeExploring();
 			}
 

@@ -1,7 +1,5 @@
 package mazestormer.explore;
 
-import mazestormer.barcode.BarcodeMapping;
-import mazestormer.barcode.ExplorerBarcodeMapping;
 import mazestormer.player.Player;
 
 public class Explorer extends Commander {
@@ -13,7 +11,6 @@ public class Explorer extends Commander {
 		super(player);
 
 		// Modes
-		BarcodeMapping mapping = new ExplorerBarcodeMapping();
 		exploreMode = new ExploreControlMode(player, this);
 		finishMode = new FinishControlMode(player, this);
 

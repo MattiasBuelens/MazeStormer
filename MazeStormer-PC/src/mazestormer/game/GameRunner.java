@@ -34,17 +34,25 @@ public class GameRunner extends Commander implements GameListener {
 	 */
 	private static final long updateFrequency = 2000; // in ms
 
+	/*
+	 * Data
+	 */
+	private int objectNumber;
 	private final Game game;
 
-	private final ControlMode findObjectMode;
+	/*
+	 * Control Modes
+	 */
+	private final FindObjectControlMode findObjectMode;
 
+	/*
+	 * Utilities
+	 */
 	private final PositionReporter positionReporter = new PositionReporter();
 	private final TileReporter tileReporter = new TileReporter();
 	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
-
-	private int objectNumber;
 
 	public GameRunner(Player player, Game game) {
 		super(player);
@@ -62,6 +70,10 @@ public class GameRunner extends Commander implements GameListener {
 		getPlayer().getLogger().log(Level.INFO, message);
 	}
 
+	/*
+	 * Getters
+	 */
+	
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) getPlayer().getRobot();
 	}
@@ -77,62 +89,16 @@ public class GameRunner extends Commander implements GameListener {
 	public Tile getCurrentTile() {
 		return getDriver().getCurrentTile();
 	}
-
-	public void setObjectTile() {
-		log("Object on next tile, set walls");
-
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-
-		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
-
-		// Mark as explored
-		getMaze().setExplored(nextTile.getPosition());
+	
+	public Game getGame(){
+		return game;
 	}
+	
+	/*
+	 * Utilities
+	 */
 
-	// TODO Dit moet naar de findObjectControlMode
-	public void setSeesawWalls() {
-		log("Seesaw on next tiles, set seesaw and barcode");
-
-		IMaze maze = getMaze();
-
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
-
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
-
-		// Seesaw
-		LongPoint nextTilePosition = nextTile.getPosition();
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, seesawBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Seesaw
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Other seesaw barcode
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setBarcode(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-	}
-
-	public void objectFound(int teamNumber) {
-		log("Own object found, join team #" + teamNumber);
-		// Report object found
-		game.objectFound();
-		// Join team
-		game.joinTeam(teamNumber);
-		// TODO Start working together
-	}
+	
 
 	public void onSeesaw(int barcode) {
 		log("The seesaw is currently opened, onwards!");
@@ -141,13 +107,6 @@ public class GameRunner extends Commander implements GameListener {
 
 	public void offSeesaw() {
 		game.unlockSeesaw();
-	}
-
-	public void afterObjectBarcode() {
-		log("Object found, go to next tile");
-		// Skip to next tile
-		getDriver().skipNextTile();
-		// Object found action resolves after this
 	}
 
 	public boolean isRunning() {
