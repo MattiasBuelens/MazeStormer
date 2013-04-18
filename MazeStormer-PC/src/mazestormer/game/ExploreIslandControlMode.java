@@ -9,14 +9,16 @@ import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.ObjectFoundAction;
 import mazestormer.explore.AbstractExploreControlMode;
-import mazestormer.explore.Commander;
 import mazestormer.explore.ControlMode;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.util.Future;
+import mazestormer.util.LongPoint;
 
 public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
@@ -27,15 +29,22 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		this.superControlMode = superControlMode;
 	}
 
+	/*
+	 * Getters
+	 */
+	
 	private ControlMode getSuperControlMode(){
 		return superControlMode;
 	}
 	
 	@Override
 	public BarcodeMapping getBarcodeMapping() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ExploreIslandBarcodeMapping();
 	}
+	
+	/*
+	 * Barcode-acties en logica
+	 */
 	
 	private class ObjectAction extends ObjectFoundAction {
 
@@ -52,7 +61,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			// TODO: verwijder volgende tegels uit queue? Worden ze ooit
 			// toegevoegd?
 
-			if (getObjectNumberFromBarcode(barcode) == getCommander().getObjectNumber()) { // indien eigen barcode:
+			if (getObjectNumberFromBarcode(barcode) == ((GameRunner) getCommander()).getObjectNumber()) { // indien eigen barcode:
 				objectFound(getTeamNumberFromBarcode(barcode));
 				return super.performAction(player); // eigen voorwerp wordt
 													// opgepikt
@@ -69,6 +78,19 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			return objectBarcode.getValue() - (objectBarcode.getValue() % 4);
 		}
 
+	}
+	
+	private class SeesawAction implements IAction{
+
+		private SeesawAction(Barcode barcode){
+		}
+		
+		@Override
+		public Future<?> performAction(Player player) {
+			// TODO Enkel als de andere kant van de wip ook op dit eiland ligt mag/moet de robot de wip oversteken
+			return null;
+		}
+		
 	}
 	
 	private class ExploreIslandBarcodeMapping implements BarcodeMapping {
@@ -93,9 +115,6 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			}
 		};
 
-		public static final int START_OF_BARCODERANGE = 11;
-		public static final int END_OF_BARCODERANGE = 21;
-
 		@Override
 		public IAction getAction(Barcode barcode) {
 			if(barcodeTypeMapping.containsKey(barcode)){
@@ -109,6 +128,38 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	/*
 	 * Utilities
 	 */
+	
+	public void setSeesawWalls() {
+		log("Seesaw on next tiles, set seesaw and barcode");
+
+		IMaze maze = getMaze();
+
+		Tile currentTile = getDriver().getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
+		Orientation orientation = currentTile.orientationTo(nextTile);
+		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
+
+		Barcode seesawBarcode = currentTile.getBarcode();
+		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
+
+		// Seesaw
+		LongPoint nextTilePosition = nextTile.getPosition();
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, seesawBarcode);
+		maze.setExplored(nextTilePosition);
+
+		// Seesaw
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
+
+		// Other seesaw barcode
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setBarcode(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
+	}
 	
 	public void setObjectTile() {
 		Tile currentTile = getDriver().getCurrentTile();
@@ -124,6 +175,15 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 		// Remove both tiles from the queue
 
+	}
+	
+	public void objectFound(int teamNumber) {
+		log("Own object found, join team #" + teamNumber);
+		// Report object found
+		((GameRunner) getSuperControlMode().getCommander()).getGame().objectFound();
+		// Join team
+		((GameRunner) getSuperControlMode().getCommander()).getGame().joinTeam(teamNumber);
+		// TODO Start working together
 	}
 
 }

@@ -3,7 +3,7 @@ package mazestormer.explore;
 import java.util.logging.Level;
 
 import mazestormer.barcode.BarcodeMapping;
-import mazestormer.maze.IMaze;
+import mazestormer.maze.Maze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
@@ -30,8 +30,8 @@ public abstract class ControlMode {
 		return player;
 	}
 
-	protected IMaze getMaze() {
-		return getPlayer().getMaze();
+	protected Maze getMaze() {
+		return (Maze) getPlayer().getMaze();
 	}
 
 	public PathFinder getPathFinder() {

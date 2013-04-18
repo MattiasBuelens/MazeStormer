@@ -5,7 +5,9 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 
@@ -17,6 +19,10 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 		super(player, commander);
 	}
 
+	/*
+	 * Methodes eigen voor deze controlMode
+	 */
+	
 	@Override
 	public void takeControl(Driver driver) {
 		log("Exploring the maze");
@@ -37,7 +43,7 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 		}
 
 		// Sort queue
-		Collections.sort(queue, new ClosestTileComparator(currentTile));
+		Collections.sort(queue, new ClosestTileComparator(currentTile, getMaze()));
 
 		// Returns the next unexplored tile.
 		Tile nextTile = queue.pollFirst();
@@ -55,7 +61,11 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	public boolean isBarcodeActionEnabled() {
 		return true;
 	}
-
+	
+	/*
+	 * Utilities
+	 */
+	
 	public boolean hasUnexploredTiles() {
 		while (!queue.isEmpty()) {
 			if (!queue.peekFirst().isExplored())
@@ -85,12 +95,14 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	 * Compares tiles based on their shortest path distance to a given reference
 	 * tile.
 	 */
-	public class ClosestTileComparator implements Comparator<Tile> {
+	public static class ClosestTileComparator implements Comparator<Tile> {
 
 		private final Tile referenceTile;
+		private Maze maze;
 
-		public ClosestTileComparator(Tile referenceTile) {
+		public ClosestTileComparator(Tile referenceTile, Maze maze) {
 			this.referenceTile = referenceTile;
+			this.maze = maze;
 		}
 
 		@Override
@@ -102,7 +114,7 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 
 		// TODO This won't work if there exist longer paths around a seesaw!!!
 		public int shortestPathLength(Tile startTile, Tile endTile) {
-			List<Tile> path = getPathFinder().findTilePath(startTile, endTile);
+			List<Tile> path = new PathFinder(maze).findTilePath(startTile, endTile);
 			for (Tile tile : path) {
 				if (tile.getIgnoreFlag()) {
 					return Integer.MAX_VALUE;
