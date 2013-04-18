@@ -1,14 +1,13 @@
 package mazestormer.simulator;
 
-import lejos.robotics.localization.PoseProvider;
+import mazestormer.infrared.OffsettedPoseProvider;
+import mazestormer.infrared.OffsettedPoseProvider.Module;
 import mazestormer.robot.IRSensor;
 import mazestormer.simulator.WorldIRDetector.IRDetectionMode;
 import mazestormer.world.World;
 
 public abstract class WorldIRSensor implements IRSensor {
 	
-	// TODO: MM add radius
-	public static final double RADIUS = 0;
 	public static final float ANGLE = (float) Math.toDegrees(120);
 	
 	private final WorldIRDetector wird;
@@ -16,15 +15,20 @@ public abstract class WorldIRSensor implements IRSensor {
 
 	protected WorldIRSensor(World world, IRDetectionMode mode) {
 		this.world = world;
-		this.wird = new WorldIRDetector(getWorld(), getPoseProvider(), RADIUS, ANGLE, mode);
+		this.wird = new WorldIRDetector(getWorld(), getPoseProvider(), ANGLE, mode);
 	}
 
 	private World getWorld() {
 		return this.world;
 	}
+	
+	private OffsettedPoseProvider poseProvider;
 
-	private PoseProvider getPoseProvider() {
-		return getWorld().getLocalPlayer().getRobot().getPoseProvider();
+	private OffsettedPoseProvider getPoseProvider() {
+		if (this.poseProvider == null) {
+			this.poseProvider = new OffsettedPoseProvider(getWorld().getLocalPlayer().getRobot().getPoseProvider(), Module.IR_SENSOR);
+		}
+		return this.poseProvider;
 	}
 	
 	private WorldIRDetector getWorldIRDetector() {

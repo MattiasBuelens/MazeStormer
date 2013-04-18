@@ -2,6 +2,7 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.Edge.EdgeType;
+import mazestormer.util.ArrayUtils;
 import mazestormer.util.LongPoint;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -638,6 +640,34 @@ public class Maze implements IMaze {
 		// Transform to absolute coordinates
 		pose = toAbsolute(pose);
 		setStartPose(playerNumber, pose);
+	}
+	
+	@Override
+	public Line2D[] getAllLines() {
+		return ArrayUtils.concat(getEdgeLines().toArray(new Line2D.Double[0]), getSeesawLines());
+	}
+	
+	// TODO: MM Point in lower left corner?
+	
+	@Override
+	public Line2D[] getSeesawLines() {
+		double d = 0.2;
+		List<Line2D> lines = new ArrayList<Line2D>();
+		for (Tile tile : tiles.values()) {
+			if (tile.isSeesaw() && tile.isSeesawOpen()) {
+				Point2D point = new Point2D.Double(defaultTileSize*tile.getPosition().getX(), defaultTileSize*tile.getPosition().getY());
+				if (getTileAt(new LongPoint(tile.getX() + 1, tile.getY())).isSeesaw()) {
+					lines.add(new Line2D.Double(point.getX()+defaultTileSize-d, point.getY(), point.getX()+defaultTileSize-d, point.getY()+defaultTileSize));
+				} else if (getTileAt(new LongPoint(tile.getX() - 1, tile.getY())).isSeesaw()){
+					lines.add(new Line2D.Double(point.getX()+d, point.getY(), point.getX()+d, point.getY()+defaultTileSize));
+				} else if (getTileAt(new LongPoint(tile.getX(), tile.getY() + 1)).isSeesaw()){
+					lines.add(new Line2D.Double(point.getX(), point.getY()+defaultTileSize-d, point.getX()+defaultTileSize, point.getY()+defaultTileSize-d));
+				} else if (getTileAt(new LongPoint(tile.getX(), tile.getY() - 1)).isSeesaw()){
+					lines.add(new Line2D.Double(point.getX(), point.getY()+d, point.getX()+defaultTileSize, point.getY()+d));
+				}
+			}
+		}
+		return lines.toArray(new Line2D[0]);
 	}
 
 }

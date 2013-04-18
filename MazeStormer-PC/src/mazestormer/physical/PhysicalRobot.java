@@ -47,7 +47,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 
 	private final UpdateReceiver updateReceiver;
 	private final List<RobotUpdateListener> updateListeners = new ArrayList<RobotUpdateListener>();
-	
+
 	private final Envelope envelope;
 
 	public PhysicalRobot(PhysicalCommunicator communicator, World world) {
@@ -75,8 +75,8 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
-		
-		this.envelope = new RectangularEnvelope(BRONS_HEIGHT+EXTERNAL_ZONE, BRONS_WIDTH+EXTERNAL_ZONE);
+
+		this.envelope = new RectangularEnvelope(width, height, DETECTION_RADIUS);
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 		}
 
 	}
-	
+
 	@Override
 	public boolean isEmitting() {
 		return true;

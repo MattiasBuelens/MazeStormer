@@ -21,8 +21,7 @@ public class ObservableRobot implements IRRobot {
 		this.width = width;
 		this.height = height;
 
-		this.envelope = new RectangularEnvelope(this.height + EXTERNAL_ZONE,
-				this.width + EXTERNAL_ZONE);
+		this.envelope = new RectangularEnvelope(width, height, DETECTION_RADIUS);
 	}
 
 	@Override
@@ -45,6 +44,7 @@ public class ObservableRobot implements IRRobot {
 		return this.modelType;
 	}
 
+	@Override
 	public double getWidth() {
 		return width;
 	}

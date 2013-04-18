@@ -9,13 +9,13 @@ public class IRBall implements IRSource {
 	private final PoseProvider staticPoseProvider;
 	private final Envelope envelope;
 	
-	//TODO: MM cm's?
+	// cm's
 	public static final double INTERNAL_RADIUS = (7.5)/2;
-	public static final double EXTERNAL_RADIUS = 5000;
+	public static final double EXTERNAL_RADIUS = 500;
 	
 	public IRBall(Pose pose) {
 		this.staticPoseProvider = new StaticPoseProvider(pose);
-		this.envelope = new CircularEnvelope(INTERNAL_RADIUS+EXTERNAL_RADIUS);
+		this.envelope = new CircularEnvelope(INTERNAL_RADIUS, EXTERNAL_RADIUS);
 	}
 
 	@Override

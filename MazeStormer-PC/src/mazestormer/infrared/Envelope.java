@@ -1,16 +1,11 @@
 package mazestormer.infrared;
 
-import java.awt.geom.Point2D;
-
-import lejos.robotics.navigation.Pose;
+import com.vividsolutions.jts.geom.Geometry;
 
 public interface Envelope {
 
-	public Point2D[] getClosestPoints(Pose pose, Point2D target);
+	public double getDetectionRadius();
 
-	public Point2D[] getDiscretization(Pose pose, int depth)
-			throws IllegalArgumentException;
+	public Geometry getGeometry();
 
-	public Point2D[] getCombination(Pose pose, Point2D target, int depth)
-			throws IllegalArgumentException;
 }

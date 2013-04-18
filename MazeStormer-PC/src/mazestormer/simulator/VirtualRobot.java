@@ -45,7 +45,7 @@ public class VirtualRobot implements ControllablePCRobot, IRRobot {
 	private final VirtualConditionResolvers conditionResolvers;
 
 	private final VirtualUpdateProducer updateProducer;
-	
+
 	private final Envelope envelope;
 
 	public VirtualRobot(World world) {
@@ -78,8 +78,8 @@ public class VirtualRobot implements ControllablePCRobot, IRRobot {
 
 		// Updates
 		updateProducer = new VirtualUpdateProducer(this);
-		
-		this.envelope = new RectangularEnvelope(BRONS_HEIGHT+EXTERNAL_ZONE, BRONS_WIDTH+EXTERNAL_ZONE);
+
+		this.envelope = new RectangularEnvelope(width, height, DETECTION_RADIUS);
 	}
 
 	@Override
