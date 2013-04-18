@@ -42,13 +42,31 @@ public class ExploreControlMode extends ControlMode {
 		// Sort queue
 		Collections.sort(queue, new ClosestTileComparator(currentTile));
 
+		// Returns the next unexplored tile.
+		Tile nextTile = queue.pollFirst();
+		while(nextTile.isExplored()) {
+			if(queue.isEmpty())
+				return null;
+			nextTile = queue.pollFirst();
+		}
+		
 		// Go to next tile
-		return queue.pollFirst();
+		return nextTile;
 	}
 
 	@Override
 	public boolean isBarcodeActionEnabled() {
 		return true;
+	}
+	
+	public boolean hasUnexploredTiles() {
+		while(!queue.isEmpty()) {
+			if(!queue.peekFirst().isExplored())
+				return true;
+			else
+				queue.pollFirst();
+		}
+		return false;
 	}
 
 	/**

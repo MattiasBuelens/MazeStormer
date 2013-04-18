@@ -9,8 +9,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -374,6 +376,21 @@ public class Maze implements IMaze {
 		}
 
 		return null;
+	}
+	
+	@Override
+	public Tile getOtherSeesawBarcodeTile(Barcode barcode) {
+		return getBarcodeTile(Seesaw.getOtherBarcode(barcode));
+	}
+	
+	@Override
+	public Set<Tile> getBarcodeTiles() {
+		Set<Tile> barcodeTiles = new HashSet<>();
+		for(Tile tile : tiles.values()) {
+			if(tile.hasBarcode())
+				barcodeTiles.add(tile);
+		}
+		return Collections.unmodifiableSet(barcodeTiles);
 	}
 
 	@Override

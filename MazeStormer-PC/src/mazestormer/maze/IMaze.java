@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -293,6 +294,8 @@ public interface IMaze {
 	 *            The seesaw barcode.
 	 */
 	public Seesaw getOrCreateSeesaw(byte barcode);
+	
+	public Set<Tile> getBarcodeTiles();
 
 	/**
 	 * Set the seesaw of a tile.
@@ -312,6 +315,8 @@ public interface IMaze {
 	 * @return The found tile, or null if not found.
 	 */
 	public Tile getSeesawTile(Barcode barcode);
+	
+	public Tile getOtherSeesawBarcodeTile(Barcode barcode);
 
 	/**
 	 * Set a tile as explored.

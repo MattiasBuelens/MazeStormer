@@ -238,12 +238,19 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 	 * transitions only if the result is {@code true}, otherwise it pauses.
 	 * </p>
 	 * 
+	 * <p>
+	 * Null futures are silently ignored.
+	 * </p>
+	 * 
 	 * @param future
 	 *            The future which results in the transition.
 	 * @param nextState
 	 *            The next state.
 	 */
 	protected void bindTransition(final Future<?> future, final S nextState) {
+		// Ignore null futures
+		if (future == null)
+			return;
 		// Register binding
 		addBinding(future);
 		// Listen for future completion

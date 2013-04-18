@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -378,6 +379,11 @@ public class CombinedMaze implements IMaze {
 	public Tile getBarcodeTile(byte barcode) {
 		return getBarcodeTile(new Barcode(barcode));
 	}
+	
+	@Override
+	public Set<Tile> getBarcodeTiles() {
+		return getTotalMaze().getBarcodeTiles();
+	}
 
 	@Override
 	public Seesaw getSeesaw(Barcode barcode) {
@@ -407,6 +413,11 @@ public class CombinedMaze implements IMaze {
 	@Override
 	public Tile getSeesawTile(Barcode barcode) {
 		return getTotalMaze().getSeesawTile(barcode);
+	}
+	
+	@Override
+	public Tile getOtherSeesawBarcodeTile(Barcode barcode) {
+		return getBarcodeTile(Seesaw.getOtherBarcode(barcode));
 	}
 
 	@Override

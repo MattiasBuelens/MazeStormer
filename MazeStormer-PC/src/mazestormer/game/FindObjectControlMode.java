@@ -1,25 +1,40 @@
 package mazestormer.game;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
+import mazestormer.barcode.NoAction;
 import mazestormer.barcode.ObjectFoundAction;
-import mazestormer.barcode.SeesawAction;
 import mazestormer.explore.Commander;
 import mazestormer.explore.ControlMode;
 import mazestormer.explore.Driver;
+import mazestormer.explore.ExploreControlMode;
+import mazestormer.maze.Orientation;
+import mazestormer.maze.PathFinder;
+import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
+import mazestormer.robot.ControllableRobot;
+import mazestormer.util.Future;
 
 public class FindObjectControlMode extends ControlMode{
 	
 	private FindObjectBarcodeMapping findObjectBarcodeMapping = new FindObjectBarcodeMapping();
 
+	private final ExploreControlMode exploreMode;
+
+	private LinkedList<Tile> reachableSeesawQueue;
+
 	public FindObjectControlMode(Player player, Commander commander) {
 		super(player, commander);
+		exploreMode = new ExploreControlMode(player, commander);
 	}
 	
 	@Override
@@ -30,17 +45,21 @@ public class FindObjectControlMode extends ControlMode{
 	@Override
 	public void takeControl(Driver driver) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void releaseControl(Driver driver) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public Tile nextTile(Tile currentTile) {
+		// als de queue van de explorecontrolMode niet leeg is, gewoon daaraan
+		// opvragen. anders met de reachableSeesawQueue werken, hierin zitten al
+		// de barcodeTiles van seesaws. Indien zelfs deze leeg is, ga dan op een
+		// T stuk, of ga over naar een volgende fase
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -50,10 +69,64 @@ public class FindObjectControlMode extends ControlMode{
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
-	private class FindObjectBarcodeMapping implements BarcodeMapping{
 
-		private final Map<Barcode,Class<?>> barcodeTypeMapping = new HashMap<Barcode, Class<?>>(){
+	private GameRunner getGameRunner() {
+		return (GameRunner) getCommander();
+	}
+
+	private ExploreControlMode getExploreControlMode() {
+		return exploreMode;
+	}
+
+	private ControllableRobot getRobot() {
+		return (ControllableRobot) getPlayer().getRobot();
+	}
+	
+	private class SeesawAction implements IAction {
+
+		@Override
+		public Future<?> performAction(Player player) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+	}
+	
+	private class ObjectAction extends ObjectFoundAction {
+		
+		private Barcode barcode;
+
+		private ObjectAction(Barcode barcode) {
+			this.barcode = barcode;
+		}
+		
+		@Override
+		public Future<?> performAction(Player player) {
+			getGameRunner().setObjectTile(); // voeg info toe aan maze
+			
+			// TODO: verwijder volgende tegels uit queue? Worden ze ooit toegevoegd?
+			
+			if(getObjectNumberFromBarcode(barcode) == getCommander().getObjectNumber()){ // indien eigen barcode:
+				getCommander().objectFound(getTeamNumberFromBarcode(barcode));
+				return super.performAction(player); // eigen voorwerp wordt opgepikt
+			} else {
+				return null; //?
+			}
+		}
+		
+		private int getObjectNumberFromBarcode(Barcode objectBarcode) {
+			return (objectBarcode.getValue() % 4);
+		}
+		
+		private int getTeamNumberFromBarcode(Barcode objectBarcode) {
+			return objectBarcode.getValue() - (objectBarcode.getValue() % 4);
+		}
+		
+	}
+
+	private class FindObjectBarcodeMapping implements BarcodeMapping {
+
+		private final Map<Barcode, Class<?>> barcodeTypeMapping = new HashMap<Barcode, Class<?>>() {
 			private static final long serialVersionUID = 1L;
 			{
 				put(new Barcode(0), ObjectFoundAction.class);
@@ -72,60 +145,90 @@ public class FindObjectControlMode extends ControlMode{
 				put(new Barcode(21), SeesawAction.class);
 			}
 		};
-		
+
+		private static final int START_OF_BARCODERANGE = 11;
+		private static final int END_OF_BARCODERANGE = 21;
+
 		@Override
 		public IAction getAction(Barcode barcode) {
 			Class<?> foundBarcodeType = barcodeTypeMapping.get(barcode);
-			// objectbarcode
-			if(foundBarcodeType.equals(ObjectFoundAction.class)) {
-				if(getObjectNumberFromBarcode(barcode) == (getCommander()).getObjectNumber()){
-					// indien eigen barcode:
-					getCommander().objectFound(getTeamNumberFromBarcode(barcode));
-					// return ObjectBarcodeAction;
-					return new ObjectFoundAction(); // eigen voorwerp wordt opgepikt
-				}
-					// verwijder volgende tegels uit queue
+			if(foundBarcodeType.equals(ObjectFoundAction.class)) { // indien objectbarcode:
+				return new ObjectAction(barcode);
+			}
+
+			else if (foundBarcodeType.equals(SeesawAction.class)) { // indien seesawBarcode:
+				getGameRunner().setSeesawWalls(); // voeg info toe aan maze
+				
+				if (getExploreControlMode().hasUnexploredTiles()) { // indien er nog te exploreren tegels zijn:
+					return new NoAction(); // driver zal gewoon verder exploreren
 					
-				// voeg info toe aan maze
-			}
-			// seesawBarcode
-			else if(foundBarcodeType.equals(SeesawAction.class))
-			{
-					// voeg info toe aan maze
-					// andere nog te exploreren tegels?
-			
-					// ja
-						// return noAction;
-							// driver zal gewoon verder exploreren
-			
-					// nee
-						// is wip open?
+				} else { // indien er geen nog te exploreren tegels zijn (dus eiland/doolhof geëxploreerd):
+					if (!getRobot().getIRSensor().hasReading()) { // indien de wip bereidbaar is:
+						reachableSeesawQueue.clear();
+						return new SeesawAction(); // de seesaw wordt overgestoken en van daar wordt verder geëxploreerd
 						
-							// ja
-								// return seesawBarcode; // de seesaw wordt overgestoken en van daar wordt verder geëxploreerd
+					} else { // indien de wip niet bereidbaar is:
+						if (reachableSeesawQueue.isEmpty()) { // indien nog geen alternatieve wippen zijn gevonden:
+							List<Tile> reachableTiles = getReachableSeesawBarcodeTiles(barcode); // zoek naar alle bereikbare wippen (incl. huidige)
+							if (!reachableTiles.isEmpty()) { // indien er andere wippen bereikbaar zijn:
+								reachableSeesawQueue.addAll(reachableTiles); // voeg de bereikbare wippen toe aan de lijst
+								// TODO: rijd naar de eerste wip in de lijst die niet de huidige wip is, geef ook een noAction terug
+							}
+						}
+						
+						else { // indien er wel al alternatieve wippen zijn gevonden
+								
 							
+							
+
 							// nee
-								// zijn er andere wippen beschikbaar?
-
-									// ja
-										// rijd naar de volgende wip zijn barcode-tegel
-						
-									// nee
-										// rijd naar een T of Cross -stuk en wacht tot er iemand passeert
-
-								// return null;
+							// rijd naar een T of Cross -stuk en wacht tot er
+							// iemand
+							// passeert
+							return new NoAction();
+						}
+					}
+				}
 			}
-			return null;
+			return new NoAction();
 		}
-		
-		
-		private int getObjectNumberFromBarcode(Barcode objectBarcode){
-			return (objectBarcode.getValue() % 4);
+
+		private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
+			List<Tile> reachableTiles = new ArrayList<>();
+			PathFinder pf = new PathFinder(getMaze());
+			for (Tile tile : getMaze().getBarcodeTiles()) {
+				Barcode tileBarcode = tile.getBarcode();
+				int number = tileBarcode.getValue();
+				if (number >= START_OF_BARCODERANGE
+						&& number <= END_OF_BARCODERANGE
+						&& !tileBarcode.equals(barcode)
+						&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
+						&& !pf.findPathWithoutSeesaws(
+								getGameRunner().getCurrentTile(), tile)
+								.isEmpty() && otherSideUnexplored(tile)) {
+					reachableTiles.add(tile);
+				}
+			}
+			Collections.sort(reachableTiles,
+					getExploreControlMode().new ClosestTileComparator(
+							getGameRunner().getCurrentTile()));
+			reachableTiles.add(getMaze().getBarcodeTile(barcode));
+			return reachableTiles;
 		}
-		
-		private int getTeamNumberFromBarcode(Barcode objectBarcode){
-			return objectBarcode.getValue() - (objectBarcode.getValue() % 4);
+
+		private boolean otherSideUnexplored(Tile seesawBarcodeTile) {
+			Barcode barcode = seesawBarcodeTile.getBarcode();
+			Tile otherBarcodeTile = getMaze()
+					.getOtherSeesawBarcodeTile(barcode);
+			for (Orientation orientation : Orientation.values()) {
+				if (getMaze().getNeighbor(otherBarcodeTile, orientation)
+						.isSeesaw())
+					return !getMaze().getNeighbor(otherBarcodeTile,
+							orientation.rotateClockwise(2)).isExplored();
+			}
+			return false;
 		}
+
 	}
 
 	@Override
