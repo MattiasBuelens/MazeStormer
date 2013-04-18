@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
@@ -35,6 +36,18 @@ public class PoseTransform {
 	}
 
 	/**
+	 * Transform the given relative position to absolute coordinates.
+	 * 
+	 * @param position
+	 *            The relative position.
+	 * @return The absolute position.
+	 */
+	public Point2D transform(Point2D position) {
+		checkNotNull(position);
+		return transform.transform(position, null);
+	}
+
+	/**
 	 * Transform the given absolute position to relative coordinates.
 	 * 
 	 * @param position
@@ -50,6 +63,23 @@ public class PoseTransform {
 			// Cannot happen
 		}
 		return transformed;
+	}
+
+	/**
+	 * Transform the given absolute position to relative coordinates.
+	 * 
+	 * @param position
+	 *            The absolute position.
+	 * @return The relative position.
+	 */
+	public Point2D inverseTransform(Point2D position) {
+		checkNotNull(position);
+		try {
+			return transform.inverseTransform(position, null);
+		} catch (NoninvertibleTransformException cannotHappen) {
+			// Cannot happen
+			return null;
+		}
 	}
 
 	/**

@@ -47,7 +47,7 @@ public class VisibilityPolygonTest {
 
 		Point viewPoint = maze.getTileCenter(tilePoint);
 		viewCoord = GeometryUtils.toCoordinate(viewPoint);
-		inner = maze.getSurroundingGeometry(viewPoint);
+		inner = maze.getSurroundingEdgeGeometry(viewPoint);
 
 		System.out.println(inner.toText());
 	}

@@ -8,4 +8,5 @@ public class VirtualIRSensor extends WorldIRSensor {
 	public VirtualIRSensor(World world) {
 		super(world, IRDetectionMode.VIRTUAL);
 	}
+
 }

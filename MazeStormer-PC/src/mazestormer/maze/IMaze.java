@@ -1,19 +1,18 @@
 package mazestormer.maze;
 
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.List;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.util.LongPoint;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 
 public interface IMaze {
 
@@ -426,6 +425,19 @@ public interface IMaze {
 	public Geometry getEdgeGeometry();
 
 	/**
+	 * Get the edges and seesaw blocks as a geometry.
+	 */
+	public Geometry getGeometry();
+
+	/**
+	 * Get the edge geometry surrounding the given relative position.
+	 * 
+	 * @param relativePosition
+	 *            The relative position.
+	 */
+	public Polygon getSurroundingEdgeGeometry(Point2D relativePosition);
+
+	/**
 	 * Get the geometry surrounding the given relative position.
 	 * 
 	 * @param relativePosition
@@ -513,8 +525,5 @@ public interface IMaze {
 	 *            The start orientation.
 	 */
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation);
-	
-	public Line2D[] getAllLines();
-	
-	public Line2D[] getSeesawLines();
+
 }

@@ -1,13 +1,13 @@
 package mazestormer.infrared;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class CircularEnvelope implements Envelope {
 
 	private final double detectionRadius;
-	private final Geometry circle;
+	private final Polygon circle;
 
 	/**
 	 * Approximate circle with hexagon.
@@ -34,7 +34,7 @@ public class CircularEnvelope implements Envelope {
 	}
 
 	@Override
-	public Geometry getGeometry() {
+	public Polygon getPolygon() {
 		return circle;
 	}
 

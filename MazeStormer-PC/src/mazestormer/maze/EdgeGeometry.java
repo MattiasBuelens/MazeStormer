@@ -30,6 +30,13 @@ public class EdgeGeometry extends DefaultMazeListener {
 		return geom;
 	}
 
+	public final Polygon getGeometry(Edge edge) {
+		// Get the edge boundaries
+		Rectangle2D rect = getMaze().getEdgeBounds(edge);
+		// Make geometry
+		return GeometryUtils.toGeometry(rect, geomFact);
+	}
+
 	/**
 	 * Add an edge to the geometry.
 	 * 
@@ -38,11 +45,7 @@ public class EdgeGeometry extends DefaultMazeListener {
 	 */
 	private void addEdge(Edge edge) {
 		if (edge.getType() == EdgeType.WALL) {
-			// Get the edge boundaries
-			Rectangle2D rect = getMaze().getEdgeBounds(edge);
-			// Add to geometry
-			Polygon poly = GeometryUtils.toGeometry(rect, geomFact);
-			geom = geom.union(poly);
+			geom = geom.union(getGeometry(edge));
 		}
 	}
 

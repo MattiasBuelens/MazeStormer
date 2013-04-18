@@ -1,13 +1,13 @@
 package mazestormer.infrared;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.util.GeometricShapeFactory;
 
 public class RectangularEnvelope implements Envelope {
 
 	private final double detectionRadius;
-	private final Geometry rectangle;
+	private final Polygon rectangle;
 
 	public RectangularEnvelope(double width, double height, double detectionRadius) throws IllegalArgumentException {
 		if (detectionRadius <= 0) {
@@ -30,7 +30,7 @@ public class RectangularEnvelope implements Envelope {
 	}
 
 	@Override
-	public Geometry getGeometry() {
+	public Polygon getPolygon() {
 		return rectangle;
 	}
 

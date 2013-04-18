@@ -1,11 +1,11 @@
 package mazestormer.infrared;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 
 public interface Envelope {
 
 	public double getDetectionRadius();
 
-	public Geometry getGeometry();
+	public Polygon getPolygon();
 
 }

@@ -2,7 +2,6 @@ package mazestormer.maze;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.Edge.EdgeType;
-import mazestormer.util.ArrayUtils;
 import mazestormer.util.LongPoint;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -515,13 +513,59 @@ public class Maze implements IMaze {
 	}
 
 	@Override
+	public Geometry getGeometry() {
+		Geometry geometry = getEdgeGeometry();
+		Geometry seesawGeometry = getSeesawGeometry(geometry.getFactory());
+		geometry = geometry.union(seesawGeometry);
+		return geometry;
+	}
+
+	protected Geometry getSeesawGeometry(GeometryFactory factory) {
+		// Make edge geometries
+		Collection<Edge> edges = getSeesawEdges();
+		List<Polygon> edgePolygons = new ArrayList<Polygon>();
+		for (Edge edge : edges) {
+			edgePolygons.add(edgeGeometry.getGeometry(edge));
+		}
+		// Combine
+		return factory.createMultiPolygon(GeometryFactory.toPolygonArray(edgePolygons));
+	}
+
+	protected Collection<Edge> getSeesawEdges() {
+		Map<Seesaw, Edge> closedEdges = new HashMap<Seesaw, Edge>();
+		for (Seesaw seesaw : seesaws.values()) {
+			// Ignore already processed seesaws
+			if (closedEdges.containsKey(seesaw))
+				continue;
+			// Get edge between closed seesaw tile and barcode tile
+			Barcode closedBarcode = seesaw.getClosedBarcode();
+			Tile closedSeesawTile = getSeesawTile(closedBarcode);
+			Tile closedBarcodeTile = getBarcodeTile(closedBarcode);
+			if (closedSeesawTile != null && closedBarcodeTile != null) {
+				// Store edge
+				Edge closedEdge = closedSeesawTile.getEdgeAt(closedSeesawTile.orientationTo(closedBarcodeTile));
+				closedEdges.put(seesaw, closedEdge);
+			}
+		}
+		return closedEdges.values();
+	}
+
+	@Override
+	public Polygon getSurroundingEdgeGeometry(Point2D relativePosition) {
+		return getSurroundingGeometry(getEdgeGeometry(), relativePosition);
+	}
+
+	@Override
 	public Polygon getSurroundingGeometry(Point2D relativePosition) {
-		Geometry edges = getEdgeGeometry();
-		GeometryFactory geomFact = edges.getFactory();
+		return getSurroundingGeometry(getGeometry(), relativePosition);
+	}
+
+	protected Polygon getSurroundingGeometry(Geometry geometry, Point2D relativePosition) {
+		GeometryFactory geomFact = geometry.getFactory();
 		Geometry point = GeometryUtils.toGeometry(relativePosition, geomFact);
 
 		// Get the inner geometry
-		Geometry inner = edges.getEnvelope().difference(edges);
+		Geometry inner = geometry.getEnvelope().difference(geometry);
 
 		// Find the polygon containing the given point
 		for (int i = 0; i < inner.getNumGeometries(); i++) {
@@ -640,34 +684,6 @@ public class Maze implements IMaze {
 		// Transform to absolute coordinates
 		pose = toAbsolute(pose);
 		setStartPose(playerNumber, pose);
-	}
-	
-	@Override
-	public Line2D[] getAllLines() {
-		return ArrayUtils.concat(getEdgeLines().toArray(new Line2D.Double[0]), getSeesawLines());
-	}
-	
-	// TODO: MM Point in lower left corner?
-	
-	@Override
-	public Line2D[] getSeesawLines() {
-		double d = 0.2;
-		List<Line2D> lines = new ArrayList<Line2D>();
-		for (Tile tile : tiles.values()) {
-			if (tile.isSeesaw() && tile.isSeesawOpen()) {
-				Point2D point = new Point2D.Double(defaultTileSize*tile.getPosition().getX(), defaultTileSize*tile.getPosition().getY());
-				if (getTileAt(new LongPoint(tile.getX() + 1, tile.getY())).isSeesaw()) {
-					lines.add(new Line2D.Double(point.getX()+defaultTileSize-d, point.getY(), point.getX()+defaultTileSize-d, point.getY()+defaultTileSize));
-				} else if (getTileAt(new LongPoint(tile.getX() - 1, tile.getY())).isSeesaw()){
-					lines.add(new Line2D.Double(point.getX()+d, point.getY(), point.getX()+d, point.getY()+defaultTileSize));
-				} else if (getTileAt(new LongPoint(tile.getX(), tile.getY() + 1)).isSeesaw()){
-					lines.add(new Line2D.Double(point.getX(), point.getY()+defaultTileSize-d, point.getX()+defaultTileSize, point.getY()+defaultTileSize-d));
-				} else if (getTileAt(new LongPoint(tile.getX(), tile.getY() - 1)).isSeesaw()){
-					lines.add(new Line2D.Double(point.getX(), point.getY()+d, point.getX()+defaultTileSize, point.getY()+d));
-				}
-			}
-		}
-		return lines.toArray(new Line2D[0]);
 	}
 
 }

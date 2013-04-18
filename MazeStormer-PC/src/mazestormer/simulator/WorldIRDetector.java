@@ -1,24 +1,27 @@
 package mazestormer.simulator;
 
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.geom.GeometryUtils;
 import mazestormer.geom.VisibleRegion;
-import mazestormer.infrared.Envelope;
 import mazestormer.infrared.IRSource;
 import mazestormer.infrared.OffsettedPoseProvider;
+import mazestormer.infrared.OffsettedPoseProvider.Module;
 import mazestormer.maze.IMaze;
+import mazestormer.maze.PoseTransform;
 import mazestormer.robot.IRSensor;
+import mazestormer.world.Model;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.math.DoubleMath;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateFilter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.Point;
@@ -29,13 +32,14 @@ public class WorldIRDetector implements IRSensor {
 
 	private float range;
 
-	private final OffsettedPoseProvider poseProvider;
+	private OffsettedPoseProvider poseProvider;
 	private final World world;
 	private final IRDetectionMode mode;
 
-	public WorldIRDetector(World world, OffsettedPoseProvider poseProvider, float range, IRDetectionMode mode) {
+	private static final double POSE_TOLERANCE = 0.01d;
+
+	public WorldIRDetector(World world, float range, IRDetectionMode mode) {
 		this.world = world;
-		this.poseProvider = poseProvider;
 		this.mode = mode;
 		setRange(range);
 	}
@@ -49,6 +53,11 @@ public class WorldIRDetector implements IRSensor {
 	}
 
 	private OffsettedPoseProvider getPoseProvider() {
+		if (this.poseProvider == null) {
+			// TODO Perhaps use a PoseTransform instead?
+			this.poseProvider = new OffsettedPoseProvider(getWorld().getLocalPlayer().getRobot().getPoseProvider(),
+					Module.IR_SENSOR);
+		}
 		return this.poseProvider;
 	}
 
@@ -64,6 +73,10 @@ public class WorldIRDetector implements IRSensor {
 		this.range = Math.abs(range);
 	}
 
+	private boolean inRange(float heading) {
+		return Math.abs(heading) <= getRange();
+	}
+
 	@Override
 	public float getAngle() {
 		return detect();
@@ -75,99 +88,102 @@ public class WorldIRDetector implements IRSensor {
 	}
 
 	private float detect() {
-		List<Float> detectedAngles = new ArrayList<Float>();
+		// Get maze obstacles
+		Geometry obstacles = getMaze().getGeometry();
+		// Get view pose
+		Pose viewPose = getPoseProvider().getPose();
+		Point2D viewPoint = viewPose.getLocation();
+		float viewHeading = viewPose.getHeading();
+		// Get robot pose
+		Pose robotPose = getPoseProvider().inverseTransform(viewPose);
 
-		for (IRSource irs : getWorld().getAllModelsClass(IRSource.class)) {
-			float result = (irs.isEmitting() && getMode().getDetectionSet().contains(irs.getModelType())) ? getDetectedAngle(
-					irs.getEnvelope(), irs.getPoseProvider()) : Float.NaN;
-			if (!Float.isNaN(result)) {
-				detectedAngles.add(result);
-			}
-		}
-		return getBestAngle(detectedAngles.toArray(new Float[0]));
-	}
-
-	private static final int DEPTH = 3;
-
-	private Float getDetectedAngle(Envelope envelope, PoseProvider poseProvider) {
-		List<Float> detectedAngles = new ArrayList<Float>();
-		Pose currentPose = getPoseProvider().getPose();
-		Pose centerPose = getPoseProvider().toRelative(currentPose);
-		Pose otherPose = poseProvider.getPose();
-
-		// Avoids self-detection
-		// Avoids not-detectable joy-riding objects
-		if (!((centerPose.getX() == otherPose.getX()) && (centerPose.getY() == otherPose.getY()))) {
-			Point2D currentPoint = new Point2D.Double(currentPose.getX(), currentPose.getY());
-			Point2D h_e = new Point2D.Double(Math.cos(currentPose.getHeading()), Math.sin(currentPose.getHeading()));
-			Point2D[] cpsi = envelope.getInternalDiscretization(otherPose, DEPTH);
-			Line2D[] edgeLines = getMaze().getAllLines();
-			for (int i = 0; i < cpsi.length; i++) {
-				Line2D l = new Line2D.Double(currentPoint, cpsi[i]);
-
-				if (l.getP1().distance(l.getP2()) > envelope.getExternalRadius()) {
+		// Find rays to visible infrared sources
+		List<LineSegment> rays = new ArrayList<LineSegment>();
+		for (IRSource irs : getWorld().getAllModels(IRSource.class)) {
+			// Check if emitting and detected in this mode
+			if (irs.isEmitting() && getMode().detects(irs)) {
+				// Ignore own robot
+				Pose irsPose = irs.getPoseProvider().getPose();
+				if (comparePositions(robotPose.getLocation(), irsPose.getLocation())) {
 					continue;
 				}
-
-				double angle = getAngle(cpsi[i], currentPoint, h_e);
-				if (angle > getRange() || angle < (-1) * getRange()) {
-					continue;
-				}
-
-				boolean isDetected = true;
-				for (int j = 0; j < edgeLines.length && isDetected; j++) {
-					isDetected = !l.intersectsLine(edgeLines[j]);
-				}
-
-				if (isDetected) {
-					detectedAngles.add((float) angle);
+				// Get best detected ray to infrared source
+				LineSegment ray = getDetectedRay(obstacles, irs, viewPoint);
+				float rayAngle = (float) ray.angle() - viewHeading;
+				if (ray != null && inRange(rayAngle)) {
+					rays.add(ray);
 				}
 			}
 		}
 
-		return getBestAngle(detectedAngles.toArray(new Float[0]));
-	}
-
-	private float getBestAngle(Float[] angles) {
-		if (angles.length != 0) {
-			float bestAngle = 180;
-			for (int i = 0; i < angles.length; i++) {
-				float f = angles[i];
-				if (Math.abs(bestAngle) > Math.abs(f)) {
-					bestAngle = f;
-				}
-			}
-			return bestAngle;
+		if (rays.isEmpty()) {
+			// No reading
+			return Float.NaN;
+		} else {
+			// Make heading relative to view heading
+			float result = getWeightedAngle(rays) - viewHeading;
+			// TODO Normalize heading?
+			return result;
 		}
-		return Float.NaN;
 	}
 
-	private static double getAngle(Point2D p1, Point2D center, Point2D p2) {
-		double cp1 = center.distance(p1);
-		double cp2 = center.distance(p2);
-		double p1p2 = p1.distance(p2);
-		return Math.acos((cp1 * cp1 + cp2 * cp2 - p1p2 * p1p2) / (2 * cp1 * cp2));
+	private boolean comparePositions(Point2D leftPosition, Point2D rightPosition) {
+		return DoubleMath.fuzzyEquals(rightPosition.getX(), leftPosition.getX(), POSE_TOLERANCE)
+				&& DoubleMath.fuzzyEquals(rightPosition.getY(), leftPosition.getY(), POSE_TOLERANCE);
 	}
 
-	// TODO Replace implementation to use this method
-	private float getDetectedAngle(Geometry obstacles, Polygon subject, Point viewPoint) {
+	private static LineSegment getDetectedRay(Geometry obstacles, IRSource subject, Point2D viewPoint) {
+		// Transform subject polygon
+		Polygon subjectPolygon = GeometryUtils.copy(subject.getEnvelope().getPolygon(), obstacles.getFactory());
+		final PoseTransform subjectTransform = new PoseTransform(subject.getPoseProvider().getPose());
+		subjectPolygon.apply(new CoordinateFilter() {
+			@Override
+			public void filter(Coordinate coord) {
+				Point2D point = GeometryUtils.fromCoordinate(coord);
+				point = subjectTransform.transform(point);
+				coord.setCoordinate(GeometryUtils.toCoordinate(point));
+			}
+		});
+		// Update polygon
+		subjectPolygon.geometryChanged();
+
 		// Get the visible part of the subject
-		Geometry visibleSubject = VisibleRegion.build(obstacles, subject, viewPoint.getCoordinate());
+		Coordinate viewCoord = GeometryUtils.toCoordinate(viewPoint);
+		Geometry visibleSubject = VisibleRegion.build(obstacles, subjectPolygon, viewCoord);
 
 		// Exit if invisible
 		if (visibleSubject.isEmpty()) {
-			return Float.NaN;
+			return null;
 		}
 
 		// Get the ray to the nearest visible point
-		Coordinate[] nearestPoints = DistanceOp.nearestPoints(viewPoint, visibleSubject);
+		Point viewGeomPoint = obstacles.getFactory().createPoint(viewCoord);
+		Coordinate[] nearestPoints = DistanceOp.nearestPoints(viewGeomPoint, visibleSubject);
 		LineSegment ray = new LineSegment(nearestPoints[0], nearestPoints[1]);
 
-		if (ray.getLength() <= getRadius()) {
-			// Return viewing angle
-			return (float) ray.angle();
+		if (ray.getLength() <= subject.getEnvelope().getDetectionRadius()) {
+			// Return viewing ray
+			return ray;
 		} else {
 			// Out of range
+			return null;
+		}
+	}
+
+	private float getWeightedAngle(List<LineSegment> rays) {
+		double weightedSum = 0;
+		double totalWeight = 0;
+
+		for (LineSegment ray : rays) {
+			double weight = 1 / (ray.getLength() + 1);
+			double angle = ray.angle();
+			weightedSum += weight * angle;
+			totalWeight += weight;
+		}
+
+		if (totalWeight > 0) {
+			return (float) (weightedSum / totalWeight);
+		} else {
 			return Float.NaN;
 		}
 	}
@@ -187,5 +203,14 @@ public class WorldIRDetector implements IRSensor {
 			return this.detectionSet;
 		}
 
+		public boolean detects(ModelType type) {
+			return getDetectionSet().contains(type);
+		}
+
+		public boolean detects(Model model) {
+			return detects(model.getModelType());
+		}
+
 	}
+
 }

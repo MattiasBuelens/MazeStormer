@@ -484,6 +484,16 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
+	public Geometry getGeometry() {
+		return getTotalMaze().getGeometry();
+	}
+
+	@Override
+	public Polygon getSurroundingEdgeGeometry(Point2D relativePosition) {
+		return getTotalMaze().getSurroundingEdgeGeometry(relativePosition);
+	}
+
+	@Override
 	public Polygon getSurroundingGeometry(Point2D relativePosition) {
 		return getTotalMaze().getSurroundingGeometry(relativePosition);
 	}

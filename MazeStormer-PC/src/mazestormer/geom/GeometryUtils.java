@@ -10,6 +10,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
@@ -17,6 +18,14 @@ import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 public final class GeometryUtils {
 
 	private GeometryUtils() {
+	}
+
+	public static Point2D fromCoordinate(Coordinate coord) {
+		checkNotNull(coord);
+
+		double x = coord.getOrdinate(Coordinate.X);
+		double y = coord.getOrdinate(Coordinate.Y);
+		return new Point2D.Double(x, y);
 	}
 
 	public static Coordinate toCoordinate(Point2D point) {
@@ -72,6 +81,15 @@ public final class GeometryUtils {
 
 	public static Polygon emptyPolygon(GeometryFactory geomFact) {
 		return geomFact.createPolygon(null, null);
+	}
+
+	public static Polygon copy(Polygon polygon, GeometryFactory geomFact) {
+		LinearRing shell = geomFact.createLinearRing(polygon.getExteriorRing().getCoordinates());
+		LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
+		for (int i = 0; i < holes.length; ++i) {
+			holes[i] = geomFact.createLinearRing(polygon.getInteriorRingN(i).getCoordinates());
+		}
+		return geomFact.createPolygon(shell, holes);
 	}
 
 }

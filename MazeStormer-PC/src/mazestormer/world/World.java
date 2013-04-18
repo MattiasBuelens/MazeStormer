@@ -16,7 +16,12 @@ import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.player.AbsolutePlayer;
+import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
 
 public class World {
 
@@ -131,38 +136,31 @@ public class World {
 		this.models.remove(model);
 	}
 
-	public Set<Model> getModels() {
+	public Iterable<Model> getModels() {
 		return Collections.unmodifiableSet(this.models);
 	}
 
-	public <T extends Model> Set<T> getAllStrictModelsClass(Class<T> clazz) {
-		Set<T> temp = new HashSet<T>();
-		for (Model model : this.models) {
-			if (model.getClass() == clazz) {
-				temp.add(clazz.cast(model));
-			}
-		}
-		return Collections.unmodifiableSet(getRobots(temp));
+	public <T extends Model> Iterable<T> getModels(Class<T> clazz) {
+		return Iterables.filter(getModels(), clazz);
 	}
 
-	public <T extends Model> Set<T> getAllModelsClass(Class<T> modelType) {
-		Set<T> temp = new HashSet<T>();
-		for (Model model : this.models) {
-			if (modelType.isInstance(model)) {
-				temp.add(modelType.cast(model));
-			}
-		}
-		return Collections.unmodifiableSet(getRobots(temp));
+	public Iterable<IRRobot> getRobots() {
+		return Collections2.transform(getPlayers(), robotFilter);
 	}
-	
-	@SuppressWarnings("unchecked")
-	private <T extends Model> Set<T> getRobots(Set<T> irs) {
-		if (IRRobot.class == irs.getClass().getComponentType() 
-				|| IRRobot.class.isInstance(irs.getClass().getComponentType())) {
-			for(AbsolutePlayer player : players.values()) {
-				irs.add(((T) player.getRobot()));
-			}
-		}
-		return irs;
+
+	public Iterable<? extends Model> getAllModels() {
+		return Iterables.concat(getModels(), getRobots());
 	}
+
+	public <T extends Model> Iterable<T> getAllModels(Class<T> clazz) {
+		return Iterables.filter(getAllModels(), clazz);
+	}
+
+	private static Function<Player, IRRobot> robotFilter = new Function<Player, IRRobot>() {
+		@Override
+		public IRRobot apply(Player player) {
+			return player.getRobot();
+		}
+	};
+
 }
