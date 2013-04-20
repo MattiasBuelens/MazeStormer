@@ -42,8 +42,7 @@ public class CalibrationPanel extends ViewPanel {
 	public CalibrationPanel(ICalibrationController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Calibration", TitledBorder.LEADING,
-				TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "Calibration", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		createModels();
@@ -64,8 +63,8 @@ public class CalibrationPanel extends ViewPanel {
 	}
 
 	private void createModels() {
-		highModel = new SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0),
-				Integer.valueOf(1023), Integer.valueOf(1));
+		highModel = new SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(1023),
+				Integer.valueOf(1));
 		highModel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -73,8 +72,8 @@ public class CalibrationPanel extends ViewPanel {
 			}
 		});
 
-		lowModel = new SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0),
-				Integer.valueOf(1023), Integer.valueOf(1));
+		lowModel = new SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(1023),
+				Integer.valueOf(1));
 		lowModel.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
@@ -133,7 +132,6 @@ public class CalibrationPanel extends ViewPanel {
 	}
 
 	private void updateState(boolean isConnected) {
-		setVisible(isConnected);
 		highModel.setValue(controller.getHighValue());
 		lowModel.setValue(controller.getLowValue());
 	}
@@ -150,8 +148,7 @@ public class CalibrationPanel extends ViewPanel {
 
 		public CalibrateAction(String type) {
 			putValue(NAME, "Calibrate");
-			putValue(SHORT_DESCRIPTION,
-					"Calibrate using the currently read value from the light sensor");
+			putValue(SHORT_DESCRIPTION, "Calibrate using the currently read value from the light sensor");
 			this.type = type;
 		}
 
@@ -159,4 +156,5 @@ public class CalibrationPanel extends ViewPanel {
 			calibrate(type);
 		}
 	}
+
 }
