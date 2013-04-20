@@ -8,9 +8,11 @@ import mazestormer.explore.Driver;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 
-public class FindObjectControlMode extends AbstractExploreControlMode {
+public class FindObjectControlMode extends ControlMode {
 
 	private ControlMode currentSubControlMode;
+	private ExploreIslandControlMode exploreIslandMode;
+	private LeaveIslandControlMode leaveIslandMode;
 
 	public FindObjectControlMode(Player player, Commander commander) {
 		super(player, commander);

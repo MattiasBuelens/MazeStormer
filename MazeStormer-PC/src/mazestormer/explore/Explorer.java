@@ -4,8 +4,8 @@ import mazestormer.player.Player;
 
 public class Explorer extends Commander {
 
-	private final ControlMode exploreMode;
-	private final ControlMode finishMode;
+	private final ExploreControlMode exploreMode;
+	private final FinishControlMode finishMode;
 
 	public Explorer(Player player) {
 		super(player);
