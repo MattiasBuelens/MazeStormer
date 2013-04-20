@@ -1,5 +1,8 @@
 package mazestormer.connect;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum ControlMode {
 	/**
 	 * Manual control
@@ -50,6 +53,14 @@ public enum ControlMode {
 
 	public String toString() {
 		return name;
+	}
+
+	public static List<String> getShortNames() {
+		List<String> shortNames = new ArrayList<String>(values().length);
+		for (ControlMode controlMode : values()) {
+			shortNames.add(controlMode.getShortName());
+		}
+		return shortNames;
 	}
 
 	public static ControlMode byShortName(String shortName) {

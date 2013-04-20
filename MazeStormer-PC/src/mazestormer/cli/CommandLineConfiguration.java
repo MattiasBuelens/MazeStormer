@@ -12,6 +12,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.google.common.base.Joiner;
+
 @SuppressWarnings("static-access")
 public class CommandLineConfiguration {
 
@@ -34,20 +36,20 @@ public class CommandLineConfiguration {
 		if (line.hasOption("help")) {
 			HelpFormatter formatter = new HelpFormatter();
 			formatter.printHelp("java mazestormer.controller.MainController",
-					"A robot that storms through mazes, powered by LEGO NXT.", options, "", true);
+					"A robot that storms through mazes, powered by LEGO NXT.\n", options, "", true);
 			System.exit(0);
 		}
 		if (line.hasOption("maze")) {
 			String mazeFilePath = line.getOptionValue("maze");
 			controller.configuration().loadMaze(mazeFilePath);
 		}
-		if (line.hasOption("connect")) {
-			String robotTypeString = line.getOptionValue("connect");
+		if (line.hasOption("robot")) {
+			String robotTypeString = line.getOptionValue("robot");
 			RobotType robotType = RobotType.valueOf(robotTypeString.toUpperCase());
 			controller.configuration().connect(robotType);
 		}
-		if (line.hasOption("mode")) {
-			String modeString = line.getOptionValue("mode");
+		if (line.hasOption("control")) {
+			String modeString = line.getOptionValue("control");
 			ControlMode mode = ControlMode.byShortName(modeString);
 			controller.configuration().setControlMode(mode);
 		}
@@ -55,13 +57,30 @@ public class CommandLineConfiguration {
 
 	private static final Options options = new Options();
 	static {
+		// help
 		options.addOption(OptionBuilder.withLongOpt("help").withDescription("prints this help message").create("?"));
-		options.addOption(OptionBuilder.withLongOpt("connect").hasArgs(1).withArgName("robotType")
-				.withDescription("connects to the robot").create("c"));
-		options.addOption(OptionBuilder.withLongOpt("mode").hasArgs(1).withArgName("controlMode")
-				.withDescription("switches to the given control mode").create("m"));
-		options.addOption(OptionBuilder.hasArgs(1).withArgName("mazeFile")
-				.withDescription("loads the given source maze").create("maze"));
+
+		// robot
+		String robotTypes = makeList((Object[]) RobotType.values());
+		options.addOption(OptionBuilder.withLongOpt("robot").hasArgs(1).withArgName("robotType")
+				.withDescription("connects to a robot:\n" + robotTypes).create("r"));
+
+		// control mode
+		String controlModes = makeList(ControlMode.getShortNames());
+		options.addOption(OptionBuilder.withLongOpt("control").hasArgs(1).withArgName("controlMode")
+				.withDescription("switches to a control mode:\n" + controlModes).create("c"));
+
+		// maze
+		options.addOption(OptionBuilder.withLongOpt("maze").hasArgs(1).withArgName("mazeFile")
+				.withDescription("loads the given source maze").create("m"));
+	}
+
+	private static String makeList(Iterable<?> items) {
+		return "- " + Joiner.on("\n- ").join(items).toLowerCase();
+	}
+
+	private static String makeList(Object... items) {
+		return "- " + Joiner.on("\n- ").join(items).toLowerCase();
 	}
 
 }
