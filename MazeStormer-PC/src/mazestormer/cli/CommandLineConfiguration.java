@@ -1,8 +1,11 @@
 package mazestormer.cli;
 
+import java.util.Properties;
+
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.RobotType;
 import mazestormer.controller.IMainController;
+import mazestormer.game.ConnectionMode;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -14,7 +17,6 @@ import org.apache.commons.cli.ParseException;
 
 import com.google.common.base.Joiner;
 
-@SuppressWarnings("static-access")
 public class CommandLineConfiguration {
 
 	private final IMainController controller;
@@ -53,26 +55,52 @@ public class CommandLineConfiguration {
 			ControlMode mode = ControlMode.byShortName(modeString);
 			controller.configuration().setControlMode(mode);
 		}
+		if (line.hasOption("ttt")) {
+			Properties tttProps = line.getOptionProperties("ttt");
+			String modeString = tttProps.getProperty("server", defaultTTTServer);
+			ConnectionMode mode = ConnectionMode.valueOf(modeString.toUpperCase());
+			String player = tttProps.getProperty("player", defaultTTTPlayer);
+			String game = tttProps.getProperty("game", defaultTTTGame);
+			controller.configuration().setControlMode(ControlMode.TeamTreasureTrek);
+			controller.gameSetUpControl().setConnectionMode(mode);
+			controller.gameSetUpControl().setPlayerID(player);
+			controller.gameSetUpControl().setGameID(game);
+		}
 	}
 
 	private static final Options options = new Options();
-	static {
+
+	private static final String defaultTTTServer = ConnectionMode.LOCAL.name().toLowerCase();
+	private static final String defaultTTTPlayer = "Brons";
+	private static final String defaultTTTGame = "BronsGame";
+
+	@SuppressWarnings("static-access")
+	private static void createOptions() {
 		// help
 		options.addOption(OptionBuilder.withLongOpt("help").withDescription("prints this help message").create("?"));
 
 		// robot
 		String robotTypes = makeList((Object[]) RobotType.values());
 		options.addOption(OptionBuilder.withLongOpt("robot").hasArgs(1).withArgName("robotType")
-				.withDescription("connects to a robot:\n" + robotTypes).create("r"));
+				.withDescription("Connects to a robot:\n" + robotTypes).create("r"));
 
 		// control mode
 		String controlModes = makeList(ControlMode.getShortNames());
 		options.addOption(OptionBuilder.withLongOpt("control").hasArgs(1).withArgName("controlMode")
-				.withDescription("switches to a control mode:\n" + controlModes).create("c"));
+				.withDescription("Switches to a control mode:\n" + controlModes).create("c"));
 
 		// maze
 		options.addOption(OptionBuilder.withLongOpt("maze").hasArgs(1).withArgName("mazeFile")
-				.withDescription("loads the given source maze").create("m"));
+				.withDescription("Loads the given source maze.").create("m"));
+
+		// ttt
+		String tttServers = Joiner.on('|').join(ConnectionMode.getNames()).toLowerCase()
+				.replace(defaultTTTServer, "[" + defaultTTTServer + "]");
+		String tttDesc = "Joins a Team Treasure Trek game.\nControl mode is also set to 'ttt'\n"
+				+ "Optional properties:\n- server=" + tttServers + "\n- player[=" + defaultTTTPlayer + "]\n- game[="
+				+ defaultTTTGame + "]";
+		options.addOption(OptionBuilder.withArgName("property=value").hasOptionalArgs(3).withValueSeparator('=')
+				.withDescription(tttDesc).create("ttt"));
 	}
 
 	private static String makeList(Iterable<?> items) {
@@ -81,6 +109,10 @@ public class CommandLineConfiguration {
 
 	private static String makeList(Object... items) {
 		return "- " + Joiner.on("\n- ").join(items).toLowerCase();
+	}
+
+	static {
+		createOptions();
 	}
 
 }

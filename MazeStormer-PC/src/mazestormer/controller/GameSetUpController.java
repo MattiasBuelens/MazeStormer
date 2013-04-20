@@ -16,6 +16,9 @@ import com.rabbitmq.client.Connection;
 
 public class GameSetUpController extends SubController implements IGameSetUpController {
 
+	private ConnectionMode connectionMode = ConnectionMode.LOCAL;
+	private String gameID = "";
+
 	private Connection connection;
 	private Game game;
 	private WorldSimulator worldSimulator;
@@ -51,6 +54,16 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	@Override
+	public ConnectionMode getConnectionMode() {
+		return connectionMode;
+	}
+
+	@Override
+	public void setConnectionMode(ConnectionMode connectionMode) {
+		this.connectionMode = connectionMode;
+	}
+
+	@Override
 	public String getPlayerID() {
 		return getMainController().getPlayer().getPlayerID();
 	}
@@ -61,11 +74,19 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		getWorld().renamePlayer(player.getPlayerID(), newPlayerID);
 	}
 
-	private void createGame(ConnectionMode connectionMode, String gameID) throws IOException {
+	@Override
+	public String getGameID() {
+		return gameID;
+	}
+
+	@Override
+	public void setGameID(String gameID) {
+		this.gameID = gameID;
+	}
+
+	private void createGame() throws IOException {
 		final Player localPlayer = getMainController().getPlayer();
-
 		connection = connectionMode.newConnection();
-
 		game = new Game(connection, gameID, localPlayer);
 		game.addGameListener(new Listener());
 
@@ -80,7 +101,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	@Override
-	public void joinGame(ConnectionMode connectionMode, String gameID) {
+	public void joinGame() {
 		if (!isReady()) {
 			onNotReady();
 			return;
@@ -88,7 +109,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		try {
 			// Create game
-			createGame(connectionMode, gameID);
+			createGame();
 			// Join game
 			game.join(new Callback<Void>() {
 				@Override
