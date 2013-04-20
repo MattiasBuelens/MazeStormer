@@ -89,10 +89,7 @@ public class MainController implements IMainController {
 	public MainController() {
 		// Create event bus on named executor
 		ExecutorService executor = Executors.newSingleThreadExecutor(factory);
-		eventBus = new AsyncEventBus(getClass().getSimpleName(), executor);
-
-		// Register on event bus
-		getEventBus().register(this);
+		registerEventBus(new AsyncEventBus(getClass().getSimpleName(), executor));
 
 		// Player and world
 		IMaze personalMaze = new CombinedMaze();
@@ -120,8 +117,15 @@ public class MainController implements IMainController {
 		return view;
 	}
 
-	private EventBus getEventBus() {
+	@Override
+	public EventBus getEventBus() {
 		return eventBus;
+	}
+
+	@Override
+	public void registerEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
+		eventBus.register(this);
 	}
 
 	private void postEvent(final Object event) {
@@ -244,11 +248,6 @@ public class MainController implements IMainController {
 			gameSetUpControl = new GameSetUpController(this);
 		}
 		return gameSetUpControl;
-	}
-
-	@Override
-	public void register(EventSource eventSource) {
-		eventSource.registerEventBus(getEventBus());
 	}
 
 	/*

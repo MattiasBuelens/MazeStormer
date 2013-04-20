@@ -3,15 +3,17 @@ package mazestormer.ui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.Beans;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.controller.IMainController;
@@ -26,15 +28,17 @@ public class MainView extends JFrame implements EventSource {
 	private static final long serialVersionUID = 1L;
 
 	private final IMainController controller;
-
 	private EventBus eventBus;
+
+	private JPanel mainPanel;
 	private ViewPanel gameTabPanel;
 	private ViewPanel controlPanel;
 	private ViewPanel configurationPanel;
 	private ViewPanel calibrationPanel;
 	private ViewPanel statePanel;
 
-	private JPanel mainPanel;
+	private boolean isHorizontalVisible = true;
+	private boolean isVerticalVisible = true;
 
 	public MainView(IMainController controller) {
 		setTitle("MazeStormer");
@@ -43,9 +47,9 @@ public class MainView extends JFrame implements EventSource {
 		this.controller = controller;
 
 		initialize();
-		
-		addHorizontalHideListener();
-		addVerticalHideListener();
+		addHideListeners();
+		updateHorizontalVisible();
+		updateVerticalVisible();
 
 		if (!Beans.isDesignTime()) {
 			registerController();
@@ -53,7 +57,7 @@ public class MainView extends JFrame implements EventSource {
 	}
 
 	private void registerController() {
-		this.controller.register(this);
+		registerEventBus(this.controller.getEventBus());
 		setControlMode(this.controller.configuration().getControlMode());
 	}
 
@@ -64,19 +68,13 @@ public class MainView extends JFrame implements EventSource {
 		setLocationRelativeTo(null);
 
 		this.mainPanel = new JPanel();
-		this.mainPanel.setLayout(new MigLayout("hidemode 3", "[grow][]",
-				"[][grow][::200px,growprio 50,grow]"));
+		this.mainPanel.setLayout(new MigLayout("hidemode 3", "[grow][]", "[][grow][::200px,growprio 50,grow]"));
 
-		this.configurationPanel = new ConfigurationPanel(
-				controller.configuration());
+		this.configurationPanel = new ConfigurationPanel(controller.configuration());
 		this.mainPanel.add(configurationPanel, "cell 0 0,grow");
-		
-		this.calibrationPanel = new CalibrationPanel(
-				controller.calibration());
-		this.mainPanel.add(calibrationPanel, "cell 1 0,grow");
 
-		this.controlPanel = new ManualControlPanel(controller.manualControl());
-		this.mainPanel.add(controlPanel, "cell 1 1,grow");
+		this.calibrationPanel = new CalibrationPanel(controller.calibration());
+		this.mainPanel.add(calibrationPanel, "cell 1 0,grow");
 
 		this.gameTabPanel = new GameTabPanel(controller.gameControl());
 		this.mainPanel.add(gameTabPanel, "cell 0 1 1 2,grow");
@@ -114,35 +112,32 @@ public class MainView extends JFrame implements EventSource {
 			setControlPanel(new BarcodePanel(this.controller.barcodeControl()));
 			break;
 		case Manual:
-			setControlPanel(new ManualControlPanel(
-					this.controller.manualControl()));
+			setControlPanel(new ManualControlPanel(this.controller.manualControl()));
 			break;
 		case Polygon:
-			setControlPanel(new PolygonControlPanel(
-					this.controller.polygonControl()));
+			setControlPanel(new PolygonControlPanel(this.controller.polygonControl()));
 			break;
 		case PerpendicularOnLine:
-			setControlPanel(new LineFinderPanel(
-					this.controller.lineFinderControl()));
+			setControlPanel(new LineFinderPanel(this.controller.lineFinderControl()));
 			break;
 		case Explorer:
-			setControlPanel(new ExplorerControlPanel(
-					this.controller.explorerControl()));
+			setControlPanel(new ExplorerControlPanel(this.controller.explorerControl()));
 			break;
 		case PathFinder:
 			PathFindingPanel p = new PathFindingPanel(this.controller.pathFindingControl());
 			p.update();
 			setControlPanel(p);
 			break;
-		case TeamTreasureTrek :
+		case TeamTreasureTrek:
 			setControlPanel(new GameSetUpPanel(this.controller.gameSetUpControl()));
 			break;
-		}			
+		}
 	}
 
 	private void setControlPanel(ViewPanel controlPanel) {
 		if (this.controlPanel != null) {
 			this.mainPanel.remove(this.controlPanel);
+			this.controlPanel = null;
 		}
 		if (controlPanel != null) {
 			this.mainPanel.add(controlPanel, "cell 1 1,grow");
@@ -152,46 +147,73 @@ public class MainView extends JFrame implements EventSource {
 	}
 
 	@Subscribe
+	public void onConnected(ConnectEvent e) {
+		updateHorizontalVisible();
+		updateVerticalVisible();
+	}
+
+	@Subscribe
 	public void onControlModeChanged(ControlModeChangeEvent e) {
 		setControlMode(e.getControlMode());
 	}
-	
-	public void addHorizontalHideListener() {
-		ActionListener hhListener = new ActionListener() {
-			
-			private boolean hidden = false;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				this.hidden = !this.hidden;
-				calibrationPanel.setVisible((this.hidden == true) ? false : controlPanel.isVisible());
-				configurationPanel.setVisible(!this.hidden);
-				getContentPane().validate();
-			}
-		};
-			
-		((JComponent) getContentPane()).registerKeyboardAction(hhListener,
-				KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0),
-				JComponent.WHEN_IN_FOCUSED_WINDOW);
+	private boolean isHorizontalVisible() {
+		return isHorizontalVisible;
 	}
-	
-	public void addVerticalHideListener() {
-		ActionListener vhListener = new ActionListener() {
-			
-			private boolean hidden = false;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				this.hidden = !this.hidden;
-				calibrationPanel.setVisible((this.hidden == true) ? false : configurationPanel.isVisible());
-				controlPanel.setVisible(!this.hidden);
-				statePanel.setVisible(!this.hidden);
-				getContentPane().validate();
-			}
-		};
-		
-		((JComponent) getContentPane()).registerKeyboardAction(vhListener,
-				KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0),
-				JComponent.WHEN_IN_FOCUSED_WINDOW);
+	private boolean isVerticalVisible() {
+		return isVerticalVisible && controlPanel != null;
 	}
+
+	private void updateHorizontalVisible() {
+		calibrationPanel.setVisible(isHorizontalVisible() && isVerticalVisible());
+		configurationPanel.setVisible(isHorizontalVisible());
+		getContentPane().validate();
+	}
+
+	private void updateVerticalVisible() {
+		calibrationPanel.setVisible(isHorizontalVisible() && isVerticalVisible());
+		if (controlPanel != null) {
+			controlPanel.setVisible(isVerticalVisible());
+		}
+		statePanel.setVisible(isVerticalVisible());
+		getContentPane().validate();
+	}
+
+	private void addHideListeners() {
+		bindKeyboardAction(KeyEvent.VK_F1, new ToggleHorizontalAction());
+		bindKeyboardAction(KeyEvent.VK_F2, new ToggleVerticalAction());
+	}
+
+	private void bindKeyboardAction(int key, Action action) {
+		Object binding = new Object();
+
+		mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(key, 0, false), binding);
+		mainPanel.getActionMap().put(binding, action);
+	}
+
+	private class ToggleHorizontalAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			isHorizontalVisible = !isHorizontalVisible;
+			updateHorizontalVisible();
+		}
+
+	}
+
+	private class ToggleVerticalAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			isVerticalVisible = !isVerticalVisible;
+			updateVerticalVisible();
+		}
+
+	}
+
 }

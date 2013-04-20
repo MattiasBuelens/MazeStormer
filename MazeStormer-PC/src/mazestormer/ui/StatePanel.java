@@ -9,7 +9,6 @@ import javax.swing.border.TitledBorder;
 
 import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Move;
-import mazestormer.connect.ConnectEvent;
 import mazestormer.controller.IStateController;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.MoveEvent.EventType;
@@ -160,15 +159,6 @@ public class StatePanel extends ViewPanel {
 		movement = new JTextField();
 		movement.setEditable(false);
 		movementPanel.add(movement, "cell 0 0");
-	}
-
-	private void updateState(boolean isConnected) {
-		setVisible(isConnected);
-	}
-
-	@Subscribe
-	public void onConnected(ConnectEvent event) {
-		updateState(event.isConnected());
 	}
 
 	@Subscribe
