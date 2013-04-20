@@ -60,13 +60,11 @@ public class ConfigurationPanel extends ViewPanel {
 	public ConfigurationPanel(IConfigurationController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Configuration", TitledBorder.LEADING,
-				TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "Configuration", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		container = new JPanel();
-		container.setLayout(new MigLayout("hidemode 3",
-				"[grow 75][grow][fill][fill]", "[fill][fill][fill]"));
+		container.setLayout(new MigLayout("hidemode 3", "[grow 75][grow][fill][fill]", "[fill][fill][fill]"));
 		add(container);
 
 		createRobotType();
@@ -85,7 +83,11 @@ public class ConfigurationPanel extends ViewPanel {
 
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
+
 		setConnectState(controller.isConnected());
+		robotTypeModel.setSelectedItem(controller.getRobotType());
+		controlModeModel.setSelectedItem(controller.getControlMode());
+		setMazePath(controller.getMazePath());
 	}
 
 	private void createRobotType() {
@@ -112,8 +114,7 @@ public class ConfigurationPanel extends ViewPanel {
 	}
 
 	private void createControlMode() {
-		controlModeModel = new DefaultComboBoxModel<ControlMode>(
-				ControlMode.values());
+		controlModeModel = new DefaultComboBoxModel<ControlMode>(ControlMode.values());
 
 		JLabel lblMode = new JLabel("Control mode");
 		container.add(lblMode, "cell 0 1,grow");
@@ -156,8 +157,7 @@ public class ConfigurationPanel extends ViewPanel {
 	}
 
 	public void setControlMode() {
-		ControlMode controlMode = (ControlMode) controlModeModel
-				.getSelectedItem();
+		ControlMode controlMode = (ControlMode) controlModeModel.getSelectedItem();
 		controller.setControlMode(controlMode);
 	}
 
@@ -252,8 +252,7 @@ public class ConfigurationPanel extends ViewPanel {
 
 		public BrowseMazeAction() {
 			putValue(NAME, "Browse for source maze file");
-			putValue(SHORT_DESCRIPTION,
-					"Browse for a file to use as source maze");
+			putValue(SHORT_DESCRIPTION, "Browse for a file to use as source maze");
 		}
 
 		public void actionPerformed(ActionEvent e) {
@@ -273,8 +272,7 @@ public class ConfigurationPanel extends ViewPanel {
 
 		public LoadMazeAction() {
 			putValue(NAME, "Load source maze");
-			putValue(SHORT_DESCRIPTION,
-					"Load the source maze from the given file");
+			putValue(SHORT_DESCRIPTION, "Load the source maze from the given file");
 		}
 
 		public void actionPerformed(ActionEvent e) {
