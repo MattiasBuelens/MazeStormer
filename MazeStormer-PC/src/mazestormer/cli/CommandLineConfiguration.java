@@ -77,7 +77,7 @@ public class CommandLineConfiguration {
 	@SuppressWarnings("static-access")
 	private static void createOptions() {
 		// help
-		options.addOption(OptionBuilder.withLongOpt("help").withDescription("prints this help message").create("?"));
+		options.addOption(OptionBuilder.withLongOpt("help").withDescription("Prints this help message.").create("?"));
 
 		// robot
 		String robotTypes = makeList((Object[]) RobotType.values());
@@ -96,7 +96,7 @@ public class CommandLineConfiguration {
 		// ttt
 		String tttServers = Joiner.on('|').join(ConnectionMode.getNames()).toLowerCase()
 				.replace(defaultTTTServer, "[" + defaultTTTServer + "]");
-		String tttDesc = "Joins a Team Treasure Trek game.\nControl mode is also set to 'ttt'\n"
+		String tttDesc = "Joins a Team Treasure Trek game.\nControl mode is also set to 'ttt'.\n"
 				+ "Optional properties:\n- server=" + tttServers + "\n- player[=" + defaultTTTPlayer + "]\n- game[="
 				+ defaultTTTGame + "]";
 		options.addOption(OptionBuilder.withArgName("property=value").hasOptionalArgs(3).withValueSeparator('=')
