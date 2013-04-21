@@ -1,6 +1,8 @@
 package mazestormer.controller;
 
+import mazestormer.player.RelativePlayer;
 import mazestormer.util.EventSource;
+import mazestormer.world.World;
 
 public interface IMainController extends EventSource {
 
@@ -33,5 +35,9 @@ public interface IMainController extends EventSource {
 	public IGameSetUpController gameSetUpControl();
 
 	public IExplorerController explorerControl();
+
+	public RelativePlayer getPlayer();
+
+	public World getWorld();
 
 }

@@ -2,10 +2,18 @@ package mazestormer.cli;
 
 import java.util.Properties;
 
+import lejos.geom.Point;
+import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.RobotType;
 import mazestormer.controller.IMainController;
 import mazestormer.game.ConnectionMode;
+import mazestormer.maze.IMaze;
+import mazestormer.maze.Maze;
+import mazestormer.maze.Orientation;
+import mazestormer.observable.ObservableRobot;
+import mazestormer.player.RelativePlayer;
+import mazestormer.util.LongPoint;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -25,15 +33,9 @@ public class CommandLineConfiguration {
 		this.controller = controller;
 	}
 
-	public void parse(String[] args) {
+	public void parse(String[] args) throws ParseException {
 		CommandLineParser parser = new BasicParser();
-		CommandLine line;
-		try {
-			line = parser.parse(options, args);
-		} catch (ParseException e) {
-			System.err.println(e.getMessage());
-			return;
-		}
+		CommandLine line = parser.parse(options, args);
 
 		if (line.hasOption("help")) {
 			HelpFormatter formatter = new HelpFormatter();
@@ -57,22 +59,53 @@ public class CommandLineConfiguration {
 		}
 		if (line.hasOption("ttt")) {
 			Properties tttProps = line.getOptionProperties("ttt");
-			String modeString = tttProps.getProperty("server", defaultTTTServer);
+			String modeString = tttProps.getProperty("server", tttServerDefault);
 			ConnectionMode mode = ConnectionMode.valueOf(modeString.toUpperCase());
-			String player = tttProps.getProperty("player", defaultTTTPlayer);
-			String game = tttProps.getProperty("game", defaultTTTGame);
+			String player = tttProps.getProperty("player", tttPlayerDefault);
+			String game = tttProps.getProperty("game", tttGameDefault);
 			controller.configuration().setControlMode(ControlMode.TeamTreasureTrek);
 			controller.gameSetUpControl().setConnectionMode(mode);
 			controller.gameSetUpControl().setPlayerID(player);
 			controller.gameSetUpControl().setGameID(game);
 		}
+		if (line.hasOption("dummy")) {
+			String[] dummies = line.getOptionValues("dummy");
+			if (dummies.length % 3 != 0) {
+				throw new ParseException("Invalid number of arguments for dummy: " + dummies.length);
+			}
+			for (int i = 0; i < dummies.length / 3; ++i) {
+				long x = Long.parseLong(dummies[3 * i]);
+				long y = Long.parseLong(dummies[3 * i + 1]);
+				Orientation orientation = Orientation.byShortName(dummies[3 * i + 2].toUpperCase());
+				createDummy("Dummy" + (i + 1), x, y, orientation);
+			}
+		}
+	}
+
+	private void createDummy(String name, long x, long y, Orientation orientation) {
+		RelativePlayer player = new RelativePlayer(name, new ObservableRobot(), new Maze());
+		// Position on tile
+		IMaze maze = controller.getWorld().getMaze();
+		Point position = maze.fromTile(new LongPoint(x, y).toPoint());
+		float heading = Orientation.EAST.angleTo(orientation);
+		// Set pose
+		Pose pose = new Pose();
+		pose.setLocation(position);
+		pose.setHeading(heading);
+		player.getRobot().getPoseProvider().setPose(pose);
+		// Add to world
+		controller.getWorld().addPlayer(player);
 	}
 
 	private static final Options options = new Options();
 
-	private static final String defaultTTTServer = ConnectionMode.LOCAL.name().toLowerCase();
-	private static final String defaultTTTPlayer = "Brons";
-	private static final String defaultTTTGame = "BronsGame";
+	private static final String tttServerDefault = ConnectionMode.LOCAL.name().toLowerCase();
+	private static final String tttPlayerDefault = "Brons";
+	private static final String tttGameDefault = "BronsGame";
+
+	private static final long dummyXDefault = 0;
+	private static final long dummyYDefault = 0;
+	private static final String dummyOrientDefault = Orientation.EAST.getShortName();
 
 	@SuppressWarnings("static-access")
 	private static void createOptions() {
@@ -95,12 +128,21 @@ public class CommandLineConfiguration {
 
 		// ttt
 		String tttServers = Joiner.on('|').join(ConnectionMode.getNames()).toLowerCase()
-				.replace(defaultTTTServer, "[" + defaultTTTServer + "]");
+				.replace(tttServerDefault, "[" + tttServerDefault + "]");
 		String tttDesc = "Joins a Team Treasure Trek game.\nControl mode is also set to 'ttt'.\n"
-				+ "Optional properties:\n- server=" + tttServers + "\n- player[=" + defaultTTTPlayer + "]\n- game[="
-				+ defaultTTTGame + "]";
+				+ "Optional arguments:\n- server=" + tttServers + "\n- player[=" + tttPlayerDefault + "]\n- game[="
+				+ tttGameDefault + "]";
 		options.addOption(OptionBuilder.withArgName("property=value").hasOptionalArgs(3).withValueSeparator('=')
 				.withDescription(tttDesc).create("ttt"));
+
+		// dummy
+		String dummyOrient = Joiner.on('|').join(Orientation.getShortNames())
+				.replace(dummyOrientDefault, "[" + dummyOrientDefault + "]");
+		String dummyDesc = "Adds a dummy robot to the world.\nRepeat this option to add multiple dummies.\n"
+				+ "Required arguments:\n- x[=" + dummyXDefault + "]\n- y[=" + dummyYDefault + "]\n- orient="
+				+ dummyOrient;
+		options.addOption(OptionBuilder.withLongOpt("dummy").withArgName("x> <y> <orient").hasArgs(3)
+				.withDescription(dummyDesc).create("d"));
 	}
 
 	private static String makeList(Iterable<?> items) {

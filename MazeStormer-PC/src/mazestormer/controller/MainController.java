@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.commons.cli.ParseException;
+
 import lejos.robotics.navigation.Pose;
 import mazestormer.cli.CommandLineConfiguration;
 import mazestormer.connect.ConnectEvent;
@@ -48,7 +50,11 @@ public class MainController implements IMainController {
 	public static void start(String[] args) throws Exception {
 		// Controller
 		IMainController controller = new MainController();
-		new CommandLineConfiguration(controller).parse(args);
+		try {
+			new CommandLineConfiguration(controller).parse(args);
+		} catch (ParseException e) {
+			System.err.println(e.getMessage());
+		}
 
 		// View
 		MainView view = new MainView(controller);
@@ -340,19 +346,21 @@ public class MainController implements IMainController {
 	}
 
 	/*
-	 * World
-	 */
-
-	public World getWorld() {
-		return world;
-	}
-
-	/*
 	 * Player
 	 */
 
+	@Override
 	public RelativePlayer getPlayer() {
 		return personalPlayer;
+	}
+
+	/*
+	 * World
+	 */
+
+	@Override
+	public World getWorld() {
+		return world;
 	}
 
 }
