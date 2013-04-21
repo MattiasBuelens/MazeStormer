@@ -1,6 +1,7 @@
 package mazestormer.maze;
 
 import static org.junit.Assert.*;
+import lejos.geom.Point;
 import mazestormer.util.LongPoint;
 
 import org.junit.Test;
@@ -87,4 +88,21 @@ public class TileTransformTest {
 		assertEquals(new LongPoint(-2, 2), transform.inverseTransform(P));
 	}
 
+	@Test
+	public void poseTransform() {
+		IMaze maze = new Maze();
+		LongPoint tile = new LongPoint(3, 4);
+		Point relative = maze.fromTile(tile.toPoint());
+
+		TileTransform tileTransform = new TileTransform(new LongPoint(1, 2), 3);
+		PoseTransform poseTransform = tileTransform.toPoseTransform(maze);
+
+		// tile > TileTransform > relative
+		Point expectedRelative = maze.fromTile(tileTransform.transform(tile).toPoint());
+		// tile > relative > PoseTransform
+		Point actualRelative = poseTransform.transform(relative);
+
+		assertEquals(expectedRelative.getX(), actualRelative.getX(), 0.1d);
+		assertEquals(expectedRelative.getY(), actualRelative.getY(), 0.1d);
+	}
 }
