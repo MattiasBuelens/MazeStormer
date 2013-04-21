@@ -103,10 +103,6 @@ public class CommandLineConfiguration {
 	private static final String tttPlayerDefault = "Brons";
 	private static final String tttGameDefault = "BronsGame";
 
-	private static final long dummyXDefault = 0;
-	private static final long dummyYDefault = 0;
-	private static final String dummyOrientDefault = Orientation.EAST.getShortName();
-
 	@SuppressWarnings("static-access")
 	private static void createOptions() {
 		// help
@@ -136,11 +132,9 @@ public class CommandLineConfiguration {
 				.withDescription(tttDesc).create("ttt"));
 
 		// dummy
-		String dummyOrient = Joiner.on('|').join(Orientation.getShortNames())
-				.replace(dummyOrientDefault, "[" + dummyOrientDefault + "]");
+		String orientations = Joiner.on('|').join(Orientation.getShortNames());
 		String dummyDesc = "Adds a dummy robot to the world.\nRepeat this option to add multiple dummies.\n"
-				+ "Required arguments:\n- x[=" + dummyXDefault + "]\n- y[=" + dummyYDefault + "]\n- orient="
-				+ dummyOrient;
+				+ "Required arguments:\n- x\n- y\n- orient=" + orientations;
 		options.addOption(OptionBuilder.withLongOpt("dummy").withArgName("x> <y> <orient").hasArgs(3)
 				.withDescription(dummyDesc).create("d"));
 	}
