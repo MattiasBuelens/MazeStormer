@@ -68,8 +68,12 @@ public class Game {
 		return client.getPlayers();
 	}
 
+	protected Player getLocalPlayer() {
+		return localPlayer;
+	}
+
 	private CombinedMaze getLocalMaze() {
-		return (CombinedMaze) localPlayer.getMaze();
+		return (CombinedMaze) getLocalPlayer().getMaze();
 	}
 
 	public void join(final Callback<Void> callback) {
@@ -201,7 +205,7 @@ public class Game {
 			// TODO Is this conform with maze coordinate specification?
 			long x = tile.getX();
 			long y = tile.getY();
-			String token = Parser.stringify(localPlayer.getMaze(), tile.getPosition());
+			String token = Parser.stringify(getLocalMaze(), tile.getPosition());
 			tilesToSend.add(new peno.htttp.Tile(x, y, token));
 		}
 

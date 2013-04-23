@@ -33,10 +33,14 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	}
 
 	private void logToAll(String message) {
-		getWorld().getLogger().info(message);
+		logToWorld(message);
 		for (Player player : getWorld().getPlayers()) {
 			logTo(player, message);
 		}
+	}
+
+	private void logToWorld(String message) {
+		getWorld().getLogger().info(message);
 	}
 
 	private void logToLocal(String message) {
@@ -86,7 +90,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	private void createGame() throws IOException {
 		final Player localPlayer = getMainController().getPlayer();
-		connection = connectionMode.newConnection();
+		connection = connectionMode.getConnection();
 		game = new Game(connection, gameID, localPlayer);
 		game.addGameListener(new Listener());
 
@@ -277,12 +281,12 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 		@Override
 		public void onPlayerReady(String playerID, boolean isReady) {
-			logTo(playerID, isReady ? "Ready" : "Not ready");
+			logToWorld("Player " + playerID + (isReady ? " ready" : " not ready"));
 		}
 
 		@Override
 		public void onObjectFound(String playerID) {
-			logTo(playerID, "Player " + playerID + " found their object");
+			logToWorld("Player " + playerID + " found their object");
 		}
 
 		@Override

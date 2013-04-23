@@ -42,13 +42,17 @@ public enum ConnectionMode {
 	};
 
 	private final ConnectionFactory connectionFactory;
+	private Connection connection;
 
 	private ConnectionMode() {
 		this.connectionFactory = createConnectionFactory();
 	}
 
-	public Connection newConnection() throws IOException {
-		return connectionFactory.newConnection();
+	public Connection getConnection() throws IOException {
+		if (connection == null || !connection.isOpen()) {
+			connection = connectionFactory.newConnection();
+		}
+		return connection;
 	}
 
 	protected abstract ConnectionFactory createConnectionFactory();

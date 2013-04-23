@@ -1,5 +1,6 @@
 package mazestormer.cli;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import lejos.geom.Point;
@@ -8,10 +9,12 @@ import mazestormer.connect.ControlMode;
 import mazestormer.connect.RobotType;
 import mazestormer.controller.IMainController;
 import mazestormer.game.ConnectionMode;
+import mazestormer.game.DummyGame;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.observable.ObservableRobot;
+import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Robot;
@@ -26,6 +29,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import com.google.common.base.Joiner;
+import com.rabbitmq.client.Connection;
 
 public class CommandLineConfiguration {
 
@@ -82,11 +86,22 @@ public class CommandLineConfiguration {
 				createDummy("Dummy" + (i + 1), x, y, orientation);
 			}
 		}
+		if (line.hasOption("dummy-player")) {
+			String[] dummies = line.getOptionValues("dummy-player");
+			for (String dummy : dummies) {
+				try {
+					createDummyPlayer(dummy);
+				} catch (IOException e) {
+					System.err.println("Failed to create dummy player: " + e.getMessage());
+				}
+			}
+		}
 	}
 
 	private void createDummy(String name, long x, long y, Orientation orientation) {
+		// Create dummy
 		Robot robot = new ObservableRobot(ControllableRobot.robotWidth, ControllableRobot.robotHeight);
-		RelativePlayer player = new RelativePlayer(name, robot, new Maze());
+		RelativePlayer dummy = new RelativePlayer(name, robot, new Maze());
 		// Position on tile
 		IMaze maze = controller.getWorld().getMaze();
 		Point position = maze.fromTile(new LongPoint(x, y).toPoint());
@@ -95,9 +110,20 @@ public class CommandLineConfiguration {
 		Pose pose = new Pose();
 		pose.setLocation(position);
 		pose.setHeading(heading);
-		player.getRobot().getPoseProvider().setPose(pose);
+		dummy.getRobot().getPoseProvider().setPose(pose);
 		// Add to world
-		controller.getWorld().addPlayer(player);
+		controller.getWorld().addPlayer(dummy);
+	}
+
+	private void createDummyPlayer(String name) throws IOException {
+		// Create player
+		Robot robot = new ObservableRobot(ControllableRobot.robotWidth, ControllableRobot.robotHeight);
+		Player player = new RelativePlayer(name, robot, new Maze());
+		// Create game
+		Connection connection = controller.gameSetUpControl().getConnectionMode().getConnection();
+		String gameID = controller.gameSetUpControl().getGameID();
+		DummyGame game = new DummyGame(connection, gameID, player);
+		game.join();
 	}
 
 	private static final Options options = new Options();
@@ -140,6 +166,11 @@ public class CommandLineConfiguration {
 				+ "Required arguments:\n- x\n- y\n- orient=" + orientations;
 		options.addOption(OptionBuilder.withLongOpt("dummy").withArgName("x> <y> <orient").hasArgs(3)
 				.withDescription(dummyDesc).create("d"));
+
+		// dummy player
+		String dummyPlayerDesc = "Adds a dummy player to the game.\nRepeat this option to add multiple players.";
+		options.addOption(OptionBuilder.withLongOpt("dummy-player").withArgName("playerID").hasArg().hasOptionalArgs()
+				.withDescription(dummyPlayerDesc).create("dp"));
 	}
 
 	private static String makeList(Iterable<?> items) {
