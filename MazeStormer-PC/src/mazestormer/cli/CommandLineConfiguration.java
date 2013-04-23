@@ -13,6 +13,8 @@ import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.RelativePlayer;
+import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.Robot;
 import mazestormer.util.LongPoint;
 
 import org.apache.commons.cli.BasicParser;
@@ -83,7 +85,8 @@ public class CommandLineConfiguration {
 	}
 
 	private void createDummy(String name, long x, long y, Orientation orientation) {
-		RelativePlayer player = new RelativePlayer(name, new ObservableRobot(), new Maze());
+		Robot robot = new ObservableRobot(ControllableRobot.robotWidth, ControllableRobot.robotHeight);
+		RelativePlayer player = new RelativePlayer(name, robot, new Maze());
 		// Position on tile
 		IMaze maze = controller.getWorld().getMaze();
 		Point position = maze.fromTile(new LongPoint(x, y).toPoint());
