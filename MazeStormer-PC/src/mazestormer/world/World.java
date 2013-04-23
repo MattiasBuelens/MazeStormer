@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mazestormer.infrared.IRBall;
 import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
@@ -126,22 +127,9 @@ public class World {
 
 	// TODO: MM Objects and ir circuits need to be added after parsing
 
-	private final Set<Model> models = new HashSet<Model>();
-
-	public void addModel(Model model) {
-		this.models.add(model);
-	}
-
-	public void removeModel(Model model) {
-		this.models.remove(model);
-	}
-
-	public Iterable<Model> getModels() {
-		return Collections.unmodifiableSet(this.models);
-	}
-
-	public <T extends Model> Iterable<T> getModels(Class<T> clazz) {
-		return Iterables.filter(getModels(), clazz);
+	public Iterable<IRBall> getBalls() {
+		// TODO
+		return Collections.emptyList();
 	}
 
 	public Iterable<IRRobot> getRobots() {
@@ -149,7 +137,7 @@ public class World {
 	}
 
 	public Iterable<? extends Model> getAllModels() {
-		return Iterables.concat(getModels(), getRobots());
+		return Iterables.concat(getBalls(), getRobots());
 	}
 
 	public <T extends Model> Iterable<T> getAllModels(Class<T> clazz) {

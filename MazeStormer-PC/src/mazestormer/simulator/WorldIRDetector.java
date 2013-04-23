@@ -34,18 +34,25 @@ public class WorldIRDetector implements IRSensor {
 
 	private OffsettedPoseProvider poseProvider;
 	private final World world;
+	private final Class<? extends IRSource> irDetectionType;
 	private final IRDetectionMode mode;
 
 	private static final double POSE_TOLERANCE = 0.01d;
 
-	public WorldIRDetector(World world, float range, IRDetectionMode mode) {
+	public WorldIRDetector(World world, float range,
+			Class<? extends IRSource> irDetectionType, IRDetectionMode mode) {
 		this.world = world;
+		this.irDetectionType = irDetectionType;
 		this.mode = mode;
 		setRange(range);
 	}
 
 	public IRDetectionMode getMode() {
 		return this.mode;
+	}
+
+	public Class<? extends IRSource> getIRDetectionType() {
+		return this.irDetectionType;
 	}
 
 	private World getWorld() {
@@ -55,7 +62,8 @@ public class WorldIRDetector implements IRSensor {
 	private OffsettedPoseProvider getPoseProvider() {
 		if (this.poseProvider == null) {
 			// TODO Perhaps use a PoseTransform instead?
-			this.poseProvider = new OffsettedPoseProvider(getWorld().getLocalPlayer().getRobot().getPoseProvider(),
+			this.poseProvider = new OffsettedPoseProvider(getWorld()
+					.getLocalPlayer().getRobot().getPoseProvider(),
 					Module.IR_SENSOR);
 		}
 		return this.poseProvider;
@@ -99,12 +107,13 @@ public class WorldIRDetector implements IRSensor {
 
 		// Find rays to visible infrared sources
 		List<LineSegment> rays = new ArrayList<LineSegment>();
-		for (IRSource irs : getWorld().getAllModels(IRSource.class)) {
+		for (IRSource irs : getWorld().getAllModels(getIRDetectionType())) {
 			// Check if emitting and detected in this mode
 			if (irs.isEmitting() && getMode().detects(irs)) {
 				// Ignore own robot
 				Pose irsPose = irs.getPoseProvider().getPose();
-				if (comparePositions(robotPose.getLocation(), irsPose.getLocation())) {
+				if (comparePositions(robotPose.getLocation(),
+						irsPose.getLocation())) {
 					continue;
 				}
 				// Get best detected ray to infrared source
@@ -128,14 +137,19 @@ public class WorldIRDetector implements IRSensor {
 	}
 
 	private boolean comparePositions(Point2D leftPosition, Point2D rightPosition) {
-		return DoubleMath.fuzzyEquals(rightPosition.getX(), leftPosition.getX(), POSE_TOLERANCE)
-				&& DoubleMath.fuzzyEquals(rightPosition.getY(), leftPosition.getY(), POSE_TOLERANCE);
+		return DoubleMath.fuzzyEquals(rightPosition.getX(),
+				leftPosition.getX(), POSE_TOLERANCE)
+				&& DoubleMath.fuzzyEquals(rightPosition.getY(),
+						leftPosition.getY(), POSE_TOLERANCE);
 	}
 
-	private static LineSegment getDetectedRay(Geometry obstacles, IRSource subject, Point2D viewPoint) {
+	private static LineSegment getDetectedRay(Geometry obstacles,
+			IRSource subject, Point2D viewPoint) {
 		// Transform subject polygon
-		Polygon subjectPolygon = GeometryUtils.copy(subject.getEnvelope().getPolygon(), obstacles.getFactory());
-		final PoseTransform subjectTransform = new PoseTransform(subject.getPoseProvider().getPose());
+		Polygon subjectPolygon = GeometryUtils.copy(subject.getEnvelope()
+				.getPolygon(), obstacles.getFactory());
+		final PoseTransform subjectTransform = new PoseTransform(subject
+				.getPoseProvider().getPose());
 		subjectPolygon.apply(new CoordinateFilter() {
 			@Override
 			public void filter(Coordinate coord) {
@@ -149,7 +163,8 @@ public class WorldIRDetector implements IRSensor {
 
 		// Get the visible part of the subject
 		Coordinate viewCoord = GeometryUtils.toCoordinate(viewPoint);
-		Geometry visibleSubject = VisibleRegion.build(obstacles, subjectPolygon, viewCoord);
+		Geometry visibleSubject = VisibleRegion.build(obstacles,
+				subjectPolygon, viewCoord);
 
 		// Exit if invisible
 		if (visibleSubject.isEmpty()) {
@@ -158,7 +173,8 @@ public class WorldIRDetector implements IRSensor {
 
 		// Get the ray to the nearest visible point
 		Point viewGeomPoint = obstacles.getFactory().createPoint(viewCoord);
-		Coordinate[] nearestPoints = DistanceOp.nearestPoints(viewGeomPoint, visibleSubject);
+		Coordinate[] nearestPoints = DistanceOp.nearestPoints(viewGeomPoint,
+				visibleSubject);
 		LineSegment ray = new LineSegment(nearestPoints[0], nearestPoints[1]);
 
 		if (ray.getLength() <= subject.getEnvelope().getDetectionRadius()) {
@@ -190,8 +206,8 @@ public class WorldIRDetector implements IRSensor {
 
 	public enum IRDetectionMode {
 
-		VIRTUAL(ImmutableSet.of(ModelType.VIRTUAL, ModelType.PHYSICAL)), SEMI_PHYSICAL(ImmutableSet
-				.of(ModelType.VIRTUAL));
+		VIRTUAL(ImmutableSet.of(ModelType.VIRTUAL, ModelType.PHYSICAL)), SEMI_PHYSICAL(
+				ImmutableSet.of(ModelType.VIRTUAL));
 
 		private Set<ModelType> detectionSet;
 

@@ -1,5 +1,6 @@
 package mazestormer.simulator;
 
+import mazestormer.infrared.IRSource;
 import mazestormer.robot.IRSensor;
 import mazestormer.simulator.WorldIRDetector.IRDetectionMode;
 import mazestormer.world.World;
@@ -11,9 +12,9 @@ public abstract class WorldIRSensor implements IRSensor {
 	private final WorldIRDetector wird;
 	private World world;
 
-	protected WorldIRSensor(World world, IRDetectionMode mode) {
+	protected WorldIRSensor(World world, Class<? extends IRSource> irDetectionType, IRDetectionMode mode) {
 		this.world = world;
-		this.wird = new WorldIRDetector(getWorld(), ANGLE, mode);
+		this.wird = new WorldIRDetector(getWorld(), ANGLE, irDetectionType, mode);
 	}
 
 	private World getWorld() {

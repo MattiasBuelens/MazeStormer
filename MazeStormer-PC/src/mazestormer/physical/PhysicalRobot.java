@@ -23,6 +23,7 @@ import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdate;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
+import mazestormer.simulator.VirtualRobotIRSensor;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
@@ -42,6 +43,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 	private final ObservableRangeScanner rangeScanner;
 	private final RangeScannerFeatureDetector rangeDetector;
 	private final IRSensor infrared;
+	private final IRSensor infraredRobot;
 
 	private final SoundPlayer soundPlayer;
 
@@ -71,7 +73,10 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 		rangeDetector.setPoseProvider(poseProvider);
 
 		// Infrared sensor
-		infrared = new ExtendedPhysicalIRSensor(getCommunicator(), world);
+		infrared = new PhysicalIRSensor(getCommunicator());
+		// TODO: sv_cheats 1
+		// infrared = new VirtualSeesawIRSensor(world);
+		infraredRobot = new VirtualRobotIRSensor(world);
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
@@ -107,6 +112,11 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 	@Override
 	public IRSensor getIRSensor() {
 		return infrared;
+	}
+	
+	@Override
+	public IRSensor getRobotIRSensor() {
+		return infraredRobot;
 	}
 
 	@Override

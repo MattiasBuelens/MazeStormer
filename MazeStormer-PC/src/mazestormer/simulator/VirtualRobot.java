@@ -35,7 +35,8 @@ public class VirtualRobot implements ControllablePCRobot, IRRobot {
 	private final CalibratedLightSensor light;
 	private final ObservableRangeScanner rangeScanner;
 	private final RangeScannerFeatureDetector rangeDetector;
-	private final VirtualIRSensor infrared;
+	private final IRSensor infraredRobot;
+	private final IRSensor infraredSeesaw;
 
 	private final SoundPlayer soundPlayer;
 
@@ -60,11 +61,13 @@ public class VirtualRobot implements ControllablePCRobot, IRRobot {
 
 		// Range scanner
 		rangeScanner = new VirtualRangeScanner(getWorld());
-		rangeDetector = new RangeScannerFeatureDetector(rangeScanner, sensorMaxDistance, new Point(0f, 0f));
+		rangeDetector = new RangeScannerFeatureDetector(rangeScanner,
+				sensorMaxDistance, new Point(0f, 0f));
 		rangeDetector.setPoseProvider(getPoseProvider());
 
 		// Infrared sensor
-		infrared = new VirtualIRSensor(world);
+		infraredRobot = new VirtualRobotIRSensor(world);
+		infraredSeesaw = new VirtualSeesawIRSensor(world);
 
 		// Sound player
 		soundPlayer = new VirtualSoundPlayer();
@@ -118,7 +121,12 @@ public class VirtualRobot implements ControllablePCRobot, IRRobot {
 
 	@Override
 	public IRSensor getIRSensor() {
-		return infrared;
+		return infraredSeesaw;
+	}
+
+	@Override
+	public IRSensor getRobotIRSensor() {
+		return infraredRobot;
 	}
 
 	@Override
