@@ -17,10 +17,9 @@
 package com.google.common.util.concurrent;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.RejectedExecutionException;
+
+import mazestormer.util.AbstractFuture;
 
 /**
  * A {@link Future} that accepts completion listeners.  Each listener has an
