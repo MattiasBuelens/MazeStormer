@@ -5,7 +5,7 @@ import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.player.Player;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
@@ -44,8 +44,8 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		return this.gameRunner;
 	}
 
-	private ControllableRobot getControllableRobot() {
-		return (ControllableRobot) player.getRobot();
+	private ControllablePCRobot getControllableRobot() {
+		return (ControllablePCRobot) player.getRobot();
 	}
 
 	private Pilot getPilot() {
@@ -56,11 +56,20 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		getGameRunner().setSeesawWalls();
 		transition(SeesawState.SCAN);
 	}
+	
+	public static boolean isOpen(float angle) {
+		if (Float.isNaN(angle)) {
+			return true;
+		}
+		return (Math.abs(angle) > ControllablePCRobot.STANDARD_IR_RANGE);
+	}
 
 	protected void scan() {
-		boolean seesawOpen = false;
-		// TODO vraag aan IRSensor (matthias)
-		// TODO en waar is de vraag?
+		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		if (seesawOpen) {
+			seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		}		
+		
 		if (seesawOpen) {
 			transition(SeesawState.ONWARDS);
 		} else {
@@ -115,9 +124,11 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	}
 
 	protected void waitAndScan() {
-		boolean seesawOpen = false;
-		// TODO vraag aan IRSensor (matthias)
-		// TODO en waar is de vraag?
+		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		if (seesawOpen) {
+			seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		}	
+		
 		if (seesawOpen)
 			transition(SeesawState.ONWARDS);
 		else {

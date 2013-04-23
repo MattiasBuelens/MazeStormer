@@ -64,7 +64,7 @@ public class OffsettedPoseProvider implements PoseProvider {
 
 	public enum Module {
 
-		IR_SENSOR(13, 0), RANGE_SCANNER(6, 0), LIGHT_SENSOR(9, 0), ITEM(8, (float) Math.PI), CENTER(0, 0);
+		IR_SENSOR(13, 0), RANGE_SCANNER(6, 0), LIGHT_SENSOR(9, 0), ITEM(8, 180), CENTER(0, 0);
 
 		private final float radius;
 		private final float angleToHeading;

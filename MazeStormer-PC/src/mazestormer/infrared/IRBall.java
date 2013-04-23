@@ -11,7 +11,7 @@ public class IRBall implements IRSource {
 	
 	// cm's
 	public static final double INTERNAL_RADIUS = (7.5)/2;
-	public static final double EXTERNAL_RADIUS = 500;
+	public static final double EXTERNAL_RADIUS = 80;
 	
 	public IRBall(Pose pose) {
 		this.staticPoseProvider = new StaticPoseProvider(pose);
