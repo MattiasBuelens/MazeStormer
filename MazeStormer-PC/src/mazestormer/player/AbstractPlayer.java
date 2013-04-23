@@ -1,4 +1,4 @@
-package mazestormer.game.player;
+package mazestormer.player;
 
 import java.util.ArrayList;
 import java.util.List;

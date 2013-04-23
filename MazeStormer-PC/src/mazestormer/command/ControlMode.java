@@ -3,7 +3,6 @@ package mazestormer.command;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.IAction;
 import mazestormer.maze.Tile;
-import mazestormer.util.state.State;
 
 /**
  * Each objective can be devided in a number of phases. These are implemented in ControleMode. ControlModes

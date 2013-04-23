@@ -1,4 +1,4 @@
-package mazestormer.game.player;
+package mazestormer.player;
 
 public interface PlayerIdentifier {
 

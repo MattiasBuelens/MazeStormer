@@ -8,8 +8,8 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <interface id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.player.Player" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/game/player/Player.java" binary="false">    
+  <interface id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.player.Player" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/player/Player.java" binary="false">    
     <position height="-1" width="-1" x="349" y="237"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="false"/>      

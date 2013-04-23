@@ -1,6 +1,5 @@
 package mazestormer.command;
 
-import mazestormer.util.state.StateMachine;
 
 /**
  * A commander tries to achieve a certain objective. This striving can be devided in a

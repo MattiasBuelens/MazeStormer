@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.game.player.Player;
+import mazestormer.player.Player;
 import mazestormer.world.World;
 import mazestormer.world.WorldListener;
 

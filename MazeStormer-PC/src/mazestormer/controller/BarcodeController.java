@@ -6,7 +6,7 @@ import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
-import mazestormer.game.player.Player;
+import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;

@@ -10,7 +10,7 @@ import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.detect.RangeFeatureListener;
-import mazestormer.game.player.RelativePlayer;
+import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.RangeScannerListener;

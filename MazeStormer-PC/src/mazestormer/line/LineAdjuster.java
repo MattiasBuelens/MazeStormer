@@ -2,8 +2,8 @@ package mazestormer.line;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
-import mazestormer.game.player.Player;
 import mazestormer.maze.IMaze;
+import mazestormer.player.Player;
 import mazestormer.util.state.AbstractStateListener;
 
 public class LineAdjuster {

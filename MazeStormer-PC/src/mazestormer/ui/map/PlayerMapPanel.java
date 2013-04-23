@@ -14,7 +14,7 @@ import javax.swing.JToggleButton;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.controller.IPlayerMapController;
-import mazestormer.game.player.PlayerIdentifier;
+import mazestormer.player.PlayerIdentifier;
 import mazestormer.ui.SplitButton;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 

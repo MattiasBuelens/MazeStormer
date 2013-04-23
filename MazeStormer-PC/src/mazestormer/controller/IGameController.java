@@ -2,8 +2,8 @@ package mazestormer.controller;
 
 import java.util.Collection;
 
-import mazestormer.game.player.Player;
-import mazestormer.game.player.PlayerIdentifier;
+import mazestormer.player.Player;
+import mazestormer.player.PlayerIdentifier;
 import mazestormer.util.EventSource;
 
 public interface IGameController extends EventSource {

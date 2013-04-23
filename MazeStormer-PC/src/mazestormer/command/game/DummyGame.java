@@ -7,7 +7,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import mazestormer.game.player.Player;
+import mazestormer.player.Player;
 import peno.htttp.Callback;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;

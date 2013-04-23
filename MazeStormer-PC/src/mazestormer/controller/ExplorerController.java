@@ -2,7 +2,7 @@ package mazestormer.controller;
 
 import mazestormer.command.explore.Explorer;
 import mazestormer.command.explore.ExplorerEvent;
-import mazestormer.game.player.Player;
+import mazestormer.player.Player;
 import mazestormer.util.state.AbstractStateListener;
 
 public class ExplorerController extends SubController implements IExplorerController {

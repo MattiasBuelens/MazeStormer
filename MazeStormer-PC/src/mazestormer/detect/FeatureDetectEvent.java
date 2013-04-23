@@ -2,7 +2,7 @@ package mazestormer.detect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import lejos.robotics.objectdetection.Feature;
-import mazestormer.game.player.Player;
+import mazestormer.player.Player;
 
 public class FeatureDetectEvent {
 

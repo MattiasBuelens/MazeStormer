@@ -2,9 +2,9 @@ package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.command.game.GameRunner;
-import mazestormer.game.player.Player;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
+import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.util.Future;

@@ -12,7 +12,7 @@ import mazestormer.controller.IGameController;
 import mazestormer.controller.IPlayerController;
 import mazestormer.controller.IWorldController;
 import mazestormer.controller.PlayerEvent;
-import mazestormer.game.player.PlayerIdentifier;
+import mazestormer.player.PlayerIdentifier;
 
 import com.google.common.eventbus.Subscribe;
 

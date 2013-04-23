@@ -1,6 +1,6 @@
 package mazestormer.world;
 
-import mazestormer.game.player.Player;
+import mazestormer.player.Player;
 
 public interface WorldListener {
 

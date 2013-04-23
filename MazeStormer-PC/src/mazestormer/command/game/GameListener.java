@@ -1,6 +1,6 @@
 package mazestormer.command.game;
 
-import mazestormer.game.player.Player;
+import mazestormer.player.Player;
 
 public interface GameListener {
 
