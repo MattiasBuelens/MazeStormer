@@ -16,6 +16,7 @@ public class FindObjectControlMode extends ControlMode {
 
 	public FindObjectControlMode(Player player, Commander commander) {
 		super(player, commander);
+		currentSubControlMode = new ExploreIslandControlMode(getPlayer(), this);
 	}
 
 	/*
@@ -49,13 +50,21 @@ public class FindObjectControlMode extends ControlMode {
 
 	@Override
 	public Tile nextTile(Tile currentTile) {
-		// als de queue van de explorecontrolMode niet leeg is, gewoon daaraan
-		// opvragen. anders met de reachableSeesawQueue werken, hierin zitten al
-		// de barcodeTiles van seesaws. Indien zelfs deze leeg is, ga dan op een
-		// T stuk, of ga over naar een volgende fase
-		// TODO Auto-generated method stub
-		return null;
+		return currentSubControlMode.nextTile(currentTile);
 	}
+	
+	public ControlMode arrangeNextMode() {
+		if(getSubControlMode() instanceof LeaveIslandControlMode){
+			currentSubControlMode = new ExploreIslandControlMode(getPlayer(), this);
+			return currentSubControlMode;
+		}
+		else if(getSubControlMode() instanceof ExploreIslandControlMode && !isMazeComplete()){
+			currentSubControlMode = new LeaveIslandControlMode(getPlayer(), this);
+			return currentSubControlMode;
+		}
+		else return getCommander().nextMode();
+	}
+
 
 	@Override
 	public boolean isBarcodeActionEnabled() {
@@ -67,8 +76,25 @@ public class FindObjectControlMode extends ControlMode {
 		return getSubControlMode().getBarcodeMapping();
 	}
 
+	public void exploreIsland(){
+		currentSubControlMode.releaseControl(getDriver());
+		currentSubControlMode = exploreIslandMode;
+		currentSubControlMode.takeControl(getDriver());
+	}
+	
+	public void leaveIsland(){
+		currentSubControlMode.releaseControl(getDriver());
+		currentSubControlMode = leaveIslandMode;
+		currentSubControlMode.takeControl(getDriver());
+	}
+	
 	/*
 	 * Utilities
 	 */
+	
+	private boolean isMazeComplete(){
+		//TODO: implementeren
+		return true;
+	}
 
 }

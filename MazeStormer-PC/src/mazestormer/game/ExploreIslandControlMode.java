@@ -125,6 +125,15 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		
 	}
 	
+	@Override
+	public Tile nextTile(Tile currentTile) {
+		Tile nextTile = super.nextTile(currentTile);
+		if(nextTile != null){
+			return nextTile;
+		}
+		return getSuperControlMode().arrangeNextMode().nextTile(currentTile);
+	}
+	
 	/*
 	 * Utilities
 	 */

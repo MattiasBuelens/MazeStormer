@@ -25,7 +25,8 @@ public abstract class Commander {
 
 	public Commander(Player player) {
 		this.player = player;
-		this.driver = new Driver(player, this);
+		this.currentMode = startMode;
+		this.driver = new Driver(player, this.getMode());
 	}
 
 	/*
