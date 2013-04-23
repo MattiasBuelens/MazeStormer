@@ -1,4 +1,4 @@
-package mazestormer.game;
+package mazestormer.command.game;
 
 import java.io.IOException;
 import java.util.ArrayList;

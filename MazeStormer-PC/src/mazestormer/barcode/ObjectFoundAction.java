@@ -1,9 +1,9 @@
 package mazestormer.barcode;
 
+import mazestormer.command.game.GameRunner;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
-import mazestormer.game.GameRunner;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;

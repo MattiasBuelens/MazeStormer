@@ -1,0 +1,37 @@
+<class-diagram version="1.0.11" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true">  
+  <interface id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Robot" project="MazeStormer" 
+    file="/MazeStormer/src/mazestormer/robot/Robot.java" binary="false">    
+    <position height="-1" width="-1" x="728" y="55"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <interface id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.maze.IMaze" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/maze/IMaze.java" binary="false">    
+    <position height="-1" width="-1" x="764" y="637"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <enumeration id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.maze.IMaze.Target" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/maze/IMaze.java" binary="false">    
+    <position height="-1" width="-1" x="937" y="885"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </enumeration>  
+  <nesting id="4">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="3"/>  
+  </nesting>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

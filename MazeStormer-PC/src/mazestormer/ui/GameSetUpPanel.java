@@ -19,9 +19,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import mazestormer.command.game.ConnectionMode;
 import mazestormer.controller.GameSetUpEvent;
 import mazestormer.controller.IGameSetUpController;
-import mazestormer.game.ConnectionMode;
 import net.miginfocom.swing.MigLayout;
 
 import com.google.common.eventbus.Subscribe;

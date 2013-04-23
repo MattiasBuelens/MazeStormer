@@ -1,4 +1,4 @@
-package mazestormer.explore;
+package mazestormer.command.explore;
 
 import mazestormer.controller.ActionEvent;
 

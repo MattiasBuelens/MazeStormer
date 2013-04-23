@@ -1,0 +1,355 @@
+<class-diagram version="1.0.11" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.explore.Commander" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/explore/Commander.java" binary="false">    
+    <position height="-1" width="-1" x="1228" y="-209"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.explore.Explorer" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/explore/Explorer.java" binary="false">    
+    <position height="-1" width="-1" x="380" y="131"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.GameRunner" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/GameRunner.java" binary="false">    
+    <position height="-1" width="-1" x="1897" y="-42"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.GameRunner.PositionReporter" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/GameRunner.java" binary="false">    
+    <position height="-1" width="-1" x="2207" y="3"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.GameRunner.TileReporter" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/GameRunner.java" binary="false">    
+    <position height="-1" width="-1" x="2159" y="141"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.explore.ControlMode" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/explore/ControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1224" y="448"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.explore.AbstractExploreControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/explore/AbstractExploreControlMode.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="944" y="752"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="8" corner="BOTTOM_RIGHT" language="java" 
+    name="mazestormer.explore.AbstractExploreControlMode.ClosestTileComparator" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/explore/AbstractExploreControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="906" y="967"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="9" corner="BOTTOM_RIGHT" language="java" 
+    name="mazestormer.game.LeaveIslandControlMode.LeaveIslandBarcodeMapping" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/game/LeaveIslandControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1805" y="1190"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.explore.FinishControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/explore/FinishControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="221" y="923"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.LeaveIslandControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/game/LeaveIslandControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1868" y="987"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="mazestormer.explore.ExploreControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/explore/ExploreControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="527" y="911"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="13" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.ExploreIslandControlMode.SeesawAction" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/game/ExploreIslandControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1238" y="1041"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="14" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.FindObjectControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/game/FindObjectControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1704" y="607"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="15" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.ExploreIslandControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/game/ExploreIslandControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1504" y="970"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="16" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.LeaveIslandControlMode.SeesawAction" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/game/LeaveIslandControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="2030" y="1182"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="17" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.ExploreIslandControlMode.ObjectAction" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/game/ExploreIslandControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1281" y="1159"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="18" corner="BOTTOM_RIGHT" language="java" 
+    name="mazestormer.game.ExploreIslandControlMode.ExploreIslandBarcodeMapping" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/game/ExploreIslandControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="1538" y="1158"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <generalization id="19">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <association id="20">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="21" name="currentSubControlMode">        
+        <position height="15" width="121" x="1338" y="467"/>      
+      </attribute>      
+      <multiplicity id="22" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <nesting id="23">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="13"/>  
+  </nesting>  
+  <generalization id="24">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="6"/>  
+  </generalization>  
+  <nesting id="25">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="4"/>  
+  </nesting>  
+  <association id="26">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="27" name="findObjectMode">        
+        <position height="15" width="82" x="1650" y="487"/>      
+      </attribute>      
+      <multiplicity id="28" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="14" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <nesting id="29">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="9"/>  
+  </nesting>  
+  <association id="30">    
+    <bendpoint x="1121" y="113"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="31" name="currentMode"/>      
+      <multiplicity id="32" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="33">    
+    <end type="SOURCE" refId="15" navigable="false">      
+      <attribute id="34" name="superControlMode">        
+        <position height="15" width="95" x="1206" y="618"/>      
+      </attribute>      
+      <multiplicity id="35" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <nesting id="36">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="18"/>  
+  </nesting>  
+  <association id="37">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="38" name="tileReporter">        
+        <position height="15" width="62" x="2027" y="118"/>      
+      </attribute>      
+      <multiplicity id="39" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="40">    
+    <bendpoint x="1269" y="113"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="41" name="bindings">        
+        <position height="15" width="47" x="1200" y="243"/>      
+      </attribute>      
+      <multiplicity id="42" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="43">    
+    <bendpoint x="1339" y="121"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="44" name="startMode">        
+        <position height="15" width="55" x="1298" y="267"/>      
+      </attribute>      
+      <multiplicity id="45" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <nesting id="46">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="8"/>  
+  </nesting>  
+  <nesting id="47">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="17"/>  
+  </nesting>  
+  <association id="48">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="49" name="exploreIslandMode">        
+        <position height="15" width="97" x="1551" y="866"/>      
+      </attribute>      
+      <multiplicity id="50" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="15" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="51">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="52" name="positionReporter">        
+        <position height="15" width="86" x="2030" y="-72"/>      
+      </attribute>      
+      <multiplicity id="53" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="54">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="55" name="exploreMode"/>      
+      <multiplicity id="56" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="57">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="58" name="finishMode"/>      
+      <multiplicity id="59" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="60">    
+    <end type="SOURCE" refId="14" navigable="false">      
+      <attribute id="61" name="leaveIslandMode">        
+        <position height="15" width="87" x="1836" y="865"/>      
+      </attribute>      
+      <multiplicity id="62" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <generalization id="63">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="6"/>  
+  </generalization>  
+  <nesting id="64">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="16"/>  
+  </nesting>  
+  <generalization id="65">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="66">    
+    <bendpoint x="1516" y="748"/>    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="6"/>  
+  </generalization>  
+  <association id="67">    
+    <bendpoint x="1189" y="109"/>    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="68" name="commander"/>      
+      <multiplicity id="69" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <generalization id="70">    
+    <end type="SOURCE" refId="15"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <nesting id="71">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="5"/>  
+  </nesting>  
+  <generalization id="72">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="7"/>  
+  </generalization>  
+  <association id="73">    
+    <bendpoint x="1556" y="708"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="74" name="superControlMode">        
+        <position height="15" width="95" x="1359" y="538"/>      
+      </attribute>      
+      <multiplicity id="75" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="false"/>
+</class-diagram>

@@ -1,7 +1,7 @@
 package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import mazestormer.game.GameRunner;
+import mazestormer.command.game.GameRunner;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.player.Player;

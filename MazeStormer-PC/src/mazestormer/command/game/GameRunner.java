@@ -1,4 +1,4 @@
-package mazestormer.game;
+package mazestormer.command.game;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -12,7 +12,7 @@ import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
-import mazestormer.explore.Explorer;
+import mazestormer.command.explore.Explorer;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;

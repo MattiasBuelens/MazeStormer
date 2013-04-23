@@ -3,7 +3,7 @@ package mazestormer.barcode;
 import java.util.HashMap;
 import java.util.Map;
 
-import mazestormer.game.GameRunner;
+import mazestormer.command.game.GameRunner;
 
 public class TeamTreasureTrekBarcodeMapping extends BarcodeMapping {
 

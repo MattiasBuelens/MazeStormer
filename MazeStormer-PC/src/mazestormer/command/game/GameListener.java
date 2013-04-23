@@ -1,4 +1,4 @@
-package mazestormer.game;
+package mazestormer.command.game;
 
 import mazestormer.player.Player;
 

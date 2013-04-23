@@ -5,11 +5,11 @@ import java.util.Properties;
 
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
+import mazestormer.command.game.ConnectionMode;
+import mazestormer.command.game.DummyGame;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.RobotType;
 import mazestormer.controller.IMainController;
-import mazestormer.game.ConnectionMode;
-import mazestormer.game.DummyGame;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
