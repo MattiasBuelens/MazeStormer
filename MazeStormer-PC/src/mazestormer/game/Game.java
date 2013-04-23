@@ -45,8 +45,7 @@ public class Game {
 
 		// Gather player details
 		String playerID = localPlayer.getPlayerID();
-		// TODO Determine robot type
-		PlayerType playerType = PlayerType.PHYSICAL;
+		PlayerType playerType = localPlayer.getRobot().getModelType().toPlayerType();
 		double width = localPlayer.getRobot().getWidth();
 		double height = localPlayer.getRobot().getHeight();
 		peno.htttp.PlayerDetails player = new peno.htttp.PlayerDetails(playerID, playerType, width, height);
