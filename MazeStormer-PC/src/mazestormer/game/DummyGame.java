@@ -34,11 +34,15 @@ public class DummyGame extends Game {
 		join(new EmptyCallback());
 	}
 
+	private void setReady() {
+		setReady(true, new EmptyCallback());
+	}
+
 	private class Handler implements GameListener {
 
 		@Override
 		public void onGameJoined() {
-			setReady(true, new EmptyCallback());
+			setReady();
 		}
 
 		@Override
@@ -57,11 +61,13 @@ public class DummyGame extends Game {
 		@Override
 		public void onGamePaused() {
 			positionReporter.stop();
+			setReady();
 		}
 
 		@Override
 		public void onGameStopped() {
 			positionReporter.stop();
+			setReady();
 		}
 
 		@Override

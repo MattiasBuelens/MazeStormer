@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
 import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
@@ -12,6 +14,7 @@ import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
 import mazestormer.robot.Robot;
+import mazestormer.util.LongPoint;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerDetails;
 import peno.htttp.SpectatorClient;
@@ -48,6 +51,10 @@ public class WorldSimulator {
 
 	public World getWorld() {
 		return world;
+	}
+
+	public IMaze getMaze() {
+		return getWorld().getMaze();
 	}
 
 	public Player getLocalPlayer() {
@@ -163,7 +170,7 @@ public class WorldSimulator {
 		}
 
 		@Override
-		public void playerUpdate(PlayerDetails playerDetails, int playerNumber, double x, double y, double angle,
+		public void playerUpdate(PlayerDetails playerDetails, int playerNumber, long x, long y, double angle,
 				boolean foundObject) {
 			// Setup player if not done yet
 			playerRolled(playerDetails, playerNumber);
@@ -173,8 +180,12 @@ public class WorldSimulator {
 
 			// Set pose of non-local player
 			if (!isLocalPlayer(playerID)) {
-				Pose pose = new Pose((float) x, (float) y, (float) angle);
-
+				// Transform tile position to absolute maze position
+				Point relativePosition = getMaze().getTileCenter(new LongPoint(x, y));
+				Point absolutePosition = getMaze().toAbsolute(relativePosition);
+				Pose pose = new Pose();
+				pose.setLocation(absolutePosition);
+				pose.setHeading((float) angle);
 				// Set relative pose
 				player.setRelativePose(pose);
 			}
