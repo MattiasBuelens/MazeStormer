@@ -15,11 +15,11 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.Robot;
-import mazestormer.state.AbstractStateListener;
-import mazestormer.state.State;
-import mazestormer.state.StateListener;
-import mazestormer.state.StateMachine;
 import mazestormer.util.LongPoint;
+import mazestormer.util.state.AbstractStateListener;
+import mazestormer.util.state.State;
+import mazestormer.util.state.StateListener;
+import mazestormer.util.state.StateMachine;
 
 public class PathFindingController extends SubController implements IPathFindingController {
 

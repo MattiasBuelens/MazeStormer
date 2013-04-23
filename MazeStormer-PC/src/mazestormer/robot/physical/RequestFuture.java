@@ -1,4 +1,4 @@
-package mazestormer.physical;
+package mazestormer.robot.physical;
 
 import mazestormer.command.RequestCommand;
 import mazestormer.report.RequestReport;

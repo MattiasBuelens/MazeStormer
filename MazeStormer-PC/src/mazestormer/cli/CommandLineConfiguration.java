@@ -10,14 +10,14 @@ import mazestormer.command.game.DummyGame;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.RobotType;
 import mazestormer.controller.IMainController;
+import mazestormer.game.player.Player;
+import mazestormer.game.player.RelativePlayer;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
-import mazestormer.observable.ObservableRobot;
-import mazestormer.player.Player;
-import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Robot;
+import mazestormer.robot.observable.ObservableRobot;
 import mazestormer.util.LongPoint;
 
 import org.apache.commons.cli.BasicParser;

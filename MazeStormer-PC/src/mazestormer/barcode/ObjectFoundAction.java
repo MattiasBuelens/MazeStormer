@@ -4,12 +4,12 @@ import mazestormer.command.game.GameRunner;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
-import mazestormer.player.Player;
+import mazestormer.game.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
-import mazestormer.state.State;
-import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
+import mazestormer.util.state.State;
+import mazestormer.util.state.StateMachine;
 
 public class ObjectFoundAction extends
 		StateMachine<ObjectFoundAction, ObjectFoundAction.ObjectFoundState>

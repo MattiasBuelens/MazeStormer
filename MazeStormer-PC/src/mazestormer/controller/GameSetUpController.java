@@ -6,7 +6,7 @@ import mazestormer.command.game.ConnectionMode;
 import mazestormer.command.game.Game;
 import mazestormer.command.game.GameListener;
 import mazestormer.command.game.GameRunner;
-import mazestormer.player.Player;
+import mazestormer.game.player.Player;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.world.World;
 import mazestormer.world.WorldSimulator;

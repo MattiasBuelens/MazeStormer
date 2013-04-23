@@ -2,7 +2,7 @@ package mazestormer.ui.map.event;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.controller.IMapController;
-import mazestormer.player.PlayerIdentifier;
+import mazestormer.game.player.PlayerIdentifier;
 
 public class MapRobotPoseChangeEvent extends MapEvent {
 

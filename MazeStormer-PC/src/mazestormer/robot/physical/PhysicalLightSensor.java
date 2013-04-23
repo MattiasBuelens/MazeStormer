@@ -1,4 +1,4 @@
-package mazestormer.physical;
+package mazestormer.robot.physical;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

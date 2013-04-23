@@ -7,8 +7,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.game.player.Player;
 import mazestormer.maze.IMaze;
-import mazestormer.player.Player;
 import mazestormer.robot.Robot;
 import mazestormer.ui.map.MapDocument;
 import mazestormer.ui.map.MapLayer;

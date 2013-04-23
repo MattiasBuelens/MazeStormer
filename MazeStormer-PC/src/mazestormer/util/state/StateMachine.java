@@ -1,4 +1,4 @@
-package mazestormer.state;
+package mazestormer.util.state;
 
 import java.util.ArrayList;
 import java.util.List;

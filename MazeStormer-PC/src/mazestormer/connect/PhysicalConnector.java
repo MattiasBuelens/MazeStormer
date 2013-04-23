@@ -10,10 +10,10 @@ import lejos.pc.comm.NXTConnector;
 import lejos.pc.comm.NXTInfo;
 import mazestormer.command.CommandType;
 import mazestormer.command.ShutdownCommand;
-import mazestormer.physical.PhysicalCommunicator;
-import mazestormer.physical.PhysicalRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.physical.PhysicalCommunicator;
+import mazestormer.robot.physical.PhysicalRobot;
 
 public class PhysicalConnector implements Connector {
 

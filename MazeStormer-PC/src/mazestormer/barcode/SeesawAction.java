@@ -2,15 +2,15 @@ package mazestormer.barcode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.command.game.GameRunner;
+import mazestormer.game.player.Player;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
-import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
-import mazestormer.state.AbstractStateListener;
-import mazestormer.state.State;
-import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
+import mazestormer.util.state.AbstractStateListener;
+import mazestormer.util.state.State;
+import mazestormer.util.state.StateMachine;
 
 public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
 

@@ -1,4 +1,4 @@
-package mazestormer.observable;
+package mazestormer.robot.observable;
 
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;

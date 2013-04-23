@@ -10,14 +10,14 @@ import java.util.Set;
 
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
+import mazestormer.game.player.Player;
+import mazestormer.game.player.RelativePlayer;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.maze.parser.Parser;
-import mazestormer.observable.ObservableRobot;
-import mazestormer.player.Player;
-import mazestormer.player.RelativePlayer;
 import mazestormer.robot.Robot;
+import mazestormer.robot.observable.ObservableRobot;
 import mazestormer.util.LongPoint;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;

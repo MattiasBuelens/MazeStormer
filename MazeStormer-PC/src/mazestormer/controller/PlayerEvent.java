@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.player.PlayerIdentifier;
+import mazestormer.game.player.PlayerIdentifier;
 
 public class PlayerEvent {
 

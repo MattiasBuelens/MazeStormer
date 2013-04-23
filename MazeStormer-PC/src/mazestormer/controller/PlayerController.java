@@ -2,7 +2,7 @@ package mazestormer.controller;
 
 import com.google.common.eventbus.Subscribe;
 
-import mazestormer.player.Player;
+import mazestormer.game.player.Player;
 
 public class PlayerController extends SubController implements IPlayerController {
 

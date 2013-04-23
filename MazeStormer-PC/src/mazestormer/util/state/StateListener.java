@@ -1,4 +1,4 @@
-package mazestormer.state;
+package mazestormer.util.state;
 
 public interface StateListener<S extends State<?, ?>> {
 

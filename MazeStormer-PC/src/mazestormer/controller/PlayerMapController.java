@@ -3,7 +3,7 @@ package mazestormer.controller;
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
-import mazestormer.player.Player;
+import mazestormer.game.player.Player;
 import mazestormer.ui.map.RangesLayer;
 
 import com.google.common.eventbus.Subscribe;

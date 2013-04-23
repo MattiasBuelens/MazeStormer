@@ -6,11 +6,11 @@ import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
-import mazestormer.player.Player;
+import mazestormer.game.player.Player;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.state.AbstractStateListener;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
+import mazestormer.util.state.AbstractStateListener;
 
 public class BarcodeController extends SubController implements IBarcodeController {
 

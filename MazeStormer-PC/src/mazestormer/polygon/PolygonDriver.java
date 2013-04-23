@@ -5,9 +5,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import mazestormer.controller.IPolygonControlController.Direction;
 import mazestormer.robot.Pilot;
-import mazestormer.state.State;
-import mazestormer.state.StateListener;
-import mazestormer.state.StateMachine;
+import mazestormer.util.state.State;
+import mazestormer.util.state.StateListener;
+import mazestormer.util.state.StateMachine;
 
 public class PolygonDriver extends
 		StateMachine<PolygonDriver, PolygonDriver.PolygonState> implements

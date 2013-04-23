@@ -6,11 +6,11 @@ import java.util.List;
 import lejos.geom.Point;
 import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.game.player.AbsolutePlayer;
 import mazestormer.maze.Edge;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
-import mazestormer.player.AbsolutePlayer;
 import mazestormer.robot.IRSensor;
 import mazestormer.world.World;
 

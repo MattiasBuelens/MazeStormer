@@ -2,7 +2,7 @@ package mazestormer.controller;
 
 import java.util.logging.Logger;
 
-import mazestormer.player.Player;
+import mazestormer.game.player.Player;
 
 public class PlayerLogController extends LogController {
 

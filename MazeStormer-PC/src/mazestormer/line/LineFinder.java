@@ -6,10 +6,10 @@ import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.state.State;
-import mazestormer.state.StateListener;
-import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
+import mazestormer.util.state.State;
+import mazestormer.util.state.StateListener;
+import mazestormer.util.state.StateMachine;
 
 public class LineFinder extends
 		StateMachine<LineFinder, LineFinder.LineFinderState>

@@ -3,16 +3,39 @@ package mazestormer.command;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.IAction;
 import mazestormer.maze.Tile;
+import mazestormer.util.state.State;
 
 /**
  * Each objective can be devided in a number of phases. These are implemented in ControleMode. ControlModes
  * differ from each other in two ways: the logic to find the next tile and the actions that have
  * to be executed when the robot goes over a certain barcode.
  */
-public interface IControlMode {
-
-	public Tile nextTile();
+public abstract class ControlMode{
 	
-	public IAction getAction(Barcode barcode);
+	/*
+	 * Atrributes
+	 */
+	
+	/*
+	 * Constructor
+	 */
+	
+	/*
+	 * Getters
+	 */
+	
+	/*
+	 * Methods to implement
+	 */
+	
+	public abstract Tile nextTile();
+	
+	public abstract IAction getAction(Barcode barcode);
+	
+	/*
+	 * Utilities
+	 */
+	
+	
 	
 }

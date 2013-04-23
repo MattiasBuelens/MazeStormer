@@ -1,4 +1,4 @@
-package mazestormer.player;
+package mazestormer.game.player;
 
 public interface PlayerListener {
 

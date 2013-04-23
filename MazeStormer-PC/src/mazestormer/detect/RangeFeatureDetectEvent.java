@@ -1,7 +1,7 @@
 package mazestormer.detect;
 
 import lejos.robotics.objectdetection.RangeFeature;
-import mazestormer.player.Player;
+import mazestormer.game.player.Player;
 
 public class RangeFeatureDetectEvent extends FeatureDetectEvent {
 

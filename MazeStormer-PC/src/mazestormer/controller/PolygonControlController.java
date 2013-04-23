@@ -4,7 +4,7 @@ import mazestormer.polygon.PolygonEvent;
 import mazestormer.polygon.PolygonDriver;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.util.state.AbstractStateListener;
 
 import com.google.common.eventbus.Subscribe;
 

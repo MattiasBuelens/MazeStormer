@@ -1,4 +1,4 @@
-package mazestormer.state;
+package mazestormer.util.state;
 
 public class AbstractStateListener<S extends State<?, ?>> implements
 		StateListener<S> {

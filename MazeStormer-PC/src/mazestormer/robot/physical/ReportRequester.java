@@ -1,4 +1,4 @@
-package mazestormer.physical;
+package mazestormer.robot.physical;
 
 import java.util.HashMap;
 import java.util.Map;

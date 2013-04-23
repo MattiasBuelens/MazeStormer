@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.player.RelativePlayer;
+import mazestormer.game.player.RelativePlayer;
 import mazestormer.util.EventSource;
 import mazestormer.world.World;
 

@@ -5,7 +5,7 @@ import mazestormer.line.LineFinderEvent;
 import mazestormer.line.LineFinder;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.util.state.AbstractStateListener;
 
 import com.google.common.eventbus.Subscribe;
 

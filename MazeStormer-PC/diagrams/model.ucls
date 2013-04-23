@@ -24,16 +24,16 @@
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </interface>  
-  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.observable.ObservableRobot" 
-    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/observable/ObservableRobot.java" binary="false">    
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.observable.ObservableRobot" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/robot/observable/ObservableRobot.java" binary="false">    
     <position height="-1" width="-1" x="293" y="596"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="true" package="true" protected="true" private="true"/>    
     </display>  
   </class>  
-  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.physical.PhysicalRobot" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/physical/PhysicalRobot.java" binary="false">    
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.physical.PhysicalRobot" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/robot/physical/PhysicalRobot.java" binary="false">    
     <position height="-1" width="-1" x="591" y="622"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      

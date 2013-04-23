@@ -1,4 +1,4 @@
-package mazestormer.physical;
+package mazestormer.robot.physical;
 
 import mazestormer.command.CommandType;
 import mazestormer.command.PlaySoundCommand;

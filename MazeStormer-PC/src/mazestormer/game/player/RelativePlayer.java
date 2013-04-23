@@ -1,4 +1,4 @@
-package mazestormer.player;
+package mazestormer.game.player;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

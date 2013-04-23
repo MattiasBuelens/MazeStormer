@@ -11,9 +11,9 @@ import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.navigation.WaypointListener;
 import lejos.robotics.pathfinding.Path;
-import mazestormer.state.State;
-import mazestormer.state.StateListener;
-import mazestormer.state.StateMachine;
+import mazestormer.util.state.State;
+import mazestormer.util.state.StateListener;
+import mazestormer.util.state.StateMachine;
 
 public class Navigator extends StateMachine<Navigator, Navigator.NavigatorState> implements
 		StateListener<Navigator.NavigatorState>, WaypointListener {

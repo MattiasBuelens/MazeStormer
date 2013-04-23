@@ -13,13 +13,13 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.TeamTreasureTrekBarcodeMapping;
 import mazestormer.command.explore.Explorer;
+import mazestormer.game.player.Player;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
-import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.LongPoint;
 
