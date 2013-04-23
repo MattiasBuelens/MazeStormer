@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import mazestormer.maze.Maze;
+import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
@@ -98,11 +98,11 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	public static class ClosestTileComparator implements Comparator<Tile> {
 
 		private final Tile referenceTile;
-		private Maze maze;
+		private IMaze maze;
 
-		public ClosestTileComparator(Tile referenceTile, Maze maze) {
+		public ClosestTileComparator(Tile referenceTile, IMaze iMaze) {
 			this.referenceTile = referenceTile;
-			this.maze = maze;
+			this.maze = iMaze;
 		}
 
 		@Override

@@ -93,10 +93,12 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 				@Override
 				public void onFailure(Throwable t) {
 					logToAll("Error when joining: " + t.getMessage());
+					t.printStackTrace();
 				}
 			});
 		} catch (Exception e) {
 			logToAll("Error when joining: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
