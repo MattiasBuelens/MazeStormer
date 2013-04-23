@@ -23,7 +23,7 @@ public class AbsolutePlayer implements Player {
 		this.poseProvider = new AbsolutePoseProvider();
 	}
 
-	public RelativePlayer delegate() {
+	protected final RelativePlayer delegate() {
 		return delegate;
 	}
 
@@ -81,24 +81,34 @@ public class AbsolutePlayer implements Player {
 			return poseProvider;
 		}
 
+		@Override
+		public double getWidth() {
+			return delegate().getRobot().getWidth();
+		}
+
+		@Override
+		public double getHeight() {
+			return delegate().getRobot().getHeight();
+		}
+
 	}
 
 	private class AbsolutePoseProvider implements PoseProvider {
 
 		@Override
 		public Pose getPose() {
-			if (delegate.getRobot() == null) {
+			if (delegate().getRobot() == null) {
 				return new Pose();
 			}
 
-			Pose relativePose = delegate.getRobot().getPoseProvider().getPose();
+			Pose relativePose = delegate().getRobot().getPoseProvider().getPose();
 			return transform.transform(relativePose);
 		}
 
 		@Override
 		public void setPose(Pose pose) {
 			Pose relativePose = transform.inverseTransform(pose);
-			delegate.getRobot().getPoseProvider().setPose(relativePose);
+			delegate().getRobot().getPoseProvider().setPose(relativePose);
 		}
 
 	}
