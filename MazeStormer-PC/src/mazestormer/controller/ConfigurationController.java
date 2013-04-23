@@ -16,8 +16,9 @@ import mazestormer.world.ModelType;
 
 public class ConfigurationController extends SubController implements IConfigurationController {
 
-	private ModelType robotType;
-	private ControlMode controlMode;
+	private ModelType robotType = ModelType.PHYSICAL;
+	private ControlMode controlMode = ControlMode.Manual;
+	private String mazeFilePath = "";
 
 	public ConfigurationController(MainController mainController) {
 		super(mainController);
@@ -99,7 +100,13 @@ public class ConfigurationController extends SubController implements IConfigura
 	}
 
 	@Override
+	public String getMazePath() {
+		return mazeFilePath;
+	}
+
+	@Override
 	public void loadMaze(String mazeFilePath) {
+		this.mazeFilePath = mazeFilePath;
 		IMaze maze = getMainController().getWorld().getMaze();
 		CharSequence contents;
 		try {
@@ -114,4 +121,5 @@ public class ConfigurationController extends SubController implements IConfigura
 			warning("Failed to parse source maze:" + e.getMessage());
 		}
 	}
+
 }

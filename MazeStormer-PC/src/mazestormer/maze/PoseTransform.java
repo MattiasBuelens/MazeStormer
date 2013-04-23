@@ -11,14 +11,18 @@ import lejos.robotics.navigation.Pose;
 
 public class PoseTransform {
 
-	private final Pose referencePose;
 	private final AffineTransform transform;
+	private final float relativeHeading;
 
 	private static final PoseTransform IDENTITY = new PoseTransform(new Pose());
 
 	public PoseTransform(Pose referencePose) {
-		this.referencePose = referencePose;
-		this.transform = createTransform(referencePose);
+		this(createTransform(referencePose), referencePose.getHeading());
+	}
+
+	PoseTransform(AffineTransform transform, float relativeHeading) {
+		this.transform = transform;
+		this.relativeHeading = relativeHeading;
 	}
 
 	/**
@@ -90,7 +94,7 @@ public class PoseTransform {
 	 * @return The absolute heading.
 	 */
 	public float transform(float heading) {
-		return normalizeHeading(heading + referencePose.getHeading());
+		return normalizeHeading(heading + relativeHeading);
 	}
 
 	/**
@@ -101,7 +105,7 @@ public class PoseTransform {
 	 * @return The relative heading.
 	 */
 	public float inverseTransform(float heading) {
-		return normalizeHeading(heading - referencePose.getHeading());
+		return normalizeHeading(heading - relativeHeading);
 	}
 
 	/**

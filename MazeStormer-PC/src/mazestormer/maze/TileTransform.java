@@ -16,7 +16,7 @@ public class TileTransform {
 		this(createTransform(translation, nbCCWRotations), nbCCWRotations);
 	}
 
-	private TileTransform(AffineTransform transform, int nbCCWRotations) {
+	TileTransform(AffineTransform transform, int nbCCWRotations) {
 		this.transform = transform;
 		this.nbCCWRotations = nbCCWRotations & 3;
 	}
@@ -82,6 +82,20 @@ public class TileTransform {
 		} catch (NoninvertibleTransformException cannotHappen) {
 			return null;
 		}
+	}
+
+	/**
+	 * Get a pose transform which transforms relative positions in the same way
+	 * as this tile transform transforms tile positions in the given maze.
+	 */
+	public PoseTransform toPoseTransform(IMaze maze) {
+		double[] matrix = new double[6];
+		transform.getMatrix(matrix);
+		// Scale translation components
+		float scale = maze.getTileSize();
+		matrix[4] = scale * matrix[4];
+		matrix[5] = scale * matrix[5];
+		return new PoseTransform(new AffineTransform(matrix), nbCCWRotations * 90f);
 	}
 
 	/**

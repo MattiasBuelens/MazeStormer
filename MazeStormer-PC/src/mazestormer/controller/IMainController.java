@@ -1,11 +1,13 @@
 package mazestormer.controller;
 
+import mazestormer.player.RelativePlayer;
 import mazestormer.util.EventSource;
+import mazestormer.world.World;
 
-public interface IMainController {
+public interface IMainController extends EventSource {
 
 	public IConfigurationController configuration();
-	
+
 	public ICalibrationController calibration();
 
 	public IParametersController parameters();
@@ -15,11 +17,11 @@ public interface IMainController {
 	public IPolygonControlController polygonControl();
 
 	public IBarcodeController barcodeControl();
-	
+
 	public IPathFindingController pathFindingControl();
 
 	public ILineFinderController lineFinderControl();
-	
+
 	public ICheatController cheatControl();
 
 	public IPlayerMapController map();
@@ -27,12 +29,15 @@ public interface IMainController {
 	public ILogController log();
 
 	public IStateController state();
-	
+
 	public IGameController gameControl();
-	
+
 	public IGameSetUpController gameSetUpControl();
 
-	public void register(EventSource eventSource);
-
 	public IExplorerController explorerControl();
+
+	public RelativePlayer getPlayer();
+
+	public World getWorld();
+
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import lejos.robotics.navigation.Pose;
+import mazestormer.cli.CommandLineConfiguration;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
@@ -19,9 +20,10 @@ import mazestormer.robot.ControllablePCRobot;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
-import mazestormer.util.EventSource;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
+
+import org.apache.commons.cli.ParseException;
 
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -33,16 +35,31 @@ public class MainController implements IMainController {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					new MainController();
+					start(args);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+
+	public static void start(String[] args) throws Exception {
+		// Controller
+		IMainController controller = new MainController();
+		try {
+			new CommandLineConfiguration(controller).parse(args);
+		} catch (ParseException e) {
+			System.err.println(e.getMessage());
+		}
+
+		// View
+		MainView view = new MainView(controller);
+		view.registerEventBus(controller.getEventBus());
+		view.setVisible(true);
 	}
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MainController-%d").build();
@@ -81,18 +98,10 @@ public class MainController implements IMainController {
 
 	private IStateController state;
 
-	/*
-	 * View
-	 */
-	private EventSource view;
-
 	public MainController() {
 		// Create event bus on named executor
 		ExecutorService executor = Executors.newSingleThreadExecutor(factory);
-		eventBus = new AsyncEventBus(getClass().getSimpleName(), executor);
-
-		// Register on event bus
-		getEventBus().register(this);
+		registerEventBus(new AsyncEventBus(getClass().getSimpleName(), executor));
 
 		// Player and world
 		IMaze personalMaze = new CombinedMaze();
@@ -106,22 +115,19 @@ public class MainController implements IMainController {
 		connectionContext.setDeviceName("brons");
 		connectionContext.setWorld(getWorld());
 
-		// View
-		view = createView();
-		view.registerEventBus(getEventBus());
-
 		// Post initialized
 		postEvent(new InitializeEvent());
 	}
 
-	protected EventSource createView() {
-		MainView view = new MainView(this);
-		view.setVisible(true);
-		return view;
+	@Override
+	public EventBus getEventBus() {
+		return eventBus;
 	}
 
-	private EventBus getEventBus() {
-		return eventBus;
+	@Override
+	public void registerEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
+		eventBus.register(this);
 	}
 
 	private void postEvent(final Object event) {
@@ -246,11 +252,6 @@ public class MainController implements IMainController {
 		return gameSetUpControl;
 	}
 
-	@Override
-	public void register(EventSource eventSource) {
-		eventSource.registerEventBus(getEventBus());
-	}
-
 	/*
 	 * Initialization
 	 */
@@ -345,19 +346,21 @@ public class MainController implements IMainController {
 	}
 
 	/*
-	 * World
-	 */
-
-	public World getWorld() {
-		return world;
-	}
-
-	/*
 	 * Player
 	 */
 
+	@Override
 	public RelativePlayer getPlayer() {
 		return personalPlayer;
+	}
+
+	/*
+	 * World
+	 */
+
+	@Override
+	public World getWorld() {
+		return world;
 	}
 
 }

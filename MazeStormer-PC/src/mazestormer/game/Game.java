@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.infrared.IRRobot;
 import mazestormer.maze.CombinedMaze;
@@ -17,6 +18,7 @@ import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
+import mazestormer.util.LongPoint;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
@@ -68,8 +70,12 @@ public class Game {
 		return client.getPlayers();
 	}
 
+	protected Player getLocalPlayer() {
+		return localPlayer;
+	}
+
 	private CombinedMaze getLocalMaze() {
-		return (CombinedMaze) localPlayer.getMaze();
+		return (CombinedMaze) getLocalPlayer().getMaze();
 	}
 
 	public void join(final Callback<Void> callback) {
@@ -167,8 +173,11 @@ public class Game {
 
 	public void updatePosition(Pose pose) {
 		try {
-			// Publish
-			client.updatePosition(pose.getX(), pose.getY(), pose.getHeading());
+			// Get tile at position
+			Point tilePosition = getLocalMaze().toTile(getLocalMaze().toRelative(pose.getLocation()));
+			Tile tile = getLocalMaze().getTileAt(tilePosition);
+			// Publish tile position
+			client.updatePosition(tile.getX(), tile.getY(), pose.getHeading());
 		} catch (IllegalStateException | IOException e) {
 			// TODO Auto-generated catch block
 			System.err.println("Could not report position update");
@@ -201,7 +210,7 @@ public class Game {
 			// TODO Is this conform with maze coordinate specification?
 			long x = tile.getX();
 			long y = tile.getY();
-			String token = Parser.stringify(localPlayer.getMaze(), tile.getPosition());
+			String token = Parser.stringify(getLocalMaze(), tile.getPosition());
 			tilesToSend.add(new peno.htttp.Tile(x, y, token));
 		}
 
@@ -374,10 +383,15 @@ public class Game {
 		}
 
 		@Override
-		public void teamPosition(double x, double y, double angle) {
+		public void teamPosition(long x, long y, double angle) {
 			if (hasPartner()) {
+				// Transform tile position to absolute maze position
+				Point relativePosition = getPartner().getMaze().fromTile(new LongPoint(x, y).toPoint());
+				Point absolutePosition = getPartner().getMaze().toAbsolute(relativePosition);
+				Pose pose = new Pose();
+				pose.setLocation(absolutePosition);
+				pose.setHeading((float) angle);
 				// Update partner pose
-				Pose pose = new Pose((float) x, (float) y, (float) angle);
 				getPartner().getRobot().getPoseProvider().setPose(pose);
 			}
 		}
