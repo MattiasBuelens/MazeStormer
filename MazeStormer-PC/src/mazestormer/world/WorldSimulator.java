@@ -69,7 +69,7 @@ public class WorldSimulator {
 		String playerID = playerDetails.getPlayerID();
 		AbsolutePlayer player = getWorld().getPlayer(playerID);
 		if (player == null) {
-			IRRobot robot = new ObservableRobot(ModelType.toModelType(playerDetails.getType()),
+			IRRobot robot = new ObservableRobot(ModelType.fromPlayerType(playerDetails.getType()),
 					playerDetails.getHeight(), playerDetails.getWidth());
 			RelativePlayer relativePlayer = new RelativePlayer(playerID, robot, null);
 			player = new AbsolutePlayer(relativePlayer);

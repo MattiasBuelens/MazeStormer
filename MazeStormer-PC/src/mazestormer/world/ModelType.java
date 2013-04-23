@@ -8,22 +8,35 @@ public enum ModelType {
 		public String toString() {
 			return "Physical";
 		}
+
+		@Override
+		public PlayerType toPlayerType() {
+			return PlayerType.PHYSICAL;
+		}
 	},
 	VIRTUAL {
 		@Override
 		public String toString() {
 			return "Virtual";
 		}
+
+		@Override
+		public PlayerType toPlayerType() {
+			return PlayerType.VIRTUAL;
+		}
 	};
-	
-	public static ModelType toModelType(PlayerType pt) {
+
+	public abstract PlayerType toPlayerType();
+
+	public static ModelType fromPlayerType(PlayerType pt) {
 		switch (pt) {
-			case PHYSICAL:
-				return PHYSICAL;
-			case VIRTUAL:
-				return VIRTUAL;
-			default:
-				return null;
+		case PHYSICAL:
+			return PHYSICAL;
+		case VIRTUAL:
+			return VIRTUAL;
+		default:
+			return null;
 		}
 	}
+
 }
