@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.game.GameRunner;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
+import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.Pilot;
@@ -12,7 +13,8 @@ import mazestormer.state.State;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
+public class SeesawAction extends
+		StateMachine<SeesawAction, SeesawAction.SeesawState> implements IAction {
 
 	private final GameRunner gameRunner;
 	private final int barcode;
@@ -52,11 +54,15 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		return getControllableRobot().getPilot();
 	}
 
+	private IMaze getMaze() {
+		return player.getMaze();
+	}
+
 	protected void initial() {
 		getGameRunner().setSeesawWalls();
 		transition(SeesawState.SCAN);
 	}
-	
+
 	public static boolean isOpen(float angle) {
 		if (Float.isNaN(angle)) {
 			return true;
@@ -65,11 +71,12 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	}
 
 	protected void scan() {
-		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor()
+				.getAngle());
 		if (seesawOpen) {
 			seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
-		}		
-		
+		}
+
 		if (seesawOpen) {
 			transition(SeesawState.ONWARDS);
 		} else {
@@ -99,7 +106,7 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	protected void onwards() {
 		// TODO Implement seesaw action
 		getGameRunner().onSeesaw(barcode);
-		bindTransition(getPilot().travelComplete(130), // TODO 130 juist?
+		bindTransition(getPilot().travelComplete(3*getMaze().getTileSize()+10), // TODO 3*40+10 juist?
 				SeesawState.FIND_LINE);
 	}
 
@@ -116,7 +123,8 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
+	private class LineFinderListener extends
+			AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(SeesawState.RESUME_EXPLORING);
@@ -124,11 +132,12 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 	}
 
 	protected void waitAndScan() {
-		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor()
+				.getAngle());
 		if (seesawOpen) {
 			seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
-		}	
-		
+		}
+
 		if (seesawOpen)
 			transition(SeesawState.ONWARDS);
 		else {
@@ -161,7 +170,8 @@ public class SeesawAction extends StateMachine<SeesawAction, SeesawAction.Seesaw
 		stop(); // stops this seesaw action
 	}
 
-	public enum SeesawState implements State<SeesawAction, SeesawAction.SeesawState> {
+	public enum SeesawState implements
+			State<SeesawAction, SeesawAction.SeesawState> {
 
 		INITIAL {
 
