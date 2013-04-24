@@ -15,7 +15,7 @@ import mazestormer.barcode.Barcode;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
 import mazestormer.game.Game;
-import mazestormer.game.GameListener;
+import mazestormer.game.DefaultGameListener;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -29,7 +29,7 @@ import mazestormer.util.LongPoint;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-public class GameRunner extends Commander implements GameListener {
+public class GameRunner extends Commander {
 
 	/**
 	 * The frequency of position updates.
@@ -66,10 +66,10 @@ public class GameRunner extends Commander implements GameListener {
 
 		// Game
 		this.game = game;
-		game.addGameListener(this);
+		game.addGameListener(new GameListener());
 
 		// Modes
-		setMode(new ExploreIslandControlMode(player,this);
+		setMode(new ExploreIslandControlMode(player,this));
 	}
 
 	/*
@@ -86,6 +86,10 @@ public class GameRunner extends Commander implements GameListener {
 
 	public int getObjectNumber() {
 		return objectNumber;
+	}
+	
+	private void setObjectNumber(int nb) {
+		this.objectNumber = nb;
 	}
 	
 	public Tile getCurrentTile() {
@@ -175,77 +179,6 @@ public class GameRunner extends Commander implements GameListener {
 		getPlayer().getMaze().addListener(tileReporter);
 	}
 
-	@Override
-	public void onGameJoined() {
-	}
-
-	@Override
-	public void onGameLeft() {
-		// Stop
-		onGameStopped();
-	}
-
-	@Override
-	public void onGameRolled(int playerNumber, int objectNumber) {
-		// Store object number
-		this.objectNumber = objectNumber;
-	}
-
-	@Override
-	public void onGameStarted() {
-		// Reset player pose
-		// TODO Do not reset when resuming from paused game?
-		getRobot().getPoseProvider().setPose(new Pose());
-		// Start reporting
-		startReporting();
-		// Start explorer
-		start();
-	}
-
-	@Override
-	public void onGamePaused() {
-		// Pause explorer
-		getDriver().pause();
-		// Stop pilot
-		getRobot().getPilot().stop();
-		// Stop reporting
-		stopReporting();
-	}
-
-	@Override
-	public void onGameStopped() {
-		// Stop explorer
-		stop();
-		// Stop pilot
-		getRobot().getPilot().stop();
-		// Stop reporting
-		stopReporting();
-	}
-
-	@Override
-	public void onGameWon(int teamNumber) {
-		// Not really needed, since it will be stopped later on
-		// onGameStopped();
-	}
-
-	@Override
-	public void onPlayerReady(String playerID, boolean isReady) {
-	}
-
-	@Override
-	public void onObjectFound(String playerID) {
-	}
-	
-	@Override
-	public void onPartnerConnected(Player partner) {
-		// Send own maze
-		game.sendOwnTiles();
-	}
-
-	@Override
-	public void onPartnerDisconnected(Player partner) {
-	}
-
 	private class PositionReporter implements MoveListener {
 
 		private ScheduledFuture<?> task;
@@ -283,6 +216,58 @@ public class GameRunner extends Commander implements GameListener {
 			game.sendTiles(tile);
 		}
 
+	}
+	
+	private class GameListener extends DefaultGameListener {
+
+		@Override
+		public void onGameLeft() {
+			// Stop
+			onGameStopped();
+		}
+
+		@Override
+		public void onGameRolled(int playerNumber, int objectNumber) {
+			// Store object number
+			setObjectNumber(objectNumber);
+		}
+
+		@Override
+		public void onGameStarted() {
+			// Reset player pose
+			// TODO Do not reset when resuming from paused game?
+			getRobot().getPoseProvider().setPose(new Pose());
+			// Start reporting
+			startReporting();
+			// Start explorer
+			start();
+		}
+
+		@Override
+		public void onGamePaused() {
+			// Pause explorer
+			getDriver().pause();
+			// Stop pilot
+			getRobot().getPilot().stop();
+			// Stop reporting
+			stopReporting();
+		}
+
+		@Override
+		public void onGameStopped() {
+			// Stop explorer
+			stop();
+			// Stop pilot
+			getRobot().getPilot().stop();
+			// Stop reporting
+			stopReporting();
+		}
+		
+		@Override
+		public void onPartnerConnected(Player partner) {
+			// Send own maze
+			game.sendOwnTiles();
+		}
 	}
 
 	/*
