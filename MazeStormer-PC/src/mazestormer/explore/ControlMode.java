@@ -2,7 +2,9 @@ package mazestormer.explore;
 
 import java.util.logging.Level;
 
+import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
+import mazestormer.barcode.IAction;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
@@ -11,7 +13,6 @@ import mazestormer.player.Player;
 public abstract class ControlMode {
 
 	private final Player player;
-	private final Driver driver;
 	private final PathFinder pathFinder;
 	private final Commander commander;
 
@@ -19,7 +20,6 @@ public abstract class ControlMode {
 		this.player = player;
 		this.pathFinder = new PathFinder(getMaze());
 		this.commander = commander;
-		this.driver = commander.getDriver();
 	}
 	
 	/*
@@ -42,10 +42,6 @@ public abstract class ControlMode {
 		return commander;
 	}
 	
-	public final Driver getDriver() {
-		return driver;
-	}
-
 	/*
 	 * Algemeen geldige methodes
 	 */
@@ -58,14 +54,14 @@ public abstract class ControlMode {
 	 * Abstracte methodes
 	 */
 
-	public abstract void takeControl(Driver driver);
+	public abstract void takeControl();
 
-	public abstract void releaseControl(Driver driver);
+	public abstract void releaseControl();
 
 	public abstract Tile nextTile(Tile currentTile);
 
 	public abstract boolean isBarcodeActionEnabled();
 	
-	public abstract BarcodeMapping getBarcodeMapping();
+	public abstract IAction getAction(Barcode barcode);
 
 }

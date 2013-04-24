@@ -9,42 +9,42 @@ import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.ObjectFoundAction;
 import mazestormer.explore.AbstractExploreControlMode;
-import mazestormer.explore.ControlMode;
-import mazestormer.maze.IMaze;
-import mazestormer.maze.Orientation;
-import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
-import mazestormer.maze.TileShape;
-import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.util.Future;
-import mazestormer.util.LongPoint;
 
 public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
-	private final ControlMode superControlMode;
+	/*
+	 * Atributes
+	 */
 	
-	public ExploreIslandControlMode(Player player, ControlMode superControlMode) {
-		super(player, superControlMode.getCommander());
-		this.superControlMode = superControlMode;
+	private final BarcodeMapping exploreBarcodeMapping = new ExploreIslandBarcodeMapping();
+	
+	/*
+	 * Constructor
+	 */
+	
+	public ExploreIslandControlMode(Player player, GameRunner gameRunner) {
+		super(player, gameRunner);
 	}
 
 	/*
 	 * Getters
 	 */
 	
-	private ControlMode getSuperControlMode(){
-		return superControlMode;
-	}
-	
-	@Override
-	public BarcodeMapping getBarcodeMapping() {
-		return new ExploreIslandBarcodeMapping();
+	private GameRunner getGameRunner(){
+		return (GameRunner) getCommander();
 	}
 	
 	/*
 	 * Barcode-acties en logica
 	 */
+
+	@Override
+	public IAction getAction(Barcode barcode) {
+		return exploreBarcodeMapping.getAction(barcode);
+	}
 	
 	private class ObjectAction extends ObjectFoundAction {
 
@@ -53,10 +53,10 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		private ObjectAction(Barcode barcode) {
 			this.barcode = barcode;
 		}
-
+		
 		@Override
 		public Future<?> performAction(Player player) {
-			setObjectTile(); // voeg info toe aan maze
+			getGameRunner().setObjectTile(); // voeg info toe aan maze
 
 			// TODO: verwijder volgende tegels uit queue? Worden ze ooit
 			// toegevoegd?
@@ -131,68 +131,24 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		if(nextTile != null){
 			return nextTile;
 		}
-		return getSuperControlMode().arrangeNextMode().nextTile(currentTile);
+		return getGameRunner().nextMode().nextTile(currentTile);
 	}
 	
 	/*
 	 * Utilities
 	 */
 	
-	public void setSeesawWalls() {
-		log("Seesaw on next tiles, set seesaw and barcode");
-
-		IMaze maze = getMaze();
-
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
-
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
-
-		// Seesaw
-		LongPoint nextTilePosition = nextTile.getPosition();
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, seesawBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Seesaw
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Other seesaw barcode
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setBarcode(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-	}
 	
-	public void setObjectTile() {
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-
-		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(),
-				new TileShape(TileType.DEAD_END, orientation));
-
-		// Mark as explored
-		getMaze().setExplored(nextTile.getPosition());
-
-		// Remove both tiles from the queue
-
-	}
 	
 	public void objectFound(int teamNumber) {
 		log("Own object found, join team #" + teamNumber);
 		// Report object found
-		((GameRunner) getSuperControlMode().getCommander()).getGame().objectFound();
+		getGameRunner().getGame().objectFound();
 		// Join team
-		((GameRunner) getSuperControlMode().getCommander()).getGame().joinTeam(teamNumber);
+		getGameRunner().getGame().joinTeam(teamNumber);
 		// TODO Start working together
 	}
+
+
 
 }

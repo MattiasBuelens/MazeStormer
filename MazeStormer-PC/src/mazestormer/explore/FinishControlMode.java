@@ -10,24 +10,25 @@ import mazestormer.robot.ControllableRobot;
 
 public class FinishControlMode extends ControlMode {
 
-
 	private static final BarcodeMapping mapping = new ExplorerBarcodeMapping();
-	
+
 	public FinishControlMode(Player player, Commander commander) {
 		super(player, commander);
 	}
 
 	@Override
-	public void takeControl(Driver driver) {
+	public void takeControl() {
 		log("Traveling to checkpoint and goal");
 		// Start traveling at high speed
-		driver.getRobot().getPilot().setTravelSpeed(BarcodeSpeed.HIGH.getBarcodeSpeedValue());
+		getCommander().getDriver().getRobot().getPilot()
+				.setTravelSpeed(BarcodeSpeed.HIGH.getBarcodeSpeedValue());
 	}
 
 	@Override
-	public void releaseControl(Driver driver) {
+	public void releaseControl() {
 		// Reset travel speed
-		driver.getRobot().getPilot().setTravelSpeed(ControllableRobot.travelSpeed);
+		getCommander().getDriver().getRobot().getPilot()
+				.setTravelSpeed(ControllableRobot.travelSpeed);
 	}
 
 	@Override

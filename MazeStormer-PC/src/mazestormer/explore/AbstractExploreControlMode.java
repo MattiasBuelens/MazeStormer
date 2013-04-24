@@ -24,12 +24,12 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	 */
 	
 	@Override
-	public void takeControl(Driver driver) {
+	public void takeControl() {
 		log("Exploring the maze");
 	}
 
 	@Override
-	public void releaseControl(Driver driver) {
+	public void releaseControl() {
 	}
 
 	@Override

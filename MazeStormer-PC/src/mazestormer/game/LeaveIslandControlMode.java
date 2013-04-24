@@ -52,13 +52,13 @@ private LinkedList<Tile> reachableSeesawQueue;
 	 */
 
 	@Override
-	public void takeControl(Driver driver) {
+	public void takeControl() {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void releaseControl(Driver driver) {
+	public void releaseControl() {
 		// TODO Auto-generated method stub
 		
 	}

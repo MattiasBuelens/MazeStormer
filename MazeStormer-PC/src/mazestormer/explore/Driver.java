@@ -359,7 +359,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		// Clean up
 		stopSubroutines();
 
-		if (getMode().getCommander().nextMode()) {
+		if (getMode().getCommander().nextMode() != null) {
 			// Next mode, cycle
 			transition(ExplorerState.NEXT_CYCLE);
 		} else {

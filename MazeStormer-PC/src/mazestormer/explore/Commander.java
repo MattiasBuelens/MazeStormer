@@ -1,8 +1,8 @@
 package mazestormer.explore;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import mazestormer.barcode.Barcode;
+import mazestormer.barcode.IAction;
+import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 
 /**
@@ -20,12 +20,13 @@ public abstract class Commander {
 	 * Control Modes (and bindings)
 	 */
 	private ControlMode currentMode;
-	private ControlMode startMode;
-	private final Map<ControlMode, ControlMode> bindings = new HashMap<>();
+	
+	/*
+	 * Constructor
+	 */
 
 	public Commander(Player player) {
 		this.player = player;
-		this.currentMode = startMode;
 		this.driver = new Driver(player, this.getMode());
 	}
 
@@ -39,6 +40,29 @@ public abstract class Commander {
 	
 	public Driver getDriver() {
 		return driver;
+	}
+	
+	public ControlMode getCurrentControlMode(){
+		return currentMode;
+	}
+
+	/*
+	 * Objective management
+	 */
+
+	/**
+	 * Starts persuing the objective of this commander.
+	 */
+	protected void start() {
+		getDriver().start();
+	}
+	
+	/**
+	 * Stops persuing the objective of this commander.
+	 */
+	protected void stop() {
+		getDriver().stop();
+		releaseControl();
 	}
 	
 	/*
@@ -56,57 +80,28 @@ public abstract class Commander {
 
 	protected final void takeControl(ControlMode mode) {
 		this.currentMode = mode;
-		getDriver().setBarcodeMapping(mode.getBarcodeMapping());
-		currentMode.takeControl(getDriver());
+		currentMode.takeControl();
 	}
 
 	protected final void releaseControl() {
 		if (getMode() != null) {
-			getMode().releaseControl(getDriver());
+			getMode().releaseControl();
 		}
 		this.currentMode = null;
 	}
 
-	protected ControlMode getStartMode() {
-		return startMode;
-	}
-
-	protected void setStartMode(ControlMode startMode) {
-		this.startMode = startMode;
-	}
-
-	public final void bind(ControlMode previous, ControlMode next) {
-		bindings.put(previous, next);
-	}
-
-	public boolean nextMode() {
-		if (bindings.containsKey(getMode())) {
-			setMode(bindings.get(getMode()));
-			return true;
-		} else {
-			releaseControl();
-			return false;
-		}
-	}
-
+	public abstract ControlMode nextMode();
+	
 	/*
-	 * Objective management
+	 * Driver support
 	 */
-
-	/**
-	 * Starts persuing the objective of this commander.
-	 */
-	protected void start() {
-		setMode(getStartMode());
-		getDriver().start();
+	
+	public Tile nextTile(Tile currentTile){
+		return getCurrentControlMode().nextTile(currentTile);
 	}
 	
-	/**
-	 * Stops persuing the objective of this commander.
-	 */
-	protected void stop() {
-		getDriver().stop();
-		releaseControl();
+	public IAction getAction(Barcode barcode){
+		return getCurrentControlMode().getAction(barcode);
 	}
 
 }

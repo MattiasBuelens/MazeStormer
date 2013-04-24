@@ -41,9 +41,9 @@ public class GameRunner extends Commander implements GameListener {
 	private final Game game;
 
 	/*
-	 * Control Modes
+	 * Current control mode
 	 */
-	private final FindObjectControlMode findObjectMode;
+	ControlMode currentControlmode;
 
 	/*
 	 * Utilities
@@ -62,8 +62,7 @@ public class GameRunner extends Commander implements GameListener {
 		game.addGameListener(this);
 
 		// Modes
-		findObjectMode = new FindObjectControlMode(player, this);
-		setStartMode(findObjectMode);
+		setMode(new ExploreIslandControlMode(player,this);
 	}
 
 	protected void log(String message) {
@@ -98,7 +97,53 @@ public class GameRunner extends Commander implements GameListener {
 	 * Utilities
 	 */
 
+	public void setSeesawWalls() {
+		log("Seesaw on next tiles, set seesaw and barcode");
+
+		IMaze maze = getMaze();
+
+		Tile currentTile = getDriver().getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
+		Orientation orientation = currentTile.orientationTo(nextTile);
+		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
+
+		Barcode seesawBarcode = currentTile.getBarcode();
+		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
+
+		// Seesaw
+		LongPoint nextTilePosition = nextTile.getPosition();
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, seesawBarcode);
+		maze.setExplored(nextTilePosition);
+
+		// Seesaw
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
+
+		// Other seesaw barcode
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setBarcode(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
+	}
 	
+	public void setObjectTile() {
+		Tile currentTile = getDriver().getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
+		Orientation orientation = currentTile.orientationTo(nextTile);
+
+		// Make next tile a dead end
+		getMaze().setTileShape(nextTile.getPosition(),
+				new TileShape(TileType.DEAD_END, orientation));
+
+		// Mark as explored
+		getMaze().setExplored(nextTile.getPosition());
+
+		// Remove both tiles from the queue
+
+	}
 
 	public void onSeesaw(int barcode) {
 		log("The seesaw is currently opened, onwards!");
