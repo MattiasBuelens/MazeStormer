@@ -10,10 +10,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mazestormer.infrared.IRBall;
 import mazestormer.infrared.IRRobot;
+import mazestormer.infrared.IRSeesaw;
+import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
+import mazestormer.maze.Seesaw;
+import mazestormer.maze.Tile;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
@@ -33,6 +36,8 @@ public class World {
 	public World(AbsolutePlayer localPlayer) {
 		this.localPlayer = localPlayer;
 		addPlayer(localPlayer);
+
+		getMaze().addListener(new SeesawListener());
 
 		logger = Logger.getLogger(World.class.getSimpleName());
 		logger.setLevel(Level.ALL);
@@ -123,11 +128,21 @@ public class World {
 		return logger;
 	}
 
-	// TODO: MM Objects and ir circuits need to be added after parsing
+	private Map<Seesaw, IRSeesaw> seesaws = new HashMap<Seesaw, IRSeesaw>();
 
-	public Iterable<IRBall> getBalls() {
-		// TODO
-		return Collections.emptyList();
+	public Iterable<IRSeesaw> getSeesaws() {
+		return Collections.unmodifiableCollection(seesaws.values());
+	}
+
+	private void addSeesaw(Tile tile) {
+		if (tile.isSeesaw() && !seesaws.containsKey(tile.getSeesaw())) {
+			Seesaw seesaw = tile.getSeesaw();
+			seesaws.put(seesaw, new IRSeesaw(getMaze(), seesaw));
+		}
+	}
+
+	private void removeSeesaws() {
+		seesaws.clear();
 	}
 
 	public Iterable<IRRobot> getRobots() {
@@ -135,7 +150,7 @@ public class World {
 	}
 
 	public Iterable<? extends Model> getAllModels() {
-		return Iterables.concat(getBalls(), getRobots());
+		return Iterables.concat(getSeesaws(), getRobots());
 	}
 
 	public <T extends Model> Iterable<T> getAllModels(Class<T> clazz) {
@@ -148,5 +163,24 @@ public class World {
 			return player.getRobot();
 		}
 	};
+
+	private class SeesawListener extends DefaultMazeListener {
+
+		@Override
+		public void tileAdded(Tile tile) {
+			addSeesaw(tile);
+		}
+
+		@Override
+		public void tileChanged(Tile tile) {
+			addSeesaw(tile);
+		}
+
+		@Override
+		public void mazeCleared() {
+			removeSeesaws();
+		}
+
+	}
 
 }
