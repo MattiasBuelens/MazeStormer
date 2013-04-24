@@ -5,7 +5,7 @@ import java.io.IOException;
 import mazestormer.command.game.GameRunner;
 import mazestormer.game.ConnectionMode;
 import mazestormer.game.Game;
-import mazestormer.game.IGameListener;
+import mazestormer.game.GameListener;
 import mazestormer.player.Player;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.world.World;
@@ -234,7 +234,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		postEvent(new GameSetUpEvent(eventType));
 	}
 
-	private class Listener implements IGameListener {
+	private class Listener implements GameListener {
 
 		@Override
 		public void onGameJoined() {

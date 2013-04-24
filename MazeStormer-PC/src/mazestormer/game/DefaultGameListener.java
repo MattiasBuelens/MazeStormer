@@ -2,7 +2,7 @@ package mazestormer.game;
 
 import mazestormer.player.Player;
 
-public class DefaultGameListener implements IGameListener {
+public class DefaultGameListener implements GameListener {
 
 	@Override
 	public void onGameJoined() {

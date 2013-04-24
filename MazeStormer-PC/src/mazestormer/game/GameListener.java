@@ -2,7 +2,7 @@ package mazestormer.game;
 
 import mazestormer.player.Player;
 
-public interface IGameListener {
+public interface GameListener {
 
 	public void onGameJoined();
 

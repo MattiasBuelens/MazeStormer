@@ -36,7 +36,7 @@ public class Game {
 
 	private final PlayerClient client;
 	private final Handler handler;
-	private final List<IGameListener> listeners = new ArrayList<IGameListener>();
+	private final List<GameListener> listeners = new ArrayList<GameListener>();
 
 	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
@@ -54,11 +54,11 @@ public class Game {
 		this.client = new PlayerClient(connection, this.handler, id, player);
 	}
 
-	public void addGameListener(IGameListener listener) {
+	public void addGameListener(GameListener listener) {
 		listeners.add(listener);
 	}
 
-	public void removeGameListener(IGameListener listener) {
+	public void removeGameListener(GameListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -84,7 +84,7 @@ public class Game {
 				@Override
 				public void onSuccess(Void result) {
 					// Call listeners
-					for (IGameListener listener : listeners) {
+					for (GameListener listener : listeners) {
 						listener.onGameJoined();
 					}
 					// Callback
@@ -106,7 +106,7 @@ public class Game {
 		try {
 			client.leave();
 			// Call listeners
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onGameLeft();
 			}
 			// Callback
@@ -260,7 +260,7 @@ public class Game {
 		getLocalMaze().setPartnerMaze(partner.getMaze());
 
 		// Call listeners
-		for (IGameListener listener : listeners) {
+		for (GameListener listener : listeners) {
 			listener.onPartnerConnected(getPartner());
 		}
 	}
@@ -277,7 +277,7 @@ public class Game {
 		partnerPlayer = null;
 
 		// Call listeners
-		for (IGameListener listener : listeners) {
+		for (GameListener listener : listeners) {
 			listener.onPartnerDisconnected(partner);
 		}
 	}
@@ -296,7 +296,7 @@ public class Game {
 
 		@Override
 		public void gameRolled(int playerNumber, int objectNumber) {
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onGameRolled(playerNumber, objectNumber);
 			}
 		}
@@ -306,28 +306,28 @@ public class Game {
 			// Reset game
 			reset();
 			// Call listeners
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onGameStarted();
 			}
 		}
 
 		@Override
 		public void gameStopped() {
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onGameStopped();
 			}
 		}
 
 		@Override
 		public void gamePaused() {
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onGamePaused();
 			}
 		}
 
 		@Override
 		public void gameWon(int teamNumber) {
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onGameWon(teamNumber);
 			}
 		}
@@ -351,14 +351,14 @@ public class Game {
 
 		@Override
 		public void playerReady(String playerID, boolean isReady) {
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onPlayerReady(playerID, isReady);
 			}
 		}
 
 		@Override
 		public void playerFoundObject(String playerID, int playerNumber) {
-			for (IGameListener listener : listeners) {
+			for (GameListener listener : listeners) {
 				listener.onObjectFound(playerID);
 			}
 		}
