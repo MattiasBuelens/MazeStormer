@@ -46,10 +46,14 @@ public class Explorer extends Commander {
 	 */
 
 	@Override
-	public ControlMode nextMode() {
+	public ControlMode nextMode(ControlMode currentMode) {
 		// the only transition in this objective is to finish-mode
-		currentMode = finishMode;
-		return finishMode;
+		if(currentMode == finishMode) {
+			// Done
+			return null;
+		} else {
+			return finishMode;
+		}
 	}
 
 }

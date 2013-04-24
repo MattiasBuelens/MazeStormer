@@ -139,7 +139,7 @@ public class LeaveIslandControlMode extends ControlMode {
 
 		@Override
 		public IAction getAction(Barcode barcode) {
-			// TODO Auto-generated method stub
+			// TODO OMG DO THIS!!!
 			return null;
 		}
 

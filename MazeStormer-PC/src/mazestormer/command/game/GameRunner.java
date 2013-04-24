@@ -270,8 +270,8 @@ public class GameRunner extends Commander {
 	 */
 	
 	@Override
-	public ControlMode nextMode() {
-		// TODO Auto-generated method stub
+	public ControlMode nextMode(ControlMode currentMode) {
+		// TODO OMG DO THIS!!!!
 		return null;
 	}
 	

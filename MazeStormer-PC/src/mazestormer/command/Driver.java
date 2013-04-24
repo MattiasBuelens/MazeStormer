@@ -125,7 +125,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	public final Commander getCommander() {
 		return commander;
 	}
-	
+
 	protected ControlMode getMode() {
 		return getCommander().getMode();
 	}
@@ -231,9 +231,9 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	private void buildNextPath() {
 		// Get the next tile
-		nextTile = getMode().nextTile(currentTile);
+		nextTile = getCommander().nextTile(currentTile);
 
-		// Check if done
+		// Objective completed
 		if (nextTile == null) {
 			noNextTile();
 			return;
@@ -362,14 +362,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	private void noNextTile() {
 		// Clean up
 		stopSubroutines();
-
-		if (getMode().getCommander().nextMode() != null) {
-			// Next mode, cycle
-			transition(ExplorerState.NEXT_CYCLE);
-		} else {
-			// Done
-			finish();
-		}
+		// Done
+		finish();
 	}
 
 	/**

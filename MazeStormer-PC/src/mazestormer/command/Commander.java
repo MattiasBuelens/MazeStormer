@@ -19,8 +19,8 @@ public abstract class Commander {
 	/*
 	 * Control Modes
 	 */
-	protected ControlMode currentMode;
-	
+	private ControlMode currentMode;
+
 	/*
 	 * Constructor
 	 */
@@ -33,16 +33,16 @@ public abstract class Commander {
 	/*
 	 * Getters
 	 */
-	
+
 	public final Player getPlayer() {
 		return player;
 	}
-	
+
 	public Driver getDriver() {
 		return driver;
 	}
-	
-	public ControlMode getCurrentControlMode(){
+
+	public ControlMode getCurrentControlMode() {
 		return currentMode;
 	}
 
@@ -56,7 +56,7 @@ public abstract class Commander {
 	protected void start() {
 		getDriver().start();
 	}
-	
+
 	/**
 	 * Stops persuing the objective of this commander.
 	 */
@@ -64,7 +64,7 @@ public abstract class Commander {
 		getDriver().stop();
 		releaseControl();
 	}
-	
+
 	/*
 	 * Control mode management
 	 */
@@ -73,7 +73,7 @@ public abstract class Commander {
 		return currentMode;
 	}
 
-	public abstract ControlMode nextMode();
+	public abstract ControlMode nextMode(ControlMode currentMode);
 
 	protected final void setMode(ControlMode mode) {
 		releaseControl();
@@ -91,16 +91,28 @@ public abstract class Commander {
 		}
 		this.currentMode = null;
 	}
-	
+
 	/*
 	 * Driver support
 	 */
-	
-	public Tile nextTile(Tile currentTile){
-		return getCurrentControlMode().nextTile(currentTile);
+
+	public Tile nextTile(Tile currentTile) {
+		Tile nextTile = getCurrentControlMode().nextTile(currentTile);
+		while (nextTile == null) {
+			ControlMode nextMode = nextMode(getCurrentControlMode());
+			if (nextMode == null) {
+				// Done
+				return null;
+			} else {
+				// Try next mode
+				setMode(nextMode);
+				nextTile = getCurrentControlMode().nextTile(currentTile);
+			}
+		}
+		return nextTile;
 	}
-	
-	public IAction getAction(Barcode barcode){
+
+	public IAction getAction(Barcode barcode) {
 		return getCurrentControlMode().getAction(barcode);
 	}
 

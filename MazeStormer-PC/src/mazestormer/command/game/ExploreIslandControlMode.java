@@ -9,7 +9,6 @@ import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.ObjectFoundAction;
 import mazestormer.command.AbstractExploreControlMode;
-import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.util.Future;
 
@@ -18,13 +17,13 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	/*
 	 * Atributes
 	 */
-	
+
 	private final BarcodeMapping exploreBarcodeMapping = new ExploreIslandBarcodeMapping();
-	
+
 	/*
 	 * Constructor
 	 */
-	
+
 	public ExploreIslandControlMode(Player player, GameRunner gameRunner) {
 		super(player, gameRunner);
 	}
@@ -32,11 +31,11 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	/*
 	 * Getters
 	 */
-	
-	private GameRunner getGameRunner(){
+
+	private GameRunner getGameRunner() {
 		return (GameRunner) getCommander();
 	}
-	
+
 	/*
 	 * Driver support
 	 */
@@ -45,20 +44,11 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	public IAction getAction(Barcode barcode) {
 		return exploreBarcodeMapping.getAction(barcode);
 	}
-	
-	@Override
-	public Tile nextTile(Tile currentTile) {
-		Tile nextTile = super.nextTile(currentTile);
-		if(nextTile != null){
-			return nextTile;
-		}
-		return getGameRunner().nextMode().nextTile(currentTile);
-	}
-	
+
 	/*
 	 * Utilities
 	 */
-	
+
 	private class ObjectAction extends ObjectFoundAction {
 
 		private Barcode barcode;
@@ -66,7 +56,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		private ObjectAction(Barcode barcode) {
 			this.barcode = barcode;
 		}
-		
+
 		@Override
 		public Future<?> performAction(Player player) {
 			getGameRunner().setObjectTile(); // voeg info toe aan maze
@@ -74,7 +64,9 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			// TODO: verwijder volgende tegels uit queue? Worden ze ooit
 			// toegevoegd?
 
-			if (getObjectNumberFromBarcode(barcode) == ((GameRunner) getCommander()).getObjectNumber()) { // indien eigen barcode:
+			if (getObjectNumberFromBarcode(barcode) == ((GameRunner) getCommander()).getObjectNumber()) { // indien
+																											// eigen
+																											// barcode:
 				objectFound(getTeamNumberFromBarcode(barcode));
 				return super.performAction(player); // eigen voorwerp wordt
 													// opgepikt
@@ -92,20 +84,21 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		}
 
 	}
-	
-	private class SeesawAction implements IAction{
 
-		private SeesawAction(Barcode barcode){
+	private class SeesawAction implements IAction {
+
+		private SeesawAction(Barcode barcode) {
 		}
-		
+
 		@Override
 		public Future<?> performAction(Player player) {
-			// TODO Enkel als de andere kant van de wip ook op dit eiland ligt mag/moet de robot de wip oversteken
+			// TODO Enkel als de andere kant van de wip ook op dit eiland ligt
+			// mag/moet de robot de wip oversteken
 			return null;
 		}
-		
+
 	}
-	
+
 	private class ExploreIslandBarcodeMapping implements BarcodeMapping {
 
 		private final Map<Barcode, IAction> barcodeTypeMapping = new HashMap<Barcode, IAction>() {
@@ -130,12 +123,12 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 		@Override
 		public IAction getAction(Barcode barcode) {
-			if(barcodeTypeMapping.containsKey(barcode)){
+			if (barcodeTypeMapping.containsKey(barcode)) {
 				return barcodeTypeMapping.get(barcode);
 			}
 			return new NoAction();
 		}
-		
+
 	}
 
 	public void objectFound(int teamNumber) {
@@ -146,7 +139,5 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		getGameRunner().getGame().joinTeam(teamNumber);
 		// TODO Start working together
 	}
-
-
 
 }
