@@ -38,13 +38,26 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	}
 	
 	/*
-	 * Barcode-acties en logica
+	 * Driver support
 	 */
 
 	@Override
 	public IAction getAction(Barcode barcode) {
 		return exploreBarcodeMapping.getAction(barcode);
 	}
+	
+	@Override
+	public Tile nextTile(Tile currentTile) {
+		Tile nextTile = super.nextTile(currentTile);
+		if(nextTile != null){
+			return nextTile;
+		}
+		return getGameRunner().nextMode().nextTile(currentTile);
+	}
+	
+	/*
+	 * Utilities
+	 */
 	
 	private class ObjectAction extends ObjectFoundAction {
 
@@ -124,22 +137,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		}
 		
 	}
-	
-	@Override
-	public Tile nextTile(Tile currentTile) {
-		Tile nextTile = super.nextTile(currentTile);
-		if(nextTile != null){
-			return nextTile;
-		}
-		return getGameRunner().nextMode().nextTile(currentTile);
-	}
-	
-	/*
-	 * Utilities
-	 */
-	
-	
-	
+
 	public void objectFound(int teamNumber) {
 		log("Own object found, join team #" + teamNumber);
 		// Report object found
