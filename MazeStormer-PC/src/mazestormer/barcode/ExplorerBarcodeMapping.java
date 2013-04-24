@@ -14,7 +14,7 @@ public class ExplorerBarcodeMapping implements BarcodeMapping {
 	@Override
 	public IAction getAction(Barcode barcode) {
 		if(actions.containsKey(barcode)) return actions.get(barcode);
-		else return null;
+		else return new NoAction();
 	}
 
 	private void createActions() {

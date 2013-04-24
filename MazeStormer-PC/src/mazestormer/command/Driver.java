@@ -51,7 +51,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Settings
 	 */
 	private final Player player;
-	private ControlMode controlMode;
+	private Commander commander;
 
 	/*
 	 * Subroutines
@@ -90,9 +90,9 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 */
 	private AtomicBoolean shouldLineAdjust = new AtomicBoolean(false);
 
-	public Driver(Player player, ControlMode controlMode) {
+	public Driver(Player player, Commander commander) {
 		this.player = checkNotNull(player);
-		this.controlMode = checkNotNull(controlMode);
+		this.commander = checkNotNull(commander);
 		addStateListener(this);
 
 		// Navigator
@@ -122,8 +122,12 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Getters and setters
 	 */
 
-	public final ControlMode getMode() {
-		return controlMode;
+	public final Commander getCommander() {
+		return commander;
+	}
+	
+	protected ControlMode getMode() {
+		return getCommander().getMode();
 	}
 
 	protected final PathFinder getPathFinder() {

@@ -41,11 +41,6 @@ public class GameRunner extends Commander {
 	 */
 	private int objectNumber;
 	private final Game game;
-
-	/*
-	 * Current control mode
-	 */
-	ControlMode currentControlmode;
 	
 	/*
 	 * GameListener
