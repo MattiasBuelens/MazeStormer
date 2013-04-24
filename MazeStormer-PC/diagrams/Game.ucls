@@ -1,7 +1,7 @@
 <class-diagram version="1.0.11" icons="true" automaticImage="JPEG" always-add-relationships="false" 
   generalizations="true" realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
-  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.Game" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/game/Game.java" binary="false">    
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.Game" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/command/game/Game.java" binary="false">    
     <position height="486" width="225" x="41" y="37"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="true" package="true" protected="true" private="false"/>      

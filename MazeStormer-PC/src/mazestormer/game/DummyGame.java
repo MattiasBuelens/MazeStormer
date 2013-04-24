@@ -38,7 +38,7 @@ public class DummyGame extends Game {
 		setReady(true, new EmptyCallback());
 	}
 
-	private class Handler implements GameListener {
+	private class Handler implements IGameListener {
 
 		@Override
 		public void onGameJoined() {

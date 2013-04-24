@@ -17,9 +17,9 @@ public abstract class Commander {
 	private final Driver driver;
 
 	/*
-	 * Control Modes (and bindings)
+	 * Control Modes
 	 */
-	private ControlMode currentMode;
+	protected ControlMode currentMode;
 	
 	/*
 	 * Constructor
@@ -73,24 +73,24 @@ public abstract class Commander {
 		return currentMode;
 	}
 
-	public final void setMode(ControlMode mode) {
+	public abstract ControlMode nextMode();
+
+	protected final void setMode(ControlMode mode) {
 		releaseControl();
+		this.currentMode = mode;
 		takeControl(mode);
 	}
 
-	protected final void takeControl(ControlMode mode) {
-		this.currentMode = mode;
+	private final void takeControl(ControlMode mode) {
 		currentMode.takeControl();
 	}
 
-	protected final void releaseControl() {
+	private final void releaseControl() {
 		if (getMode() != null) {
 			getMode().releaseControl();
 		}
 		this.currentMode = null;
 	}
-
-	public abstract ControlMode nextMode();
 	
 	/*
 	 * Driver support

@@ -1,8 +1,10 @@
 package mazestormer.command.explore;
 
+import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.ExplorerBarcodeMapping;
+import mazestormer.barcode.IAction;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
 import mazestormer.maze.IMaze.Target;
@@ -11,12 +13,24 @@ import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 
 public class FinishControlMode extends ControlMode {
+	
+	/*
+	 * Data
+	 */
 
 	private static final BarcodeMapping mapping = new ExplorerBarcodeMapping();
+	
+	/*
+	 * Constructor
+	 */
 
 	public FinishControlMode(Player player, Commander commander) {
 		super(player, commander);
 	}
+	
+	/*
+	 * ControlMode Management
+	 */
 
 	@Override
 	public void takeControl() {
@@ -32,6 +46,10 @@ public class FinishControlMode extends ControlMode {
 		getCommander().getDriver().getRobot().getPilot()
 				.setTravelSpeed(ControllableRobot.travelSpeed);
 	}
+	
+	/*
+	 * Driver support
+	 */
 
 	@Override
 	public Tile nextTile(Tile currentTile) {
@@ -46,6 +64,15 @@ public class FinishControlMode extends ControlMode {
 			return getMaze().getTarget(Target.CHECKPOINT);
 		}
 	}
+	
+	@Override
+	public IAction getAction(Barcode barcode) {
+		return mapping.getAction(barcode);
+	}
+	
+	/*
+	 * Utilities
+	 */
 
 	private boolean isTarget(Tile tile, Target target) {
 		Tile targetTile = getMaze().getTarget(target);
@@ -57,11 +84,6 @@ public class FinishControlMode extends ControlMode {
 	@Override
 	public boolean isBarcodeActionEnabled() {
 		return false;
-	}
-
-	@Override
-	public BarcodeMapping getBarcodeMapping() {
-		return mapping;
 	}
 
 }

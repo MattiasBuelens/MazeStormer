@@ -12,15 +12,23 @@ import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 
 public abstract class AbstractExploreControlMode extends ControlMode {
+	
+	/*
+	 * Data
+	 */
 
 	private final LinkedList<Tile> queue = new LinkedList<Tile>();
+	
+	/*
+	 * Constructor
+	 */
 
 	public AbstractExploreControlMode(Player player, Commander commander) {
 		super(player, commander);
 	}
 
 	/*
-	 * Methodes eigen voor deze controlMode
+	 * ControlMode management
 	 */
 	
 	@Override
@@ -31,6 +39,10 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	@Override
 	public void releaseControl() {
 	}
+	
+	/*
+	 * Driver support
+	 */
 
 	@Override
 	public Tile nextTile(Tile currentTile) {
@@ -112,14 +124,8 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 			return Integer.compare(leftDistance, rightDistance);
 		}
 
-		// TODO This won't work if there exist longer paths around a seesaw!!!
 		public int shortestPathLength(Tile startTile, Tile endTile) {
-			List<Tile> path = new PathFinder(maze).findTilePath(startTile, endTile);
-			for (Tile tile : path) {
-				if (tile.getIgnoreFlag()) {
-					return Integer.MAX_VALUE;
-				}
-			}
+			List<Tile> path = new PathFinder(maze).findTilePathWithoutSeesaws(startTile, endTile);
 			return path.size();
 		}
 

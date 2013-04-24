@@ -12,8 +12,8 @@ import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
-import mazestormer.explore.Commander;
-import mazestormer.explore.ControlMode;
+import mazestormer.command.Commander;
+import mazestormer.command.ControlMode;
 import mazestormer.game.Game;
 import mazestormer.game.GameListener;
 import mazestormer.maze.DefaultMazeListener;
@@ -46,16 +46,21 @@ public class GameRunner extends Commander implements GameListener {
 	 * Current control mode
 	 */
 	ControlMode currentControlmode;
-
+	
 	/*
-	 * Utilities
+	 * GameListener
 	 */
+
 	private final PositionReporter positionReporter = new PositionReporter();
 	private final TileReporter tileReporter = new TileReporter();
 	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
 
+	/*
+	 * Constructor
+	 */
+	
 	public GameRunner(Player player, Game game) {
 		super(player);
 
@@ -65,10 +70,6 @@ public class GameRunner extends Commander implements GameListener {
 
 		// Modes
 		setMode(new ExploreIslandControlMode(player,this);
-	}
-
-	protected void log(String message) {
-		getPlayer().getLogger().log(Level.INFO, message);
 	}
 
 	/*
@@ -282,6 +283,24 @@ public class GameRunner extends Commander implements GameListener {
 			game.sendTiles(tile);
 		}
 
+	}
+
+	/*
+	 * ControlMode management
+	 */
+	
+	@Override
+	public ControlMode nextMode() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	/*
+	 * Utilities
+	 */
+	
+	protected void log(String message) {
+		getPlayer().getLogger().log(Level.INFO, message);
 	}
 
 }

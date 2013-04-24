@@ -1,13 +1,22 @@
 package mazestormer.command.explore;
 
 import mazestormer.command.Commander;
+import mazestormer.command.ControlMode;
 import mazestormer.player.Player;
 
 public class Explorer extends Commander {
+	
+	/*
+	 * ControlModes
+	 */
 
 	private final ExploreControlMode exploreMode;
 	private final FinishControlMode finishMode;
 
+	/*
+	 * Constructor
+	 */
+	
 	public Explorer(Player player) {
 		super(player);
 
@@ -15,9 +24,12 @@ public class Explorer extends Commander {
 		exploreMode = new ExploreControlMode(player, this);
 		finishMode = new FinishControlMode(player, this);
 
-		setStartMode(exploreMode);
-		bind(exploreMode, finishMode);
+		setMode(exploreMode);
 	}
+	
+	/*
+	 * Objective Management
+	 */
 
 	@Override
 	public void start() {
@@ -27,6 +39,17 @@ public class Explorer extends Commander {
 	@Override
 	public void stop() {
 		super.stop();
+	}
+	
+	/*
+	 * ControlMode Management
+	 */
+
+	@Override
+	public ControlMode nextMode() {
+		// the only transition in this objective is to finish-mode
+		currentMode = finishMode;
+		return finishMode;
 	}
 
 }
