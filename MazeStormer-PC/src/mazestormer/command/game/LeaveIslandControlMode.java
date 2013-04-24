@@ -1,4 +1,4 @@
-package mazestormer.game;
+package mazestormer.command.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,9 +10,9 @@ import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.DriveOverSeesawAction;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
-import mazestormer.explore.AbstractExploreControlMode.ClosestTileComparator;
-import mazestormer.explore.ControlMode;
-import mazestormer.explore.Driver;
+import mazestormer.command.ControlMode;
+import mazestormer.command.Driver;
+import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Seesaw;

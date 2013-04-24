@@ -1,7 +1,9 @@
-package mazestormer.explore;
+package mazestormer.command.explore;
 
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.ExplorerBarcodeMapping;
+import mazestormer.command.AbstractExploreControlMode;
+import mazestormer.command.Commander;
 import mazestormer.player.Player;
 
 public class ExploreControlMode extends AbstractExploreControlMode {

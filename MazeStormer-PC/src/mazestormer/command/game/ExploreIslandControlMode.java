@@ -1,4 +1,4 @@
-package mazestormer.game;
+package mazestormer.command.game;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.ObjectFoundAction;
-import mazestormer.explore.AbstractExploreControlMode;
+import mazestormer.command.AbstractExploreControlMode;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.util.Future;

@@ -1,5 +1,6 @@
-package mazestormer.explore;
+package mazestormer.command.explore;
 
+import mazestormer.command.Commander;
 import mazestormer.player.Player;
 
 public class Explorer extends Commander {

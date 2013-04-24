@@ -1,4 +1,4 @@
-package mazestormer.explore;
+package mazestormer.command;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

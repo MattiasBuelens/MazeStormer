@@ -1,4 +1,4 @@
-package mazestormer.explore;
+package mazestormer.command;
 
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.IAction;

@@ -1,8 +1,10 @@
-package mazestormer.explore;
+package mazestormer.command.explore;
 
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.BarcodeSpeed;
 import mazestormer.barcode.ExplorerBarcodeMapping;
+import mazestormer.command.Commander;
+import mazestormer.command.ControlMode;
 import mazestormer.maze.IMaze.Target;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;

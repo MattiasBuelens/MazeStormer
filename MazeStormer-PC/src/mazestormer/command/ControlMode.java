@@ -1,4 +1,4 @@
-package mazestormer.explore;
+package mazestormer.command;
 
 import java.util.logging.Level;
 

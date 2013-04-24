@@ -1,7 +1,7 @@
 package mazestormer.controller;
 
-import mazestormer.explore.Explorer;
-import mazestormer.explore.Driver;
+import mazestormer.command.Driver;
+import mazestormer.command.explore.Explorer;
 import mazestormer.player.Player;
 import mazestormer.state.AbstractStateListener;
 
