@@ -8,6 +8,16 @@ import mazestormer.detect.RangeFeatureDetector;
 public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 
 	/**
+	 * The width of the robot, in centimeters.
+	 */
+	public static final double robotWidth = 8.0d;
+
+	/**
+	 * The height of the robot, in centimeters.
+	 */
+	public static final double robotHeight = 15.0d;
+
+	/**
 	 * Left wheel diameter, in centimeters.
 	 */
 	public final static float leftWheelDiameter = 5.6f;

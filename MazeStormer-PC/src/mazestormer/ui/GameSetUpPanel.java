@@ -74,8 +74,13 @@ public class GameSetUpPanel extends ViewPanel {
 	private void registerController() {
 		registerEventBus(controller.getEventBus());
 
-		serverModel.setSelectedItem(ConnectionMode.LOCAL);
+		serverModel.setSelectedItem(controller.getConnectionMode());
 		playerID.setText(controller.getPlayerID());
+		gameID.setText(controller.getGameID());
+	}
+
+	private ConnectionMode getServer() {
+		return (ConnectionMode) serverModel.getSelectedItem();
 	}
 
 	private void createServer() {
@@ -102,6 +107,13 @@ public class GameSetUpPanel extends ViewPanel {
 
 	private String getPlayerID() {
 		return playerID.getText();
+	}
+
+	private void setPlayerID() {
+		String id = getPlayerID();
+		if (!id.isEmpty()) {
+			controller.setPlayerID(id);
+		}
 	}
 
 	private void createJoinGame() {
@@ -191,17 +203,12 @@ public class GameSetUpPanel extends ViewPanel {
 				"Setup", 1);
 	}
 
-	private void setPlayerID() {
-		String id = getPlayerID();
-		if (!id.isEmpty())
-			controller.setPlayerID(id);
-	}
-
 	private void joinGame() {
-		ConnectionMode mode = (ConnectionMode) serverModel.getSelectedItem();
-		String id = getGameID();
-		if (!id.isEmpty())
-			controller.joinGame(mode, id);
+		controller.setConnectionMode(getServer());
+		controller.setGameID(getGameID());
+		if (!getGameID().trim().isEmpty()) {
+			controller.joinGame();
+		}
 	}
 
 	private void setReady(boolean isReady) {

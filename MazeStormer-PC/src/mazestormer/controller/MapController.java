@@ -2,9 +2,9 @@ package mazestormer.controller;
 
 import java.awt.EventQueue;
 import java.awt.Rectangle;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.IMaze;
@@ -25,7 +25,7 @@ import org.w3c.dom.svg.SVGDocument;
 public abstract class MapController extends SubController implements IMapController {
 
 	private MapDocument map;
-	private Map<Player, RobotLayer> robotLayers = new HashMap<Player, RobotLayer>();
+	private Map<Player, RobotLayer> robotLayers = new ConcurrentHashMap<Player, RobotLayer>();
 	private MapLayerHandler mapLayerHandler;
 
 	public MapController(MainController mainController) {

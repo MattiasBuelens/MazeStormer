@@ -24,6 +24,8 @@ public class VirtualRobot implements ControllableRobot {
 
 	private final VirtualPilot pilot;
 	private final PoseProvider poseProvider;
+	private final double width = robotWidth;
+	private final double height = robotHeight;
 
 	private final CalibratedLightSensor light;
 	private final ObservableRangeScanner rangeScanner;
@@ -69,6 +71,16 @@ public class VirtualRobot implements ControllableRobot {
 
 		// Updates
 		updateProducer = new VirtualUpdateProducer(this);
+	}
+
+	@Override
+	public double getWidth() {
+		return width;
+	}
+
+	@Override
+	public double getHeight() {
+		return height;
 	}
 
 	private World getWorld() {

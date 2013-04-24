@@ -14,11 +14,11 @@ import mazestormer.maze.parser.Parser;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
 
-public class ConfigurationController extends SubController implements
-		IConfigurationController {
+public class ConfigurationController extends SubController implements IConfigurationController {
 
-	private RobotType robotType;
-	private ControlMode controlMode;
+	private RobotType robotType = RobotType.PHYSICAL;
+	private ControlMode controlMode = ControlMode.Manual;
+	private String mazeFilePath = "";
 
 	public ConfigurationController(MainController mainController) {
 		super(mainController);
@@ -94,13 +94,19 @@ public class ConfigurationController extends SubController implements
 			postEvent(new StopEvent());
 		}
 	}
-	
+
 	private void postState(ConfigurationEvent.EventType eventType) {
 		postEvent(new ConfigurationEvent(eventType));
 	}
 
 	@Override
+	public String getMazePath() {
+		return mazeFilePath;
+	}
+
+	@Override
 	public void loadMaze(String mazeFilePath) {
+		this.mazeFilePath = mazeFilePath;
 		IMaze maze = getMainController().getWorld().getMaze();
 		CharSequence contents;
 		try {
@@ -115,4 +121,5 @@ public class ConfigurationController extends SubController implements
 			warning("Failed to parse source maze:" + e.getMessage());
 		}
 	}
+
 }

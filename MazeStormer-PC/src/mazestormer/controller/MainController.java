@@ -7,7 +7,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import org.apache.commons.cli.ParseException;
+
 import lejos.robotics.navigation.Pose;
+import mazestormer.cli.CommandLineConfiguration;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
@@ -20,7 +23,6 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
-import mazestormer.util.EventSource;
 import mazestormer.world.World;
 
 import com.google.common.eventbus.AsyncEventBus;
@@ -33,16 +35,31 @@ public class MainController implements IMainController {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					new MainController();
+					start(args);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+
+	public static void start(String[] args) throws Exception {
+		// Controller
+		IMainController controller = new MainController();
+		try {
+			new CommandLineConfiguration(controller).parse(args);
+		} catch (ParseException e) {
+			System.err.println(e.getMessage());
+		}
+
+		// View
+		MainView view = new MainView(controller);
+		view.registerEventBus(controller.getEventBus());
+		view.setVisible(true);
 	}
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("MainController-%d").build();
@@ -81,11 +98,6 @@ public class MainController implements IMainController {
 
 	private IStateController state;
 
-	/*
-	 * View
-	 */
-	private EventSource view;
-
 	public MainController() {
 		// Create event bus on named executor
 		ExecutorService executor = Executors.newSingleThreadExecutor(factory);
@@ -103,18 +115,8 @@ public class MainController implements IMainController {
 		connectionContext.setDeviceName("brons");
 		connectionContext.setWorld(getWorld());
 
-		// View
-		view = createView();
-		view.registerEventBus(getEventBus());
-
 		// Post initialized
 		postEvent(new InitializeEvent());
-	}
-
-	protected EventSource createView() {
-		MainView view = new MainView(this);
-		view.setVisible(true);
-		return view;
 	}
 
 	@Override
@@ -344,19 +346,21 @@ public class MainController implements IMainController {
 	}
 
 	/*
-	 * World
-	 */
-
-	public World getWorld() {
-		return world;
-	}
-
-	/*
 	 * Player
 	 */
 
+	@Override
 	public RelativePlayer getPlayer() {
 		return personalPlayer;
+	}
+
+	/*
+	 * World
+	 */
+
+	@Override
+	public World getWorld() {
+		return world;
 	}
 
 }

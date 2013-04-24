@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.Maze;
@@ -16,10 +17,13 @@ import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
+import mazestormer.robot.Robot;
+import mazestormer.util.LongPoint;
 import peno.htttp.Callback;
 import peno.htttp.DisconnectReason;
 import peno.htttp.PlayerClient;
 import peno.htttp.PlayerHandler;
+import peno.htttp.PlayerType;
 
 import com.rabbitmq.client.Connection;
 
@@ -37,9 +41,17 @@ public class Game {
 	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
-
 		this.handler = new Handler();
-		this.client = new PlayerClient(connection, this.handler, id, localPlayer.getPlayerID());
+
+		// Gather player details
+		String playerID = localPlayer.getPlayerID();
+		// TODO Determine robot type
+		PlayerType playerType = PlayerType.PHYSICAL;
+		double width = localPlayer.getRobot().getWidth();
+		double height = localPlayer.getRobot().getHeight();
+		peno.htttp.PlayerDetails player = new peno.htttp.PlayerDetails(playerID, playerType, width, height);
+
+		this.client = new PlayerClient(connection, this.handler, id, player);
 	}
 
 	public void addGameListener(GameListener listener) {
@@ -58,8 +70,12 @@ public class Game {
 		return client.getPlayers();
 	}
 
+	protected Player getLocalPlayer() {
+		return localPlayer;
+	}
+
 	private CombinedMaze getLocalMaze() {
-		return (CombinedMaze) localPlayer.getMaze();
+		return (CombinedMaze) getLocalPlayer().getMaze();
 	}
 
 	public void join(final Callback<Void> callback) {
@@ -157,8 +173,11 @@ public class Game {
 
 	public void updatePosition(Pose pose) {
 		try {
-			// Publish
-			client.updatePosition(pose.getX(), pose.getY(), pose.getHeading());
+			// Get tile at position
+			Point tilePosition = getLocalMaze().toTile(getLocalMaze().toRelative(pose.getLocation()));
+			Tile tile = getLocalMaze().getTileAt(tilePosition);
+			// Publish tile position
+			client.updatePosition(tile.getX(), tile.getY(), pose.getHeading());
 		} catch (IllegalStateException | IOException e) {
 			// TODO Auto-generated catch block
 			System.err.println("Could not report position update");
@@ -191,7 +210,7 @@ public class Game {
 			// TODO Is this conform with maze coordinate specification?
 			long x = tile.getX();
 			long y = tile.getY();
-			String token = Parser.stringify(localPlayer.getMaze(), tile.getPosition());
+			String token = Parser.stringify(getLocalMaze(), tile.getPosition());
 			tilesToSend.add(new peno.htttp.Tile(x, y, token));
 		}
 
@@ -231,8 +250,11 @@ public class Game {
 		if (hasPartner())
 			return;
 
+		// Create robot to track partner's position
+		// Note: the size of the partner's robot are not important
+		Robot partnerRobot = new ObservableRobot(0, 0);
 		// Create partner
-		RelativePlayer partner = new RelativePlayer(partnerID, new ObservableRobot(), new Maze());
+		RelativePlayer partner = new RelativePlayer(partnerID, partnerRobot, new Maze());
 		partnerPlayer = partner;
 		// Set partner maze
 		getLocalMaze().setPartnerMaze(partner.getMaze());
@@ -361,10 +383,15 @@ public class Game {
 		}
 
 		@Override
-		public void teamPosition(double x, double y, double angle) {
+		public void teamPosition(long x, long y, double angle) {
 			if (hasPartner()) {
+				// Transform tile position to absolute maze position
+				Point relativePosition = getPartner().getMaze().fromTile(new LongPoint(x, y).toPoint());
+				Point absolutePosition = getPartner().getMaze().toAbsolute(relativePosition);
+				Pose pose = new Pose();
+				pose.setLocation(absolutePosition);
+				pose.setHeading((float) angle);
 				// Update partner pose
-				Pose pose = new Pose((float) x, (float) y, (float) angle);
 				getPartner().getRobot().getPoseProvider().setPose(pose);
 			}
 		}

@@ -1,6 +1,8 @@
 package mazestormer.maze;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -96,7 +98,8 @@ public enum Orientation {
 	 * Rotate this orientation clockwise for the given amount of times.
 	 * 
 	 * <p>
-	 * Example: Orientation.NORTH.rotateClockwise(3) == Orientation.WEST
+	 * Example: {@code Orientation.NORTH.rotateClockwise(3) == Orientation.WEST}
+	 * </p>
 	 * 
 	 * @param amount
 	 *            The amount of times to rotate.
@@ -116,7 +119,8 @@ public enum Orientation {
 	 * Rotate this orientation clockwise.
 	 * 
 	 * <p>
-	 * Example: Orientation.NORTH.rotateClockwise() == Orientation.EAST
+	 * Example: {@code Orientation.NORTH.rotateClockwise() == Orientation.EAST}
+	 * </p>
 	 * 
 	 * @return The rotated orientation.
 	 */
@@ -128,7 +132,9 @@ public enum Orientation {
 	 * Rotate this orientation counter-clockwise for the given amount of times.
 	 * 
 	 * <p>
-	 * Example: Orientation.EAST.rotateCounterClockwise(3) == Orientation.SOUTH
+	 * Example:
+	 * {@code Orientation.EAST.rotateCounterClockwise(3) == Orientation.SOUTH}
+	 * </p>
 	 * 
 	 * @param amount
 	 *            The amount of times to rotate.
@@ -143,12 +149,51 @@ public enum Orientation {
 	 * Rotate this orientation counter-clockwise.
 	 * 
 	 * <p>
-	 * Example: Orientation.NORTH.rotateCounterClockwise() == Orientation.WEST
+	 * Example:
+	 * {@code Orientation.NORTH.rotateCounterClockwise() == Orientation.WEST}
+	 * </p>
 	 * 
 	 * @return The rotated orientation.
 	 */
 	public Orientation rotateCounterClockwise() {
 		return rotateCounterClockwise(1);
+	}
+
+	/**
+	 * Get the number of clockwise orientations needed to rotate this
+	 * orientation to the given orientation.
+	 * 
+	 * <p>
+	 * {@code nbRotations == this.getNbClockwiseRotationsTo(orientation)} if and
+	 * only if {@code this.rotateClockwise(nbOrientations) == orientation}.
+	 * </p>
+	 * 
+	 * @param orientation
+	 *            The orientation to rotate towards.
+	 * @return The number of clockwise rotations.
+	 */
+	public int getNbClockwiseRotationsTo(Orientation orientation) {
+		final int nbOrientations = Orientation.values().length;
+		return IntMath.mod(orientation.ordinal() - this.ordinal(), nbOrientations);
+	}
+
+	/**
+	 * Get the number of counter-clockwise orientations needed to rotate this
+	 * orientation to the given orientation.
+	 * 
+	 * <p>
+	 * {@code nbRotations == this.getNbCounterClockwiseRotationsTo(orientation)}
+	 * if and only if
+	 * {@code this.rotateCounterClockwise(nbOrientations) == orientation}.
+	 * </p>
+	 * 
+	 * @param orientation
+	 *            The orientation to rotate towards.
+	 * @return The number of counter-clockwise rotations.
+	 */
+	public int getNbCounterClockwiseRotationsTo(Orientation orientation) {
+		final int nbOrientations = Orientation.values().length;
+		return IntMath.mod(this.ordinal() - orientation.ordinal(), nbOrientations);
 	}
 
 	/**
@@ -182,6 +227,14 @@ public enum Orientation {
 	 */
 	public <P extends Point2D> P shift(P point) {
 		return shift(point, 1);
+	}
+
+	public static List<String> getShortNames() {
+		List<String> shortNames = new ArrayList<String>(values().length);
+		for (Orientation orientation : values()) {
+			shortNames.add(orientation.getShortName());
+		}
+		return shortNames;
 	}
 
 	/**

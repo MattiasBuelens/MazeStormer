@@ -30,6 +30,8 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 
 	private final PhysicalPilot pilot;
 	private final PoseProvider poseProvider;
+	private final double width = robotWidth;
+	private final double height = robotHeight;
 
 	private final PhysicalLightSensor light;
 	private final ObservableRangeScanner rangeScanner;
@@ -66,6 +68,16 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
+	}
+
+	@Override
+	public double getWidth() {
+		return width;
+	}
+
+	@Override
+	public double getHeight() {
+		return height;
 	}
 
 	@Override
