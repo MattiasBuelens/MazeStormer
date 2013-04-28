@@ -18,8 +18,13 @@ import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
+import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class Maze implements IMaze {
 
@@ -36,7 +41,6 @@ public class Maze implements IMaze {
 	private PoseTransform originTransform;
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
-	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
@@ -45,10 +49,15 @@ public class Maze implements IMaze {
 
 	private final Map<Barcode, Seesaw> seesaws = new HashMap<Barcode, Seesaw>();
 
+	private final EdgeGeometry edgeGeometry;
+
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
 		this.barLength = barLength;
+
+		this.edgeGeometry = new EdgeGeometry(this);
+		addListener(edgeGeometry);
 
 		setOriginToDefault();
 	}
@@ -266,7 +275,6 @@ public class Maze implements IMaze {
 
 		// Fire edge changed event
 		fireEdgeChanged(edge);
-		updateEdgeLine(edge);
 
 		// Fire tile changed events
 		for (LongPoint touchingPosition : edge.getTouching()) {
@@ -420,7 +428,6 @@ public class Maze implements IMaze {
 	@Override
 	public void clear() {
 		tiles.clear();
-		lines.clear();
 		targets.clear();
 		fireMazeCleared();
 	}
@@ -529,8 +536,75 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public Collection<Line> getEdgeLines() {
-		return Collections.unmodifiableCollection(lines.values());
+	public Geometry getEdgeGeometry() {
+		return edgeGeometry.getGeometry();
+	}
+
+	@Override
+	public Geometry getGeometry() {
+		Geometry geometry = getEdgeGeometry();
+		Geometry seesawGeometry = getSeesawGeometry(geometry.getFactory());
+		geometry = geometry.union(seesawGeometry);
+		return geometry;
+	}
+
+	protected Geometry getSeesawGeometry(GeometryFactory factory) {
+		// Make edge geometries
+		Collection<Edge> edges = getSeesawEdges();
+		List<Polygon> edgePolygons = new ArrayList<Polygon>();
+		for (Edge edge : edges) {
+			edgePolygons.add(edgeGeometry.getGeometry(edge));
+		}
+		// Combine
+		return factory.createMultiPolygon(GeometryFactory.toPolygonArray(edgePolygons));
+	}
+
+	protected Collection<Edge> getSeesawEdges() {
+		Map<Seesaw, Edge> closedEdges = new HashMap<Seesaw, Edge>();
+		for (Seesaw seesaw : seesaws.values()) {
+			// Ignore already processed seesaws
+			if (closedEdges.containsKey(seesaw))
+				continue;
+			// Get edge between closed seesaw tile and barcode tile
+			Barcode closedBarcode = seesaw.getClosedBarcode();
+			Tile closedSeesawTile = getSeesawTile(closedBarcode);
+			Tile closedBarcodeTile = getBarcodeTile(closedBarcode);
+			if (closedSeesawTile != null && closedBarcodeTile != null) {
+				// Store edge
+				Edge closedEdge = closedSeesawTile.getEdgeAt(closedSeesawTile.orientationTo(closedBarcodeTile));
+				closedEdges.put(seesaw, closedEdge);
+			}
+		}
+		return closedEdges.values();
+	}
+
+	@Override
+	public Polygon getSurroundingEdgeGeometry(Point2D relativePosition) {
+		return getSurroundingGeometry(getEdgeGeometry(), relativePosition);
+	}
+
+	@Override
+	public Polygon getSurroundingGeometry(Point2D relativePosition) {
+		return getSurroundingGeometry(getGeometry(), relativePosition);
+	}
+
+	protected Polygon getSurroundingGeometry(Geometry geometry, Point2D relativePosition) {
+		GeometryFactory geomFact = geometry.getFactory();
+		Geometry point = GeometryUtils.toGeometry(relativePosition, geomFact);
+
+		// Get the inner geometry
+		Geometry inner = geometry.getEnvelope().difference(geometry);
+
+		// Find the polygon containing the given point
+		for (int i = 0; i < inner.getNumGeometries(); i++) {
+			Polygon innerPolygon = (Polygon) inner.getGeometryN(i);
+			if (innerPolygon.contains(point)) {
+				// Simplify result
+				return GeometryUtils.removeCollinear(innerPolygon);
+			}
+		}
+		// Point not found inside geometry
+		return null;
 	}
 
 	@Override
@@ -552,16 +626,6 @@ public class Maze implements IMaze {
 
 		// Return bounding box
 		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX() - p1.getX(), p2.getY() - p1.getY());
-	}
-
-	private void updateEdgeLine(Edge edge) {
-		if (edge.getType() == EdgeType.WALL) {
-			// Add line
-			lines.put(edge, createEdgeLine(edge));
-		} else {
-			// Remove line
-			lines.remove(edge);
-		}
 	}
 
 	private Line createEdgeLine(Edge edge) {

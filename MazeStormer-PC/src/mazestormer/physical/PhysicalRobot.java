@@ -10,18 +10,24 @@ import mazestormer.condition.Condition;
 import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.infrared.Envelope;
+import mazestormer.infrared.IRRobot;
+import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.remote.MessageListener;
 import mazestormer.report.Report;
 import mazestormer.report.UpdateReport;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdate;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
+import mazestormer.simulator.VirtualRobotIRSensor;
+import mazestormer.world.ModelType;
+import mazestormer.world.World;
 
-public class PhysicalRobot extends PhysicalComponent implements ControllableRobot {
+public class PhysicalRobot extends PhysicalComponent implements ControllablePCRobot, IRRobot {
 
 	/**
 	 * Timeout for synchronous requests.
@@ -37,13 +43,16 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 	private final ObservableRangeScanner rangeScanner;
 	private final RangeScannerFeatureDetector rangeDetector;
 	private final IRSensor infrared;
+	private final IRSensor infraredRobot;
 
 	private final SoundPlayer soundPlayer;
 
 	private final UpdateReceiver updateReceiver;
 	private final List<RobotUpdateListener> updateListeners = new ArrayList<RobotUpdateListener>();
 
-	public PhysicalRobot(PhysicalCommunicator communicator) {
+	private final Envelope envelope;
+
+	public PhysicalRobot(PhysicalCommunicator communicator, World world) {
 		super(communicator);
 
 		// Updates
@@ -64,10 +73,15 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 		rangeDetector.setPoseProvider(poseProvider);
 
 		// Infrared sensor
-		infrared = new PhysicalIRSensor(communicator);
+		infrared = new PhysicalIRSensor(getCommunicator());
+		// TODO: sv_cheats 1
+		// infrared = new VirtualSeesawIRSensor(world);
+		infraredRobot = new VirtualRobotIRSensor(world);
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
+
+		this.envelope = new RectangularEnvelope(width, height, DETECTION_RADIUS);
 	}
 
 	@Override
@@ -98,6 +112,11 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 	@Override
 	public IRSensor getIRSensor() {
 		return infrared;
+	}
+	
+	@Override
+	public IRSensor getRobotIRSensor() {
+		return infraredRobot;
 	}
 
 	@Override
@@ -158,6 +177,21 @@ public class PhysicalRobot extends PhysicalComponent implements ControllableRobo
 			}
 		}
 
+	}
+
+	@Override
+	public boolean isEmitting() {
+		return true;
+	}
+
+	@Override
+	public Envelope getEnvelope() {
+		return this.envelope;
+	}
+
+	@Override
+	public ModelType getModelType() {
+		return ModelType.PHYSICAL;
 	}
 
 }

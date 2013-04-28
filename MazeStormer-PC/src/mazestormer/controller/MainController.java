@@ -7,23 +7,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import org.apache.commons.cli.ParseException;
-
 import lejos.robotics.navigation.Pose;
 import mazestormer.cli.CommandLineConfiguration;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
-import mazestormer.connect.RobotType;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
 import mazestormer.player.RelativePlayer;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.simulator.VirtualRobot;
 import mazestormer.simulator.collision.CollisionListener;
 import mazestormer.ui.MainView;
+import mazestormer.world.ModelType;
 import mazestormer.world.World;
+
+import org.apache.commons.cli.ParseException;
 
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -275,7 +275,7 @@ public class MainController implements IMainController {
 		return connector != null && connector.isConnected();
 	}
 
-	public void connect(RobotType robotType) throws IllegalStateException {
+	public void connect(ModelType robotType) throws IllegalStateException {
 		checkState(!isConnected());
 
 		connector = connectionProvider.getConnector(robotType);
@@ -308,9 +308,9 @@ public class MainController implements IMainController {
 	 * Robot
 	 */
 
-	public ControllableRobot getControllableRobot() throws IllegalStateException {
+	public ControllablePCRobot getControllableRobot() throws IllegalStateException {
 		checkState(isConnected());
-		ControllableRobot r = connector.getRobot();
+		ControllablePCRobot r = connector.getRobot();
 		getPlayer().setRobot(r);
 		return r;
 	}

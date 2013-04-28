@@ -6,7 +6,7 @@ import lejos.nxt.*;
 import mazestormer.connect.ConnectionContext;
 import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
-import mazestormer.connect.RobotType;
+import mazestormer.world.ModelType;
 
 public class CalibrateLight {
 
@@ -14,7 +14,7 @@ public class CalibrateLight {
 	public static void main(String[] aArgs) throws Exception {
 
 		Connector connector = new ConnectionProvider()
-				.getConnector(RobotType.PHYSICAL);
+				.getConnector(ModelType.PHYSICAL);
 		ConnectionContext context = new ConnectionContext();
 		context.setDeviceName("brons");
 		connector.connect(context);

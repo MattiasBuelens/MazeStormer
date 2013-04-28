@@ -6,10 +6,10 @@ import java.util.Properties;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ControlMode;
-import mazestormer.connect.RobotType;
 import mazestormer.controller.IMainController;
 import mazestormer.game.ConnectionMode;
 import mazestormer.game.DummyGame;
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
@@ -17,8 +17,8 @@ import mazestormer.observable.ObservableRobot;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.Robot;
 import mazestormer.util.LongPoint;
+import mazestormer.world.ModelType;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -55,7 +55,7 @@ public class CommandLineConfiguration {
 		}
 		if (line.hasOption("robot")) {
 			String robotTypeString = line.getOptionValue("robot");
-			RobotType robotType = RobotType.valueOf(robotTypeString.toUpperCase());
+			ModelType robotType = ModelType.valueOf(robotTypeString.toUpperCase());
 			controller.configuration().connect(robotType);
 		}
 		if (line.hasOption("control")) {
@@ -100,7 +100,8 @@ public class CommandLineConfiguration {
 
 	private void createDummy(String name, long x, long y, Orientation orientation) {
 		// Create dummy
-		Robot robot = new ObservableRobot(ControllableRobot.robotWidth, ControllableRobot.robotHeight);
+		IRRobot robot = new ObservableRobot(ModelType.VIRTUAL, ControllableRobot.robotWidth,
+				ControllableRobot.robotHeight);
 		RelativePlayer dummy = new RelativePlayer(name, robot, new Maze());
 		// Position on tile
 		IMaze maze = controller.getWorld().getMaze();
@@ -117,7 +118,8 @@ public class CommandLineConfiguration {
 
 	private void createDummyPlayer(String name) throws IOException {
 		// Create player
-		Robot robot = new ObservableRobot(ControllableRobot.robotWidth, ControllableRobot.robotHeight);
+		IRRobot robot = new ObservableRobot(ModelType.VIRTUAL, ControllableRobot.robotWidth,
+				ControllableRobot.robotHeight);
 		Player player = new RelativePlayer(name, robot, new Maze());
 		// Create game
 		Connection connection = controller.gameSetUpControl().getConnectionMode().getConnection();
@@ -138,7 +140,7 @@ public class CommandLineConfiguration {
 		options.addOption(OptionBuilder.withLongOpt("help").withDescription("Prints this help message.").create("?"));
 
 		// robot
-		String robotTypes = makeList((Object[]) RobotType.values());
+		String robotTypes = makeList((Object[]) ModelType.values());
 		options.addOption(OptionBuilder.withLongOpt("robot").hasArgs(1).withArgName("robotType")
 				.withDescription("Connects to a robot:\n" + robotTypes).create("r"));
 

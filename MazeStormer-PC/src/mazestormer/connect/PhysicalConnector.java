@@ -12,25 +12,26 @@ import mazestormer.command.CommandType;
 import mazestormer.command.ShutdownCommand;
 import mazestormer.physical.PhysicalCommunicator;
 import mazestormer.physical.PhysicalRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
+import mazestormer.world.World;
 
 public class PhysicalConnector implements Connector {
 
 	private NXTConnector connector;
 	private PhysicalCommunicator communicator;
-	private ControllableRobot robot;
+	private ControllablePCRobot robot;
 
 	@Override
-	public ControllableRobot getRobot() throws IllegalStateException {
+	public ControllablePCRobot getRobot() throws IllegalStateException {
 		checkState(isConnected());
 		return robot;
 	}
 
 	@Override
 	public boolean isConnected() {
-		return communicator != null && communicator.isListening()
-				&& robot != null;
+		return communicator != null && communicator.isListening() && robot != null;
 	}
 
 	@Override
@@ -47,15 +48,14 @@ public class PhysicalConnector implements Connector {
 		communicator = new PhysicalCommunicator(connector);
 
 		// Create robot
-		robot = createRobot(communicator);
+		robot = createRobot(communicator, context.getWorld());
 
 		// Start communicating
 		communicator.start();
 	}
 
-	private static ControllableRobot createRobot(
-			PhysicalCommunicator communicator) {
-		ControllableRobot robot = new PhysicalRobot(communicator);
+	private static ControllablePCRobot createRobot(PhysicalCommunicator communicator, World world) {
+		ControllablePCRobot robot = new PhysicalRobot(communicator, world);
 		// Set default speeds
 		Pilot pilot = robot.getPilot();
 		pilot.setTravelSpeed(ControllableRobot.travelSpeed);
@@ -66,8 +66,7 @@ public class PhysicalConnector implements Connector {
 	private boolean createConnection(String deviceName) {
 		// Search for NXT
 		NXTConnector connector = new NXTConnector();
-		NXTInfo[] devices = connector.search(deviceName, null,
-				NXTCommFactory.BLUETOOTH);
+		NXTInfo[] devices = connector.search(deviceName, null, NXTCommFactory.BLUETOOTH);
 		if (devices.length == 0)
 			return false;
 

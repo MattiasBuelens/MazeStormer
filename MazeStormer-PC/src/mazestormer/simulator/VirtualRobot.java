@@ -8,7 +8,11 @@ import mazestormer.condition.ConditionFuture;
 import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
+import mazestormer.infrared.Envelope;
+import mazestormer.infrared.IRRobot;
+import mazestormer.infrared.RectangularEnvelope;
 import mazestormer.robot.CalibratedLightSensor;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
@@ -16,9 +20,10 @@ import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
 import mazestormer.simulator.collision.CollisionObserver;
 import mazestormer.simulator.collision.VirtualCollisionDetector;
+import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
-public class VirtualRobot implements ControllableRobot {
+public class VirtualRobot implements ControllablePCRobot, IRRobot {
 
 	private final World world;
 
@@ -30,7 +35,8 @@ public class VirtualRobot implements ControllableRobot {
 	private final CalibratedLightSensor light;
 	private final ObservableRangeScanner rangeScanner;
 	private final RangeScannerFeatureDetector rangeDetector;
-	private final VirtualIRSensor infrared;
+	private final IRSensor infraredRobot;
+	private final IRSensor infraredSeesaw;
 
 	private final SoundPlayer soundPlayer;
 
@@ -40,6 +46,8 @@ public class VirtualRobot implements ControllableRobot {
 	private final VirtualConditionResolvers conditionResolvers;
 
 	private final VirtualUpdateProducer updateProducer;
+
+	private final Envelope envelope;
 
 	public VirtualRobot(World world) {
 		this.world = world;
@@ -53,11 +61,13 @@ public class VirtualRobot implements ControllableRobot {
 
 		// Range scanner
 		rangeScanner = new VirtualRangeScanner(getWorld());
-		rangeDetector = new RangeScannerFeatureDetector(rangeScanner, sensorMaxDistance, new Point(0f, 0f));
+		rangeDetector = new RangeScannerFeatureDetector(rangeScanner,
+				sensorMaxDistance, new Point(0f, 0f));
 		rangeDetector.setPoseProvider(getPoseProvider());
 
 		// Infrared sensor
-		infrared = new VirtualIRSensor(world);
+		infraredRobot = new VirtualRobotIRSensor(world);
+		infraredSeesaw = new VirtualSeesawIRSensor(world);
 
 		// Sound player
 		soundPlayer = new VirtualSoundPlayer();
@@ -71,6 +81,8 @@ public class VirtualRobot implements ControllableRobot {
 
 		// Updates
 		updateProducer = new VirtualUpdateProducer(this);
+
+		this.envelope = new RectangularEnvelope(width, height, DETECTION_RADIUS);
 	}
 
 	@Override
@@ -109,7 +121,12 @@ public class VirtualRobot implements ControllableRobot {
 
 	@Override
 	public IRSensor getIRSensor() {
-		return infrared;
+		return infraredSeesaw;
+	}
+
+	@Override
+	public IRSensor getRobotIRSensor() {
+		return infraredRobot;
 	}
 
 	@Override
@@ -153,4 +170,18 @@ public class VirtualRobot implements ControllableRobot {
 		conditionResolvers.terminate();
 	}
 
+	@Override
+	public boolean isEmitting() {
+		return true;
+	}
+
+	@Override
+	public Envelope getEnvelope() {
+		return this.envelope;
+	}
+
+	@Override
+	public ModelType getModelType() {
+		return ModelType.VIRTUAL;
+	}
 }

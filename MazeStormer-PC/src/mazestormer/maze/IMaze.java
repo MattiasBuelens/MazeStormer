@@ -12,6 +12,9 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.util.LongPoint;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+
 public interface IMaze {
 
 	/**
@@ -435,9 +438,30 @@ public interface IMaze {
 	public Point getTileCenter(LongPoint tilePosition);
 
 	/**
-	 * Get a collection of all edges as lines, in relative coordinates.
+	 * Get the edges as a geometry.
 	 */
-	public Collection<Line> getEdgeLines();
+	public Geometry getEdgeGeometry();
+
+	/**
+	 * Get the edges and seesaw blocks as a geometry.
+	 */
+	public Geometry getGeometry();
+
+	/**
+	 * Get the edge geometry surrounding the given relative position.
+	 * 
+	 * @param relativePosition
+	 *            The relative position.
+	 */
+	public Polygon getSurroundingEdgeGeometry(Point2D relativePosition);
+
+	/**
+	 * Get the geometry surrounding the given relative position.
+	 * 
+	 * @param relativePosition
+	 *            The relative position.
+	 */
+	public Polygon getSurroundingGeometry(Point2D relativePosition);
 
 	/**
 	 * Get the line of an edge, in relative coordinates.

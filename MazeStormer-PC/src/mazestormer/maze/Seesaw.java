@@ -57,6 +57,14 @@ public class Seesaw {
 		return highestBarcode;
 	}
 
+	public Barcode getOpenBarcode() {
+		return isHighOpen() ? getHighestBarcode() : getLowestBarcode();
+	}
+
+	public Barcode getClosedBarcode() {
+		return isHighOpen() ? getLowestBarcode() : getHighestBarcode();
+	}
+
 	public boolean isHighOpen() {
 		return isHighOpen;
 	}

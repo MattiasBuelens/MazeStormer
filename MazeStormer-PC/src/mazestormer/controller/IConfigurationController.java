@@ -1,18 +1,18 @@
 package mazestormer.controller;
 
 import mazestormer.connect.ControlMode;
-import mazestormer.connect.RobotType;
 import mazestormer.util.EventSource;
+import mazestormer.world.ModelType;
 
 public interface IConfigurationController extends EventSource {
 
-	public RobotType getRobotType();
+	public ModelType getRobotType();
 
 	public ControlMode getControlMode();
 
 	public boolean isConnected();
 
-	public void connect(RobotType robotType);
+	public void connect(ModelType robotType);
 
 	public void setControlMode(ControlMode controlMode);
 
