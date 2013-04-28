@@ -9,17 +9,21 @@ public class Seesaw {
 
 	private final Barcode lowestBarcode;
 	private final Barcode highestBarcode;
-	
+
+	private Island lowestIsland;
+	private Island highestIsland;
+
 	private static final Map<Barcode, Barcode> otherBarcode = new HashMap<Barcode, Barcode>() {
-		private static final long serialVersionUID = 1L; 
-	{
-		put(new Barcode(11), new Barcode(13));
-		put(new Barcode(13), new Barcode(11));
-		put(new Barcode(15), new Barcode(17));
-		put(new Barcode(17), new Barcode(15));
-		put(new Barcode(19), new Barcode(21));
-		put(new Barcode(21), new Barcode(19));
-	}};
+		private static final long serialVersionUID = 1L;
+		{
+			put(new Barcode(11), new Barcode(13));
+			put(new Barcode(13), new Barcode(11));
+			put(new Barcode(15), new Barcode(17));
+			put(new Barcode(17), new Barcode(15));
+			put(new Barcode(19), new Barcode(21));
+			put(new Barcode(21), new Barcode(19));
+		}
+	};
 
 	private boolean isHighOpen = false;
 
@@ -36,7 +40,7 @@ public class Seesaw {
 	public Seesaw(Barcode barcode) {
 		this(barcode, getOtherBarcode(barcode));
 	}
-	
+
 	public static Barcode getOtherBarcode(Barcode barcode) {
 		return otherBarcode.get(barcode);
 	}
@@ -73,7 +77,7 @@ public class Seesaw {
 		this.isHighOpen = !this.isHighOpen;
 	}
 
-	public boolean isOpen(Barcode barcode) {
+	public boolean isOpen(Barcode barcode) throws IllegalArgumentException {
 		if (barcode.equals(lowestBarcode)) {
 			return isLowOpen();
 		} else if (barcode.equals(highestBarcode)) {
@@ -83,7 +87,7 @@ public class Seesaw {
 		}
 	}
 
-	public void setOpen(Barcode barcode) {
+	public void setOpen(Barcode barcode) throws IllegalArgumentException {
 		if (barcode.equals(lowestBarcode)) {
 			setLowOpen();
 		} else if (barcode.equals(highestBarcode)) {
@@ -92,4 +96,75 @@ public class Seesaw {
 			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
 		}
 	}
+
+	public Island getLowestIsland() {
+		return lowestIsland;
+	}
+
+	public void setLowestIsland(Island lowestIsland) {
+		this.lowestIsland = lowestIsland;
+	}
+
+	public Island getHighestIsland() {
+		return highestIsland;
+	}
+
+	public void setHighestIsland(Island highestIsland) {
+		this.highestIsland = highestIsland;
+	}
+
+	/**
+	 * Get the island of the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 * @return The island, or {@code null} if none assigned yet.
+	 * @throws IllegalArgumentException
+	 *             If the given barcode does not belong to this seesaw.
+	 */
+	public Island getIsland(Barcode barcode) throws IllegalArgumentException {
+		if (barcode.equals(lowestBarcode)) {
+			return getLowestIsland();
+		} else if (barcode.equals(highestBarcode)) {
+			return getHighestIsland();
+		} else {
+			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
+		}
+	}
+
+	/**
+	 * Set the island of the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The seesaw barcode.
+	 * @param island
+	 *            The island.
+	 * @throws IllegalArgumentException
+	 *             If the given barcode does not belong to this seesaw.
+	 */
+	public void setIsland(Barcode barcode, Island island) throws IllegalArgumentException {
+		if (barcode.equals(lowestBarcode)) {
+			setLowestIsland(island);
+		} else if (barcode.equals(highestBarcode)) {
+			setHighestIsland(island);
+		} else {
+			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
+		}
+	}
+
+	/**
+	 * Check whether this seesaw is internal, i.e. it links between two tiles on
+	 * the same {@link Island}.
+	 * 
+	 * @return True if and only if the islands of both barcodes are effective
+	 *         and equal.
+	 */
+	public boolean isInternal() {
+		if (getLowestIsland() == null)
+			return false;
+		if (getHighestIsland() == null)
+			return false;
+		return getLowestIsland().equals(getHighestIsland());
+	}
+
 }

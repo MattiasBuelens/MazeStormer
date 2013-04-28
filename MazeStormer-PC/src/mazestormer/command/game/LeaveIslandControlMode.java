@@ -94,14 +94,14 @@ public class LeaveIslandControlMode extends ControlMode {
 
 		@Override
 		public Future<?> performAction(Player player) {
-			// indien de wip bereidbaar is:
+			// indien de wip berijdbaar is:
 			if (!getRobot().getIRSensor().hasReading()) {
 				reachableSeesawQueue.clear();
 				// de seesaw wordt overgestoken en van daar wordt verder
 				// geëxploreerd
 				return new DriveOverSeesawAction().performAction(player);
 
-				// indien de wip niet bereidbaar is:
+				// indien de wip niet berijdbaar is:
 			} else {
 
 				// indien nog geen alternatieve wippen zijn gevonden:
@@ -152,25 +152,33 @@ public class LeaveIslandControlMode extends ControlMode {
 	private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
 		List<Tile> reachableTiles = new ArrayList<>();
 		PathFinder pf = new PathFinder(getMaze());
+		Tile currentTile = getCommander().getDriver().getCurrentTile();
+		/*
+		 * TODO Revise this using Island.setSeesawBarcodes().
+		 * 
+		 * Do we need that many checks if we only leave an island after fully
+		 * exploring it?
+		 */
 		for (Tile tile : getMaze().getBarcodeTiles()) {
 			Barcode tileBarcode = tile.getBarcode();
 			int number = tileBarcode.getValue();
 			if (number >= LeaveIslandBarcodeMapping.START_OF_BARCODERANGE
 					&& number <= LeaveIslandBarcodeMapping.END_OF_BARCODERANGE && !tileBarcode.equals(barcode)
 					&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
-					&& !pf.findPathWithoutSeesaws(getGameRunner().getCurrentTile(), tile).isEmpty()
-					&& otherSideUnexplored(tile)) {
+					&& !pf.findPathWithoutSeesaws(currentTile, tile).isEmpty() && otherSideUnexplored(tile)) {
 				reachableTiles.add(tile);
 			}
 		}
-		Collections.sort(reachableTiles, new ClosestTileComparator(getGameRunner().getCurrentTile(), getMaze()));
+		Collections.sort(reachableTiles, new ClosestTileComparator(currentTile, getMaze()));
 		reachableTiles.add(getMaze().getBarcodeTile(barcode));
 		return reachableTiles;
 	}
 
 	private boolean otherSideUnexplored(Tile seesawBarcodeTile) {
 		Barcode barcode = seesawBarcodeTile.getBarcode();
-		Tile otherBarcodeTile = getMaze().getOtherSeesawBarcodeTile(barcode);
+		Barcode otherBarcode = Seesaw.getOtherBarcode(barcode);
+		Tile otherBarcodeTile = getMaze().getSeesawTile(otherBarcode);
+		// TODO What is all this about?!
 		for (Orientation orientation : Orientation.values()) {
 			if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
 				return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();

@@ -11,21 +11,14 @@ import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
-import mazestormer.barcode.Barcode;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
-import mazestormer.game.Game;
 import mazestormer.game.DefaultGameListener;
+import mazestormer.game.Game;
 import mazestormer.maze.DefaultMazeListener;
-import mazestormer.maze.IMaze;
-import mazestormer.maze.Orientation;
-import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
-import mazestormer.maze.TileShape;
-import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.util.LongPoint;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -41,7 +34,7 @@ public class GameRunner extends Commander {
 	 */
 	private int objectNumber;
 	private final Game game;
-	
+
 	/*
 	 * GameListener
 	 */
@@ -55,7 +48,7 @@ public class GameRunner extends Commander {
 	/*
 	 * Constructor
 	 */
-	
+
 	public GameRunner(Player player, Game game) {
 		super(player);
 
@@ -64,88 +57,32 @@ public class GameRunner extends Commander {
 		game.addGameListener(new GameListener());
 
 		// Modes
-		setMode(new ExploreIslandControlMode(player,this));
+		setMode(new ExploreIslandControlMode(player, this));
 	}
 
 	/*
 	 * Getters
 	 */
-	
+
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) getPlayer().getRobot();
-	}
-
-	private IMaze getMaze() {
-		return getPlayer().getMaze();
 	}
 
 	public int getObjectNumber() {
 		return objectNumber;
 	}
-	
+
 	private void setObjectNumber(int nb) {
 		this.objectNumber = nb;
 	}
-	
-	public Tile getCurrentTile() {
-		return getDriver().getCurrentTile();
-	}
-	
-	public Game getGame(){
+
+	public Game getGame() {
 		return game;
 	}
-	
+
 	/*
 	 * Utilities
 	 */
-
-	public void setSeesawWalls() {
-		log("Seesaw on next tiles, set seesaw and barcode");
-
-		IMaze maze = getMaze();
-
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
-
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
-
-		// Seesaw
-		LongPoint nextTilePosition = nextTile.getPosition();
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, seesawBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Seesaw
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Other seesaw barcode
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setBarcode(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-	}
-	
-	public void setObjectTile() {
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-
-		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(),
-				new TileShape(TileType.DEAD_END, orientation));
-
-		// Mark as explored
-		getMaze().setExplored(nextTile.getPosition());
-
-		// Remove both tiles from the queue
-
-	}
 
 	public void onSeesaw(int barcode) {
 		log("The seesaw is currently opened, onwards!");
@@ -212,7 +149,7 @@ public class GameRunner extends Commander {
 		}
 
 	}
-	
+
 	private class GameListener extends DefaultGameListener {
 
 		@Override
@@ -257,7 +194,7 @@ public class GameRunner extends Commander {
 			// Stop reporting
 			stopReporting();
 		}
-		
+
 		@Override
 		public void onPartnerConnected(Player partner) {
 			// Send own maze
@@ -268,17 +205,17 @@ public class GameRunner extends Commander {
 	/*
 	 * ControlMode management
 	 */
-	
+
 	@Override
 	public ControlMode nextMode(ControlMode currentMode) {
 		// TODO OMG DO THIS!!!!
 		return null;
 	}
-	
+
 	/*
 	 * Utilities
 	 */
-	
+
 	protected void log(String message) {
 		getPlayer().getLogger().log(Level.INFO, message);
 	}

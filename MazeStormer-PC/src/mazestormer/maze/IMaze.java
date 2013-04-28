@@ -263,6 +263,8 @@ public interface IMaze {
 	 */
 	public Tile getBarcodeTile(byte barcode);
 
+	public Set<Tile> getBarcodeTiles();
+
 	/**
 	 * Get the seesaw corresponding to the given seesaw barcode.
 	 * 
@@ -294,8 +296,6 @@ public interface IMaze {
 	 *            The seesaw barcode.
 	 */
 	public Seesaw getOrCreateSeesaw(byte barcode);
-	
-	public Set<Tile> getBarcodeTiles();
 
 	/**
 	 * Set the seesaw of a tile.
@@ -315,8 +315,21 @@ public interface IMaze {
 	 * @return The found tile, or null if not found.
 	 */
 	public Tile getSeesawTile(Barcode barcode);
-	
-	public Tile getOtherSeesawBarcodeTile(Barcode barcode);
+
+	/**
+	 * Set the island on the given seesaw barcode.
+	 * 
+	 * <p>
+	 * If the seesaw barcode already belongs to a different island, both islands
+	 * are merged.
+	 * </p>
+	 * 
+	 * @param seesawBarcode
+	 *            The seesaw barcode.
+	 * @param island
+	 *            The island.
+	 */
+	public void setSeesawIsland(Barcode seesawBarcode, Island island);
 
 	/**
 	 * Set a tile as explored.

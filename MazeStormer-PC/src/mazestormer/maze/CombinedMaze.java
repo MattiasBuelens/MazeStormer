@@ -379,7 +379,7 @@ public class CombinedMaze implements IMaze {
 	public Tile getBarcodeTile(byte barcode) {
 		return getBarcodeTile(new Barcode(barcode));
 	}
-	
+
 	@Override
 	public Set<Tile> getBarcodeTiles() {
 		return getTotalMaze().getBarcodeTiles();
@@ -414,10 +414,10 @@ public class CombinedMaze implements IMaze {
 	public Tile getSeesawTile(Barcode barcode) {
 		return getTotalMaze().getSeesawTile(barcode);
 	}
-	
+
 	@Override
-	public Tile getOtherSeesawBarcodeTile(Barcode barcode) {
-		return getBarcodeTile(Seesaw.getOtherBarcode(barcode));
+	public void setSeesawIsland(Barcode seesawBarcode, Island island) {
+		getOwnMaze().setSeesawIsland(seesawBarcode, island);
 	}
 
 	@Override
