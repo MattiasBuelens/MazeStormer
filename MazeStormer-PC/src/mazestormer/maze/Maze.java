@@ -390,6 +390,9 @@ public class Maze implements IMaze {
 
 	@Override
 	public void setSeesawIsland(Barcode seesawBarcode, Island island) {
+		// Add to island
+		island.addSeesawBarcode(seesawBarcode);
+		// Set island on seesaw
 		Seesaw seesaw = getOrCreateSeesaw(seesawBarcode);
 		Island currentIsland = seesaw.getIsland(seesawBarcode);
 		if (currentIsland != null) {
