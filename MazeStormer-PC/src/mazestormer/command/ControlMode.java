@@ -3,7 +3,6 @@ package mazestormer.command;
 import java.util.logging.Level;
 
 import mazestormer.barcode.Barcode;
-import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PathFinder;
@@ -21,7 +20,7 @@ public abstract class ControlMode {
 		this.pathFinder = new PathFinder(getMaze());
 		this.commander = commander;
 	}
-	
+
 	/*
 	 * Getters
 	 */
@@ -41,15 +40,15 @@ public abstract class ControlMode {
 	public Commander getCommander() {
 		return commander;
 	}
-	
+
 	/*
 	 * Algemeen geldige methodes
 	 */
-	
+
 	protected void log(String message) {
 		getPlayer().getLogger().log(Level.INFO, message);
 	}
-	
+
 	/*
 	 * Abstracte methodes
 	 */
@@ -61,7 +60,7 @@ public abstract class ControlMode {
 	public abstract Tile nextTile(Tile currentTile);
 
 	public abstract boolean isBarcodeActionEnabled();
-	
+
 	public abstract IAction getAction(Barcode barcode);
 
 }

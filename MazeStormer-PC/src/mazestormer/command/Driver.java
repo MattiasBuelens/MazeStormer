@@ -15,7 +15,7 @@ import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import lejos.robotics.objectdetection.RangeFeature;
-import mazestormer.barcode.BarcodeMapping;
+import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeScanner;
 import mazestormer.barcode.BarcodeScannerListener;
 import mazestormer.line.LineAdjuster;
@@ -89,6 +89,11 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Flag indicating if the line finder should be run.
 	 */
 	private AtomicBoolean shouldLineAdjust = new AtomicBoolean(false);
+	/**
+	 * Flag indicating whether the barcode at the current tile should be
+	 * ignored.
+	 */
+	private AtomicBoolean skipCurrentBarcode = new AtomicBoolean(false);
 
 	public Driver(Player player, Commander commander) {
 		this.player = checkNotNull(player);
@@ -109,9 +114,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		// Barcode scanner
 		this.barcodeScanner = new BarcodeScanner(player);
 		barcodeScanner.addBarcodeListener(new BarcodeListener());
-
-		// Barcode actions are manually executed
-		barcodeScanner.setPerformAction(false);
 	}
 
 	protected void log(String message) {
@@ -166,10 +168,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		return getMode().isBarcodeActionEnabled();
 	}
 
-	public void setBarcodeMapping(BarcodeMapping mapping) {
-		barcodeScanner.setMapping(mapping);
-	}
-
 	private void reset() {
 		// Reset state
 		getMaze().clear();
@@ -222,14 +220,10 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	protected void goToNext() {
-		// Get and build path to next tile
-		buildNextPath();
-
-		// Follow path until before traveling
-		transition(ExplorerState.NEXT_WAYPOINT);
+		skipToNextTile(false);
 	}
 
-	private void buildNextPath() {
+	public void skipToNextTile(boolean skipCurrentBarcode) {
 		// Get the next tile
 		nextTile = getCommander().nextTile(currentTile);
 
@@ -239,10 +233,37 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 			return;
 		}
 
-		// Create path to next tile
+		// Create and follow path to next tile
 		log("Go to tile (" + nextTile.getX() + ", " + nextTile.getY() + ")");
+		followPath(getPathFinder().findTilePath(getCurrentTile(), nextTile), skipCurrentBarcode);
+	}
+
+	/**
+	 * Follow the given path.
+	 * 
+	 * @param tilePath
+	 *            The path to follow.
+	 * @param skipCurrentBarcode
+	 *            True if the barcode at the current tile should be ignored.
+	 *            Useful when calling from a barcode action.
+	 */
+	public void followPath(List<Tile> tilePath, boolean skipCurrentBarcode) {
+		// Set path
 		navigator.stop();
-		navigator.setPath(getPathFinder().findPath(getCurrentTile(), nextTile));
+		navigator.setPath(getPathFinder().toWaypointPath(tilePath));
+
+		// Skip current barcode if requested
+		this.skipCurrentBarcode.set(skipCurrentBarcode);
+
+		// Follow path until before traveling
+		transition(ExplorerState.NEXT_WAYPOINT);
+	}
+
+	/**
+	 * @see #followPath(List, boolean)
+	 */
+	public void followPath(List<Tile> tilePath) {
+		followPath(tilePath, false);
 	}
 
 	protected void nextWaypoint() {
@@ -258,8 +279,13 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	protected void barcodeAction() {
 		Tile currentTile = getCurrentTile();
-		// Skip barcodes when traveling to checkpoint or goal
-		if (isBarcodeActionEnabled() && currentTile.hasBarcode()) {
+		/*
+		 * Check if barcode action should be executed.
+		 * 
+		 * Implementation note: order is important! The flag should be cleared
+		 * regardless of whether barcode actions are enabled.
+		 */
+		if (!skipCurrentBarcode.getAndSet(false) && isBarcodeActionEnabled() && currentTile.hasBarcode()) {
 			log("Performing barcode action for (" + currentTile.getX() + ", " + currentTile.getY() + ")");
 			// Pause navigator
 			// Note: Cannot interrupt report state
@@ -267,7 +293,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 				navigator.pause();
 			}
 			// Resume when action is done
-			bindTransition(barcodeScanner.performAction(currentTile.getBarcode()), ExplorerState.NAVIGATE);
+			Future<?> future = getCommander().getAction(currentTile.getBarcode()).performAction(player);
+			bindTransition(future, ExplorerState.NAVIGATE);
 		} else {
 			// No action, just continue
 			transition(ExplorerState.NAVIGATE);
@@ -334,7 +361,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		log("Barcode found, pausing navigation");
 	}
 
-	protected void afterBarcode(byte barcode) {
+	protected void afterBarcode(Barcode barcode) {
 		log("Barcode read, placing on: (" + nextTile.getX() + ", " + nextTile.getY() + ")");
 		// Set barcode on tile
 		setBarcodeTile(nextTile, barcode);
@@ -374,7 +401,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * @param barcode
 	 *            The barcode.
 	 */
-	private void setBarcodeTile(Tile tile, byte barcode) {
+	private void setBarcodeTile(Tile tile, Barcode barcode) {
 		float relativeHeading = getMaze().toRelative(getPose().getHeading());
 		Orientation heading = angleToOrientation(relativeHeading);
 
@@ -564,13 +591,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	/**
-	 * Skip to the next tile.
-	 */
-	public void skipNextTile() {
-		buildNextPath();
-	}
-
-	/**
 	 * Get the current pose of the robot.
 	 */
 	private Pose getPose() {
@@ -672,7 +692,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		}
 
 		@Override
-		public void onEndBarcode(final byte barcode) {
+		public void onEndBarcode(final Barcode barcode) {
 			afterBarcode(barcode);
 		}
 	}

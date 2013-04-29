@@ -9,12 +9,7 @@ public interface BarcodeScannerListener {
 
 	/**
 	 * Triggered when the barcode was successfully read.
-	 * 
-	 * <p>
-	 * The default implementation logs the read barcode and performs the
-	 * associated action.
-	 * </p>
 	 */
-	public void onEndBarcode(byte barcode);
+	public void onEndBarcode(Barcode barcode);
 
 }

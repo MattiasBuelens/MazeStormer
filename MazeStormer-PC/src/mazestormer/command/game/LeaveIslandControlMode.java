@@ -2,12 +2,14 @@ package mazestormer.command.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import mazestormer.barcode.AbstractSeesawAction;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
-import mazestormer.barcode.DriveOverSeesawAction;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
@@ -46,6 +48,10 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) getPlayer().getRobot();
+	}
+
+	private Tile getCurrentTile() {
+		return getCommander().getDriver().getCurrentTile();
 	}
 
 	/*
@@ -106,63 +112,62 @@ public class LeaveIslandControlMode extends ControlMode {
 		return leaveBarcodeMapping.getAction(barcode);
 	}
 
-	private class SeesawAction implements IAction {
+	private class SeesawAction extends AbstractSeesawAction {
 
-		private Barcode barcode;
+		private Barcode seesawBarcode;
 
-		private SeesawAction(Barcode barcode) {
-			this.barcode = barcode;
+		private SeesawAction(Barcode seesawBarcode) {
+			super(LeaveIslandControlMode.this.getPlayer(), LeaveIslandControlMode.this.getCommander().getDriver());
+			this.seesawBarcode = seesawBarcode;
 		}
 
 		@Override
 		public Future<?> performAction(Player player) {
-			// indien de wip bereidbaar is:
-			if (!getRobot().getIRSensor().hasReading()) {
-				reachableSeesawQueue.clear();
-				// de seesaw wordt overgestoken en van daar wordt verder
-				// geëxploreerd
-				return new DriveOverSeesawAction().performAction(player);
+			// TODO Check whether we're trying to cross the seesaw?
 
-				// indien de wip niet bereidbaar is:
-			} else {
-
-				// indien nog geen alternatieve wippen zijn gevonden:
-				if (reachableSeesawQueue.isEmpty()) {
-					// zoek naar alle bereikbare wippen (incl. huidige)
-					List<Tile> reachableTiles = getReachableSeesawBarcodeTiles(barcode);
-					// indien er andere wippen bereikbaar zijn:
-					if (!reachableTiles.isEmpty()) {
-						// voeg de bereikbare wippen toe aan de lijst
-						reachableSeesawQueue.addAll(reachableTiles);
-						// TODO: rijd naar de eerste wip in de lijst die
-						// niet de huidige wip is, geef ook een noAction
-						// terug
-					}
-				}
-
-				else { // indien er wel al alternatieve wippen zijn gevonden
-
-					// nee
-					// rijd naar een T of Cross -stuk en wacht tot er
-					// iemand
-					// passeert
-					return new NoAction().performAction(player);
-				}
+			// Cross the seesaw if open
+			if (canDriveOverSeesaw()) {
+				return driveOverSeesaw();
 			}
+
+			// Try to go around seesaw
+			List<Tile> pathAroundSeesaw = getPathWithoutSeesaws();
+			if (!pathAroundSeesaw.isEmpty()) {
+				return redirect(pathAroundSeesaw);
+			}
+
+			// Try to go over another seesaw
+			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
+			List<Tile> pathWithoutSeesaw = getPathWithoutSeesaw(seesaw);
+			if (!pathWithoutSeesaw.isEmpty()) {
+				return redirect(pathWithoutSeesaw);
+			}
+
+			// TODO Train spotting
 			return null;
 		}
-
 	}
 
 	private class LeaveIslandBarcodeMapping implements BarcodeMapping {
 
-		public static final int START_OF_BARCODERANGE = 11;
-		public static final int END_OF_BARCODERANGE = 21;
+		private final Map<Barcode, IAction> barcodeMapping = new HashMap<Barcode, IAction>() {
+			private static final long serialVersionUID = 1L;
+			{
+				put(new Barcode(11), new SeesawAction(new Barcode(11)));
+				put(new Barcode(13), new SeesawAction(new Barcode(13)));
+				put(new Barcode(15), new SeesawAction(new Barcode(15)));
+				put(new Barcode(17), new SeesawAction(new Barcode(17)));
+				put(new Barcode(19), new SeesawAction(new Barcode(19)));
+				put(new Barcode(21), new SeesawAction(new Barcode(21)));
+			}
+		};
 
 		@Override
 		public IAction getAction(Barcode barcode) {
-			// TODO OMG DO THIS!!!
-			return null;
+			if (barcodeMapping.containsKey(barcode)) {
+				return barcodeMapping.get(barcode);
+			}
+			return new NoAction();
 		}
 
 	}
@@ -176,16 +181,13 @@ public class LeaveIslandControlMode extends ControlMode {
 		PathFinder pf = new PathFinder(getMaze());
 		for (Tile tile : getMaze().getBarcodeTiles()) {
 			Barcode tileBarcode = tile.getBarcode();
-			int number = tileBarcode.getValue();
-			if (number >= LeaveIslandBarcodeMapping.START_OF_BARCODERANGE
-					&& number <= LeaveIslandBarcodeMapping.END_OF_BARCODERANGE && !tileBarcode.equals(barcode)
+			if (Seesaw.isSeesawBarcode(tileBarcode) && !tileBarcode.equals(barcode)
 					&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
-					&& !pf.findPathWithoutSeesaws(getGameRunner().getCurrentTile(), tile).isEmpty()
-					&& otherSideUnexplored(tile)) {
+					&& !pf.findTilePathWithoutSeesaws(getCurrentTile(), tile).isEmpty() && otherSideUnexplored(tile)) {
 				reachableTiles.add(tile);
 			}
 		}
-		Collections.sort(reachableTiles, new ClosestTileComparator(getGameRunner().getCurrentTile(), getMaze()));
+		Collections.sort(reachableTiles, new ClosestTileComparator(getCurrentTile(), getMaze()));
 		reachableTiles.add(getMaze().getBarcodeTile(barcode));
 		return reachableTiles;
 	}

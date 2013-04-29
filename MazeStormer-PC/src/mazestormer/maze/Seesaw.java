@@ -9,17 +9,18 @@ public class Seesaw {
 
 	private final Barcode lowestBarcode;
 	private final Barcode highestBarcode;
-	
+
 	private static final Map<Barcode, Barcode> otherBarcode = new HashMap<Barcode, Barcode>() {
-		private static final long serialVersionUID = 1L; 
-	{
-		put(new Barcode(11), new Barcode(13));
-		put(new Barcode(13), new Barcode(11));
-		put(new Barcode(15), new Barcode(17));
-		put(new Barcode(17), new Barcode(15));
-		put(new Barcode(19), new Barcode(21));
-		put(new Barcode(21), new Barcode(19));
-	}};
+		private static final long serialVersionUID = 1L;
+		{
+			put(new Barcode(11), new Barcode(13));
+			put(new Barcode(13), new Barcode(11));
+			put(new Barcode(15), new Barcode(17));
+			put(new Barcode(17), new Barcode(15));
+			put(new Barcode(19), new Barcode(21));
+			put(new Barcode(21), new Barcode(19));
+		}
+	};
 
 	private boolean isHighOpen = false;
 
@@ -36,7 +37,11 @@ public class Seesaw {
 	public Seesaw(Barcode barcode) {
 		this(barcode, getOtherBarcode(barcode));
 	}
-	
+
+	public static boolean isSeesawBarcode(Barcode barcode) {
+		return otherBarcode.containsKey(barcode);
+	}
+
 	public static Barcode getOtherBarcode(Barcode barcode) {
 		return otherBarcode.get(barcode);
 	}
@@ -99,6 +104,10 @@ public class Seesaw {
 		} else {
 			throw new IllegalArgumentException("Barcode does not belong to this seesaw.");
 		}
+	}
+
+	public void setClosed(Barcode barcode) {
+		setOpen(barcode.equals(highestBarcode) ? lowestBarcode : highestBarcode);
 	}
 
 }

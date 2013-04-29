@@ -1,8 +1,11 @@
 package mazestormer.controller;
 
 import mazestormer.barcode.ActionType;
+import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeScanner;
+import mazestormer.barcode.BarcodeScannerListener;
 import mazestormer.barcode.BarcodeSpeed;
+import mazestormer.barcode.ExplorerBarcodeMapping;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
@@ -88,7 +91,16 @@ public class BarcodeController extends SubController implements IBarcodeControll
 		// Prepare
 		barcodeScanner = new BarcodeScanner(getPlayer());
 		barcodeScanner.addStateListener(new BarcodeListener());
-		barcodeScanner.setPerformAction(false);
+		barcodeScanner.addBarcodeListener(new BarcodeScannerListener() {
+			@Override
+			public void onStartBarcode() {
+			}
+
+			@Override
+			public void onEndBarcode(Barcode barcode) {
+				new ExplorerBarcodeMapping().getAction(barcode).performAction(getPlayer());
+			}
+		});
 		barcodeScanner.setScanSpeed(getScanSpeed());
 
 		// Start

@@ -1,14 +1,16 @@
 package mazestormer.maze;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-
-import com.google.common.base.Predicate;
 
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import lejos.robotics.navigation.Waypoint;
 import mazestormer.maze.path.MazeAStar;
+
+import com.google.common.base.Predicate;
 
 /**
  * Utility class for path finding.
@@ -68,46 +70,22 @@ public class PathFinder {
 	 * @param startTile
 	 *            The start tile.
 	 * @param goalTile
-	 *            The goal tile
+	 *            The goal tile.
 	 * @param tileValidator
 	 *            A validator which should evaluate to true if the given tile is
 	 *            valid.
 	 * @return An ordered list of tiles. The starting tile is
 	 *         <strong>not</strong> included. An empty list if there is no path.
 	 */
-	public List<Tile> findTilePath(Tile startTile, Tile goalTile,
-			Predicate<Tile> tileValidator) {
+	public List<Tile> findTilePath(Tile startTile, Tile goalTile, Predicate<Tile> tileValidator) {
 		// Get path of tiles
-		MazeAStar astar = new MazeAStar(getMaze(), startTile.getPosition(),
-				goalTile.getPosition(), tileValidator);
-		List<Tile> tiles = astar.findPath();
+		MazeAStar astar = new MazeAStar(getMaze(), startTile.getPosition(), goalTile.getPosition(), tileValidator);
+		List<Tile> tilePath = astar.findPath();
 		// Skip starting tile
-		if (tiles == null || tiles.size() <= 1)
+		if (tilePath == null || tilePath.size() <= 1)
 			return new ArrayList<Tile>();
 		else
-			return tiles.subList(1, tiles.size());
-	}
-
-	/**
-	 * @return A path without seesaws in it if there is any, else it returns an
-	 *         empty list. Take a look at the findTilePath doc for more
-	 *         information ;)
-	 */
-	public List<Tile> findTilePathWithoutSeesaws(Tile startTile, Tile goalTile) {
-		return findTilePath(startTile, goalTile, new Predicate<Tile>() {
-			@Override
-			public boolean apply(Tile tile) {
-				return !tile.isSeesaw();
-			}
-		});
-	}
-
-	public List<Waypoint> findPathWithoutSeesaws(Tile startTile, Tile goalTile) {
-		List<Tile> tiles = findTilePathWithoutSeesaws(startTile, goalTile);
-		List<Waypoint> waypoints = new ArrayList<>();
-		for (Tile tile : tiles)
-			waypoints.add(toWaypoint(tile));
-		return waypoints;
+			return tilePath.subList(1, tilePath.size());
 	}
 
 	/**
@@ -121,14 +99,55 @@ public class PathFinder {
 	 *         is <strong>not</strong> included.
 	 */
 	public List<Waypoint> findPath(Tile startTile, Tile goalTile) {
-		// Get path of tiles
-		List<Tile> tiles = findTilePath(startTile, goalTile);
-		// Get path of way points
-		List<Waypoint> waypoints = new ArrayList<Waypoint>();
-		for (Tile tile : tiles) {
-			waypoints.add(toWaypoint(tile));
+		return findPath(startTile, goalTile, null);
+	}
+
+	/**
+	 * Find the shortest path from the start tile to the goal tile.
+	 * 
+	 * @param startTile
+	 *            The start tile.
+	 * @param goalTile
+	 *            The goal tile.
+	 * @param tileValidator
+	 *            A validator which should evaluate to true if the given tile is
+	 *            valid.
+	 * @return An ordered list of way points. The way point at the starting tile
+	 *         is <strong>not</strong> included.
+	 */
+	public List<Waypoint> findPath(Tile startTile, Tile goalTile, Predicate<Tile> tileValidator) {
+		List<Tile> tilePath = findTilePath(startTile, goalTile, tileValidator);
+		return toWaypointPath(tilePath);
+	}
+
+	public List<Tile> findTilePathWithoutSeesaws(Tile startTile, Tile goalTile, final Collection<Seesaw> ignoredSeesaws) {
+		return findTilePath(startTile, goalTile, new Predicate<Tile>() {
+			@Override
+			public boolean apply(Tile tile) {
+				return !(tile.isSeesaw() && ignoredSeesaws.contains(tile.getSeesaw()));
+			}
+		});
+	}
+
+	public List<Tile> findTilePathWithoutSeesaws(Tile startTile, Tile goalTile) {
+		return findTilePath(startTile, goalTile, new Predicate<Tile>() {
+			@Override
+			public boolean apply(Tile tile) {
+				return !tile.isSeesaw();
+			}
+		});
+	}
+
+	public List<Tile> findTilePathWithoutSeesaw(Tile startTile, Tile goalTile, final Seesaw ignoredSeesaw) {
+		return findTilePathWithoutSeesaws(startTile, goalTile, Collections.singleton(ignoredSeesaw));
+	}
+
+	public List<Waypoint> toWaypointPath(List<Tile> tilePath) {
+		List<Waypoint> waypointPath = new ArrayList<Waypoint>();
+		for (Tile tile : tilePath) {
+			waypointPath.add(toWaypoint(tile));
 		}
-		return waypoints;
+		return waypointPath;
 	}
 
 	/**
@@ -146,4 +165,5 @@ public class PathFinder {
 		// Create way point
 		return new Waypoint(absolutePosition.getX(), absolutePosition.getY());
 	}
+
 }
