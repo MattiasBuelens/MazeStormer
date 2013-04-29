@@ -22,6 +22,8 @@ import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 import mazestormer.util.LongPoint;
 
+import com.google.common.base.Predicate;
+
 public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 	/*
@@ -55,15 +57,30 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		return exploreBarcodeMapping.getAction(barcode);
 	}
 
-	private void skipToNextTile() {
-		// Skip to next tile and ignore barcode at current tile
-		getCommander().getDriver().skipToNextTile(true);
+	@Override
+	public List<Tile> createPath(Tile startTile, Tile goalTile) {
+		return getPathFinder().findTilePath(startTile, goalTile, new Predicate<Tile>() {
+			@Override
+			public boolean apply(Tile tile) {
+				// Only allow internal seesaws in paths
+				return !(tile.isSeesaw() && isInternal(tile.getSeesaw()));
+			}
+		});
+	}
+
+	// TODO Resolve duplication in AbstractSeesawAction
+	private boolean isInternal(Seesaw seesaw) {
+		Tile lowTile = getMaze().getBarcodeTile(seesaw.getLowestBarcode());
+		Tile highTile = getMaze().getBarcodeTile(seesaw.getHighestBarcode());
+		if (lowTile == null || highTile == null) {
+			return false;
+		}
+		return !getPathFinder().findTilePathWithoutSeesaws(lowTile, highTile).isEmpty();
 	}
 
 	/*
 	 * Object found
 	 */
-
 	public void setObjectTile() {
 		Tile currentTile = getCommander().getDriver().getCurrentTile();
 		Tile nextTile = getCommander().getDriver().getNextTile();
@@ -74,12 +91,9 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
-
-		// TODO Remove both tiles from the queue
 	}
 
 	public void objectFound(int teamNumber) {
-		log("Own object found, join team #" + teamNumber);
 		// Report object found
 		getGameRunner().getGame().objectFound();
 		// Join team
@@ -111,13 +125,17 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			// Check if own object
 			if (getObjectNumber(barcode) == getGameRunner().getObjectNumber()) {
 				// Found own object
-				objectFound(getTeamNumber(barcode));
+				int teamNumber = getTeamNumber(barcode);
+				log("Own object found, join team #" + teamNumber);
+				objectFound(teamNumber);
 				// Pick up own object
 				Future<?> future = super.performAction(player);
 				future.addFutureListener(new AfterObjectFoundListener());
 			} else {
 				// Not our object
-				skipToNextTile();
+				log("Not our object");
+				// Skip dead end tile
+				skipToNextTile(true);
 			}
 			return null;
 		}
@@ -126,7 +144,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	private class AfterObjectFoundListener implements FutureListener<Object> {
 		@Override
 		public void futureResolved(Future<? extends Object> future, Object result) {
-			skipToNextTile();
+			// Skip dead end tile
+			skipToNextTile(true);
 		}
 
 		@Override
@@ -190,19 +209,24 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
 			if (isInternal(seesaw)) {
 				// Check if seesaw is open
+				// TODO DEBUG ME
 				if (canDriveOverSeesaw()) {
-					// Cross the seesaw
+					// Drive over seesaw
+					log("Drive over internal seesaw");
 					seesaw.setOpen(seesawBarcode);
 					return driveOverSeesaw();
 				} else {
+					// Drive around
+					log("Go around internal seesaw");
 					seesaw.setClosed(seesawBarcode);
 					// Go around seesaw
 					List<Tile> pathAroundSeesaw = getPathWithoutSeesaws();
 					return redirect(pathAroundSeesaw);
 				}
 			} else {
-				// Skip to next
-				skipToNextTile();
+				// Skip non-internal seesaw
+				log("Non-internal seesaw, skip to next tile");
+				skipToNextTile(true);
 				return null;
 			}
 		}

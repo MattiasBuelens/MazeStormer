@@ -194,7 +194,7 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	private boolean otherSideUnexplored(Tile seesawBarcodeTile) {
 		Barcode barcode = seesawBarcodeTile.getBarcode();
-		Tile otherBarcodeTile = getMaze().getOtherSeesawBarcodeTile(barcode);
+		Tile otherBarcodeTile = getMaze().getBarcodeTile(Seesaw.getOtherBarcode(barcode));
 		for (Orientation orientation : Orientation.values()) {
 			if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
 				return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();

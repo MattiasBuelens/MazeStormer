@@ -116,6 +116,7 @@ public abstract class AbstractSeesawAction implements IAction {
 		return (Math.abs(angle) > ControllablePCRobot.STANDARD_IR_RANGE);
 	}
 
+	// TODO Resolve duplication in ExploreIslandControlMode
 	protected boolean isInternal(Seesaw seesaw) {
 		Tile lowTile = getMaze().getBarcodeTile(seesaw.getLowestBarcode());
 		Tile highTile = getMaze().getBarcodeTile(seesaw.getHighestBarcode());

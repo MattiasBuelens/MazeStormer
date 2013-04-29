@@ -1,5 +1,6 @@
 package mazestormer.command;
 
+import java.util.List;
 import java.util.logging.Level;
 
 import mazestormer.barcode.Barcode;
@@ -12,12 +13,10 @@ import mazestormer.player.Player;
 public abstract class ControlMode {
 
 	private final Player player;
-	private final PathFinder pathFinder;
 	private final Commander commander;
 
 	public ControlMode(Player player, Commander commander) {
 		this.player = player;
-		this.pathFinder = new PathFinder(getMaze());
 		this.commander = commander;
 	}
 
@@ -25,32 +24,36 @@ public abstract class ControlMode {
 	 * Getters
 	 */
 
-	protected Player getPlayer() {
+	protected final Player getPlayer() {
 		return player;
 	}
 
-	protected IMaze getMaze() {
+	protected final IMaze getMaze() {
 		return (IMaze) getPlayer().getMaze();
 	}
 
-	public PathFinder getPathFinder() {
-		return pathFinder;
+	protected final PathFinder getPathFinder() {
+		return getCommander().getDriver().getPathFinder();
 	}
 
-	public Commander getCommander() {
+	public final Commander getCommander() {
 		return commander;
 	}
 
 	/*
-	 * Algemeen geldige methodes
+	 * Overridable
 	 */
 
 	protected void log(String message) {
 		getPlayer().getLogger().log(Level.INFO, message);
 	}
 
+	protected List<Tile> createPath(Tile startTile, Tile goalTile) {
+		return getPathFinder().findTilePath(startTile, goalTile);
+	}
+
 	/*
-	 * Abstracte methodes
+	 * Abstract
 	 */
 
 	public abstract void takeControl();

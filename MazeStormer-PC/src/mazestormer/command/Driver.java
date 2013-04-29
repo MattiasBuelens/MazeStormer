@@ -51,6 +51,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Settings
 	 */
 	private final Player player;
+	private final PathFinder pathFinder;
 	private Commander commander;
 
 	/*
@@ -97,6 +98,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	public Driver(Player player, Commander commander) {
 		this.player = checkNotNull(player);
+		this.pathFinder = new PathFinder(getMaze());
 		this.commander = checkNotNull(commander);
 		addStateListener(this);
 
@@ -133,7 +135,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	protected final PathFinder getPathFinder() {
-		return getMode().getPathFinder();
+		return pathFinder;
 	}
 
 	public final ControllableRobot getRobot() {
@@ -235,7 +237,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 		// Create and follow path to next tile
 		log("Go to tile (" + nextTile.getX() + ", " + nextTile.getY() + ")");
-		followPath(getPathFinder().findTilePath(getCurrentTile(), nextTile), skipCurrentBarcode);
+		List<Tile> tilePath = getMode().createPath(getCurrentTile(), nextTile);
+		followPath(tilePath, skipCurrentBarcode);
 	}
 
 	/**
