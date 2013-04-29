@@ -7,16 +7,16 @@ import java.text.ParseException;
 
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
-import mazestormer.connect.RobotType;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.parser.FileUtils;
 import mazestormer.maze.parser.Parser;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
+import mazestormer.world.ModelType;
 
 public class ConfigurationController extends SubController implements IConfigurationController {
 
-	private RobotType robotType = RobotType.PHYSICAL;
+	private ModelType robotType = ModelType.PHYSICAL;
 	private ControlMode controlMode = ControlMode.Manual;
 	private String mazeFilePath = "";
 
@@ -33,11 +33,11 @@ public class ConfigurationController extends SubController implements IConfigura
 	}
 
 	@Override
-	public RobotType getRobotType() {
+	public ModelType getRobotType() {
 		return robotType;
 	}
 
-	private void setRobotType(RobotType robotType) {
+	private void setRobotType(ModelType robotType) {
 		this.robotType = robotType;
 	}
 
@@ -68,7 +68,7 @@ public class ConfigurationController extends SubController implements IConfigura
 	}
 
 	@Override
-	public void connect(RobotType robotType) {
+	public void connect(ModelType robotType) {
 		checkState(!isConnected());
 
 		setRobotType(robotType);

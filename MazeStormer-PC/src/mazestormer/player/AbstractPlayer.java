@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
-import mazestormer.robot.Robot;
 
 public abstract class AbstractPlayer implements Player {
 
 	private String playerID;
-	private Robot robot;
+	private IRRobot robot;
 	private IMaze maze;
 	private Logger logger;
 
@@ -32,11 +32,11 @@ public abstract class AbstractPlayer implements Player {
 	}
 
 	@Override
-	public Robot getRobot() {
+	public IRRobot getRobot() {
 		return this.robot;
 	}
 
-	protected void setRobot(Robot robot) {
+	protected void setRobot(IRRobot robot) {
 		this.robot = robot;
 	}
 
@@ -65,5 +65,4 @@ public abstract class AbstractPlayer implements Player {
 	public void removePlayerListener(PlayerListener listener) {
 		listeners.remove(listener);
 	}
-
 }

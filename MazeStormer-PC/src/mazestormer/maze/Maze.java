@@ -18,8 +18,13 @@ import lejos.geom.Line;
 import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
+import mazestormer.geom.GeometryUtils;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class Maze implements IMaze {
 
@@ -36,20 +41,23 @@ public class Maze implements IMaze {
 	private PoseTransform originTransform;
 
 	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
-	private Map<Edge, Line> lines = new HashMap<Edge, Line>();
 
 	private List<MazeListener> listeners = new ArrayList<MazeListener>();
 
-	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(
-			Target.class);
+	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(Target.class);
 	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
 
 	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
+
+	private final EdgeGeometry edgeGeometry;
 
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
 		this.edgeSize = edgeSize;
 		this.barLength = barLength;
+
+		this.edgeGeometry = new EdgeGeometry(this);
+		addListener(edgeGeometry);
 
 		setOriginToDefault();
 	}
@@ -227,8 +235,7 @@ public class Maze implements IMaze {
 			if (edgeType == EdgeType.UNKNOWN)
 				continue;
 			// Place edge
-			setEdge(tilePosition, tileTransform.transform(orientation),
-					edgeType);
+			setEdge(tilePosition, tileTransform.transform(orientation), edgeType);
 		}
 		// Barcode
 		if (tile.hasBarcode()) {
@@ -257,8 +264,7 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setEdge(LongPoint tilePosition, Orientation orientation,
-			Edge.EdgeType type) {
+	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type) {
 		Tile tile = getTileAt(tilePosition);
 		Edge edge = tile.getEdgeAt(orientation);
 
@@ -269,7 +275,6 @@ public class Maze implements IMaze {
 
 		// Fire edge changed event
 		fireEdgeChanged(edge);
-		updateEdgeLine(edge);
 
 		// Fire tile changed events
 		for (LongPoint touchingPosition : edge.getTouching()) {
@@ -279,19 +284,16 @@ public class Maze implements IMaze {
 
 	@Override
 	public void setTileShape(LongPoint tilePosition, TileShape shape) {
-		for (Orientation orientation : shape.getType().getWalls(
-				shape.getOrientation())) {
+		for (Orientation orientation : shape.getType().getWalls(shape.getOrientation())) {
 			setEdge(tilePosition, orientation, EdgeType.WALL);
 		}
-		for (Orientation orientation : shape.getType().getOpenings(
-				shape.getOrientation())) {
+		for (Orientation orientation : shape.getType().getOpenings(shape.getOrientation())) {
 			setEdge(tilePosition, orientation, EdgeType.OPEN);
 		}
 	}
 
 	@Override
-	public void setBarcode(LongPoint position, Barcode barcode)
-			throws IllegalStateException {
+	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException {
 		Tile tile = getTileAt(position);
 
 		// Set barcode
@@ -304,8 +306,7 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setBarcode(LongPoint position, byte barcode)
-			throws IllegalStateException {
+	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException {
 		setBarcode(position, new Barcode(barcode));
 	}
 
@@ -416,7 +417,6 @@ public class Maze implements IMaze {
 	@Override
 	public void clear() {
 		tiles.clear();
-		lines.clear();
 		targets.clear();
 		fireMazeCleared();
 	}
@@ -525,8 +525,75 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public Collection<Line> getEdgeLines() {
-		return Collections.unmodifiableCollection(lines.values());
+	public Geometry getEdgeGeometry() {
+		return edgeGeometry.getGeometry();
+	}
+
+	@Override
+	public Geometry getGeometry() {
+		Geometry geometry = getEdgeGeometry();
+		Geometry seesawGeometry = getSeesawGeometry(geometry.getFactory());
+		geometry = geometry.union(seesawGeometry);
+		return geometry;
+	}
+
+	protected Geometry getSeesawGeometry(GeometryFactory factory) {
+		// Make edge geometries
+		Collection<Edge> edges = getSeesawEdges();
+		List<Polygon> edgePolygons = new ArrayList<Polygon>();
+		for (Edge edge : edges) {
+			edgePolygons.add(edgeGeometry.getGeometry(edge));
+		}
+		// Combine
+		return factory.createMultiPolygon(GeometryFactory.toPolygonArray(edgePolygons));
+	}
+
+	protected Collection<Edge> getSeesawEdges() {
+		Map<Seesaw, Edge> closedEdges = new HashMap<Seesaw, Edge>();
+		for (Seesaw seesaw : seesaws.values()) {
+			// Ignore already processed seesaws
+			if (closedEdges.containsKey(seesaw))
+				continue;
+			// Get edge between closed seesaw tile and barcode tile
+			Barcode closedBarcode = seesaw.getClosedBarcode();
+			Tile closedSeesawTile = getSeesawTile(closedBarcode);
+			Tile closedBarcodeTile = getBarcodeTile(closedBarcode);
+			if (closedSeesawTile != null && closedBarcodeTile != null) {
+				// Store edge
+				Edge closedEdge = closedSeesawTile.getEdgeAt(closedSeesawTile.orientationTo(closedBarcodeTile));
+				closedEdges.put(seesaw, closedEdge);
+			}
+		}
+		return closedEdges.values();
+	}
+
+	@Override
+	public Polygon getSurroundingEdgeGeometry(Point2D relativePosition) {
+		return getSurroundingGeometry(getEdgeGeometry(), relativePosition);
+	}
+
+	@Override
+	public Polygon getSurroundingGeometry(Point2D relativePosition) {
+		return getSurroundingGeometry(getGeometry(), relativePosition);
+	}
+
+	protected Polygon getSurroundingGeometry(Geometry geometry, Point2D relativePosition) {
+		GeometryFactory geomFact = geometry.getFactory();
+		Geometry point = GeometryUtils.toGeometry(relativePosition, geomFact);
+
+		// Get the inner geometry
+		Geometry inner = geometry.getEnvelope().difference(geometry);
+
+		// Find the polygon containing the given point
+		for (int i = 0; i < inner.getNumGeometries(); i++) {
+			Polygon innerPolygon = (Polygon) inner.getGeometryN(i);
+			if (innerPolygon.contains(point)) {
+				// Simplify result
+				return GeometryUtils.removeCollinear(innerPolygon);
+			}
+		}
+		// Point not found inside geometry
+		return null;
 	}
 
 	@Override
@@ -547,18 +614,7 @@ public class Maze implements IMaze {
 		p2 = p2.add(shift);
 
 		// Return bounding box
-		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX()
-				- p1.getX(), p2.getY() - p1.getY());
-	}
-
-	private void updateEdgeLine(Edge edge) {
-		if (edge.getType() == EdgeType.WALL) {
-			// Add line
-			lines.put(edge, createEdgeLine(edge));
-		} else {
-			// Remove line
-			lines.remove(edge);
-		}
+		return new Rectangle2D.Double(p1.getX(), p1.getY(), p2.getX() - p1.getX(), p2.getY() - p1.getY());
 	}
 
 	private Line createEdgeLine(Edge edge) {
@@ -601,11 +657,9 @@ public class Maze implements IMaze {
 			// Add bar
 			float barWidth = width * barLength;
 			if (isVertical) {
-				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint
-						.getY(), 1, barWidth));
+				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint.getY(), 1, barWidth));
 			} else {
-				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint
-						.getY(), barWidth, 1));
+				bars.add(new Rectangle2D.Double(barPoint.getX(), barPoint.getY(), barWidth, 1));
 			}
 			// Move to next bar
 			barPoint = direction.shift(barPoint, barWidth);
@@ -640,8 +694,7 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public void setStartPose(int playerNumber, LongPoint tilePosition,
-			Orientation orientation) {
+	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation) {
 		// Center on tile
 		Point relativePosition = getTileCenter(tilePosition);
 		float relativeAngle = orientation.getAngle();

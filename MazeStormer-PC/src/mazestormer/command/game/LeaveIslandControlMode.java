@@ -17,6 +17,7 @@ import mazestormer.maze.PathFinder;
 import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 
@@ -73,6 +74,27 @@ public class LeaveIslandControlMode extends ControlMode {
 	public boolean isBarcodeActionEnabled() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public static boolean isOpen(float angle) {
+		if (Float.isNaN(angle)) {
+			return true;
+		}
+		return (Math.abs(angle) > ControllablePCRobot.STANDARD_IR_RANGE);
+	}
+
+	// TODO Call me maybe?
+	protected void scan() {
+		boolean seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
+		if (seesawOpen) {
+			seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
+		}
+
+		if (seesawOpen) {
+			// TODO All good, cross the seesaw
+		} else {
+			// TODO Seesaw closed, what to do now?
+		}
 	}
 
 	/*

@@ -16,6 +16,9 @@ import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.util.LongPoint;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+
 /**
  * A class that contains the observed maze of the player that uses it, as well
  * as the observed maze of his partner. Contains methods to puzzle the mazes
@@ -487,8 +490,23 @@ public class CombinedMaze implements IMaze {
 	}
 
 	@Override
-	public Collection<Line> getEdgeLines() {
-		return getTotalMaze().getEdgeLines();
+	public Geometry getEdgeGeometry() {
+		return getTotalMaze().getEdgeGeometry();
+	}
+
+	@Override
+	public Geometry getGeometry() {
+		return getTotalMaze().getGeometry();
+	}
+
+	@Override
+	public Polygon getSurroundingEdgeGeometry(Point2D relativePosition) {
+		return getTotalMaze().getSurroundingEdgeGeometry(relativePosition);
+	}
+
+	@Override
+	public Polygon getSurroundingGeometry(Point2D relativePosition) {
+		return getTotalMaze().getSurroundingGeometry(relativePosition);
 	}
 
 	@Override

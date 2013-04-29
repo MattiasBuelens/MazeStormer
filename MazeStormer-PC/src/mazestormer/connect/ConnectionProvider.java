@@ -1,22 +1,24 @@
 package mazestormer.connect;
 
 import java.util.EnumMap;
+
+import mazestormer.world.ModelType;
 import static com.google.common.base.Preconditions.*;
 
 public class ConnectionProvider {
 
-	private final EnumMap<RobotType, Connector> connectorMap = new EnumMap<RobotType, Connector>(
-			RobotType.class);
+	private final EnumMap<ModelType, Connector> connectorMap = new EnumMap<ModelType, Connector>(
+			ModelType.class);
 
 	public ConnectionProvider() {
 		addConnectors();
 	}
 
-	public Connector getConnector(RobotType robotType) {
+	public Connector getConnector(ModelType robotType) {
 		return connectorMap.get(robotType);
 	}
 
-	public void setConnector(RobotType robotType, Connector connector) {
+	public void setConnector(ModelType robotType, Connector connector) {
 		checkNotNull(robotType);
 
 		if (connector == null) {
@@ -27,8 +29,8 @@ public class ConnectionProvider {
 	}
 
 	protected void addConnectors() {
-		setConnector(RobotType.PHYSICAL, new PhysicalConnector());
-		setConnector(RobotType.VIRTUAL, new VirtualConnector());
+		setConnector(ModelType.PHYSICAL, new PhysicalConnector());
+		setConnector(ModelType.VIRTUAL, new VirtualConnector());
 	}
 
 }
