@@ -94,6 +94,30 @@ public class GameRunner extends Commander {
 	public Game getGame(){
 		return game;
 	}
+
+	/*
+	 * ControlMode management
+	 */
+	
+	@Override
+	public ControlMode nextMode(ControlMode currentMode) {
+		// TODO: tear down current controlMode?
+		if(currentMode instanceof ExploreIslandControlMode) {
+			// other unexplored islands => LeaveIslandControlMode
+			// no other unexplored islands => DriveToCenterControlMode
+		}
+		else if(currentMode instanceof LeaveIslandControlMode){
+			setMode(new ExploreIslandControlMode(getPlayer(), this));
+		}
+		else if(currentMode instanceof DriveToCenterControlMode){
+			
+		}
+		else if(currentMode instanceof DriveToPartnerControlMode){
+			
+		}
+		// TODO: log
+		return currentMode;
+	}
 	
 	/*
 	 * Utilities
@@ -264,20 +288,6 @@ public class GameRunner extends Commander {
 			game.sendOwnTiles();
 		}
 	}
-
-	/*
-	 * ControlMode management
-	 */
-	
-	@Override
-	public ControlMode nextMode(ControlMode currentMode) {
-		// TODO OMG DO THIS!!!!
-		return null;
-	}
-	
-	/*
-	 * Utilities
-	 */
 	
 	protected void log(String message) {
 		getPlayer().getLogger().log(Level.INFO, message);

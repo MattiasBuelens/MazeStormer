@@ -92,8 +92,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 		@Override
 		public Future<?> performAction(Player player) {
-			// TODO Enkel als de andere kant van de wip ook op dit eiland ligt
-			// mag/moet de robot de wip oversteken
+			//seesaw open?
 			return null;
 		}
 
