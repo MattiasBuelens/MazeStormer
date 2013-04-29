@@ -3,7 +3,9 @@ package mazestormer.barcode;
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
+import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.state.AbstractStateListener;
@@ -11,8 +13,8 @@ import mazestormer.state.State;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class DriveOverSeesawAction extends
-		StateMachine<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> implements IAction {
+public class DriveOverSeesawAction extends StateMachine<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState>
+		implements IAction {
 
 	private Player player;
 
@@ -28,7 +30,7 @@ public class DriveOverSeesawAction extends
 
 		// Start from the initial state
 		start();
-		transition(SeesawState.ONWARDS);
+		transition(SeesawState.INITIAL);
 
 		return future;
 	}
@@ -39,6 +41,35 @@ public class DriveOverSeesawAction extends
 
 	private Pilot getPilot() {
 		return getControllableRobot().getPilot();
+	}
+
+	private IMaze getMaze() {
+		return player.getMaze();
+	}
+
+	protected void initial() {
+		transition(SeesawState.SCAN);
+	}
+
+	public static boolean isOpen(float angle) {
+		if (Float.isNaN(angle)) {
+			return true;
+		}
+		return (Math.abs(angle) > ControllablePCRobot.STANDARD_IR_RANGE);
+	}
+
+	protected void scan() {
+		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		if (seesawOpen) {
+			seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		}
+
+		if (seesawOpen) {
+			transition(SeesawState.ONWARDS);
+		} else {
+			// TODO opvragen of we moeten hervatten of wait and scan?
+			transition(SeesawState.RESUME_EXPLORING);
+		}
 	}
 
 	/**
@@ -61,8 +92,8 @@ public class DriveOverSeesawAction extends
 	 */
 
 	protected void onwards() {
-		bindTransition(getPilot().travelComplete(130), // TODO 130 juist?
-				SeesawState.FIND_LINE);
+		// TODO 3*40+10 juist?
+		bindTransition(getPilot().travelComplete(3 * getMaze().getTileSize() + 10), SeesawState.FIND_LINE);
 	}
 
 	protected void findLine() {
@@ -78,11 +109,28 @@ public class DriveOverSeesawAction extends
 		lineFinder.addStateListener(new LineFinderListener());
 	}
 
-	private class LineFinderListener extends
-			AbstractStateListener<LineFinder.LineFinderState> {
+	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(SeesawState.RESUME_EXPLORING);
+		}
+	}
+
+	protected void waitAndScan() {
+		boolean seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		if (seesawOpen) {
+			seesawOpen = isOpen(getControllableRobot().getIRSensor().getAngle());
+		}
+
+		if (seesawOpen)
+			transition(SeesawState.ONWARDS);
+		else {
+			try {
+				Thread.sleep(5000);
+				transition(SeesawState.WAIT_AND_SCAN);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -90,39 +138,53 @@ public class DriveOverSeesawAction extends
 		finish();
 	}
 
-	public enum SeesawState implements
-			State<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> {
+	public enum SeesawState implements State<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> {
+
+		INITIAL {
+			@Override
+			public void execute(DriveOverSeesawAction input) {
+				input.initial();
+			}
+		},
+
+		SCAN {
+			@Override
+			public void execute(DriveOverSeesawAction input) {
+				input.scan();
+			}
+		},
 
 		ONWARDS {
-
 			@Override
 			public void execute(DriveOverSeesawAction input) {
 				input.onwards();
 			}
 		},
 
-		FIND_LINE {
+		WAIT_AND_SCAN {
+			@Override
+			public void execute(DriveOverSeesawAction input) {
+				input.waitAndScan();
+			}
+		},
 
+		FIND_LINE {
 			@Override
 			public void execute(DriveOverSeesawAction input) {
 				input.findLine();
 			}
-
 		},
 
 		RESUME_EXPLORING {
-
 			@Override
 			public void execute(DriveOverSeesawAction input) {
 				input.resumeExploring();
 			}
-
 		};
 
 	}
 
 	private class FinishFuture extends StateMachine.FinishFuture<SeesawState> {
-
 		@Override
 		public boolean isFinished() {
 			return true;
