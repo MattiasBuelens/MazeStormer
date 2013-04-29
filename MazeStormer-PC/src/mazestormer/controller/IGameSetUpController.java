@@ -23,8 +23,6 @@ public interface IGameSetUpController extends EventSource {
 
 	public void setReady(boolean isReady);
 
-	public void pauseGame();
-
 	public void stopGame();
 
 }

@@ -27,7 +27,6 @@ import net.miginfocom.swing.MigLayout;
 import com.google.common.eventbus.Subscribe;
 import com.javarichclient.icon.tango.actions.GoNextIcon;
 import com.javarichclient.icon.tango.actions.ListAllIcon;
-import com.javarichclient.icon.tango.actions.MediaPlaybackPauseIcon;
 import com.javarichclient.icon.tango.actions.MediaPlaybackStopIcon;
 import com.javarichclient.icon.tango.actions.SystemLogOutIcon;
 
@@ -40,12 +39,10 @@ public class GameSetUpPanel extends ViewPanel {
 	private final JButton rename = new JButton();
 	private final JButton join = new JButton();
 	private final JButton leave = new JButton();
-	private final JButton pause = new JButton();
 	private final JButton stop = new JButton();
 	private final Action renameAction = new RenameAction();
 	private final Action joinAction = new JoinAction();
 	private final Action leaveAction = new LeaveAction();
-	private final Action pauseAction = new PauseAction();
 	private final Action stopAction = new StopAction();
 	private final JCheckBox ready = new JCheckBox();
 
@@ -152,15 +149,10 @@ public class GameSetUpPanel extends ViewPanel {
 		add(buttons, "cell 0 4 3 1,grow");
 		buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		pause.setAction(pauseAction);
-		pause.setText("");
-		pause.setIcon(new MediaPlaybackPauseIcon(32, 32));
-		buttons.add(pause, "cell 0 0");
-
 		stop.setAction(stopAction);
 		stop.setText("");
 		stop.setIcon(new MediaPlaybackStopIcon(32, 32));
-		buttons.add(stop, "cell 0 1");
+		buttons.add(stop, "cell 0 0");
 	}
 
 	private void enableGameButtons(boolean isJoined, boolean isPlaying) {
@@ -170,7 +162,6 @@ public class GameSetUpPanel extends ViewPanel {
 
 		// TODO Implement events to report playing state
 		ready.setEnabled(isJoined);
-		pause.setEnabled(isJoined);// && isPlaying);
 		stop.setEnabled(isJoined);// && isPlaying);
 	}
 
@@ -213,10 +204,6 @@ public class GameSetUpPanel extends ViewPanel {
 
 	private void setReady(boolean isReady) {
 		controller.setReady(isReady);
-	}
-
-	private void pauseGame() {
-		controller.pauseGame();
 	}
 
 	private void stopGame() {
@@ -271,21 +258,6 @@ public class GameSetUpPanel extends ViewPanel {
 		}
 	}
 
-	private class PauseAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-
-		public PauseAction() {
-			putValue(NAME, "Pause game");
-			putValue(SHORT_DESCRIPTION, "Pause the game");
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			pauseGame();
-		}
-
-	}
-
 	private class StopAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 
@@ -295,7 +267,7 @@ public class GameSetUpPanel extends ViewPanel {
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent e) {
 			stopGame();
 		}
 

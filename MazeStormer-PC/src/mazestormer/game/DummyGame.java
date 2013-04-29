@@ -59,12 +59,6 @@ public class DummyGame extends Game {
 		}
 
 		@Override
-		public void onGamePaused() {
-			positionReporter.stop();
-			setReady();
-		}
-
-		@Override
 		public void onGameStopped() {
 			positionReporter.stop();
 			setReady();

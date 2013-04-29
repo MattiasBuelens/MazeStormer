@@ -118,11 +118,6 @@ public class WorldSimulator {
 		}
 
 		@Override
-		public void gamePaused() {
-			// Nothing to do here
-		}
-
-		@Override
 		public void gameWon(int teamNumber) {
 			// Nothing to do here
 		}

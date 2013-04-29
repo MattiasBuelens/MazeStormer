@@ -82,6 +82,7 @@ public class Game {
 			client.join(new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
+					System.out.println(client.getPlayers());
 					// Call listeners
 					for (GameListener listener : listeners) {
 						listener.onGameJoined();
@@ -122,10 +123,6 @@ public class Game {
 		} catch (Exception e) {
 			callback.onFailure(e);
 		}
-	}
-
-	public void pause() throws IllegalStateException, IOException {
-		client.pause();
 	}
 
 	public void stop() throws IllegalStateException, IOException {
@@ -318,13 +315,6 @@ public class Game {
 		}
 
 		@Override
-		public void gamePaused() {
-			for (GameListener listener : listeners) {
-				listener.onGamePaused();
-			}
-		}
-
-		@Override
 		public void gameWon(int teamNumber) {
 			for (GameListener listener : listeners) {
 				listener.onGameWon(teamNumber);
@@ -333,19 +323,18 @@ public class Game {
 
 		@Override
 		public void playerJoining(String playerID) {
+			System.out.println(localPlayer.getPlayerID() + " sees joining: " + playerID);
 			// TODO Perhaps add GameListener.onPlayerJoining() ?
 		}
 
 		@Override
 		public void playerJoined(String playerID) {
+			System.out.println(localPlayer.getPlayerID() + " sees joined: " + playerID);
 		}
 
 		@Override
 		public void playerDisconnected(String playerID, DisconnectReason reason) {
-			if (isPartner(playerID)) {
-				// Partner disconnected
-				removePartner();
-			}
+			System.out.println(localPlayer.getPlayerID() + " sees disconnecting: " + playerID);
 		}
 
 		@Override
@@ -365,6 +354,11 @@ public class Game {
 		@Override
 		public void teamConnected(String partnerID) {
 			createPartner(partnerID);
+		}
+
+		@Override
+		public void teamDisconnected(String partnerID) {
+			removePartner();
 		}
 
 		@Override

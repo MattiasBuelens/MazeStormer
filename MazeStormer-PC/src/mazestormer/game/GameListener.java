@@ -12,8 +12,6 @@ public interface GameListener {
 
 	public void onGameStarted();
 
-	public void onGamePaused();
-
 	public void onGameStopped();
 
 	public void onGameWon(int teamNumber);
