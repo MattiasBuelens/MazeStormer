@@ -105,12 +105,12 @@ public class GameRunner extends Commander {
 		if(currentMode instanceof ExploreIslandControlMode) {
 			// other unexplored islands => LeaveIslandControlMode
 			// no other unexplored islands => DriveToCenterControlMode
-//			if(){
-//				
-//			}
-//			else {
-//				
-//			}
+			if(otherIslands()){
+				setMode(new LeaveIslandControlMode(getPlayer(), this));
+			}
+			else {
+				setMode(new DriveToCenterControlMode(getPlayer(), this));
+			}
 		}
 		else if(currentMode instanceof LeaveIslandControlMode){
 			setMode(new ExploreIslandControlMode(getPlayer(), this));
@@ -121,7 +121,7 @@ public class GameRunner extends Commander {
 		else if(currentMode instanceof DriveToPartnerControlMode){
 			// should never happen
 		}
-		// TODO: log
+		log("Changed controlMode to " + currentMode);
 		return currentMode;
 	}
 	
@@ -209,6 +209,16 @@ public class GameRunner extends Commander {
 		Collections.sort(reachableTiles, new ClosestTileComparator(getDriver().getCurrentTile(), getMaze()));
 		reachableTiles.add(getMaze().getBarcodeTile(barcode));
 		return reachableTiles;
+	}
+	
+	private boolean otherIslands() {
+		for (Tile tile : getMaze().getBarcodeTiles()) {
+			Barcode tileBarcode = tile.getBarcode();
+			if(Seesaw.isSeesawBarcode(tileBarcode) && !otherSideUnexplored(tile)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean isRunning() {

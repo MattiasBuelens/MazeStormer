@@ -65,5 +65,14 @@ public abstract class ControlMode {
 	public abstract boolean isBarcodeActionEnabled();
 
 	public abstract IAction getAction(Barcode barcode);
+	
+	/*
+	 * Utilities
+	 */
+	
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
 
 }
