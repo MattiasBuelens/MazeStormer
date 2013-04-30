@@ -1,0 +1,4 @@
+6 3
+Corner.N.S1N Straight.E Straight.E Straight.E Straight.E Corner.E.S2N
+T.W Straight.E.11 Seesaw.W Seesaw.E Straight.W.13 T.E
+Corner.W.S3N Straight.E Straight.E Straight.E Straight.E Corner.S.S4N

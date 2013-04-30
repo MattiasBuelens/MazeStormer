@@ -55,12 +55,13 @@ public abstract class AbstractSeesawAction implements IAction {
 	 */
 
 	protected boolean canDriveOverSeesaw() {
-		boolean seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
+		return isOpen(getRobot().getIRSensor().getAngle());
+		/* boolean seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
 		if (seesawOpen) {
 			return isOpen(getRobot().getIRSensor().getAngle());
 		} else {
 			return false;
-		}
+		} */
 	}
 
 	/*

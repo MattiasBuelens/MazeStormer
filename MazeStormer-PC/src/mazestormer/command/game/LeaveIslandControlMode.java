@@ -1,7 +1,5 @@
 package mazestormer.command.game;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,46 +10,28 @@ import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeMapping;
 import mazestormer.barcode.IAction;
 import mazestormer.barcode.NoAction;
-import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
 import mazestormer.command.ControlMode;
-import mazestormer.maze.Orientation;
-import mazestormer.maze.PathFinder;
 import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
-import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 
 public class LeaveIslandControlMode extends ControlMode {
 
-	private final ControlMode superControlMode;
 	private LinkedList<Tile> reachableSeesawQueue;
 	private final BarcodeMapping leaveBarcodeMapping = new LeaveIslandBarcodeMapping();
 
-	public LeaveIslandControlMode(Player player, ControlMode superControlMode) {
-		super(player, superControlMode.getCommander());
-		this.superControlMode = superControlMode;
+	public LeaveIslandControlMode(Player player, GameRunner gameRunner) {
+		super(player, gameRunner);
 	}
 
 	/*
 	 * Getters
 	 */
 
-	private ControlMode getSuperControlMode() {
-		return superControlMode;
-	}
-
-	private GameRunner getGameRunner() {
-		return (GameRunner) getSuperControlMode().getCommander();
-	}
-
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) getPlayer().getRobot();
-	}
-
-	private Tile getCurrentTile() {
-		return getCommander().getDriver().getCurrentTile();
 	}
 
 	/*
@@ -80,27 +60,6 @@ public class LeaveIslandControlMode extends ControlMode {
 	public boolean isBarcodeActionEnabled() {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	public static boolean isOpen(float angle) {
-		if (Float.isNaN(angle)) {
-			return true;
-		}
-		return (Math.abs(angle) > ControllablePCRobot.STANDARD_IR_RANGE);
-	}
-
-	// TODO Call me maybe?
-	protected void scan() {
-		boolean seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
-		if (seesawOpen) {
-			seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
-		}
-
-		if (seesawOpen) {
-			// TODO All good, cross the seesaw
-		} else {
-			// TODO Seesaw closed, what to do now?
-		}
 	}
 
 	/*
@@ -171,35 +130,4 @@ public class LeaveIslandControlMode extends ControlMode {
 		}
 
 	}
-
-	/*
-	 * Utilities
-	 */
-
-	private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
-		List<Tile> reachableTiles = new ArrayList<>();
-		PathFinder pf = new PathFinder(getMaze());
-		for (Tile tile : getMaze().getBarcodeTiles()) {
-			Barcode tileBarcode = tile.getBarcode();
-			if (Seesaw.isSeesawBarcode(tileBarcode) && !tileBarcode.equals(barcode)
-					&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
-					&& !pf.findTilePathWithoutSeesaws(getCurrentTile(), tile).isEmpty() && otherSideUnexplored(tile)) {
-				reachableTiles.add(tile);
-			}
-		}
-		Collections.sort(reachableTiles, new ClosestTileComparator(getCurrentTile(), getMaze()));
-		reachableTiles.add(getMaze().getBarcodeTile(barcode));
-		return reachableTiles;
-	}
-
-	private boolean otherSideUnexplored(Tile seesawBarcodeTile) {
-		Barcode barcode = seesawBarcodeTile.getBarcode();
-		Tile otherBarcodeTile = getMaze().getBarcodeTile(Seesaw.getOtherBarcode(barcode));
-		for (Orientation orientation : Orientation.values()) {
-			if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
-				return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();
-		}
-		return false;
-	}
-
 }
