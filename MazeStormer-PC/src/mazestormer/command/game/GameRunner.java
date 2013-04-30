@@ -1,5 +1,8 @@
 package mazestormer.command.game;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -11,14 +14,23 @@ import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
+import mazestormer.barcode.Barcode;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
+import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
 import mazestormer.game.DefaultGameListener;
 import mazestormer.game.Game;
 import mazestormer.maze.DefaultMazeListener;
+import mazestormer.maze.IMaze;
+import mazestormer.maze.Orientation;
+import mazestormer.maze.PathFinder;
+import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
+import mazestormer.maze.TileShape;
+import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.util.LongPoint;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -79,6 +91,90 @@ public class GameRunner extends Commander {
 	public Game getGame() {
 		return game;
 	}
+	
+	public IMaze getMaze() {
+		return getPlayer().getMaze();
+	}
+
+	/*
+	 * ControlMode management
+	 */
+	
+	@Override
+	public ControlMode nextMode(ControlMode currentMode) {
+		if(currentMode instanceof ExploreIslandControlMode) {
+			// other unexplored islands => LeaveIslandControlMode
+			// no other unexplored islands => DriveToCenterControlMode
+			if(otherIslands()){
+				setMode(new LeaveIslandControlMode(getPlayer(), this));
+			}
+			else {
+				setMode(new DriveToCenterControlMode(getPlayer(), this));
+			}
+		}
+		else if(currentMode instanceof LeaveIslandControlMode){
+			setMode(new ExploreIslandControlMode(getPlayer(), this));
+		}
+		else if(currentMode instanceof DriveToCenterControlMode){
+			// should never happen
+		}
+		else if(currentMode instanceof DriveToPartnerControlMode){
+			// should never happen
+		}
+		log("Changed controlMode to " + currentMode);
+		return currentMode;
+	}
+	
+	/*
+	 * Utilities
+	 */
+
+	public void setSeesawWalls() {
+		log("Seesaw on next tiles, set seesaw and barcode");
+
+		IMaze maze = getMaze();
+
+		Tile currentTile = getDriver().getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
+		Orientation orientation = currentTile.orientationTo(nextTile);
+		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
+
+		Barcode seesawBarcode = currentTile.getBarcode();
+		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
+
+		// Seesaw
+		LongPoint nextTilePosition = nextTile.getPosition();
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, seesawBarcode);
+		maze.setExplored(nextTilePosition);
+
+		// Seesaw
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setSeesaw(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
+
+		// Other seesaw barcode
+		nextTilePosition = orientation.shift(nextTilePosition);
+		maze.setTileShape(nextTilePosition, tileShape);
+		maze.setBarcode(nextTilePosition, otherBarcode);
+		maze.setExplored(nextTilePosition);
+	}
+	
+	public void setObjectTile() {
+		Tile currentTile = getDriver().getCurrentTile();
+		Tile nextTile = getDriver().getNextTile();
+		Orientation orientation = currentTile.orientationTo(nextTile);
+
+		// Make next tile a dead end
+		getMaze().setTileShape(nextTile.getPosition(),
+				new TileShape(TileType.DEAD_END, orientation));
+
+		// Mark as explored
+		getMaze().setExplored(nextTile.getPosition());
+
+		// Remove both tiles from the queue
+	}
 
 	public void onSeesaw(int barcode) {
 		log("The seesaw is currently opened, onwards!");
@@ -87,6 +183,42 @@ public class GameRunner extends Commander {
 
 	public void offSeesaw() {
 		game.unlockSeesaw();
+	}
+	
+	public boolean otherSideUnexplored(Tile seesawBarcodeTile) {
+			Barcode barcode = seesawBarcodeTile.getBarcode();
+			Tile otherBarcodeTile = getMaze().getBarcodeTile(Seesaw.getOtherBarcode(barcode));
+			for (Orientation orientation : Orientation.values()) {
+				if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
+					return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();
+			}
+			return false;
+		}
+	
+	private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
+		List<Tile> reachableTiles = new ArrayList<>();
+		PathFinder pf = new PathFinder(getMaze());
+		for (Tile tile : getMaze().getBarcodeTiles()) {
+			Barcode tileBarcode = tile.getBarcode();
+			if (Seesaw.isSeesawBarcode(tileBarcode) && !tileBarcode.equals(barcode)
+					&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
+					&& !pf.findTilePathWithoutSeesaws(getDriver().getCurrentTile(), tile).isEmpty() && otherSideUnexplored(tile)) {
+				reachableTiles.add(tile);
+			}
+		}
+		Collections.sort(reachableTiles, new ClosestTileComparator(getDriver().getCurrentTile(), getMaze()));
+		reachableTiles.add(getMaze().getBarcodeTile(barcode));
+		return reachableTiles;
+	}
+	
+	private boolean otherIslands() {
+		for (Tile tile : getMaze().getBarcodeTiles()) {
+			Barcode tileBarcode = tile.getBarcode();
+			if(Seesaw.isSeesawBarcode(tileBarcode) && !otherSideUnexplored(tile)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public boolean isRunning() {
@@ -197,21 +329,7 @@ public class GameRunner extends Commander {
 			game.sendOwnTiles();
 		}
 	}
-
-	/*
-	 * ControlMode management
-	 */
-
-	@Override
-	public ControlMode nextMode(ControlMode currentMode) {
-		// TODO OMG DO THIS!!!!
-		return null;
-	}
-
-	/*
-	 * Utilities
-	 */
-
+	
 	protected void log(String message) {
 		getPlayer().getLogger().log(Level.INFO, message);
 	}
