@@ -184,7 +184,6 @@ public class CombinedMaze implements IMaze {
 		for (Tile tile : getPartnerMaze().getTiles()) {
 			importPartnerTileIntoTotalMaze(tile);
 		}
-
 	}
 
 	/**
@@ -200,6 +199,8 @@ public class CombinedMaze implements IMaze {
 		twoCommonBarcodes.clear();
 		// Reset transformation
 		tileTransformation = null;
+		// Rebuild
+		rebuild();
 	}
 
 	private void resetPartnerMaze() {
@@ -211,6 +212,19 @@ public class CombinedMaze implements IMaze {
 		twoCommonBarcodes.clear();
 		// Reset transformation
 		tileTransformation = null;
+		// Rebuild
+		rebuild();
+	}
+
+	private void rebuild() {
+		// Clear total maze
+		getTotalMaze().clear();
+		// Import own maze
+		getTotalMaze().importTiles(getOwnMaze().getTiles());
+		// Import partner maze, if possible
+		if (getTileTransform() != null) {
+			mergeTotalAndPartnerMazes();
+		}
 	}
 
 	public final IMaze getOwnMaze() {
