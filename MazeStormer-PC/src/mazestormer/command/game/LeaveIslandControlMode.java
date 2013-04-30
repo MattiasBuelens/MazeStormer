@@ -22,8 +22,13 @@ public class LeaveIslandControlMode extends ControlMode {
 	private LinkedList<Tile> reachableSeesawQueue;
 	private final BarcodeMapping leaveBarcodeMapping = new LeaveIslandBarcodeMapping();
 
+	/*
+	 * Constructor 
+	 */
+	
 	public LeaveIslandControlMode(Player player, GameRunner gameRunner) {
 		super(player, gameRunner);
+		// make a list of inter island seesaws. 
 	}
 
 	/*
@@ -35,7 +40,7 @@ public class LeaveIslandControlMode extends ControlMode {
 	}
 
 	/*
-	 * Methodes eigen voor deze controlmode
+	 * ControlMode Management
 	 */
 
 	@Override
@@ -50,6 +55,10 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	}
 
+	/*
+	 * Driver support
+	 */
+	
 	@Override
 	public Tile nextTile(Tile currentTile) {
 		// TODO Auto-generated method stub
@@ -57,19 +66,18 @@ public class LeaveIslandControlMode extends ControlMode {
 	}
 
 	@Override
-	public boolean isBarcodeActionEnabled() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/*
-	 * Barcode-acties en logica
-	 */
-
-	@Override
 	public IAction getAction(Barcode barcode) {
 		return leaveBarcodeMapping.getAction(barcode);
 	}
+
+	@Override
+	public boolean isBarcodeActionEnabled() {
+		return true;
+	}
+
+	/*
+	 * Utilities
+	 */
 
 	private class SeesawAction extends AbstractSeesawAction {
 

@@ -61,7 +61,7 @@ public class DriveOverSeesawAction extends
 	 */
 
 	protected void onwards() {
-		bindTransition(getPilot().travelComplete(130), // TODO 130 juist?
+		bindTransition(getPilot().travelComplete(122), // TODO 122 juist?
 				SeesawState.FIND_LINE);
 	}
 

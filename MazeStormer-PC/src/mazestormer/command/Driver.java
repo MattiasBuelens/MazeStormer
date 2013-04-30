@@ -65,8 +65,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	/*
 	 * Navigation
 	 */
-	private Tile currentTile;
-	private Tile nextTile;
+	private Tile startTile;
+	private Tile goalTile;
 
 	/**
 	 * Flag indicating if the driver should periodically adjust the robot's
@@ -134,7 +134,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		return getCommander().getMode();
 	}
 
-	protected final PathFinder getPathFinder() {
+	public final PathFinder getPathFinder() {
 		return pathFinder;
 	}
 
@@ -196,9 +196,9 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	protected void nextCycle() {
 		// Get the current tile
-		currentTile = getCurrentTile();
+		startTile = getCurrentTile();
 
-		if (!currentTile.isExplored()) {
+		if (!startTile.isExplored()) {
 			// Scan for walls
 			transition(ExplorerState.SCAN);
 		} else {
@@ -209,13 +209,13 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	protected void scan() {
 		// Scan and update current tile
-		log("Scan for edges at (" + currentTile.getX() + ", " + currentTile.getY() + ")");
-		bindTransition(scanAndUpdate(currentTile), ExplorerState.AFTER_SCAN);
+		log("Scan for edges at (" + startTile.getX() + ", " + startTile.getY() + ")");
+		bindTransition(scanAndUpdate(startTile), ExplorerState.AFTER_SCAN);
 	}
 
 	protected void afterScan() {
 		// Set as explored
-		getMaze().setExplored(currentTile.getPosition());
+		getMaze().setExplored(startTile.getPosition());
 
 		// Go to next tile
 		transition(ExplorerState.GO_NEXT_TILE);
@@ -227,18 +227,26 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	public void skipToNextTile(boolean skipCurrentBarcode) {
 		// Get the next tile
-		nextTile = getCommander().nextTile(currentTile);
+		goalTile = getCommander().nextTile(startTile);
 
 		// Objective completed
-		if (nextTile == null) {
+		if (goalTile == null) {
 			noNextTile();
 			return;
 		}
 
 		// Create and follow path to next tile
-		log("Go to tile (" + nextTile.getX() + ", " + nextTile.getY() + ")");
-		List<Tile> tilePath = getMode().createPath(getCurrentTile(), nextTile);
+		log("Go to tile (" + goalTile.getX() + ", " + goalTile.getY() + ")");
+		followPathToTile(goalTile, skipCurrentBarcode);
+	}
+	
+	public void followPathToTile(Tile tile, boolean skipCurrentBarcode) {
+		List<Tile> tilePath = getMode().createPath(getCurrentTile(), tile);
 		followPath(tilePath, skipCurrentBarcode);
+	}
+	
+	public void recalculateAndFollowPath(boolean skipCurrentBarcode) {
+		followPathToTile(getGoalTile(), skipCurrentBarcode);
 	}
 
 	/**
@@ -365,9 +373,9 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	protected void afterBarcode(Barcode barcode) {
-		log("Barcode read, placing on: (" + nextTile.getX() + ", " + nextTile.getY() + ")");
+		log("Barcode read, placing on: (" + goalTile.getX() + ", " + goalTile.getY() + ")");
 		// Set barcode on tile
-		setBarcodeTile(nextTile, barcode);
+		setBarcodeTile(goalTile, barcode);
 		// Travel
 		transition(ExplorerState.TRAVEL);
 	}
@@ -589,8 +597,12 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	/**
 	 * Get the next tile to which the robot is navigating.
 	 */
-	public Tile getNextTile() {
-		return nextTile;
+	public Tile getGoalTile() {
+		return goalTile;
+	}
+	
+	public Tile getStartTile() {
+		return startTile;
 	}
 
 	/**

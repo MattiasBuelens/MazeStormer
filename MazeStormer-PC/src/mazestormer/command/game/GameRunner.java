@@ -135,7 +135,7 @@ public class GameRunner extends Commander {
 		IMaze maze = getMaze();
 
 		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
+		Tile nextTile = getDriver().getGoalTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
@@ -163,7 +163,7 @@ public class GameRunner extends Commander {
 	
 	public void setObjectTile() {
 		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getNextTile();
+		Tile nextTile = getDriver().getGoalTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
 		// Make next tile a dead end

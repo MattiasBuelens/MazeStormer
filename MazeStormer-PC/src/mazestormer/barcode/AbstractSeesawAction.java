@@ -75,7 +75,7 @@ public abstract class AbstractSeesawAction implements IAction {
 		future.addFutureListener(new FutureListener<Object>() {
 			@Override
 			public void futureResolved(Future<? extends Object> future, Object result) {
-				// TODO Follow updated path
+				getDriver().recalculateAndFollowPath(true);
 			}
 
 			@Override
@@ -87,13 +87,13 @@ public abstract class AbstractSeesawAction implements IAction {
 
 	protected final List<Tile> getPathWithoutSeesaws() {
 		Tile startTile = getDriver().getCurrentTile();
-		Tile goalTile = getDriver().getNextTile();
+		Tile goalTile = getDriver().getGoalTile();
 		return getPathFinder().findTilePathWithoutSeesaws(startTile, goalTile);
 	}
 
 	protected final List<Tile> getPathWithoutSeesaw(Seesaw seesaw) {
 		Tile startTile = getDriver().getCurrentTile();
-		Tile goalTile = getDriver().getNextTile();
+		Tile goalTile = getDriver().getGoalTile();
 		return getPathFinder().findTilePathWithoutSeesaw(startTile, goalTile, seesaw);
 	}
 

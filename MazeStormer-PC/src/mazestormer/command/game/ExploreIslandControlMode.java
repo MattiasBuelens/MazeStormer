@@ -83,7 +83,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	 */
 	public void setObjectTile() {
 		Tile currentTile = getCommander().getDriver().getCurrentTile();
-		Tile nextTile = getCommander().getDriver().getNextTile();
+		Tile nextTile = getCommander().getDriver().getGoalTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
 		// Make next tile a dead end
@@ -163,7 +163,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		IMaze maze = getMaze();
 
 		Tile currentTile = getCommander().getDriver().getCurrentTile();
-		Tile nextTile = getCommander().getDriver().getNextTile();
+		Tile nextTile = getCommander().getDriver().getGoalTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
@@ -200,14 +200,12 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 		@Override
 		public Future<?> performAction(Player player) {
-			// TODO Check whether we're trying to cross the seesaw?
-
 			// Place seesaw
 			setSeesawWalls();
 
 			// Only cross if the seesaw is internal
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
-			if (isInternal(seesaw)) {
+			if (isInternal(seesaw) && meantToCrossSeesaw()) {
 				// Check if seesaw is open
 				// TODO DEBUG ME
 				if (canDriveOverSeesaw()) {
@@ -229,6 +227,13 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 				skipToNextTile(true);
 				return null;
 			}
+		}
+		
+		private boolean meantToCrossSeesaw() {
+			// if the current (seesaw barcode) tile is equal to the start tile of the
+			// drivers new cycle, the driver was simply exploring it. It didn't have the
+			// intention to cross the seesaw
+			return !(getDriver().getCurrentTile().equals(getDriver().getStartTile()));
 		}
 	}
 
