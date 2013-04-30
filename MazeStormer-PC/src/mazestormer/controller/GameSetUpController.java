@@ -19,7 +19,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 	private ConnectionMode connectionMode = ConnectionMode.LOCAL;
 	private String gameID = "";
 
-	private Connection connection;
 	private Game game;
 	private WorldSimulator worldSimulator;
 	private GameRunner runner;
@@ -90,7 +89,7 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 
 	private void createGame() throws IOException {
 		final Player localPlayer = getMainController().getPlayer();
-		connection = connectionMode.getConnection();
+		Connection connection = connectionMode.getConnection();
 		game = new Game(connection, gameID, localPlayer);
 		game.addGameListener(new Listener());
 
@@ -146,10 +145,6 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			});
 			// Stop simulator
 			worldSimulator.terminate();
-			// Close connection
-			if (connection != null) {
-				connection.close();
-			}
 		} catch (Exception e) {
 			logToAll("Error when leaving: " + e.getMessage());
 		}

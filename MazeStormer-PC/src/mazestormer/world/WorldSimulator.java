@@ -31,7 +31,7 @@ public class WorldSimulator {
 	private final Player localPlayer;
 	private final String id;
 
-	private final Set<Integer> transformedPlayers = new HashSet<Integer>();
+	private final Set<Player> transformedPlayers = new HashSet<Player>();
 
 	public WorldSimulator(Connection connection, String id, Player localPlayer, World world) throws IOException,
 			IllegalStateException {
@@ -69,6 +69,7 @@ public class WorldSimulator {
 		String playerID = playerDetails.getPlayerID();
 		AbsolutePlayer player = getWorld().getPlayer(playerID);
 		if (player == null) {
+			// Create observable player
 			IRRobot robot = new ObservableRobot(ModelType.fromPlayerType(playerDetails.getType()),
 					playerDetails.getHeight(), playerDetails.getWidth());
 			RelativePlayer relativePlayer = new RelativePlayer(playerID, robot, null);
@@ -80,14 +81,14 @@ public class WorldSimulator {
 
 	private void setupPlayerTransform(AbsolutePlayer player, int playerNumber) {
 		// Ignore if already set
-		if (transformedPlayers.contains(playerNumber))
+		if (transformedPlayers.contains(player))
 			return;
 
 		// Create transformation from start pose
 		Pose startPose = getWorld().getMaze().getStartPose(playerNumber);
 		player.setTransform(new PoseTransform(startPose));
 		// Set as transformed
-		transformedPlayers.add(playerNumber);
+		transformedPlayers.add(player);
 	}
 
 	private void clearPlayerTransforms() {
