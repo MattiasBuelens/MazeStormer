@@ -103,6 +103,10 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 		}
 	}
 
+	protected void skipToNextTile(boolean skipCurrentBarcode) {
+		getCommander().getDriver().skipToNextTile(skipCurrentBarcode);
+	}
+
 	/**
 	 * Compares tiles based on their shortest path distance to a given reference
 	 * tile.

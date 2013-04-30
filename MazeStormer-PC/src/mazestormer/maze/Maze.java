@@ -387,11 +387,6 @@ public class Maze implements IMaze {
 	}
 
 	@Override
-	public Tile getOtherSeesawBarcodeTile(Barcode barcode) {
-		return getBarcodeTile(Seesaw.getOtherBarcode(barcode));
-	}
-
-	@Override
 	public Set<Tile> getBarcodeTiles() {
 		Set<Tile> barcodeTiles = new HashSet<>();
 		for (Tile tile : tiles.values()) {

@@ -14,8 +14,8 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
-import mazestormer.game.Game;
 import mazestormer.game.DefaultGameListener;
+import mazestormer.game.Game;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -41,7 +41,7 @@ public class GameRunner extends Commander {
 	 */
 	private int objectNumber;
 	private final Game game;
-	
+
 	/*
 	 * GameListener
 	 */
@@ -55,7 +55,7 @@ public class GameRunner extends Commander {
 	/*
 	 * Constructor
 	 */
-	
+
 	public GameRunner(Player player, Game game) {
 		super(player);
 
@@ -64,35 +64,31 @@ public class GameRunner extends Commander {
 		game.addGameListener(new GameListener());
 
 		// Modes
-		setMode(new ExploreIslandControlMode(player,this));
+		setMode(new ExploreIslandControlMode(player, this));
 	}
 
 	/*
 	 * Getters
 	 */
-	
+
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) getPlayer().getRobot();
-	}
-
-	private IMaze getMaze() {
-		return getPlayer().getMaze();
 	}
 
 	public int getObjectNumber() {
 		return objectNumber;
 	}
-	
+
 	private void setObjectNumber(int nb) {
 		this.objectNumber = nb;
 	}
-	
-	public Tile getCurrentTile() {
-		return getDriver().getCurrentTile();
+
+	public Game getGame() {
+		return game;
 	}
 	
-	public Game getGame(){
-		return game;
+	public IMaze getMaze() {
+		return getPlayer().getMaze();
 	}
 
 	/*
@@ -168,7 +164,6 @@ public class GameRunner extends Commander {
 		getMaze().setExplored(nextTile.getPosition());
 
 		// Remove both tiles from the queue
-
 	}
 
 	public void onSeesaw(int barcode) {
@@ -236,7 +231,7 @@ public class GameRunner extends Commander {
 		}
 
 	}
-	
+
 	private class GameListener extends DefaultGameListener {
 
 		@Override
@@ -281,7 +276,7 @@ public class GameRunner extends Commander {
 			// Stop reporting
 			stopReporting();
 		}
-		
+
 		@Override
 		public void onPartnerConnected(Player partner) {
 			// Send own maze

@@ -23,8 +23,7 @@ import mazestormer.util.Future;
 import com.google.common.base.Strings;
 import com.google.common.math.DoubleMath;
 
-public class BarcodeScanner extends
-		StateMachine<BarcodeScanner, BarcodeScanner.BarcodeState> implements
+public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.BarcodeState> implements
 		StateListener<BarcodeScanner.BarcodeState>, BarcodeScannerListener {
 
 	/*
@@ -41,10 +40,8 @@ public class BarcodeScanner extends
 	 */
 
 	private final Player player;
-	private boolean performAction;
 	private double scanSpeed = 2; // cm/sec
 	private double originalTravelSpeed;
-	private BarcodeMapping mapping = new ExplorerBarcodeMapping();
 
 	/*
 	 * State
@@ -79,14 +76,6 @@ public class BarcodeScanner extends
 		this.scanSpeed = scanSpeed;
 	}
 
-	public boolean performsAction() {
-		return performAction;
-	}
-
-	public void setPerformAction(boolean performAction) {
-		this.performAction = performAction;
-	}
-
 	protected Pose getPose() {
 		return getRobot().getPoseProvider().getPose();
 	}
@@ -97,14 +86,6 @@ public class BarcodeScanner extends
 
 	protected float getStartOffset() {
 		return getRobot().getLightSensor().getSensorRadius();
-	}
-
-	public BarcodeMapping getMapping() {
-		return mapping;
-	}
-
-	public void setMapping(BarcodeMapping mapping) {
-		this.mapping = mapping;
 	}
 
 	protected void log(String message) {
@@ -124,42 +105,26 @@ public class BarcodeScanner extends
 	}
 
 	@Override
-	public void onEndBarcode(byte barcode) {
+	public void onEndBarcode(Barcode barcode) {
 		// Log
-		String paddedBarcode = Strings.padStart(
-				Integer.toBinaryString(barcode), Barcode.getNbValueBars(), '0');
-		log("Scanned barcode: " + paddedBarcode);
-
-		// Action
-		if (performsAction()) {
-			performAction(new Barcode(barcode));
-		}
-	}
-
-	public Future<?> performAction(Barcode barcode) {
-		return performAction(getMapping().getAction(barcode));
-	}
-
-	protected Future<?> performAction(IAction action) {
-		return action.performAction(player);
+		String binary = Integer.toBinaryString(barcode.getValue());
+		String padded = Strings.padStart(binary, Barcode.getNbValueBars(), '0');
+		log("Scanned barcode: " + padded);
 	}
 
 	private Future<Void> onFirstBlack() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> onWhiteToBlack() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_SMALLER_THAN,
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
 				Threshold.WHITE_BLACK.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
 
 	private Future<Void> onBlackToWhite() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_GREATER_THAN,
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
 				Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
@@ -187,8 +152,7 @@ public class BarcodeScanner extends
 		getRobot().getPilot().setTravelSpeed(getScanSpeed());
 		// TODO Check with start offset
 		// travel(- START_BAR_LENGTH / 2);
-		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()),
-				BarcodeState.STROKE_START);
+		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()), BarcodeState.STROKE_START);
 	}
 
 	protected void strokeStart() {
@@ -226,8 +190,7 @@ public class BarcodeScanner extends
 			nextStrokeBlack = foundBlack;
 		}
 
-		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1)
-				* getBarLength()) {
+		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1) * getBarLength()) {
 			// Iterate
 			if (nextStrokeBlack) {
 				transition(BarcodeState.FIND_STROKE_BLACK);
@@ -256,8 +219,7 @@ public class BarcodeScanner extends
 				// TODO Check with start offset
 				// at = Math.max((distance - START_BAR_LENGTH) / barLength,
 				// 0);
-				at = Math.max((distance - getStartOffset() - barLength)
-						/ barLength, 0);
+				at = Math.max((distance - getStartOffset() - barLength) / barLength, 0);
 			} else {
 				at = Math.max(distance / barLength, 1);
 			}
@@ -305,7 +267,7 @@ public class BarcodeScanner extends
 		// Reset
 		stateStopped();
 		// Read barcode
-		byte barcode = (byte) readBarcode(distances);
+		Barcode barcode = new Barcode(readBarcode(distances));
 		// Notify listeners
 		for (BarcodeScannerListener listener : listeners) {
 			listener.onEndBarcode(barcode);
