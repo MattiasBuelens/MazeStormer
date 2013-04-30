@@ -110,10 +110,10 @@ public class GameRunner extends Commander {
 			setMode(new ExploreIslandControlMode(getPlayer(), this));
 		}
 		else if(currentMode instanceof DriveToCenterControlMode){
-			
+			// should never happen
 		}
 		else if(currentMode instanceof DriveToPartnerControlMode){
-			
+			// should never happen
 		}
 		// TODO: log
 		return currentMode;
