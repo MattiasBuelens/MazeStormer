@@ -63,6 +63,14 @@ public class CommandLineConfiguration {
 			ControlMode mode = ControlMode.byShortName(modeString);
 			controller.configuration().setControlMode(mode);
 		}
+		if (line.hasOption("travel-speed")) {
+			String travelSpeed = line.getOptionValue("travel-speed");
+			controller.manualControl().parameters().setTravelSpeed(Double.parseDouble(travelSpeed));
+		}
+		if (line.hasOption("rotate-speed")) {
+			String rotateSpeed = line.getOptionValue("rotate-speed");
+			controller.manualControl().parameters().setRotateSpeed(Double.parseDouble(rotateSpeed));
+		}
 		if (line.hasOption("ttt")) {
 			Properties tttProps = line.getOptionProperties("ttt");
 			String modeString = tttProps.getProperty("server", tttServerDefault);
@@ -150,6 +158,14 @@ public class CommandLineConfiguration {
 		// maze
 		options.addOption(OptionBuilder.withLongOpt("maze").hasArgs(1).withArgName("mazeFile")
 				.withDescription("Loads the given source maze.").create("m"));
+
+		// travel speed
+		options.addOption(OptionBuilder.withLongOpt("travel-speed").hasArgs(1).withArgName("cm/s")
+				.withDescription("Sets the travel speed.").create("ts"));
+
+		// rotate speed
+		options.addOption(OptionBuilder.withLongOpt("rotate-speed").hasArgs(1).withArgName("deg/s")
+				.withDescription("Sets the rotate speed.").create("rs"));
 
 		// ttt
 		String tttServers = Joiner.on('|').join(ConnectionMode.getNames()).toLowerCase()
