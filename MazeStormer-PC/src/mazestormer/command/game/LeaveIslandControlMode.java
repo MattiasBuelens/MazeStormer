@@ -50,10 +50,6 @@ public class LeaveIslandControlMode extends ControlMode {
 		return (ControllableRobot) getPlayer().getRobot();
 	}
 
-	private Tile getCurrentTile() {
-		return getCommander().getDriver().getCurrentTile();
-	}
-
 	/*
 	 * Methodes eigen voor deze controlmode
 	 */
@@ -171,35 +167,4 @@ public class LeaveIslandControlMode extends ControlMode {
 		}
 
 	}
-
-	/*
-	 * Utilities
-	 */
-
-	private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
-		List<Tile> reachableTiles = new ArrayList<>();
-		PathFinder pf = new PathFinder(getMaze());
-		for (Tile tile : getMaze().getBarcodeTiles()) {
-			Barcode tileBarcode = tile.getBarcode();
-			if (Seesaw.isSeesawBarcode(tileBarcode) && !tileBarcode.equals(barcode)
-					&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
-					&& !pf.findTilePathWithoutSeesaws(getCurrentTile(), tile).isEmpty() && otherSideUnexplored(tile)) {
-				reachableTiles.add(tile);
-			}
-		}
-		Collections.sort(reachableTiles, new ClosestTileComparator(getCurrentTile(), getMaze()));
-		reachableTiles.add(getMaze().getBarcodeTile(barcode));
-		return reachableTiles;
-	}
-
-	private boolean otherSideUnexplored(Tile seesawBarcodeTile) {
-		Barcode barcode = seesawBarcodeTile.getBarcode();
-		Tile otherBarcodeTile = getMaze().getBarcodeTile(Seesaw.getOtherBarcode(barcode));
-		for (Orientation orientation : Orientation.values()) {
-			if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
-				return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();
-		}
-		return false;
-	}
-
 }

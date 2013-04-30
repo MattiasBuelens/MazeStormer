@@ -1,5 +1,8 @@
 package mazestormer.command.game;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -14,11 +17,13 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
+import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
 import mazestormer.game.DefaultGameListener;
 import mazestormer.game.Game;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.PathFinder;
 import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
@@ -97,10 +102,15 @@ public class GameRunner extends Commander {
 	
 	@Override
 	public ControlMode nextMode(ControlMode currentMode) {
-		// TODO: tear down current controlMode?
 		if(currentMode instanceof ExploreIslandControlMode) {
 			// other unexplored islands => LeaveIslandControlMode
 			// no other unexplored islands => DriveToCenterControlMode
+//			if(){
+//				
+//			}
+//			else {
+//				
+//			}
 		}
 		else if(currentMode instanceof LeaveIslandControlMode){
 			setMode(new ExploreIslandControlMode(getPlayer(), this));
@@ -173,6 +183,32 @@ public class GameRunner extends Commander {
 
 	public void offSeesaw() {
 		game.unlockSeesaw();
+	}
+	
+	public boolean otherSideUnexplored(Tile seesawBarcodeTile) {
+			Barcode barcode = seesawBarcodeTile.getBarcode();
+			Tile otherBarcodeTile = getMaze().getBarcodeTile(Seesaw.getOtherBarcode(barcode));
+			for (Orientation orientation : Orientation.values()) {
+				if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
+					return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();
+			}
+			return false;
+		}
+	
+	private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
+		List<Tile> reachableTiles = new ArrayList<>();
+		PathFinder pf = new PathFinder(getMaze());
+		for (Tile tile : getMaze().getBarcodeTiles()) {
+			Barcode tileBarcode = tile.getBarcode();
+			if (Seesaw.isSeesawBarcode(tileBarcode) && !tileBarcode.equals(barcode)
+					&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
+					&& !pf.findTilePathWithoutSeesaws(getDriver().getCurrentTile(), tile).isEmpty() && otherSideUnexplored(tile)) {
+				reachableTiles.add(tile);
+			}
+		}
+		Collections.sort(reachableTiles, new ClosestTileComparator(getDriver().getCurrentTile(), getMaze()));
+		reachableTiles.add(getMaze().getBarcodeTile(barcode));
+		return reachableTiles;
 	}
 
 	public boolean isRunning() {
