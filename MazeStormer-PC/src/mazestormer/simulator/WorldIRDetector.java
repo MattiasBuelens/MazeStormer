@@ -118,9 +118,11 @@ public class WorldIRDetector implements IRSensor {
 				}
 				// Get best detected ray to infrared source
 				LineSegment ray = getDetectedRay(obstacles, irs, viewPoint);
-				float rayAngle = (float) ray.angle() - viewHeading;
-				if (ray != null && inRange(rayAngle)) {
-					rays.add(ray);
+				if (ray != null) {
+					float rayAngle = (float) ray.angle() - viewHeading;
+					if (inRange(rayAngle)) {
+						rays.add(ray);
+					}
 				}
 			}
 		}
