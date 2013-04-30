@@ -536,7 +536,8 @@ public class Maze implements IMaze {
 		List<Polygon> polygons = new ArrayList<Polygon>();
 		polygons.addAll(getPolygons(edgeGeometry));
 		polygons.addAll(getPolygons(seesawGeometry));
-		MultiPolygon geometry = factory.createMultiPolygon(GeometryFactory.toPolygonArray(polygons));
+		Geometry geometry = factory.createMultiPolygon(GeometryFactory.toPolygonArray(polygons));
+		geometry = geometry.union();
 		return geometry;
 	}
 
