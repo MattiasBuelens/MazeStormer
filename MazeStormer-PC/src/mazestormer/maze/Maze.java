@@ -24,6 +24,7 @@ import mazestormer.util.LongPoint;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class Maze implements IMaze {
@@ -526,10 +527,33 @@ public class Maze implements IMaze {
 
 	@Override
 	public Geometry getGeometry() {
-		Geometry geometry = getEdgeGeometry();
-		Geometry seesawGeometry = getSeesawGeometry(geometry.getFactory());
-		geometry = geometry.union(seesawGeometry);
+		// Get edges
+		Geometry edgeGeometry = getEdgeGeometry();
+		GeometryFactory factory = edgeGeometry.getFactory();
+		// Get seesaws
+		Geometry seesawGeometry = getSeesawGeometry(factory);
+		// Combine
+		List<Polygon> polygons = new ArrayList<Polygon>();
+		polygons.addAll(getPolygons(edgeGeometry));
+		polygons.addAll(getPolygons(seesawGeometry));
+		Geometry geometry = factory.createMultiPolygon(GeometryFactory.toPolygonArray(polygons));
+		geometry = geometry.union();
 		return geometry;
+	}
+
+	private List<Polygon> getPolygons(Geometry geometry) {
+		if (geometry instanceof Polygon) {
+			return Collections.singletonList((Polygon) geometry);
+		} else if (geometry instanceof MultiPolygon) {
+			MultiPolygon multi = (MultiPolygon) geometry;
+			List<Polygon> polygons = new ArrayList<Polygon>(multi.getNumGeometries());
+			for (int i = 0; i < multi.getNumGeometries(); ++i) {
+				polygons.add((Polygon) multi.getGeometryN(i));
+			}
+			return polygons;
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	protected Geometry getSeesawGeometry(GeometryFactory factory) {

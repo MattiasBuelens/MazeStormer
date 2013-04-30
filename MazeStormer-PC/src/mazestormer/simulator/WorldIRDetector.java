@@ -7,7 +7,7 @@ import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.geom.GeometryUtils;
-import mazestormer.geom.VisibleRegion;
+import mazestormer.geom.ParallelVisibleRegion;
 import mazestormer.infrared.IRSource;
 import mazestormer.infrared.OffsettedPoseProvider;
 import mazestormer.infrared.OffsettedPoseProvider.Module;
@@ -118,9 +118,11 @@ public class WorldIRDetector implements IRSensor {
 				}
 				// Get best detected ray to infrared source
 				LineSegment ray = getDetectedRay(obstacles, irs, viewPoint);
-				float rayAngle = (float) ray.angle() - viewHeading;
-				if (ray != null && inRange(rayAngle)) {
-					rays.add(ray);
+				if (ray != null) {
+					float rayAngle = (float) ray.angle() - viewHeading;
+					if (inRange(rayAngle)) {
+						rays.add(ray);
+					}
 				}
 			}
 		}
@@ -163,8 +165,7 @@ public class WorldIRDetector implements IRSensor {
 
 		// Get the visible part of the subject
 		Coordinate viewCoord = GeometryUtils.toCoordinate(viewPoint);
-		Geometry visibleSubject = VisibleRegion.build(obstacles,
-				subjectPolygon, viewCoord);
+		Geometry visibleSubject = ParallelVisibleRegion.build(obstacles, subjectPolygon, viewCoord);
 
 		// Exit if invisible
 		if (visibleSubject.isEmpty()) {
