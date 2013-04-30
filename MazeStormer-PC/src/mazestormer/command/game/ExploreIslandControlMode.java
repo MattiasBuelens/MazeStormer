@@ -63,7 +63,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			@Override
 			public boolean apply(Tile tile) {
 				// Only allow internal seesaws in paths
-				return !(tile.isSeesaw() && isInternal(tile.getSeesaw()));
+				return !tile.isSeesaw() || isInternal(tile.getSeesaw());
 			}
 		});
 	}
@@ -207,7 +207,6 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
 			if (isInternal(seesaw) && meantToCrossSeesaw()) {
 				// Check if seesaw is open
-				// TODO DEBUG ME
 				if (canDriveOverSeesaw()) {
 					// Drive over seesaw
 					log("Drive over internal seesaw");
@@ -228,10 +227,12 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 				return null;
 			}
 		}
-		
+
 		private boolean meantToCrossSeesaw() {
-			// if the current (seesaw barcode) tile is equal to the start tile of the
-			// drivers new cycle, the driver was simply exploring it. It didn't have the
+			// if the current (seesaw barcode) tile is equal to the start tile
+			// of the
+			// drivers new cycle, the driver was simply exploring it. It didn't
+			// have the
 			// intention to cross the seesaw
 			return !(getDriver().getCurrentTile().equals(getDriver().getStartTile()));
 		}
