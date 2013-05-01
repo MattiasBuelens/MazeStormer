@@ -1,7 +1,9 @@
-package mazestormer.barcode;
+package mazestormer.barcode.action;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import mazestormer.barcode.Barcode;
 
 public class ExplorerBarcodeMapping implements BarcodeMapping {
 

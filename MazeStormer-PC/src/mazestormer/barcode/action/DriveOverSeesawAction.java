@@ -1,4 +1,4 @@
-package mazestormer.barcode;
+package mazestormer.barcode.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.line.LineAdjuster;

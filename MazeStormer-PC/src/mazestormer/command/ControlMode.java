@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import mazestormer.barcode.Barcode;
-import mazestormer.barcode.IAction;
+import mazestormer.barcode.action.IAction;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;

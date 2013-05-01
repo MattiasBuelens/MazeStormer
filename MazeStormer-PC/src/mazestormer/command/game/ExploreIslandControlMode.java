@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mazestormer.barcode.AbstractSeesawAction;
 import mazestormer.barcode.Barcode;
-import mazestormer.barcode.BarcodeMapping;
-import mazestormer.barcode.IAction;
-import mazestormer.barcode.NoAction;
-import mazestormer.barcode.ObjectFoundAction;
+import mazestormer.barcode.action.AbstractSeesawAction;
+import mazestormer.barcode.action.BarcodeMapping;
+import mazestormer.barcode.action.IAction;
+import mazestormer.barcode.action.NoAction;
+import mazestormer.barcode.action.ObjectFoundAction;
 import mazestormer.command.AbstractExploreControlMode;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;

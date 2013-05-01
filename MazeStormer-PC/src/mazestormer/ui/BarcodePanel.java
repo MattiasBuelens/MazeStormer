@@ -14,7 +14,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
-import mazestormer.barcode.ActionType;
+
+import mazestormer.barcode.action.ActionType;
 import mazestormer.controller.BarcodeActionEvent;
 import mazestormer.controller.BarcodeScanEvent;
 import mazestormer.controller.IBarcodeController;

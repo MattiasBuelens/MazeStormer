@@ -1,9 +1,9 @@
 package mazestormer.command.explore;
 
 import mazestormer.barcode.Barcode;
-import mazestormer.barcode.BarcodeMapping;
-import mazestormer.barcode.ExplorerBarcodeMapping;
-import mazestormer.barcode.IAction;
+import mazestormer.barcode.action.BarcodeMapping;
+import mazestormer.barcode.action.ExplorerBarcodeMapping;
+import mazestormer.barcode.action.IAction;
 import mazestormer.command.AbstractExploreControlMode;
 import mazestormer.command.Commander;
 import mazestormer.player.Player;

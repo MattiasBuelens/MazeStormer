@@ -1,4 +1,4 @@
-package mazestormer.barcode;
+package mazestormer.barcode.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import lejos.geom.Point;
@@ -9,7 +9,7 @@ import mazestormer.robot.Robot;
 import mazestormer.util.Future;
 import mazestormer.util.ImmediateFuture;
 
-public class GoalAction implements IAction {
+public class CheckPointAction implements IAction {
 
 	@Override
 	public Future<?> performAction(Player player) {
@@ -24,8 +24,8 @@ public class GoalAction implements IAction {
 		// Get tile underneath robot
 		Point relativePosition = maze.toRelative(pose.getLocation());
 		Point tilePosition = maze.toTile(relativePosition);
-		maze.setTarget(mazestormer.maze.IMaze.Target.GOAL, maze.getTileAt(tilePosition));
-
+		maze.setTarget(mazestormer.maze.IMaze.Target.CHECKPOINT, maze.getTileAt(tilePosition));
+		
 		return new ImmediateFuture<Void>(null);
 	}
 

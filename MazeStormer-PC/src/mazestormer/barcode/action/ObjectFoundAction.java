@@ -1,4 +1,4 @@
-package mazestormer.barcode;
+package mazestormer.barcode.action;
 
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;

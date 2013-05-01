@@ -1,5 +1,194 @@
 <class-diagram version="1.0.11" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
   associations="true" dependencies="false" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.Commander" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/command/Commander.java" binary="false">    
+    <position height="-1" width="-1" x="740" y="200"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.AbstractExploreControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/AbstractExploreControlMode.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="536" y="601"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.ControlMode" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/command/ControlMode.java" binary="false">    
+    <position height="-1" width="-1" x="771" y="523"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.Driver" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/command/Driver.java" binary="false">    
+    <position height="-1" width="-1" x="943" y="303"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <enumeration id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.Driver.ExplorerState" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/Driver.java" binary="false">    
+    <position height="-1" width="-1" x="1178" y="471"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </enumeration>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.DriveToCenterControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/DriveToCenterControlMode.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="896" y="750"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.LeaveIslandControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/LeaveIslandControlMode.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="633" y="767"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.GameRunner" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/GameRunner.java" binary="false">    
+    <position height="-1" width="-1" x="526" y="345"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.DriveToPartnerControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/DriveToPartnerControlMode.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="1165" y="751"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.command.game.ExploreIslandControlMode" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/command/game/ExploreIslandControlMode.java" 
+    binary="false">    
+    <position height="-1" width="-1" x="369" y="759"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="false"/>    
+    </display>  
+  </class>  
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.game.Game" project="MazeStormer-PC" 
+    file="/MazeStormer-PC/src/mazestormer/game/Game.java" binary="false">    
+    <position height="-1" width="-1" x="288" y="345"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="peno.htttp.PlayerClient" project="htttp-peno" 
+    file="/htttp-peno/src/peno/htttp/PlayerClient.java" binary="false">    
+    <position height="-1" width="-1" x="289" y="244"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </class>  
+  <association id="13">    
+    <bendpoint x="784" y="360"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="14" name="currentMode">        
+        <position height="15" width="68" x="779" y="463"/>      
+      </attribute>      
+      <multiplicity id="15" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="16">    
+    <bendpoint x="732" y="380"/>    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="17" name="commander">        
+        <position height="15" width="63" x="672" y="268"/>      
+      </attribute>      
+      <multiplicity id="18" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="19">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="20" name="client"/>      
+      <multiplicity id="21" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <association id="22">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="23" name="commander">        
+        <position height="15" width="63" x="775" y="249"/>      
+      </attribute>      
+      <multiplicity id="24" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="1" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <generalization id="25">    
+    <bendpoint x="986" y="665"/>    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="26">    
+    <end type="SOURCE" refId="2"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <association id="27">    
+    <bendpoint x="821" y="209"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="28" name="driver">        
+        <position height="15" width="35" x="802" y="190"/>      
+      </attribute>      
+      <multiplicity id="29" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <nesting id="30">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="5"/>  
+  </nesting>  
+  <generalization id="31">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="32">    
+    <end type="SOURCE" refId="7"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="33">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="2"/>  
+  </generalization>  
+  <association id="34">    
+    <end type="SOURCE" refId="8" navigable="false">      
+      <attribute id="35" name="game"/>      
+      <multiplicity id="36" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <generalization id="37">    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    
     <attributes public="true" package="true" protected="true" private="true"/>    

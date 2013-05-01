@@ -1,6 +1,6 @@
 package mazestormer.controller;
 
-import mazestormer.barcode.ActionType;
+import mazestormer.barcode.action.ActionType;
 import mazestormer.util.EventSource;
 
 public interface IBarcodeController extends EventSource {

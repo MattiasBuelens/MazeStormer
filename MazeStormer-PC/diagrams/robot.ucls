@@ -2,7 +2,7 @@
   associations="true" dependencies="false" nesting-relationships="true">  
   <interface id="1" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.ControllableRobot" 
     project="MazeStormer" file="/MazeStormer/src/mazestormer/robot/ControllableRobot.java" binary="false">    
-    <position height="-1" width="-1" x="190" y="82"/>    
+    <position height="-1" width="-1" x="223" y="153"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -10,7 +10,7 @@
   </interface>  
   <interface id="2" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Robot" project="MazeStormer" 
     file="/MazeStormer/src/mazestormer/robot/Robot.java" binary="false">    
-    <position height="-1" width="-1" x="332" y="23"/>    
+    <position height="-1" width="-1" x="364" y="63"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -18,7 +18,7 @@
   </interface>  
   <class id="3" corner="BOTTOM_RIGHT" language="java" name="mazestormer.remote.PhysicalRobot" project="MazeStormer-NXT" 
     file="/MazeStormer-NXT/src/mazestormer/remote/PhysicalRobot.java" binary="false">    
-    <position height="-1" width="-1" x="59" y="493"/>    
+    <position height="-1" width="-1" x="115" y="393"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -26,7 +26,7 @@
   </class>  
   <interface id="4" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.ControllablePCRobot" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/robot/ControllablePCRobot.java" binary="false">    
-    <position height="-1" width="-1" x="304" y="364"/>    
+    <position height="-1" width="-1" x="339" y="266"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -34,7 +34,7 @@
   </interface>  
   <class id="5" corner="BOTTOM_RIGHT" language="java" name="mazestormer.simulator.VirtualRobot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/simulator/VirtualRobot.java" binary="false">    
-    <position height="-1" width="-1" x="242" y="492"/>    
+    <position height="-1" width="-1" x="277" y="394"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -42,7 +42,7 @@
   </class>  
   <class id="6" corner="BOTTOM_RIGHT" language="java" name="mazestormer.physical.PhysicalRobot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/physical/PhysicalRobot.java" binary="false">    
-    <position height="-1" width="-1" x="363" y="491"/>    
+    <position height="-1" width="-1" x="398" y="393"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -50,7 +50,7 @@
   </class>  
   <class id="7" corner="BOTTOM_RIGHT" language="java" name="mazestormer.observable.ObservableRobot" 
     project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/observable/ObservableRobot.java" binary="false">    
-    <position height="-1" width="-1" x="588" y="491"/>    
+    <position height="-1" width="-1" x="551" y="392"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -58,7 +58,7 @@
   </class>  
   <interface id="8" corner="BOTTOM_RIGHT" language="java" name="mazestormer.infrared.IRRobot" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/infrared/IRRobot.java" binary="false">    
-    <position height="-1" width="-1" x="588" y="363"/>    
+    <position height="-1" width="-1" x="551" y="267"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -66,7 +66,7 @@
   </interface>  
   <interface id="9" corner="BOTTOM_RIGHT" language="java" name="mazestormer.world.Model" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/world/Model.java" binary="false">    
-    <position height="-1" width="-1" x="589" y="175"/>    
+    <position height="-1" width="-1" x="552" y="66"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
@@ -74,75 +74,111 @@
   </interface>  
   <interface id="10" corner="BOTTOM_RIGHT" language="java" name="mazestormer.infrared.IRSource" project="MazeStormer-PC" 
     file="/MazeStormer-PC/src/mazestormer/infrared/IRSource.java" binary="false">    
-    <position height="-1" width="-1" x="589" y="262"/>    
+    <position height="-1" width="-1" x="552" y="153"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </interface>  
-  <class id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.infrared.IRCircuit" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/infrared/IRCircuit.java" binary="false">    
-    <position height="-1" width="-1" x="860" y="262"/>    
+  <class id="11" corner="BOTTOM_RIGHT" language="java" name="mazestormer.physical.PhysicalPilot" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/physical/PhysicalPilot.java" binary="false">    
+    <position height="-1" width="-1" x="400" y="485"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <class id="12" corner="BOTTOM_RIGHT" language="java" name="mazestormer.infrared.IRBall" project="MazeStormer-PC" 
-    file="/MazeStormer-PC/src/mazestormer/infrared/IRBall.java" binary="false">    
-    <position height="-1" width="-1" x="861" y="323"/>    
+  <class id="12" corner="BOTTOM_RIGHT" language="java" name="mazestormer.simulator.VirtualPilot" 
+    project="MazeStormer-PC" file="/MazeStormer-PC/src/mazestormer/simulator/VirtualPilot.java" binary="false">    
+    <position height="-1" width="-1" x="278" y="484"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
       <attributes public="false" package="false" protected="false" private="false"/>      
       <operations public="false" package="false" protected="false" private="false"/>    
     </display>  
   </class>  
-  <generalization id="13">    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="10"/>  
-  </generalization>  
-  <generalization id="14">    
-    <end type="SOURCE" refId="10"/>    
-    <end type="TARGET" refId="9"/>  
-  </generalization>  
-  <realization id="15">    
-    <end type="SOURCE" refId="3"/>    
-    <end type="TARGET" refId="1"/>  
-  </realization>  
-  <realization id="16">    
+  <interface id="13" corner="BOTTOM_RIGHT" language="java" name="mazestormer.robot.Pilot" project="MazeStormer" 
+    file="/MazeStormer/src/mazestormer/robot/Pilot.java" binary="false">    
+    <position height="-1" width="-1" x="346" y="568"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <interface id="14" corner="BOTTOM_RIGHT" language="java" name="lejos.robotics.navigation.RotateMoveController" 
+    project="MazeStormer" file="C:/Program Files (x86)/leJOS NXJ/lib/nxt/classes.jar" binary="true">    
+    <position height="-1" width="-1" x="346" y="645"/>    
+    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false"/>      
+      <operations public="false" package="false" protected="false" private="false"/>    
+    </display>  
+  </interface>  
+  <association id="15">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="16" name="pilot"/>      
+      <multiplicity id="17" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <realization id="18">    
     <end type="SOURCE" refId="7"/>    
     <end type="TARGET" refId="8"/>  
   </realization>  
-  <realization id="17">    
+  <realization id="19">    
     <end type="SOURCE" refId="5"/>    
     <end type="TARGET" refId="4"/>  
   </realization>  
-  <generalization id="18">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="1"/>  
-  </generalization>  
-  <generalization id="19">    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="8"/>  
-  </generalization>  
-  <realization id="20">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="4"/>  
-  </realization>  
-  <generalization id="21">    
+  <generalization id="20">    
     <end type="SOURCE" refId="8"/>    
     <end type="TARGET" refId="2"/>  
   </generalization>  
-  <realization id="22">    
-    <end type="SOURCE" refId="12"/>    
+  <association id="21">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="22" name="pilot"/>      
+      <multiplicity id="23" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="false"/>  
+  </association>  
+  <generalization id="24">    
+    <end type="SOURCE" refId="8"/>    
     <end type="TARGET" refId="10"/>  
+  </generalization>  
+  <realization id="25">    
+    <end type="SOURCE" refId="11"/>    
+    <end type="TARGET" refId="13"/>  
   </realization>  
-  <generalization id="23">    
+  <generalization id="26">    
+    <end type="SOURCE" refId="10"/>    
+    <end type="TARGET" refId="9"/>  
+  </generalization>  
+  <realization id="27">    
+    <end type="SOURCE" refId="3"/>    
+    <end type="TARGET" refId="1"/>  
+  </realization>  
+  <generalization id="28">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="1"/>  
+  </generalization>  
+  <generalization id="29">    
+    <end type="SOURCE" refId="13"/>    
+    <end type="TARGET" refId="14"/>  
+  </generalization>  
+  <realization id="30">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="4"/>  
+  </realization>  
+  <generalization id="31">    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="8"/>  
+  </generalization>  
+  <generalization id="32">    
     <end type="SOURCE" refId="1"/>    
     <end type="TARGET" refId="2"/>  
   </generalization>  
-  <realization id="24">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="10"/>  
+  <realization id="33">    
+    <end type="SOURCE" refId="12"/>    
+    <end type="TARGET" refId="13"/>  
   </realization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     visibility="true">    

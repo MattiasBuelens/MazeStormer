@@ -1,14 +1,14 @@
 package mazestormer.controller;
 
-import mazestormer.barcode.ActionType;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeScanner;
 import mazestormer.barcode.BarcodeScannerListener;
 import mazestormer.barcode.BarcodeSpeed;
-import mazestormer.barcode.ExplorerBarcodeMapping;
-import mazestormer.barcode.IAction;
-import mazestormer.barcode.NoAction;
 import mazestormer.barcode.Threshold;
+import mazestormer.barcode.action.ActionType;
+import mazestormer.barcode.action.ExplorerBarcodeMapping;
+import mazestormer.barcode.action.IAction;
+import mazestormer.barcode.action.NoAction;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.state.AbstractStateListener;

@@ -1,7 +1,7 @@
 package mazestormer.command;
 
 import mazestormer.barcode.Barcode;
-import mazestormer.barcode.IAction;
+import mazestormer.barcode.action.IAction;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 

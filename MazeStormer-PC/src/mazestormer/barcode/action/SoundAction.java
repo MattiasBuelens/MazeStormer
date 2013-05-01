@@ -1,4 +1,4 @@
-package mazestormer.barcode;
+package mazestormer.barcode.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import mazestormer.maze.IMaze;
@@ -7,7 +7,7 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
 import mazestormer.util.ImmediateFuture;
 
-public class HighSpeedAction implements IAction {
+public class SoundAction implements IAction {
 
 	@Override
 	public Future<?> performAction(Player player) {
@@ -17,7 +17,7 @@ public class HighSpeedAction implements IAction {
 		IMaze maze = player.getMaze();
 		checkNotNull(maze);
 		
-		robot.getPilot().setTravelSpeed(BarcodeSpeed.HIGH.getBarcodeSpeedValue());
+		robot.getSoundPlayer().playSound();
 
 		return new ImmediateFuture<Void>(null);
 	}

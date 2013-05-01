@@ -1,4 +1,4 @@
-package mazestormer.barcode;
+package mazestormer.barcode.action;
 
 public enum ActionType {
 
