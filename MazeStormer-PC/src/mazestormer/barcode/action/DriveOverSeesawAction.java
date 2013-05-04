@@ -1,18 +1,15 @@
 package mazestormer.barcode.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import mazestormer.line.LineAdjuster;
-import mazestormer.line.LineFinder;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
-import mazestormer.state.AbstractStateListener;
 import mazestormer.state.State;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class DriveOverSeesawAction extends
-		StateMachine<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> implements IAction {
+public class DriveOverSeesawAction extends StateMachine<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState>
+		implements IAction {
 
 	private Player player;
 
@@ -62,56 +59,23 @@ public class DriveOverSeesawAction extends
 
 	protected void onwards() {
 		bindTransition(getPilot().travelComplete(122), // TODO 122 juist?
-				SeesawState.FIND_LINE);
-	}
-
-	protected void findLine() {
-		LineFinder lineFinder = new LineFinder(player) {
-			@Override
-			protected void log(String message) {
-				super.log(message);
-			}
-		};
-
-		LineAdjuster lineAdjuster = new LineAdjuster(player);
-		lineAdjuster.bind(lineFinder);
-		lineFinder.addStateListener(new LineFinderListener());
-	}
-
-	private class LineFinderListener extends
-			AbstractStateListener<LineFinder.LineFinderState> {
-		@Override
-		public void stateFinished() {
-			transition(SeesawState.RESUME_EXPLORING);
-		}
+				SeesawState.RESUME_EXPLORING);
 	}
 
 	protected void resumeExploring() {
 		finish();
 	}
 
-	public enum SeesawState implements
-			State<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> {
+	public enum SeesawState implements State<DriveOverSeesawAction, DriveOverSeesawAction.SeesawState> {
 
 		ONWARDS {
-
 			@Override
 			public void execute(DriveOverSeesawAction input) {
 				input.onwards();
 			}
 		},
 
-		FIND_LINE {
-
-			@Override
-			public void execute(DriveOverSeesawAction input) {
-				input.findLine();
-			}
-
-		},
-
 		RESUME_EXPLORING {
-
 			@Override
 			public void execute(DriveOverSeesawAction input) {
 				input.resumeExploring();
@@ -122,7 +86,6 @@ public class DriveOverSeesawAction extends
 	}
 
 	private class FinishFuture extends StateMachine.FinishFuture<SeesawState> {
-
 		@Override
 		public boolean isFinished() {
 			return true;

@@ -9,7 +9,6 @@ import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllablePCRobot;
-import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
@@ -34,8 +33,8 @@ public abstract class AbstractSeesawAction implements IAction {
 		return getPlayer().getMaze();
 	}
 
-	protected final ControllableRobot getRobot() {
-		return (ControllableRobot) getPlayer().getRobot();
+	protected final ControllablePCRobot getRobot() {
+		return (ControllablePCRobot) getPlayer().getRobot();
 	}
 
 	protected final Pilot getPilot() {
@@ -55,13 +54,12 @@ public abstract class AbstractSeesawAction implements IAction {
 	 */
 
 	protected boolean canDriveOverSeesaw() {
-		return isOpen(getRobot().getIRSensor().getAngle());
-		/* boolean seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
+		boolean seesawOpen = isOpen(getRobot().getIRSensor().getAngle());
 		if (seesawOpen) {
-			return isOpen(getRobot().getIRSensor().getAngle());
+			return isOpen(getRobot().getRobotIRSensor().getAngle());
 		} else {
 			return false;
-		} */
+		}
 	}
 
 	/*
@@ -76,7 +74,12 @@ public abstract class AbstractSeesawAction implements IAction {
 		future.addFutureListener(new FutureListener<Object>() {
 			@Override
 			public void futureResolved(Future<? extends Object> future, Object result) {
-				getDriver().recalculateAndFollowPath(true);
+				// Do not execute seesaw barcode action at other side
+				getDriver().skipCurrentBarcode(true);
+				// Force a line adjust
+				getDriver().forceLineAdjust();
+				// Recalculate from new current tile
+				getDriver().recalculateAndFollowPath();
 			}
 
 			@Override
@@ -106,7 +109,8 @@ public abstract class AbstractSeesawAction implements IAction {
 	 */
 	protected final Future<?> redirect(List<Tile> tilePath) {
 		// Redirect and skip current barcode
-		getDriver().followPath(tilePath, true);
+		getDriver().skipCurrentBarcode(true);
+		getDriver().followPath(tilePath);
 		return null;
 	}
 

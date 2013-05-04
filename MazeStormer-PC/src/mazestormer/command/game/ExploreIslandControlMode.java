@@ -135,7 +135,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 				// Not our object
 				log("Not our object");
 				// Skip dead end tile
-				skipToNextTile(true);
+				skipCurrentBarcode(true);
+				skipToNextTile();
 			}
 			return null;
 		}
@@ -145,7 +146,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		@Override
 		public void futureResolved(Future<? extends Object> future, Object result) {
 			// Skip dead end tile
-			skipToNextTile(true);
+			skipCurrentBarcode(true);
+			skipToNextTile();
 		}
 
 		@Override
@@ -238,7 +240,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			}
 
 			// Skip seesaw tile
-			skipToNextTile(true);
+			skipCurrentBarcode(true);
+			skipToNextTile();
 			return null;
 		}
 

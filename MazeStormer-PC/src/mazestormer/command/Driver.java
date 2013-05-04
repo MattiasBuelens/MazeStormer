@@ -28,7 +28,7 @@ import mazestormer.maze.Tile;
 import mazestormer.maze.TileShape;
 import mazestormer.maze.TileType;
 import mazestormer.player.Player;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.Navigator.NavigatorState;
 import mazestormer.robot.NavigatorListener;
@@ -138,8 +138,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		return pathFinder;
 	}
 
-	public final ControllableRobot getRobot() {
-		return (ControllableRobot) player.getRobot();
+	public final ControllablePCRobot getRobot() {
+		return (ControllablePCRobot) player.getRobot();
 	}
 
 	public final IMaze getMaze() {
@@ -168,6 +168,22 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	public boolean isBarcodeActionEnabled() {
 		return getMode().isBarcodeActionEnabled();
+	}
+
+	/**
+	 * Skip executing the barcode action when arriving at the current tile. This
+	 * flag is reset afterwards.
+	 * 
+	 * <p>
+	 * A barcode action can use this to redirect the driver with
+	 * {@link #followPath(List)} without triggering the same barcode again.
+	 * </p>
+	 * 
+	 * @param skip
+	 *            True if the barcode at the current tile should be ignored.
+	 */
+	public void skipCurrentBarcode(boolean skip) {
+		skipCurrentBarcode.set(skip);
 	}
 
 	private void reset() {
@@ -222,10 +238,10 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	protected void goToNext() {
-		skipToNextTile(false);
+		skipToNextTile();
 	}
 
-	public void skipToNextTile(boolean skipCurrentBarcode) {
+	public void skipToNextTile() {
 		// Get the next tile
 		goalTile = getCommander().nextTile(startTile);
 
@@ -237,16 +253,16 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 		// Create and follow path to next tile
 		log("Go to tile (" + goalTile.getX() + ", " + goalTile.getY() + ")");
-		followPathToTile(goalTile, skipCurrentBarcode);
+		followPathToTile(goalTile);
 	}
-	
-	public void followPathToTile(Tile tile, boolean skipCurrentBarcode) {
+
+	public void followPathToTile(Tile tile) {
 		List<Tile> tilePath = getMode().createPath(getCurrentTile(), tile);
-		followPath(tilePath, skipCurrentBarcode);
+		followPath(tilePath);
 	}
-	
-	public void recalculateAndFollowPath(boolean skipCurrentBarcode) {
-		followPathToTile(getGoalTile(), skipCurrentBarcode);
+
+	public void recalculateAndFollowPath() {
+		followPathToTile(getGoalTile());
 	}
 
 	/**
@@ -254,27 +270,14 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * 
 	 * @param tilePath
 	 *            The path to follow.
-	 * @param skipCurrentBarcode
-	 *            True if the barcode at the current tile should be ignored.
-	 *            Useful when calling from a barcode action.
 	 */
-	public void followPath(List<Tile> tilePath, boolean skipCurrentBarcode) {
+	public void followPath(List<Tile> tilePath) {
 		// Set path
 		navigator.stop();
 		navigator.setPath(getPathFinder().toWaypointPath(tilePath));
 
-		// Skip current barcode if requested
-		this.skipCurrentBarcode.set(skipCurrentBarcode);
-
 		// Follow path until before traveling
 		transition(ExplorerState.NEXT_WAYPOINT);
-	}
-
-	/**
-	 * @see #followPath(List, boolean)
-	 */
-	public void followPath(List<Tile> tilePath) {
-		followPath(tilePath, false);
 	}
 
 	protected void nextWaypoint() {
@@ -538,14 +541,21 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	/**
+	 * Force a line adjust on the next tile.
+	 */
+	public void forceLineAdjust() {
+		shouldLineAdjust.set(true);
+		lineAdjustCounter.set(0);
+	}
+
+	/**
 	 * Increment the way point counter which controls when the robot adjust its
 	 * position with the line finder. Triggered when a way point is reached.
 	 */
 	private void incrementLineAdjustCounter() {
 		// Increment counter for line finder
 		if (lineAdjustCounter.incrementAndGet() >= getLineAdjustInterval()) {
-			shouldLineAdjust.set(true);
-			lineAdjustCounter.set(0);
+			forceLineAdjust();
 		}
 	}
 
@@ -600,7 +610,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	public Tile getGoalTile() {
 		return goalTile;
 	}
-	
+
 	public Tile getStartTile() {
 		return startTile;
 	}

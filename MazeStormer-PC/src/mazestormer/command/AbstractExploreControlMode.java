@@ -12,13 +12,13 @@ import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 
 public abstract class AbstractExploreControlMode extends ControlMode {
-	
+
 	/*
 	 * Data
 	 */
 
 	private final LinkedList<Tile> queue = new LinkedList<Tile>();
-	
+
 	/*
 	 * Constructor
 	 */
@@ -30,7 +30,7 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	/*
 	 * ControlMode management
 	 */
-	
+
 	@Override
 	public void takeControl() {
 		log("Exploring the maze");
@@ -39,7 +39,7 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	@Override
 	public void releaseControl() {
 	}
-	
+
 	/*
 	 * Driver support
 	 */
@@ -73,11 +73,11 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 	public boolean isBarcodeActionEnabled() {
 		return true;
 	}
-	
+
 	/*
 	 * Utilities
 	 */
-	
+
 	public boolean hasUnexploredTiles() {
 		while (!queue.isEmpty()) {
 			if (!queue.peekFirst().isExplored())
@@ -103,8 +103,12 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 		}
 	}
 
-	protected void skipToNextTile(boolean skipCurrentBarcode) {
-		getCommander().getDriver().skipToNextTile(skipCurrentBarcode);
+	protected void skipCurrentBarcode(boolean skip) {
+		getCommander().getDriver().skipCurrentBarcode(skip);
+	}
+
+	protected void skipToNextTile() {
+		getCommander().getDriver().skipToNextTile();
 	}
 
 	/**
