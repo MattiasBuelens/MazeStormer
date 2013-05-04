@@ -82,7 +82,6 @@ public class Game {
 			client.join(new Callback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					System.out.println(client.getPlayers());
 					// Call listeners
 					for (GameListener listener : listeners) {
 						listener.onGameJoined();
@@ -323,18 +322,15 @@ public class Game {
 
 		@Override
 		public void playerJoining(String playerID) {
-			System.out.println(localPlayer.getPlayerID() + " sees joining: " + playerID);
 			// TODO Perhaps add GameListener.onPlayerJoining() ?
 		}
 
 		@Override
 		public void playerJoined(String playerID) {
-			System.out.println(localPlayer.getPlayerID() + " sees joined: " + playerID);
 		}
 
 		@Override
 		public void playerDisconnected(String playerID, DisconnectReason reason) {
-			System.out.println(localPlayer.getPlayerID() + " sees disconnecting: " + playerID);
 		}
 
 		@Override
