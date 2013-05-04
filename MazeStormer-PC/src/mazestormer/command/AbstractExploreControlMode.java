@@ -57,12 +57,17 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 		// Sort queue
 		Collections.sort(queue, new ClosestTileComparator(currentTile, getMaze()));
 
-		// Returns the next unexplored tile.
-		Tile nextTile = queue.pollFirst();
+		// Find the next unexplored tile
+		Tile nextTile = queue.peekFirst();
 		while (nextTile.isExplored()) {
-			if (queue.isEmpty())
+			// Remove explored tile
+			queue.pollFirst();
+			// Try the next tile
+			nextTile = queue.peekFirst();
+			if (nextTile == null) {
+				// Queue depleted
 				return null;
-			nextTile = queue.pollFirst();
+			}
 		}
 
 		// Go to next tile

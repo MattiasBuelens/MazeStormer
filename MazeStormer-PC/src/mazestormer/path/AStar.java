@@ -195,10 +195,10 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 	 * 
 	 * @param start
 	 *            The node to check.
-	 * @return True if and only if the given node is effective and valid.
+	 * @return True if and only if the given node is effective.
 	 */
 	protected boolean canHaveAsStart(N start) {
-		return start != null && isValidNode(start);
+		return start != null;
 	}
 
 	/**
@@ -235,10 +235,10 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 	 * 
 	 * @param target
 	 *            The node to check.
-	 * @return True if and only if the given node is effective and valid.
+	 * @return True if and only if the given node is effective.
 	 */
 	protected boolean canHaveAsTarget(N target) {
-		return target != null && isValidNode(target);
+		return target != null;
 	}
 
 	/**
