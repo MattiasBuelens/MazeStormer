@@ -17,9 +17,9 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
-import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
 import mazestormer.game.DefaultGameListener;
 import mazestormer.game.Game;
+import mazestormer.maze.ClosestTileComparator;
 import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -197,7 +197,7 @@ public class GameRunner extends Commander {
 
 	private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
 		List<Tile> reachableTiles = new ArrayList<>();
-		PathFinder pf = new PathFinder(getMaze());
+		final PathFinder pf = new PathFinder(getMaze());
 		for (Tile tile : getMaze().getBarcodeTiles()) {
 			Barcode tileBarcode = tile.getBarcode();
 			if (Seesaw.isSeesawBarcode(tileBarcode) && !tileBarcode.equals(barcode)
@@ -207,7 +207,12 @@ public class GameRunner extends Commander {
 				reachableTiles.add(tile);
 			}
 		}
-		Collections.sort(reachableTiles, new ClosestTileComparator(getDriver().getCurrentTile(), getMaze()));
+		Collections.sort(reachableTiles, new ClosestTileComparator(getDriver().getCurrentTile()) {
+			@Override
+			public List<?> createPath(Tile startTile, Tile goalTile) {
+				return pf.findTilePathWithoutSeesaws(startTile, goalTile);
+			}
+		});
 		reachableTiles.add(getMaze().getBarcodeTile(barcode));
 		return reachableTiles;
 	}

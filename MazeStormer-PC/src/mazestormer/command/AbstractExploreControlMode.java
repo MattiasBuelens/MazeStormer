@@ -1,13 +1,11 @@
 package mazestormer.command;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import mazestormer.maze.IMaze;
+import mazestormer.maze.ClosestTileComparator;
 import mazestormer.maze.Orientation;
-import mazestormer.maze.PathFinder;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 
@@ -55,7 +53,12 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 		}
 
 		// Sort queue
-		Collections.sort(queue, new ClosestTileComparator(currentTile, getMaze()));
+		Collections.sort(queue, new ClosestTileComparator(currentTile) {
+			@Override
+			public List<?> createPath(Tile startTile, Tile goalTile) {
+				return AbstractExploreControlMode.this.createPath(startTile, goalTile);
+			}
+		});
 
 		// Find the next unexplored tile
 		Tile nextTile = queue.peekFirst();
@@ -114,34 +117,6 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 
 	protected void skipToNextTile() {
 		getCommander().getDriver().skipToNextTile();
-	}
-
-	/**
-	 * Compares tiles based on their shortest path distance to a given reference
-	 * tile.
-	 */
-	public static class ClosestTileComparator implements Comparator<Tile> {
-
-		private final Tile referenceTile;
-		private IMaze maze;
-
-		public ClosestTileComparator(Tile referenceTile, IMaze iMaze) {
-			this.referenceTile = referenceTile;
-			this.maze = iMaze;
-		}
-
-		@Override
-		public int compare(Tile left, Tile right) {
-			int leftDistance = shortestPathLength(referenceTile, left);
-			int rightDistance = shortestPathLength(referenceTile, right);
-			return Integer.compare(leftDistance, rightDistance);
-		}
-
-		public int shortestPathLength(Tile startTile, Tile endTile) {
-			List<Tile> path = new PathFinder(maze).findTilePathWithoutSeesaws(startTile, endTile);
-			return path.size();
-		}
-
 	}
 
 }

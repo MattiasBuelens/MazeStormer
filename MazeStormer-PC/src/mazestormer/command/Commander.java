@@ -42,10 +42,6 @@ public abstract class Commander {
 		return driver;
 	}
 
-	public ControlMode getCurrentControlMode() {
-		return currentMode;
-	}
-
 	/*
 	 * Objective management
 	 */
@@ -97,23 +93,23 @@ public abstract class Commander {
 	 */
 
 	public Tile nextTile(Tile currentTile) {
-		Tile nextTile = getCurrentControlMode().nextTile(currentTile);
+		Tile nextTile = getMode().nextTile(currentTile);
 		while (nextTile == null) {
-			ControlMode nextMode = nextMode(getCurrentControlMode());
+			ControlMode nextMode = nextMode(getMode());
 			if (nextMode == null) {
 				// Done
 				return null;
 			} else {
 				// Try next mode
 				setMode(nextMode);
-				nextTile = getCurrentControlMode().nextTile(currentTile);
+				nextTile = getMode().nextTile(currentTile);
 			}
 		}
 		return nextTile;
 	}
 
 	public IAction getAction(Barcode barcode) {
-		return getCurrentControlMode().getAction(barcode);
+		return getMode().getAction(barcode);
 	}
 
 }
