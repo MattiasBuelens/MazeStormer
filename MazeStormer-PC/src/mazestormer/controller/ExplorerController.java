@@ -3,7 +3,7 @@ package mazestormer.controller;
 import mazestormer.command.Driver;
 import mazestormer.command.explore.Explorer;
 import mazestormer.player.Player;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.state.DefaultStateListener;
 
 public class ExplorerController extends SubController implements IExplorerController {
 
@@ -84,7 +84,7 @@ public class ExplorerController extends SubController implements IExplorerContro
 		}
 	}
 
-	private class ExplorerListener extends AbstractStateListener<Driver.ExplorerState> {
+	private class ExplorerListener extends DefaultStateListener<Driver.ExplorerState> {
 
 		@Override
 		public void stateStarted() {

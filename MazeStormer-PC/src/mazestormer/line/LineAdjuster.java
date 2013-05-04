@@ -6,7 +6,7 @@ import lejos.robotics.localization.PoseProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.maze.IMaze;
 import mazestormer.player.Player;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.state.DefaultStateListener;
 
 public class LineAdjuster {
 
@@ -93,7 +93,7 @@ public class LineAdjuster {
 		return angle;
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
+	private class LineFinderListener extends DefaultStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			adjust();

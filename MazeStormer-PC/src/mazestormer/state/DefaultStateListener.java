@@ -1,6 +1,6 @@
 package mazestormer.state;
 
-public class AbstractStateListener<S extends State<?, ?>> implements
+public class DefaultStateListener<S extends State<?, ?>> implements
 		StateListener<S> {
 
 	@Override

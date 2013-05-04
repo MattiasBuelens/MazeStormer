@@ -5,7 +5,7 @@ import mazestormer.line.LineFinder;
 import mazestormer.line.LineFinderEvent;
 import mazestormer.player.Player;
 import mazestormer.robot.CalibratedLightSensor;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.state.DefaultStateListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -51,7 +51,7 @@ public class LineFinderController extends SubController implements ILineFinderCo
 		postEvent(new LineFinderEvent(eventType));
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
+	private class LineFinderListener extends DefaultStateListener<LineFinder.LineFinderState> {
 
 		@Override
 		public void stateStarted() {

@@ -4,7 +4,7 @@ import mazestormer.polygon.PolygonEvent;
 import mazestormer.polygon.PolygonDriver;
 import mazestormer.robot.Pilot;
 import mazestormer.robot.StopEvent;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.state.DefaultStateListener;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -51,7 +51,7 @@ public class PolygonControlController extends SubController implements
 	}
 
 	private class PolygonListener extends
-			AbstractStateListener<PolygonDriver.PolygonState> {
+			DefaultStateListener<PolygonDriver.PolygonState> {
 
 		@Override
 		public void stateStarted() {

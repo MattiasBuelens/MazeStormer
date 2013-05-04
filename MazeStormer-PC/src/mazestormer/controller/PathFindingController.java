@@ -16,7 +16,7 @@ import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.NavigatorListener;
 import mazestormer.robot.Robot;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.state.DefaultStateListener;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
@@ -173,7 +173,7 @@ public class PathFindingController extends SubController implements IPathFinding
 
 			// Line finder
 			this.lineFinder = new LineFinder(getPlayer());
-			lineFinder.addStateListener(new AbstractStateListener<LineFinder.LineFinderState>() {
+			lineFinder.addStateListener(new DefaultStateListener<LineFinder.LineFinderState>() {
 				@Override
 				public void stateFinished() {
 					transition(TileSequenceState.NAVIGATOR);

@@ -11,7 +11,7 @@ import mazestormer.barcode.action.IAction;
 import mazestormer.barcode.action.NoAction;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.state.DefaultStateListener;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
@@ -172,7 +172,7 @@ public class BarcodeController extends SubController implements IBarcodeControll
 
 	}
 
-	private class BarcodeListener extends AbstractStateListener<BarcodeScanner.BarcodeState> {
+	private class BarcodeListener extends DefaultStateListener<BarcodeScanner.BarcodeState> {
 
 		@Override
 		public void stateStarted() {

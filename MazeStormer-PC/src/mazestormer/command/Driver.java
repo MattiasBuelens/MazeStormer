@@ -32,7 +32,7 @@ import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.Navigator;
 import mazestormer.robot.Navigator.NavigatorState;
 import mazestormer.robot.NavigatorListener;
-import mazestormer.state.AbstractStateListener;
+import mazestormer.state.DefaultStateListener;
 import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
@@ -703,7 +703,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		transition(ExplorerState.NEXT_CYCLE);
 	}
 
-	private class LineFinderListener extends AbstractStateListener<LineFinder.LineFinderState> {
+	private class LineFinderListener extends DefaultStateListener<LineFinder.LineFinderState> {
 		@Override
 		public void stateFinished() {
 			transition(ExplorerState.AFTER_LINE_ADJUST);
