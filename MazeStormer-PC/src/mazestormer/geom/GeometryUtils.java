@@ -84,10 +84,10 @@ public final class GeometryUtils {
 	}
 
 	public static Polygon copy(Polygon polygon, GeometryFactory geomFact) {
-		LinearRing shell = geomFact.createLinearRing(polygon.getExteriorRing().getCoordinates());
+		LinearRing shell = (LinearRing) polygon.getExteriorRing().clone();
 		LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
 		for (int i = 0; i < holes.length; ++i) {
-			holes[i] = geomFact.createLinearRing(polygon.getInteriorRingN(i).getCoordinates());
+			holes[i] = (LinearRing) polygon.getInteriorRingN(i).clone();
 		}
 		return geomFact.createPolygon(shell, holes);
 	}

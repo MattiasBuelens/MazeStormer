@@ -84,7 +84,8 @@ public class RobotUpdate implements Transmittable {
 
 		// Sensor readings
 		int lightValue = robot.getLightSensor().getLightValue();
-		float infraredAngle = robot.getIRSensor().getAngle();
+		// float infraredAngle = robot.getIRSensor().getAngle();
+		float infraredAngle = Float.NaN;
 
 		return new RobotUpdate(movement, lightValue, infraredAngle);
 	}

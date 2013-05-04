@@ -91,7 +91,7 @@ public class GameRunner extends Commander {
 	public Game getGame() {
 		return game;
 	}
-	
+
 	public IMaze getMaze() {
 		return getPlayer().getMaze();
 	}
@@ -99,32 +99,33 @@ public class GameRunner extends Commander {
 	/*
 	 * ControlMode management
 	 */
-	
+
 	@Override
 	public ControlMode nextMode(ControlMode currentMode) {
-		if(currentMode instanceof ExploreIslandControlMode) {
+		if (currentMode instanceof ExploreIslandControlMode) {
 			// other unexplored islands => LeaveIslandControlMode
 			// no other unexplored islands => DriveToCenterControlMode
-			if(otherIslands()){
-				setMode(new LeaveIslandControlMode(getPlayer(), this));
+			if (otherIslands()) {
+				return new LeaveIslandControlMode(getPlayer(), this);
+			} else {
+				return new DriveToCenterControlMode(getPlayer(), this);
 			}
-			else {
-				setMode(new DriveToCenterControlMode(getPlayer(), this));
-			}
-		}
-		else if(currentMode instanceof LeaveIslandControlMode){
-			setMode(new ExploreIslandControlMode(getPlayer(), this));
-		}
-		else if(currentMode instanceof DriveToCenterControlMode){
+		} else if (currentMode instanceof LeaveIslandControlMode) {
+			return new ExploreIslandControlMode(getPlayer(), this);
+		} else if (currentMode instanceof DriveToCenterControlMode) {
 			// should never happen
-		}
-		else if(currentMode instanceof DriveToPartnerControlMode){
+			log("Fatal error: drive to center ran out of tiles");
+			return null;
+		} else if (currentMode instanceof DriveToPartnerControlMode) {
 			// should never happen
+			log("Fatal error: drive to partner ran out of tiles");
+			return null;
+		} else {
+			log("Fatal error: unknown control mode " + currentMode.getClass().getSimpleName());
+			return null;
 		}
-		log("Changed controlMode to " + currentMode);
-		return currentMode;
 	}
-	
+
 	/*
 	 * Utilities
 	 */
@@ -160,15 +161,14 @@ public class GameRunner extends Commander {
 		maze.setBarcode(nextTilePosition, otherBarcode);
 		maze.setExplored(nextTilePosition);
 	}
-	
+
 	public void setObjectTile() {
 		Tile currentTile = getDriver().getCurrentTile();
 		Tile nextTile = getDriver().getGoalTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 
 		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(),
-				new TileShape(TileType.DEAD_END, orientation));
+		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
 
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
@@ -184,17 +184,17 @@ public class GameRunner extends Commander {
 	public void offSeesaw() {
 		game.unlockSeesaw();
 	}
-	
+
 	public boolean otherSideUnexplored(Tile seesawBarcodeTile) {
-			Barcode barcode = seesawBarcodeTile.getBarcode();
-			Tile otherBarcodeTile = getMaze().getBarcodeTile(Seesaw.getOtherBarcode(barcode));
-			for (Orientation orientation : Orientation.values()) {
-				if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
-					return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();
-			}
-			return false;
+		Barcode barcode = seesawBarcodeTile.getBarcode();
+		Tile otherBarcodeTile = getMaze().getBarcodeTile(Seesaw.getOtherBarcode(barcode));
+		for (Orientation orientation : Orientation.values()) {
+			if (getMaze().getNeighbor(otherBarcodeTile, orientation).isSeesaw())
+				return !getMaze().getNeighbor(otherBarcodeTile, orientation.rotateClockwise(2)).isExplored();
 		}
-	
+		return false;
+	}
+
 	private List<Tile> getReachableSeesawBarcodeTiles(Barcode barcode) {
 		List<Tile> reachableTiles = new ArrayList<>();
 		PathFinder pf = new PathFinder(getMaze());
@@ -202,7 +202,8 @@ public class GameRunner extends Commander {
 			Barcode tileBarcode = tile.getBarcode();
 			if (Seesaw.isSeesawBarcode(tileBarcode) && !tileBarcode.equals(barcode)
 					&& !tileBarcode.equals(Seesaw.getOtherBarcode(barcode))
-					&& !pf.findTilePathWithoutSeesaws(getDriver().getCurrentTile(), tile).isEmpty() && otherSideUnexplored(tile)) {
+					&& !pf.findTilePathWithoutSeesaws(getDriver().getCurrentTile(), tile).isEmpty()
+					&& otherSideUnexplored(tile)) {
 				reachableTiles.add(tile);
 			}
 		}
@@ -210,11 +211,11 @@ public class GameRunner extends Commander {
 		reachableTiles.add(getMaze().getBarcodeTile(barcode));
 		return reachableTiles;
 	}
-	
+
 	private boolean otherIslands() {
 		for (Tile tile : getMaze().getBarcodeTiles()) {
 			Barcode tileBarcode = tile.getBarcode();
-			if(Seesaw.isSeesawBarcode(tileBarcode) && !otherSideUnexplored(tile)){
+			if (Seesaw.isSeesawBarcode(tileBarcode) && otherSideUnexplored(tile)) {
 				return true;
 			}
 		}
@@ -329,7 +330,7 @@ public class GameRunner extends Commander {
 			game.sendOwnTiles();
 		}
 	}
-	
+
 	protected void log(String message) {
 		getPlayer().getLogger().log(Level.INFO, message);
 	}

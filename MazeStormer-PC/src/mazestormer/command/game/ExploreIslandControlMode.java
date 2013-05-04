@@ -205,35 +205,43 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 			// Only cross if the seesaw is internal
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
-			if (isInternal(seesaw) && meantToCrossSeesaw()) {
-				// Check if seesaw is open
-				if (canDriveOverSeesaw()) {
-					// Drive over seesaw
-					log("Drive over internal seesaw");
-					seesaw.setOpen(seesawBarcode);
-					return driveOverSeesaw();
+			if (isInternal(seesaw)) {
+				// Check if actually trying to cross
+				if (meantToCrossSeesaw()) {
+					// Check if seesaw is open
+					if (canDriveOverSeesaw()) {
+						// Drive over seesaw
+						log("Drive over internal seesaw");
+						seesaw.setOpen(seesawBarcode);
+						return driveOverSeesaw();
+					} else {
+						// Drive around
+						log("Go around internal seesaw");
+						seesaw.setClosed(seesawBarcode);
+						// Go around seesaw
+						List<Tile> pathAroundSeesaw = getPathWithoutSeesaws();
+						return redirect(pathAroundSeesaw);
+					}
 				} else {
-					// Drive around
-					log("Go around internal seesaw");
-					seesaw.setClosed(seesawBarcode);
-					// Go around seesaw
-					List<Tile> pathAroundSeesaw = getPathWithoutSeesaws();
-					return redirect(pathAroundSeesaw);
+					// Not trying to cross
+					log("Not trying to cross seesaw, skip to next tile");
 				}
 			} else {
-				// Skip non-internal seesaw
+				// Non-internal seesaw
 				log("Non-internal seesaw, skip to next tile");
-				skipToNextTile(true);
-				return null;
 			}
+
+			// Skip seesaw tile
+			skipToNextTile(true);
+			return null;
 		}
 
 		private boolean meantToCrossSeesaw() {
-			// if the current (seesaw barcode) tile is equal to the start tile
-			// of the
-			// drivers new cycle, the driver was simply exploring it. It didn't
-			// have the
-			// intention to cross the seesaw
+			/*
+			 * If the current (seesaw barcode) tile is equal to the start tile
+			 * of the drivers new cycle, the driver was simply exploring it. It
+			 * didn't have the intention to cross the seesaw.
+			 */
 			return !(getDriver().getCurrentTile().equals(getDriver().getStartTile()));
 		}
 	}
