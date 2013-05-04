@@ -158,17 +158,23 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	 */
 
 	public void setSeesawWalls() {
-		log("Seesaw on next tiles, set seesaw and barcode");
-
 		IMaze maze = getMaze();
 
+		// Get seesaw barcodes
 		Tile currentTile = getCommander().getDriver().getCurrentTile();
+		Barcode seesawBarcode = currentTile.getBarcode();
+		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
+
+		// Exit if seesaw already placed
+		if (getMaze().getSeesawTile(seesawBarcode) != null)
+			return;
+
+		// When still unexplored, the next tile is the unexplored seesaw tile
 		Tile nextTile = getCommander().getDriver().getGoalTile();
 		Orientation orientation = currentTile.orientationTo(nextTile);
 		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
+		log("Seesaw on next tiles, set seesaw and barcode");
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();

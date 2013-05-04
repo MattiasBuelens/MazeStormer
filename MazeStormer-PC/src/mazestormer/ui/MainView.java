@@ -17,6 +17,7 @@ import mazestormer.connect.ConnectEvent;
 import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.controller.IMainController;
+import mazestormer.controller.InitializeEvent;
 import mazestormer.util.EventSource;
 import net.miginfocom.swing.MigLayout;
 
@@ -101,8 +102,8 @@ public class MainView extends JFrame implements EventSource {
 			getEventBus().post(event);
 	}
 
-	private void setControlMode(ControlMode controlMode) {
-		if (controlMode == null) {
+	private void setControlMode(ControlMode controlMode, boolean isConnected) {
+		if (!isConnected || controlMode == null) {
 			setControlPanel(null);
 			return;
 		}
@@ -134,6 +135,14 @@ public class MainView extends JFrame implements EventSource {
 		}
 	}
 
+	private void setControlMode(ControlMode controlMode) {
+		setControlMode(controlMode, this.controller.configuration().isConnected());
+	}
+
+	private void setControlMode(boolean isConnected) {
+		setControlMode(this.controller.configuration().getControlMode(), isConnected);
+	}
+
 	private void setControlPanel(ViewPanel controlPanel) {
 		if (this.controlPanel != null) {
 			this.mainPanel.remove(this.controlPanel);
@@ -147,14 +156,20 @@ public class MainView extends JFrame implements EventSource {
 	}
 
 	@Subscribe
+	public void onInitialized(InitializeEvent e) {
+		updateVisible();
+	}
+
+	@Subscribe
 	public void onConnected(ConnectEvent e) {
-		updateHorizontalVisible();
-		updateVerticalVisible();
+		setControlMode(e.isConnected());
+		updateVisible();
 	}
 
 	@Subscribe
 	public void onControlModeChanged(ControlModeChangeEvent e) {
 		setControlMode(e.getControlMode());
+		updateVisible();
 	}
 
 	private boolean isHorizontalVisible() {
@@ -178,6 +193,11 @@ public class MainView extends JFrame implements EventSource {
 		}
 		statePanel.setVisible(isVerticalVisible());
 		getContentPane().validate();
+	}
+
+	private void updateVisible() {
+		updateHorizontalVisible();
+		updateVerticalVisible();
 	}
 
 	private void addHideListeners() {

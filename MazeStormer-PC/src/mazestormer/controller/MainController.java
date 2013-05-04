@@ -256,12 +256,6 @@ public class MainController implements IMainController {
 	 * Initialization
 	 */
 
-	// Post connected state on initialize
-	@Subscribe
-	public void onInitialized(InitializeEvent e) {
-		postConnected();
-	}
-
 	@Subscribe
 	public void logInitialize(InitializeEvent e) {
 		getPlayer().getLogger().info("Initialized.");
