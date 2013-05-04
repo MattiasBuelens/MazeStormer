@@ -2,6 +2,7 @@ package mazestormer.command.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import mazestormer.command.Driver;
 import mazestormer.maze.IMaze;
@@ -20,8 +21,8 @@ import com.google.common.base.Predicate;
 public class CollisionAvoider extends StateMachine<CollisionAvoider, CollisionAvoider.AvoiderState> implements
 		StateListener<CollisionAvoider.AvoiderState> {
 
-	public static final long MINIMUM_TIMEOUT = 2000;
-	public static final long MAXIMUM_TIMEOUT = 10000;
+	public static final int MINIMUM_TIMEOUT = 2;
+	public static final int MAXIMUM_TIMEOUT = 10;
 
 	private final Driver driver;
 
@@ -50,7 +51,7 @@ public class CollisionAvoider extends StateMachine<CollisionAvoider, CollisionAv
 	 * Check if the robot is currently blocked by another robot.
 	 */
 	public boolean isBlocked() {
-		// TODO Check whether reading within certain range?
+		// TODO Check whether reading is within certain range?
 		return getRobot().getRobotIRSensor().hasReading();
 	}
 
@@ -68,8 +69,31 @@ public class CollisionAvoider extends StateMachine<CollisionAvoider, CollisionAv
 		transition(AvoiderState.WAITING);
 	}
 
-	protected void driveToCorridor() {
+	/**
+	 * Stare down the other robot.
+	 */
+	protected void stare() {
 		log("Robot detected, avoiding collision");
+
+		// Wait for a random time
+		WaitFuture<?> future = new WaitFuture<Object>();
+		int timeout = getRandomTimeout();
+		log("Awaiting other robot's move for " + timeout + " seconds");
+
+		bindTransition(future, AvoiderState.DRIVE);
+		future.resolveAfter(null, timeout * 1000l);
+	}
+
+	/**
+	 * Try to drive to a corridor if still blocked.
+	 */
+	protected void driveToCorridor() {
+		// Check if other robot moved
+		if (!isBlocked()) {
+			log("Other robot resolved conflict, continuing");
+			transition(AvoiderState.FINISH);
+			return;
+		}
 
 		// Get current and blocked tile
 		Tile currentTile = getDriver().getCurrentTile();
@@ -80,14 +104,36 @@ public class CollisionAvoider extends StateMachine<CollisionAvoider, CollisionAv
 		List<Tile> path = null;
 		path = findPathToCorridor(currentTile, blockedTile);
 		if (path.isEmpty()) {
-			// Cannot move, simply wait
-			transition(AvoiderState.WAITING);
+			// Cannot move
+			log("Unable to move, retrying");
+			transition(AvoiderState.FINISH);
 		} else {
 			// Follow path
+			Tile target = path.get(path.size() - 1);
+			log("Driving to corridor at (" + target.getX() + ", " + target.getY() + ")");
 			getDriver().skipCurrentBarcode(true);
 			getDriver().followPath(path);
 			transition(AvoiderState.DRIVING);
 		}
+	}
+
+	/**
+	 * Driving to the corridor.
+	 */
+	protected void drivingToCorridor() {
+	}
+
+	/**
+	 * Wait in the corridor.
+	 */
+	protected void waitInCorridor() {
+		// Wait for a random time
+		WaitFuture<?> future = new WaitFuture<Object>();
+		int timeout = getRandomTimeout();
+		log("Waiting for " + timeout + " seconds in corridor");
+
+		bindTransition(future, AvoiderState.FINISH);
+		future.resolveAfter(null, timeout * 1000l);
 	}
 
 	private List<Tile> findPathToCorridor(final Tile startTile, final Tile blockedTile) {
@@ -112,27 +158,13 @@ public class CollisionAvoider extends StateMachine<CollisionAvoider, CollisionAv
 			return tilePath.subList(1, tilePath.size());
 	}
 
-	protected void drivingToCorridor() {
-		log("Driving to corridor");
-	}
-
-	protected void waitInCorridor() {
-		// Wait for a random time
-		WaitFuture<?> future = new WaitFuture<Object>();
-		long timeout = getRandomTimeout();
-		log("Waiting for " + timeout + " ms in corridor");
-
-		bindTransition(future, AvoiderState.FINISH);
-		future.resolveAfter(null, timeout);
-	}
-
-	private long getRandomTimeout() {
-		return MINIMUM_TIMEOUT + (long) (Math.random() * (MAXIMUM_TIMEOUT - MINIMUM_TIMEOUT + 1));
+	private int getRandomTimeout() {
+		return MINIMUM_TIMEOUT + new Random().nextInt(MAXIMUM_TIMEOUT - MINIMUM_TIMEOUT + 1);
 	}
 
 	@Override
 	public void stateStarted() {
-		transition(AvoiderState.DRIVE);
+		transition(AvoiderState.STARE);
 	}
 
 	@Override
@@ -157,6 +189,13 @@ public class CollisionAvoider extends StateMachine<CollisionAvoider, CollisionAv
 	}
 
 	public enum AvoiderState implements State<CollisionAvoider, AvoiderState> {
+
+		STARE {
+			@Override
+			public void execute(CollisionAvoider avoider) {
+				avoider.stare();
+			}
+		},
 
 		DRIVE {
 			@Override
