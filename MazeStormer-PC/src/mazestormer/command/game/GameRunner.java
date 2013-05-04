@@ -329,6 +329,12 @@ public class GameRunner extends Commander {
 			// Send own maze
 			game.sendOwnTiles();
 		}
+
+		@Override
+		public void onPartnerDisconnected(Player partner) {
+			// TODO Stop driving to partner
+			// Revert to exploring the maze
+		}
 	}
 
 	protected void log(String message) {

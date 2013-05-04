@@ -2,11 +2,11 @@ package mazestormer.ui.map;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import lejos.robotics.RangeReading;
 import lejos.robotics.navigation.Pose;
@@ -23,7 +23,7 @@ public class RangesLayer extends MapLayer {
 	private static final Color pointEndColor = Color.RED;
 	private static final int pointColorThreshold = 5;
 
-	private List<Set<Element>> points = new ArrayList<Set<Element>>();
+	private List<Set<Element>> points = new CopyOnWriteArrayList<Set<Element>>();
 
 	public RangesLayer(String name) {
 		super(name);

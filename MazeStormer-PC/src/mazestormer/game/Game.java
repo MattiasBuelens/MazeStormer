@@ -270,8 +270,8 @@ public class Game {
 
 		Player partner = getPartner();
 		// Clear maze
+		// This also rebuilds the total maze
 		partner.getMaze().clear();
-		// TODO Clear partner maze in total maze?
 		// Unset partner
 		partnerPlayer = null;
 
