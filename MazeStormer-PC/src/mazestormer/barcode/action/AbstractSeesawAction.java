@@ -3,6 +3,7 @@ package mazestormer.barcode.action;
 import java.util.List;
 
 import mazestormer.command.Driver;
+import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Seesaw;
@@ -118,7 +119,7 @@ public abstract class AbstractSeesawAction implements IAction {
 		if (Float.isNaN(angle)) {
 			return true;
 		}
-		return (Math.abs(angle) > ControllablePCRobot.STANDARD_IR_RANGE);
+		return Math.abs(angle) > IRRobot.SEESAW_IR_RANGE;
 	}
 
 	// TODO Resolve duplication in ExploreIslandControlMode

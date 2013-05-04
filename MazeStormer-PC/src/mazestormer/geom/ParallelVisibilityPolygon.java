@@ -14,6 +14,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class ParallelVisibilityPolygon extends VisibilityPolygon {
 
 	private static final int THRESHOLD = 8;
+	private static final ForkJoinPool POOL = new ForkJoinPool();
 
 	public ParallelVisibilityPolygon(Polygon polygon, Coordinate viewCoord) throws NullPointerException {
 		super(polygon, viewCoord);
@@ -27,8 +28,7 @@ public class ParallelVisibilityPolygon extends VisibilityPolygon {
 	protected Collection<Geometry> getVisibleRegions(List<LineSegment> edges) {
 		Collection<Geometry> regions = new ConcurrentLinkedQueue<Geometry>();
 		Task task = new Task(edges, regions);
-		ForkJoinPool pool = new ForkJoinPool();
-		pool.invoke(task);
+		POOL.invoke(task);
 		return regions;
 	}
 

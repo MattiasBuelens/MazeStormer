@@ -15,7 +15,7 @@ public class ObservableRobot implements IRRobot {
 	private final double width;
 	private final double height;
 
-	public ObservableRobot(ModelType modelType, double height, double width) {
+	public ObservableRobot(ModelType modelType, double width, double height) {
 		poseProvider = new ObservePoseProvider();
 		this.modelType = modelType;
 		this.width = width;

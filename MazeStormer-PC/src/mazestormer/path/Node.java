@@ -123,13 +123,14 @@ public abstract class Node<V extends Comparable<? super V>> implements Comparabl
 	 * Calculate the estimated remaining cost from this node to the given target
 	 * node and store the cost in the node.
 	 * 
+	 * <p>
+	 * If the target is not effective, the remaining cost is set to zero.
+	 * </p>
+	 * 
 	 * @param target
 	 *            The target node.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             If the target is not effective.
 	 */
-	public abstract void calculateH(Node<V> target) throws IllegalArgumentException;
+	public abstract void calculateH(Node<V> target);
 
 	/**
 	 * Get the previous node.

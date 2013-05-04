@@ -18,6 +18,7 @@ import lejos.robotics.objectdetection.RangeFeature;
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.BarcodeScanner;
 import mazestormer.barcode.BarcodeScannerListener;
+import mazestormer.command.game.CollisionAvoider;
 import mazestormer.line.LineAdjuster;
 import mazestormer.line.LineFinder;
 import mazestormer.maze.Edge.EdgeType;
@@ -61,6 +62,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	private final LineFinder lineFinder;
 	private final LineAdjuster lineAdjuster;
 	private final BarcodeScanner barcodeScanner;
+	private final CollisionAvoider collisionAvoider;
 
 	/*
 	 * Navigation
@@ -116,10 +118,14 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		// Barcode scanner
 		this.barcodeScanner = new BarcodeScanner(player);
 		barcodeScanner.addBarcodeListener(new BarcodeListener());
+
+		// Collision avoider
+		this.collisionAvoider = new CollisionAvoider(this);
+		collisionAvoider.addStateListener(new CollisionAvoiderListener());
 	}
 
 	protected void log(String message) {
-		player.getLogger().log(Level.INFO, message);
+		getPlayer().getLogger().log(Level.INFO, message);
 	}
 
 	/*
@@ -138,12 +144,16 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		return pathFinder;
 	}
 
+	public final Player getPlayer() {
+		return player;
+	}
+
 	public final ControllablePCRobot getRobot() {
-		return (ControllablePCRobot) player.getRobot();
+		return (ControllablePCRobot) getPlayer().getRobot();
 	}
 
 	public final IMaze getMaze() {
-		return player.getMaze();
+		return getPlayer().getMaze();
 	}
 
 	public boolean isLineAdjustEnabled() {
@@ -196,6 +206,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		navigator.stop();
 		lineFinder.stop();
 		barcodeScanner.stop();
+		collisionAvoider.stop();
 	}
 
 	/*
@@ -262,7 +273,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	public void recalculateAndFollowPath() {
-		followPathToTile(getGoalTile());
+		startTile = getCurrentTile();
+		skipToNextTile();
 	}
 
 	/**
@@ -272,6 +284,11 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 *            The path to follow.
 	 */
 	public void followPath(List<Tile> tilePath) {
+		// Stop collision avoider
+		if (collisionAvoider.isDrivingToCorridor()) {
+			collisionAvoider.stop();
+		}
+
 		// Set path
 		navigator.stop();
 		navigator.setPath(getPathFinder().toWaypointPath(tilePath));
@@ -327,6 +344,17 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		}
 	}
 
+	protected void avoidCollision() {
+		if (collisionAvoider.isBlocked()) {
+			// Robot detected, restart collision avoider
+			collisionAvoider.stop();
+			collisionAvoider.start();
+		} else {
+			// No robot detected
+			transition(ExplorerState.CLEAR_BARCODE);
+		}
+	}
+
 	protected void clearBarcode() {
 		if (getCurrentTile().hasBarcode()) {
 			// Travel off barcode
@@ -376,9 +404,10 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	protected void afterBarcode(Barcode barcode) {
-		log("Barcode read, placing on: (" + goalTile.getX() + ", " + goalTile.getY() + ")");
+		Tile tile = getCurrentTile();
+		log("Barcode read, placing on: (" + tile.getX() + ", " + tile.getY() + ")");
 		// Set barcode on tile
-		setBarcodeTile(goalTile, barcode);
+		setBarcodeTile(tile, barcode);
 		// Travel
 		transition(ExplorerState.TRAVEL);
 	}
@@ -416,8 +445,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 *            The barcode.
 	 */
 	private void setBarcodeTile(Tile tile, Barcode barcode) {
-		float relativeHeading = getMaze().toRelative(getPose().getHeading());
-		Orientation heading = angleToOrientation(relativeHeading);
+		Orientation heading = getRobotHeading();
 
 		// Make straight tile
 		getMaze().setTileShape(tile.getPosition(), new TileShape(TileType.STRAIGHT, heading));
@@ -564,12 +592,20 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 */
 
 	/**
+	 * Get the orientation the robot is looking towards.
+	 */
+	public Orientation getRobotHeading() {
+		float relativeHeading = getMaze().toRelative(getPose().getHeading());
+		return angleToOrientation(relativeHeading);
+	}
+
+	/**
 	 * Get the orientation corresponding to the given angle.
 	 * 
 	 * @param angle
 	 *            The angle.
 	 */
-	private Orientation angleToOrientation(float angle) {
+	private static Orientation angleToOrientation(float angle) {
 		angle = normalize(angle);
 
 		if (angle > -45 && angle <= 45) {
@@ -589,12 +625,19 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * @param angle
 	 *            The angle to normalize.
 	 */
-	private float normalize(float angle) {
+	private static float normalize(float angle) {
 		while (angle > 180)
 			angle -= 360f;
 		while (angle < -180)
 			angle += 360f;
 		return angle;
+	}
+
+	/**
+	 * Get the tile from which the robot started navigating.
+	 */
+	public Tile getStartTile() {
+		return startTile;
 	}
 
 	/**
@@ -609,10 +652,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 */
 	public Tile getGoalTile() {
 		return goalTile;
-	}
-
-	public Tile getStartTile() {
-		return startTile;
 	}
 
 	/**
@@ -681,7 +720,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		if (getState() == ExplorerState.NAVIGATE) {
 			// Paused after rotating and before traveling
 			assert (currentState == NavigatorState.TRAVEL);
-			transition(ExplorerState.CLEAR_BARCODE);
+			transition(ExplorerState.AVOID_COLLISION);
 		}
 	}
 
@@ -699,8 +738,13 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	@Override
 	public void navigatorCompleted(Waypoint waypoint, Pose pose) {
-		// Path completed
-		transition(ExplorerState.NEXT_CYCLE);
+		if (collisionAvoider.isDrivingToCorridor()) {
+			// Corridor reached
+			collisionAvoider.atCorridor();
+		} else {
+			// Path completed
+			transition(ExplorerState.NEXT_CYCLE);
+		}
 	}
 
 	private class LineFinderListener extends DefaultStateListener<LineFinder.LineFinderState> {
@@ -719,6 +763,13 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		@Override
 		public void onEndBarcode(final Barcode barcode) {
 			afterBarcode(barcode);
+		}
+	}
+
+	private class CollisionAvoiderListener extends DefaultStateListener<CollisionAvoider.AvoiderState> {
+		@Override
+		public void stateFinished() {
+			transition(ExplorerState.NEXT_CYCLE);
 		}
 	}
 
@@ -769,6 +820,12 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 			@Override
 			public void execute(Driver explorer) {
 				explorer.navigate();
+			}
+		},
+		AVOID_COLLISION {
+			@Override
+			public void execute(Driver explorer) {
+				explorer.avoidCollision();
 			}
 		},
 		CLEAR_BARCODE {

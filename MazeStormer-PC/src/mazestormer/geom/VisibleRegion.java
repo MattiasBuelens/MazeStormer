@@ -15,6 +15,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.precision.GeometryPrecisionReducer;
 
 public class VisibleRegion extends PointVisibility {
 
@@ -143,7 +145,9 @@ public class VisibleRegion extends PointVisibility {
 
 	private Geometry produceResult(Geometry blocked) {
 		// Return non-obscured portions of subject
-		return subject.difference(blocked);
+		Geometry result = subject.difference(blocked);
+		result = GeometryPrecisionReducer.reduce(result, new PrecisionModel(1e3));
+		return result;
 	}
 
 }

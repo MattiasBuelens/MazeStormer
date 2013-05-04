@@ -20,6 +20,7 @@ import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
+import mazestormer.util.ImmediateFuture;
 import mazestormer.util.LongPoint;
 
 import com.google.common.base.Predicate;
@@ -81,16 +82,20 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	/*
 	 * Object found
 	 */
-	public void setObjectTile() {
+	public boolean setObjectTile() {
 		Tile currentTile = getCommander().getDriver().getCurrentTile();
-		Tile nextTile = getCommander().getDriver().getGoalTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
+		Orientation heading = getCommander().getDriver().getRobotHeading();
+		Tile nextTile = getMaze().getOrCreateNeighbor(currentTile, heading);
+
+		// Exit if already explored
+		if (nextTile.isExplored())
+			return false;
 
 		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
-
+		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, heading));
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
+		return true;
 	}
 
 	public void objectFound(int teamNumber) {
@@ -120,7 +125,11 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		@Override
 		public Future<?> performAction(Player player) {
 			// Store in maze
-			setObjectTile();
+			boolean success = setObjectTile();
+			if (!success) {
+				// Already explored, just ignore
+				return new ImmediateFuture<Object>(null);
+			}
 
 			// Check if own object
 			if (getObjectNumber(barcode) == getGameRunner().getObjectNumber()) {
@@ -160,23 +169,21 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 	 */
 
 	public void setSeesawWalls() {
-		IMaze maze = getMaze();
+		Tile currentTile = getCommander().getDriver().getCurrentTile();
+		Orientation orientation = getCommander().getDriver().getRobotHeading();
+		Tile nextTile = getMaze().getOrCreateNeighbor(currentTile, orientation);
 
 		// Get seesaw barcodes
-		Tile currentTile = getCommander().getDriver().getCurrentTile();
 		Barcode seesawBarcode = currentTile.getBarcode();
 		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
 
-		// Exit if seesaw already placed
-		if (getMaze().getSeesawTile(seesawBarcode) != null)
+		// Exit if seesaw tile already placed
+		if (nextTile.isSeesaw())
 			return;
 
-		// When still unexplored, the next tile is the unexplored seesaw tile
-		Tile nextTile = getCommander().getDriver().getGoalTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
-
 		log("Seesaw on next tiles, set seesaw and barcode");
+		IMaze maze = getMaze();
+		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
 
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();

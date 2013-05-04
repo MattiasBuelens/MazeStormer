@@ -235,7 +235,6 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 	 * 
 	 * @param target
 	 *            The node to check.
-	 * @return True if and only if the given node is effective.
 	 */
 	protected boolean canHaveAsTarget(N target) {
 		return target != null;
@@ -251,7 +250,6 @@ public abstract class AStar<N extends Node<V>, V extends Comparable<? super V>> 
 	 * 
 	 * @param node
 	 *            The node to check.
-	 * @return False if the given node is not effective.
 	 */
 	public abstract boolean isTarget(N node);
 

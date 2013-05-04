@@ -13,32 +13,29 @@ import mazestormer.infrared.OffsettedPoseProvider;
 import mazestormer.infrared.OffsettedPoseProvider.Module;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
+import mazestormer.player.AbsolutePlayer;
 import mazestormer.robot.IRSensor;
 import mazestormer.world.Model;
 import mazestormer.world.ModelType;
 import mazestormer.world.World;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.math.DoubleMath;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateFilter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineSegment;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 public class WorldIRDetector implements IRSensor {
 
 	private float range;
 
-	private OffsettedPoseProvider poseProvider;
+	private OffsettedPoseProvider sensorPoseProvider;
 	private final World world;
 	private final Class<? extends IRSource> irDetectionType;
 	private final IRDetectionMode mode;
-
-	private static final double POSE_TOLERANCE = 0.01d;
 
 	public WorldIRDetector(World world, float range, Class<? extends IRSource> irDetectionType, IRDetectionMode mode) {
 		this.world = world;
@@ -59,13 +56,17 @@ public class WorldIRDetector implements IRSensor {
 		return this.world;
 	}
 
-	private OffsettedPoseProvider getPoseProvider() {
-		if (this.poseProvider == null) {
+	private AbsolutePlayer getLocalPlayer() {
+		return getWorld().getLocalPlayer();
+	}
+
+	private OffsettedPoseProvider getSensorPoseProvider() {
+		if (this.sensorPoseProvider == null) {
 			// TODO Perhaps use a PoseTransform instead?
-			this.poseProvider = new OffsettedPoseProvider(getWorld().getLocalPlayer().getRobot().getPoseProvider(),
+			this.sensorPoseProvider = new OffsettedPoseProvider(getLocalPlayer().getRobot().getPoseProvider(),
 					Module.IR_SENSOR);
 		}
-		return this.poseProvider;
+		return this.sensorPoseProvider;
 	}
 
 	private IMaze getMaze() {
@@ -98,11 +99,8 @@ public class WorldIRDetector implements IRSensor {
 		// Get maze obstacles
 		Geometry obstacles = getMaze().getGeometry();
 		// Get view pose
-		Pose viewPose = getPoseProvider().getPose();
-		Point2D viewPoint = viewPose.getLocation();
+		Pose viewPose = getSensorPoseProvider().getPose();
 		float viewHeading = viewPose.getHeading();
-		// Get robot pose
-		Pose robotPose = getPoseProvider().inverseTransform(viewPose);
 
 		// Find rays to visible infrared sources
 		List<LineSegment> rays = new ArrayList<LineSegment>();
@@ -110,14 +108,13 @@ public class WorldIRDetector implements IRSensor {
 			// Check if emitting and detected in this mode
 			if (irs.isEmitting() && getMode().detects(irs)) {
 				// Ignore own robot
-				Pose irsPose = irs.getPoseProvider().getPose();
-				if (comparePositions(robotPose.getLocation(), irsPose.getLocation())) {
+				if (irs.equals(getLocalPlayer().getRobot())) {
 					continue;
 				}
 				// Get best detected ray to infrared source
-				LineSegment ray = getDetectedRay(obstacles, irs, viewPoint);
+				LineSegment ray = getDetectedRay(obstacles, irs, viewPose);
 				if (ray != null) {
-					float rayAngle = (float) ray.angle() - viewHeading;
+					float rayAngle = normalize((float) Math.toDegrees(ray.angle()) - viewHeading);
 					if (inRange(rayAngle)) {
 						rays.add(ray);
 					}
@@ -130,21 +127,18 @@ public class WorldIRDetector implements IRSensor {
 			return Float.NaN;
 		} else {
 			// Make heading relative to view heading
-			float result = getWeightedAngle(rays) - viewHeading;
+			float result = normalize((float) getWeightedAngle(rays) - viewHeading);
 			// TODO Normalize heading?
 			return result;
 		}
 	}
 
-	private boolean comparePositions(Point2D leftPosition, Point2D rightPosition) {
-		return DoubleMath.fuzzyEquals(rightPosition.getX(), leftPosition.getX(), POSE_TOLERANCE)
-				&& DoubleMath.fuzzyEquals(rightPosition.getY(), leftPosition.getY(), POSE_TOLERANCE);
-	}
-
-	private LineSegment getDetectedRay(Geometry obstacles, IRSource subject, Point2D viewPoint) {
+	private LineSegment getDetectedRay(Geometry obstacles, IRSource subject, Pose viewPose) {
+		// Transform to relative maze coordinates
+		Point2D viewPoint = getMaze().toRelative(viewPose.getLocation());
+		Pose subjectPose = getMaze().toRelative(subject.getPoseProvider().getPose());
 		// Transform subject polygon
 		Polygon subjectPolygon = GeometryUtils.copy(subject.getEnvelope().getPolygon(), obstacles.getFactory());
-		Pose subjectPose = getMaze().toRelative(subject.getPoseProvider().getPose());
 		final PoseTransform subjectTransform = new PoseTransform(subjectPose);
 		subjectPolygon.apply(new CoordinateFilter() {
 			@Override
@@ -162,7 +156,7 @@ public class WorldIRDetector implements IRSensor {
 		Geometry visibleSubject = null;
 		try {
 			visibleSubject = ParallelVisibleRegion.build(obstacles, subjectPolygon, viewCoord);
-		} catch (TopologyException e) {
+		} catch (RuntimeException e) {
 			System.err.println(e.getMessage());
 			e.printStackTrace();
 			return null;
@@ -187,22 +181,30 @@ public class WorldIRDetector implements IRSensor {
 		}
 	}
 
-	private float getWeightedAngle(List<LineSegment> rays) {
+	private double getWeightedAngle(List<LineSegment> rays) {
 		double weightedSum = 0;
 		double totalWeight = 0;
 
 		for (LineSegment ray : rays) {
 			double weight = 1 / (ray.getLength() + 1);
-			double angle = ray.angle();
+			double angle = normalize((float) Math.toDegrees(ray.angle()));
 			weightedSum += weight * angle;
 			totalWeight += weight;
 		}
 
 		if (totalWeight > 0) {
-			return (float) (weightedSum / totalWeight);
+			return weightedSum / totalWeight;
 		} else {
-			return Float.NaN;
+			return Double.NaN;
 		}
+	}
+
+	private static float normalize(float angle) {
+		while (angle > 180)
+			angle -= 360f;
+		while (angle < -180)
+			angle += 360f;
+		return angle;
 	}
 
 	public enum IRDetectionMode {

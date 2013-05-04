@@ -14,6 +14,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class ParallelVisibleRegion extends VisibleRegion {
 
 	private static final int THRESHOLD = 8;
+	private static final ForkJoinPool POOL = new ForkJoinPool();
 
 	public ParallelVisibleRegion(Geometry obstacles, Polygon subject, Coordinate viewCoord)
 			throws IllegalArgumentException {
@@ -28,8 +29,7 @@ public class ParallelVisibleRegion extends VisibleRegion {
 	protected Collection<Geometry> getBlockedRegions(List<LineSegment> edges, double collisionSize) {
 		Collection<Geometry> regions = new ConcurrentLinkedQueue<Geometry>();
 		Task task = new Task(edges, regions, collisionSize);
-		ForkJoinPool pool = new ForkJoinPool();
-		pool.invoke(task);
+		POOL.invoke(task);
 		return regions;
 	}
 

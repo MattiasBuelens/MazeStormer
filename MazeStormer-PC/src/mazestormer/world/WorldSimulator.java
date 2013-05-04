@@ -71,7 +71,7 @@ public class WorldSimulator {
 		if (player == null) {
 			// Create observable player
 			IRRobot robot = new ObservableRobot(ModelType.fromPlayerType(playerDetails.getType()),
-					playerDetails.getHeight(), playerDetails.getWidth());
+					playerDetails.getWidth(), playerDetails.getHeight());
 			RelativePlayer relativePlayer = new RelativePlayer(playerID, robot, null);
 			player = new AbsolutePlayer(relativePlayer);
 			getWorld().addPlayer(player);

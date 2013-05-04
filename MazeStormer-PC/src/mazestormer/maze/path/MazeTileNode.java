@@ -61,8 +61,14 @@ public class MazeTileNode extends Node<Long> {
 	}
 
 	@Override
-	public void calculateH(Node<Long> target) throws IllegalArgumentException {
-		setH((long) manhattanDistance(getPosition(), target.getPosition()));
+	public void calculateH(Node<Long> target) {
+		long h;
+		if (target == null) {
+			h = 0l;
+		} else {
+			h = (long) manhattanDistance(getPosition(), target.getPosition());
+		}
+		setH(h);
 	}
 
 	@Override
