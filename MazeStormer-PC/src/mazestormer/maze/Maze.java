@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lejos.geom.Line;
 import lejos.geom.Point;
@@ -41,16 +42,15 @@ public class Maze implements IMaze {
 	private Pose origin;
 	private PoseTransform originTransform;
 
-	private Map<LongPoint, Tile> tiles = new HashMap<LongPoint, Tile>();
+	private final ConcurrentHashMap<LongPoint, Tile> tiles = new ConcurrentHashMap<LongPoint, Tile>();
+	private final ConcurrentHashMap<Barcode, Seesaw> seesaws = new ConcurrentHashMap<Barcode, Seesaw>();
 
-	private List<MazeListener> listeners = new ArrayList<MazeListener>();
-
-	private Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(Target.class);
-	private Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
-
-	private final Map<Barcode, Seesaw> seesaws = new HashMap<>();
+	private final Map<Target, LongPoint> targets = new EnumMap<Target, LongPoint>(Target.class);
+	private final Map<Integer, Pose> startPoses = new HashMap<Integer, Pose>();
 
 	private final EdgeGeometry edgeGeometry;
+
+	private final List<MazeListener> listeners = new ArrayList<MazeListener>();
 
 	public Maze(float tileSize, float edgeSize, float barLength) {
 		this.tileSize = tileSize;
@@ -142,10 +142,8 @@ public class Maze implements IMaze {
 	}
 
 	private Tile createTile(LongPoint tilePosition) {
-		// Create and put tile
+		// Create tile
 		Tile tile = new Tile(tilePosition);
-		tiles.put(tilePosition, tile);
-		updateMinMax(tile);
 
 		// Share edges with neighbours
 		for (Orientation orientation : Orientation.values()) {
@@ -155,9 +153,6 @@ public class Maze implements IMaze {
 				tile.setEdge(edge);
 			}
 		}
-
-		// Fire tile added event
-		fireTileAdded(tile);
 
 		return tile;
 	}
@@ -176,8 +171,18 @@ public class Maze implements IMaze {
 		Tile tile = tiles.get(tilePosition);
 		if (tile == null) {
 			// Create tile
-			tile = createTile(tilePosition);
+			Tile createdTile = createTile(tilePosition);
+			tile = tiles.putIfAbsent(tilePosition, createdTile);
+			// Check if added
+			if (tile == null) {
+				tile = createdTile;
+				// Update bounds
+				updateMinMax(tile);
+				// Fire tile added event
+				fireTileAdded(tile);
+			}
 		}
+
 		return tile;
 	}
 
@@ -343,10 +348,12 @@ public class Maze implements IMaze {
 	public Seesaw getOrCreateSeesaw(Barcode barcode) {
 		checkNotNull(barcode);
 
+		// Try to get seesaw
 		Seesaw seesaw = getSeesaw(barcode);
 		if (seesaw == null) {
-			seesaw = new Seesaw(barcode);
-			registerSeesaw(seesaw);
+			// Create seesaw
+			registerSeesaw(new Seesaw(barcode));
+			seesaw = getSeesaw(barcode);
 		}
 		return seesaw;
 	}
@@ -370,8 +377,8 @@ public class Maze implements IMaze {
 	}
 
 	private void registerSeesaw(Seesaw seesaw) {
-		seesaws.put(seesaw.getLowestBarcode(), seesaw);
-		seesaws.put(seesaw.getHighestBarcode(), seesaw);
+		seesaws.putIfAbsent(seesaw.getLowestBarcode(), seesaw);
+		seesaws.putIfAbsent(seesaw.getHighestBarcode(), seesaw);
 	}
 
 	@Override
