@@ -102,6 +102,8 @@ public class Barcode {
 	public boolean equals(Object other) {
 		if (this == other)
 			return true;
+		if (other == null)
+			return false;
 		if (other.getClass() != Barcode.class)
 			return false;
 

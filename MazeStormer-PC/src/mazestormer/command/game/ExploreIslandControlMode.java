@@ -64,19 +64,9 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			@Override
 			public boolean apply(Tile tile) {
 				// Only allow internal seesaws in paths
-				return !tile.isSeesaw() || isInternal(tile.getSeesaw());
+				return !tile.isSeesaw() || AbstractSeesawAction.isInternal(getMaze(), tile.getSeesaw());
 			}
 		});
-	}
-
-	// TODO Resolve duplication in AbstractSeesawAction
-	private boolean isInternal(Seesaw seesaw) {
-		Tile lowTile = getMaze().getBarcodeTile(seesaw.getLowestBarcode());
-		Tile highTile = getMaze().getBarcodeTile(seesaw.getHighestBarcode());
-		if (lowTile == null || highTile == null) {
-			return false;
-		}
-		return !getPathFinder().findTilePathWithoutSeesaws(lowTile, highTile).isEmpty();
 	}
 
 	/*
@@ -220,7 +210,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 			// Only cross if the seesaw is internal
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
-			if (isInternal(seesaw)) {
+			if (isInternal(getMaze(), seesaw)) {
 				// Check if actually trying to cross
 				if (meantToCrossSeesaw()) {
 					// Check if seesaw is open

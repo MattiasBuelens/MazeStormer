@@ -218,6 +218,8 @@ public abstract class Node<V extends Comparable<? super V>> implements Comparabl
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
+		if (obj == null)
+			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		@SuppressWarnings("rawtypes")
