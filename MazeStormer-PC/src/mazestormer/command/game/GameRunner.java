@@ -15,7 +15,6 @@ import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
-import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
 import mazestormer.game.DefaultGameListener;
