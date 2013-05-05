@@ -377,8 +377,10 @@ public class Maze implements IMaze {
 	}
 
 	private void registerSeesaw(Seesaw seesaw) {
-		seesaws.putIfAbsent(seesaw.getLowestBarcode(), seesaw);
-		seesaws.putIfAbsent(seesaw.getHighestBarcode(), seesaw);
+		Seesaw previousSeesaw = seesaws.putIfAbsent(seesaw.getLowestBarcode(), seesaw);
+		if (previousSeesaw == null) {
+			seesaws.put(seesaw.getHighestBarcode(), seesaw);
+		}
 	}
 
 	@Override

@@ -54,6 +54,7 @@ public class Program implements Runnable, ButtonListener {
 		if (connection == null) {
 			println("Connection failed");
 			stop();
+			return;
 		}
 
 		// Connected
