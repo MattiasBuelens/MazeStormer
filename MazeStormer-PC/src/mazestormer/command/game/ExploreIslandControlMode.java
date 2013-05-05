@@ -114,7 +114,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		return objectBarcode.getValue() / 4;
 	}
 
-	private class ObjectAction extends ObjectFoundAction {
+	private class ObjectAction extends ObjectFoundAction implements FutureListener<Object> {
 
 		private Barcode barcode;
 
@@ -134,12 +134,10 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			// Check if own object
 			if (getObjectNumber(barcode) == getGameRunner().getObjectNumber()) {
 				// Found own object
-				int teamNumber = getTeamNumber(barcode);
-				log("Own object found, join team #" + teamNumber);
-				objectFound(teamNumber);
+				log("Own object found");
 				// Pick up own object
 				Future<?> future = super.performAction(player);
-				future.addFutureListener(new AfterObjectFoundListener());
+				future.addFutureListener(this);
 			} else {
 				// Not our object
 				log("Not our object");
@@ -149,14 +147,16 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			}
 			return null;
 		}
-	}
 
-	private class AfterObjectFoundListener implements FutureListener<Object> {
 		@Override
 		public void futureResolved(Future<? extends Object> future, Object result) {
 			// Skip dead end tile
 			skipCurrentBarcode(true);
 			skipToNextTile();
+			// Publish
+			int teamNumber = getTeamNumber(barcode);
+			log("Joining team #" + teamNumber);
+			objectFound(teamNumber);
 		}
 
 		@Override
@@ -178,7 +178,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
 
 		// Exit if seesaw tile already placed
-		if (nextTile.isSeesaw())
+		if (getMaze().getSeesawTile(seesawBarcode) != null)
 			return;
 
 		log("Seesaw on next tiles, set seesaw and barcode");
