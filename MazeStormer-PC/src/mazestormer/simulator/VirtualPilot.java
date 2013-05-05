@@ -292,15 +292,17 @@ public class VirtualPilot implements Pilot {
 	}
 
 	private void movementStop(boolean wasMoving) {
-		if (move == null)
+		if (this.move == null)
 			return;
 
 		// Reset current move
 		resetMove();
 
 		// Publish the *traveled* move distance and angle
-		Move travelledMove = new Move(move.getMoveType(), getMovementIncrement(), getAngleIncrement(),
-				move.getTravelSpeed(), move.getRotateSpeed(), wasMoving);
+		Move move = this.move;
+		long time = System.currentTimeMillis();
+		Move travelledMove = new Move(move.getMoveType(), getMovementIncrement(move, time), getAngleIncrement(move,
+				time), move.getTravelSpeed(), move.getRotateSpeed(), wasMoving);
 
 		MoveListener[] listeners = moveListeners.toArray(new MoveListener[0]);
 		for (MoveListener ml : listeners) {
@@ -352,9 +354,8 @@ public class VirtualPilot implements Pilot {
 	/**
 	 * @return The move distance since it last started moving
 	 */
-	public float getMovementIncrement() {
+	public float getMovementIncrement(Move move, long currentTime) {
 		// Time spent traveling so far
-		long currentTime = System.currentTimeMillis();
 		float duration = (currentTime - move.getTimeStamp()) / 1000f;
 
 		// Currently traveled distance
@@ -380,9 +381,8 @@ public class VirtualPilot implements Pilot {
 	/**
 	 * @return The angle rotated since rotation began.
 	 */
-	public float getAngleIncrement() {
+	public float getAngleIncrement(Move move, long currentTime) {
 		// Time spent rotating so far
-		long currentTime = System.currentTimeMillis();
 		float duration = (currentTime - move.getTimeStamp()) / 1000f;
 
 		// Currently rotated angle
@@ -450,7 +450,9 @@ public class VirtualPilot implements Pilot {
 
 	@Override
 	public Move getMovement() {
-		return new Move(move.getMoveType(), getMovementIncrement(), getAngleIncrement(), isMoving());
+		Move move = this.move;
+		long time = System.currentTimeMillis();
+		return new Move(move.getMoveType(), getMovementIncrement(move, time), getAngleIncrement(move, time), isMoving());
 	}
 
 	@Override
