@@ -15,6 +15,7 @@ import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
+import mazestormer.command.AbstractExploreControlMode.ClosestTileComparator;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
 import mazestormer.game.DefaultGameListener;
@@ -26,11 +27,8 @@ import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
 import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
-import mazestormer.maze.TileShape;
-import mazestormer.maze.TileType;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.util.LongPoint;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -126,55 +124,14 @@ public class GameRunner extends Commander {
 		}
 	}
 
+	private void driveToPartner() {
+		// TODO Is it allowed to switch modes asynchronously?
+		setMode(new DriveToPartnerControlMode(getPlayer(), this));
+	}
+
 	/*
 	 * Utilities
 	 */
-
-	public void setSeesawWalls() {
-		log("Seesaw on next tiles, set seesaw and barcode");
-
-		IMaze maze = getMaze();
-
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getGoalTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-		TileShape tileShape = new TileShape(TileType.STRAIGHT, orientation);
-
-		Barcode seesawBarcode = currentTile.getBarcode();
-		Barcode otherBarcode = Seesaw.getOtherBarcode(seesawBarcode);
-
-		// Seesaw
-		LongPoint nextTilePosition = nextTile.getPosition();
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, seesawBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Seesaw
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-
-		// Other seesaw barcode
-		nextTilePosition = orientation.shift(nextTilePosition);
-		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setBarcode(nextTilePosition, otherBarcode);
-		maze.setExplored(nextTilePosition);
-	}
-
-	public void setObjectTile() {
-		Tile currentTile = getDriver().getCurrentTile();
-		Tile nextTile = getDriver().getGoalTile();
-		Orientation orientation = currentTile.orientationTo(nextTile);
-
-		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, orientation));
-
-		// Mark as explored
-		getMaze().setExplored(nextTile.getPosition());
-
-		// Remove both tiles from the queue
-	}
 
 	public void onSeesaw(int barcode) {
 		log("The seesaw is currently opened, onwards!");
@@ -340,6 +297,12 @@ public class GameRunner extends Commander {
 			// TODO Stop driving to partner
 			// Revert to exploring the maze
 		}
+
+		@Override
+		public void onMazesMerged() {
+			driveToPartner();
+		}
+
 	}
 
 	protected void log(String message) {

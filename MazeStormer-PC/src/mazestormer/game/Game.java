@@ -12,10 +12,12 @@ import lejos.geom.Point;
 import lejos.robotics.navigation.Pose;
 import mazestormer.infrared.IRRobot;
 import mazestormer.maze.CombinedMaze;
+import mazestormer.maze.CombinedMazeListener;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Tile;
 import mazestormer.maze.parser.Parser;
 import mazestormer.observable.ObservableRobot;
+import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
 import mazestormer.player.RelativePlayer;
 import mazestormer.util.LongPoint;
@@ -32,16 +34,22 @@ public class Game {
 	private final String id;
 
 	private final Player localPlayer;
-	private Player partnerPlayer;
+	private RelativePlayer partnerPlayer;
+	private AbsolutePlayer absolutePartnerPlayer;
 
 	private final PlayerClient client;
 	private final Handler handler;
+	private final CombinedMazeListener mazesMergedListener;
 	private final List<GameListener> listeners = new ArrayList<GameListener>();
 
 	public Game(Connection connection, String id, Player localPlayer) throws IOException, IllegalStateException {
 		this.id = id;
 		this.localPlayer = localPlayer;
 		this.handler = new Handler();
+
+		// Listen for maze merges
+		this.mazesMergedListener = new MazesMergedListener();
+		getLocalMaze().addCombinedMazeListener(mazesMergedListener);
 
 		// Gather player details
 		String playerID = localPlayer.getPlayerID();
@@ -69,11 +77,11 @@ public class Game {
 		return client.getPlayers();
 	}
 
-	protected Player getLocalPlayer() {
+	public Player getLocalPlayer() {
 		return localPlayer;
 	}
 
-	private CombinedMaze getLocalMaze() {
+	public CombinedMaze getLocalMaze() {
 		return (CombinedMaze) getLocalPlayer().getMaze();
 	}
 
@@ -178,8 +186,16 @@ public class Game {
 			// Publish tile position
 			client.updatePosition(tile.getX(), tile.getY(), pose.getHeading());
 		} catch (IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
 			System.err.println("Could not report position update");
+			e.printStackTrace();
+		}
+	}
+
+	public void win() {
+		try {
+			client.win();
+		} catch (IllegalStateException | IOException e) {
+			System.err.println("Could not report win");
 			e.printStackTrace();
 		}
 	}
@@ -234,11 +250,22 @@ public class Game {
 		return partnerPlayer != null;
 	}
 
-	public Player getPartner() {
+	public RelativePlayer getPartner() {
 		if (!hasPartner()) {
 			throw new IllegalStateException("Partner still unknown.");
 		}
 		return partnerPlayer;
+	}
+
+	public Player getAbsolutePartner() {
+		if (!hasAbsolutePartner()) {
+			throw new IllegalStateException("Absolute partner still unknown.");
+		}
+		return absolutePartnerPlayer;
+	}
+
+	public boolean hasAbsolutePartner() {
+		return absolutePartnerPlayer != null;
 	}
 
 	public boolean isPartner(String playerID) {
@@ -255,6 +282,7 @@ public class Game {
 		// Create partner
 		RelativePlayer partner = new RelativePlayer(partnerID, partnerRobot, new Maze());
 		partnerPlayer = partner;
+		absolutePartnerPlayer = null;
 		// Set partner maze
 		getLocalMaze().setPartnerMaze(partner.getMaze());
 
@@ -274,6 +302,7 @@ public class Game {
 		partner.getMaze().clear();
 		// Unset partner
 		partnerPlayer = null;
+		absolutePartnerPlayer = null;
 
 		// Call listeners
 		for (GameListener listener : listeners) {
@@ -289,6 +318,28 @@ public class Game {
 		removePartner();
 		// Clear own maze
 		getLocalMaze().clear();
+	}
+
+	/**
+	 * Terminate the game.
+	 */
+	public void terminate() {
+		// Remove listeners
+		listeners.clear();
+		getLocalMaze().removeCombinedListenerListener(mazesMergedListener);
+	}
+
+	private class MazesMergedListener implements CombinedMazeListener {
+		@Override
+		public void mazesMerged() {
+			// Create absolute player
+			absolutePartnerPlayer = new AbsolutePlayer(getPartner());
+			absolutePartnerPlayer.setTransform(getLocalMaze().getPoseTransform());
+			// Call listeners
+			for (GameListener listener : listeners) {
+				listener.onMazesMerged();
+			}
+		}
 	}
 
 	private class Handler implements PlayerHandler {

@@ -32,6 +32,7 @@ public class CombinedMaze implements IMaze {
 	private IMaze partnerMaze; // tilecoordinates in partner's relative system
 	private final Map<Barcode, LongPoint> partnerBarcodeMapping = new HashMap<Barcode, LongPoint>();
 	private final PartnerMazeListener partnerListener = new PartnerMazeListener();
+	private final List<CombinedMazeListener> listeners = new ArrayList<CombinedMazeListener>();
 
 	private final IMaze totalMaze; // tilecoordinates in own relative system
 
@@ -55,6 +56,14 @@ public class CombinedMaze implements IMaze {
 
 	public CombinedMaze() {
 		this(new Maze());
+	}
+
+	public void addCombinedMazeListener(CombinedMazeListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeCombinedListenerListener(CombinedMazeListener listener) {
+		listeners.remove(listener);
 	}
 
 	/**
@@ -132,6 +141,10 @@ public class CombinedMaze implements IMaze {
 			calculateTileTransformation();
 			// Merge partner maze into the total maze using transformation
 			mergeTotalAndPartnerMazes();
+			// Call listeners
+			for (CombinedMazeListener listener : listeners) {
+				listener.mazesMerged();
+			}
 		}
 	}
 
@@ -189,8 +202,12 @@ public class CombinedMaze implements IMaze {
 	/**
 	 * Returns the tileTransform, which is null if it not yet calculated.
 	 */
-	private TileTransform getTileTransform() {
+	public TileTransform getTileTransform() {
 		return tileTransformation;
+	}
+
+	public PoseTransform getPoseTransform() {
+		return getTileTransform().toPoseTransform(this);
 	}
 
 	private void resetOwnMaze() {

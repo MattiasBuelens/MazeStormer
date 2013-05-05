@@ -73,12 +73,18 @@ public class LongPoint extends Point2D implements Serializable {
 	public String toString() {
 		return "LongPoint[" + x + ", " + y + "]";
 	}
-	
+
 	public static double getSquared2Norm(LongPoint p1, LongPoint p2) {
-		return (Math.pow((p1.getX()-p2.getX()),2) + Math.pow((p1.getY()-p2.getY()),2));
+		return (Math.pow((p1.getX() - p2.getX()), 2) + Math.pow(
+				(p1.getY() - p2.getY()), 2));
 	}
-	
+
 	public static double get2Norm(LongPoint p1, LongPoint p2) {
 		return Math.sqrt(getSquared2Norm(p1, p2));
+	}
+
+	public static long get1Norm(LongPoint p1, LongPoint p2) {
+		return (long) (Math.abs(p1.getX() - p2.getX()) + Math.abs(p1.getY()
+				- p2.getY()));
 	}
 }

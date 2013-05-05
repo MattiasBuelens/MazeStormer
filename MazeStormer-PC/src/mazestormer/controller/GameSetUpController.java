@@ -143,7 +143,8 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 					logToAll("Error when leaving: " + t.getMessage());
 				}
 			});
-			// Stop simulator
+			// Terminate
+			game.terminate();
 			worldSimulator.terminate();
 		} catch (Exception e) {
 			logToAll("Error when leaving: " + e.getMessage());
@@ -291,6 +292,11 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 		public void onPartnerDisconnected(Player partner) {
 			logToLocal("Partner disconnected: " + partner.getPlayerID());
 			getMainController().gameControl().removePlayer(partner);
+		}
+
+		@Override
+		public void onMazesMerged() {
+			logToLocal("Partner maze merged into own maze");
 		}
 
 	}

@@ -18,32 +18,26 @@ public class DefaultGameListener implements GameListener {
 
 	@Override
 	public void onGameStarted() {
-
 	}
 
 	@Override
 	public void onGamePaused() {
-
 	}
 
 	@Override
 	public void onGameStopped() {
-
 	}
 
 	@Override
 	public void onGameWon(int teamNumber) {
-
 	}
 
 	@Override
 	public void onPlayerReady(String playerID, boolean isReady) {
-
 	}
 
 	@Override
 	public void onObjectFound(String playerID) {
-
 	}
 
 	@Override
@@ -52,7 +46,10 @@ public class DefaultGameListener implements GameListener {
 
 	@Override
 	public void onPartnerDisconnected(Player partner) {
+	}
 
+	@Override
+	public void onMazesMerged() {
 	}
 
 }

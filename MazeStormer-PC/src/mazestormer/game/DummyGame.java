@@ -38,19 +38,11 @@ public class DummyGame extends Game {
 		setReady(true, new EmptyCallback());
 	}
 
-	private class Handler implements GameListener {
+	private class Handler extends DefaultGameListener {
 
 		@Override
 		public void onGameJoined() {
 			setReady();
-		}
-
-		@Override
-		public void onGameLeft() {
-		}
-
-		@Override
-		public void onGameRolled(int playerNumber, int objectNumber) {
 		}
 
 		@Override
@@ -68,26 +60,6 @@ public class DummyGame extends Game {
 		public void onGameStopped() {
 			positionReporter.stop();
 			setReady();
-		}
-
-		@Override
-		public void onGameWon(int teamNumber) {
-		}
-
-		@Override
-		public void onPlayerReady(String playerID, boolean isReady) {
-		}
-
-		@Override
-		public void onObjectFound(String playerID) {
-		}
-
-		@Override
-		public void onPartnerConnected(Player partner) {
-		}
-
-		@Override
-		public void onPartnerDisconnected(Player partner) {
 		}
 
 	}
