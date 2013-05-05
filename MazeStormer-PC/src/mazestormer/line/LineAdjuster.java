@@ -36,11 +36,11 @@ public class LineAdjuster {
 		Pose pose = getMaze().toRelative(getPoseProvider().getPose());
 
 		// Round orientation
-		float newHeading = roundAngle(pose.getHeading());
+		int newHeading = roundAngle(pose.getHeading());
 
 		// Fix one coordinate
 		float newX, newY;
-		if (newHeading == -90f || newHeading == 90f) {
+		if (newHeading == -90 || newHeading == 90) {
 			newX = pose.getX();
 			newY = roundToTileSize(pose.getY());
 		} else {
@@ -65,17 +65,17 @@ public class LineAdjuster {
 	 * @param angle
 	 *            The angle.
 	 */
-	private float roundAngle(float angle) {
+	private int roundAngle(float angle) {
 		angle = normalize(angle);
 
 		if (angle > -45 && angle <= 45) {
-			return 0f;
+			return 0;
 		} else if (angle > 45 && angle <= 135) {
-			return 90f;
+			return 90;
 		} else if (angle > 135 || angle <= -135) {
-			return 180f;
+			return 180;
 		} else {
-			return -90f;
+			return -90;
 		}
 	}
 
