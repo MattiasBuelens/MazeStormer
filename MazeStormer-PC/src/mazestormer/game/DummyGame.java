@@ -34,6 +34,10 @@ public class DummyGame extends Game {
 		join(new EmptyCallback());
 	}
 
+	public void fakeOwnRoll(int roll) {
+		super.fakeOwnRoll(roll);
+	}
+
 	private void setReady() {
 		setReady(true, new EmptyCallback());
 	}

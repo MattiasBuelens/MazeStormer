@@ -200,6 +200,10 @@ public class Game {
 		}
 	}
 
+	protected void fakeOwnRoll(int roll) {
+		client.fakeOwnRoll(roll);
+	}
+
 	/**
 	 * Send a set of tiles to the partner.
 	 * 

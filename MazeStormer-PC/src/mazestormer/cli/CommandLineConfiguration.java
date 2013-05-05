@@ -96,10 +96,16 @@ public class CommandLineConfiguration {
 			}
 		}
 		if (line.hasOption("dummy-player")) {
+			boolean dummyFixRolls = line.hasOption("dummy-fix-rolls");
+			int fixedRoll = Integer.MIN_VALUE;
 			String[] dummies = line.getOptionValues("dummy-player");
 			for (String dummy : dummies) {
 				try {
-					createDummyPlayer(dummy);
+					DummyGame dummyGame = createDummyPlayer(dummy);
+					if (dummyFixRolls) {
+						dummyGame.fakeOwnRoll(fixedRoll++);
+					}
+					dummyGame.join();
 				} catch (IOException e) {
 					System.err.println("Failed to create dummy player: " + e.getMessage());
 				}
@@ -125,7 +131,7 @@ public class CommandLineConfiguration {
 		controller.getWorld().addPlayer(dummy);
 	}
 
-	private void createDummyPlayer(String name) throws IOException {
+	private DummyGame createDummyPlayer(String name) throws IOException {
 		// Create player
 		IRRobot robot = new ObservableRobot(ModelType.VIRTUAL, ControllableRobot.robotWidth,
 				ControllableRobot.robotHeight);
@@ -133,8 +139,7 @@ public class CommandLineConfiguration {
 		// Create game
 		Connection connection = controller.gameSetUpControl().getConnectionMode().getConnection();
 		String gameID = controller.gameSetUpControl().getGameID();
-		DummyGame game = new DummyGame(connection, gameID, player);
-		game.join();
+		return new DummyGame(connection, gameID, player);
 	}
 
 	private static final Options options = new Options();
@@ -190,6 +195,11 @@ public class CommandLineConfiguration {
 		String dummyPlayerDesc = "Adds a dummy player to the game.\nRepeat this option to add multiple players.";
 		options.addOption(OptionBuilder.withLongOpt("dummy-player").withArgName("playerID").hasArg().hasOptionalArgs()
 				.withDescription(dummyPlayerDesc).create("dp"));
+
+		// dummy fix rolls
+		String dummyFixRollsDesc = "Fix dummy player rolls.\n"
+				+ "If set, dummies will always take the lowest player numbers in definition order.";
+		options.addOption(OptionBuilder.withLongOpt("dummy-fix-rolls").withDescription(dummyFixRollsDesc).create("dfr"));
 	}
 
 	private static String makeList(Iterable<?> items) {
