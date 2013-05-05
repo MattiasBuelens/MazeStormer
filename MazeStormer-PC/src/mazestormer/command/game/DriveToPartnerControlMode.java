@@ -53,25 +53,32 @@ public class DriveToPartnerControlMode extends ControlMode {
 
 	@Override
 	public Tile nextTile(Tile currentTile) {
-		if (!hasPartner()) {
-			log("Something went wrong, trying to drive to your partner, "
-					+ "but there is no partner yet.");
+		if (!hasAbsolutePartner()) {
+			log("Something went wrong, trying to drive to your partner, but there is no partner yet.");
 			return null;
 		}
-		Pose pose = getPartner().getRobot().getPoseProvider().getPose();
-		Tile destination = getMaze().getTileAt(pose.getLocation());
-		if (currentTile.isNeighbourTo(destination)) {
+
+		/*
+		 * The shortest path is recalculated tile per tile, as we have no idea
+		 * where our partner will be going.
+		 */
+
+		Player absolutePartner = getAbsolutePartner();
+		// Partner position in own coordinate system
+		Pose partnerPose = absolutePartner.getRobot().getPoseProvider().getPose();
+		// Partner tile
+		Tile partnerTile = getPathFinder().getTileAt(partnerPose.getLocation());
+		if (currentTile.isNeighbourTo(partnerTile)) {
 			log("Standing next to the partner, you've won the game!");
+			getGame().win();
 			return null;
 		}
-		List<Tile> path = getPathFinder()
-				.findTilePath(currentTile, destination);
+
+		// Go to the first tile of the shortest path
+		List<Tile> path = createPath(currentTile, partnerTile);
 		return path.get(0);
 	}
 
-	/**
-	 * Returns true because of the seesaws, should redirect whenever it's closed
-	 */
 	@Override
 	public boolean isBarcodeActionEnabled() {
 		return true;
@@ -86,16 +93,16 @@ public class DriveToPartnerControlMode extends ControlMode {
 	 * Utilities
 	 */
 
-	private Player getPartner() {
-		return getGame().getPartner();
-	}
-
-	private boolean hasPartner() {
-		return getGame().hasPartner();
-	}
-
 	private Game getGame() {
 		return ((GameRunner) getCommander()).getGame();
+	}
+
+	private Player getAbsolutePartner() {
+		return getGame().getAbsolutePartner();
+	}
+
+	private boolean hasAbsolutePartner() {
+		return getGame().hasAbsolutePartner();
 	}
 
 	private class DriveToPartnerMapping implements BarcodeMapping {
@@ -127,8 +134,7 @@ public class DriveToPartnerControlMode extends ControlMode {
 		private final Barcode seesawBarcode;
 
 		protected SeesawAction(Barcode seesawBarcode) {
-			super(DriveToPartnerControlMode.this.getPlayer(),
-					DriveToPartnerControlMode.this.getCommander().getDriver());
+			super(DriveToPartnerControlMode.this.getPlayer(), DriveToPartnerControlMode.this.getCommander().getDriver());
 			this.seesawBarcode = seesawBarcode;
 		}
 
@@ -139,7 +145,7 @@ public class DriveToPartnerControlMode extends ControlMode {
 				// Check if seesaw is open
 				if (canDriveOverSeesaw()) {
 					// Drive over seesaw
-					log("Drive over internal seesaw");
+					log("Drive over seesaw");
 					seesaw.setOpen(seesawBarcode);
 					return driveOverSeesaw();
 				} else {
@@ -161,13 +167,13 @@ public class DriveToPartnerControlMode extends ControlMode {
 		}
 
 		private boolean meantToCrossSeesaw() {
-			return !(getDriver().getCurrentTile().equals(getDriver()
-					.getStartTile()));
+			return !(getDriver().getCurrentTile().equals(getDriver().getStartTile()));
 		}
 
 		private void skipToNextTile() {
 			getCommander().getDriver().skipToNextTile();
 		}
+
 	}
 
 }
