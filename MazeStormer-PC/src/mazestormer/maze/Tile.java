@@ -15,8 +15,7 @@ import mazestormer.util.LongPoint;
 public class Tile {
 
 	private final LongPoint position;
-	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(
-			Orientation.class);
+	private final Map<Orientation, Edge> edges = new EnumMap<Orientation, Edge>(Orientation.class);
 
 	/*
 	 * Exploration
@@ -99,8 +98,7 @@ public class Tile {
 
 	public void setBarcode(Barcode barcode) throws IllegalStateException {
 		if (!getShape().getType().supportsBarcode())
-			throw new IllegalStateException(
-					"Tile type does not support barcodes.");
+			throw new IllegalStateException("Tile type does not support barcodes.");
 		this.barcode = barcode;
 	}
 
@@ -176,9 +174,9 @@ public class Tile {
 		return getSidesByType(EdgeType.UNKNOWN);
 	}
 
-	public boolean isNeighbourTo(Tile other) {
-		return LongPoint.get1Norm(getPosition(), other.getPosition()) == 1
-				&& getOpenSides().contains(orientationTo(other));
+	public boolean isNeighbourTo(Tile otherTile) {
+		Orientation orientation = orientationTo(otherTile);
+		return orientation != null && getEdgeAt(orientation).getType() == EdgeType.OPEN;
 	}
 
 }
