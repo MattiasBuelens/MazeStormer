@@ -64,7 +64,7 @@ public class MainView extends JFrame implements EventSource {
 
 	private void initialize() {
 		setBounds(100, 100, 650, 500);
-		setMinimumSize(new Dimension(800, 600));
+		setMinimumSize(new Dimension(800, 700));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 
