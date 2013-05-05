@@ -10,6 +10,7 @@ import mazestormer.controller.IMainController;
 import mazestormer.game.ConnectionMode;
 import mazestormer.game.DummyGame;
 import mazestormer.infrared.IRRobot;
+import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Maze;
 import mazestormer.maze.Orientation;
@@ -128,7 +129,7 @@ public class CommandLineConfiguration {
 		// Create player
 		IRRobot robot = new ObservableRobot(ModelType.VIRTUAL, ControllableRobot.robotWidth,
 				ControllableRobot.robotHeight);
-		Player player = new RelativePlayer(name, robot, new Maze());
+		Player player = new RelativePlayer(name, robot, new CombinedMaze());
 		// Create game
 		Connection connection = controller.gameSetUpControl().getConnectionMode().getConnection();
 		String gameID = controller.gameSetUpControl().getGameID();
