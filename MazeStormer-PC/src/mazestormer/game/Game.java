@@ -332,8 +332,13 @@ public class Game {
 	private class MazesMergedListener implements CombinedMazeListener {
 		@Override
 		public void mazesMerged() {
+			// Create absolute player
 			absolutePartnerPlayer = new AbsolutePlayer(getPartner());
 			absolutePartnerPlayer.setTransform(getLocalMaze().getPoseTransform());
+			// Call listeners
+			for (GameListener listener : listeners) {
+				listener.onMazesMerged();
+			}
 		}
 	}
 

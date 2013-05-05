@@ -28,4 +28,6 @@ public interface GameListener {
 
 	public void onPartnerDisconnected(Player partner);
 
+	public void onMazesMerged();
+
 }

@@ -294,6 +294,11 @@ public class GameSetUpController extends SubController implements IGameSetUpCont
 			getMainController().gameControl().removePlayer(partner);
 		}
 
+		@Override
+		public void onMazesMerged() {
+			logToLocal("Partner maze merged into own maze");
+		}
+
 	}
 
 }
