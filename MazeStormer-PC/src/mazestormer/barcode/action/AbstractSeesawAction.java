@@ -122,14 +122,14 @@ public abstract class AbstractSeesawAction implements IAction {
 		return Math.abs(angle) > IRRobot.SEESAW_IR_RANGE;
 	}
 
-	// TODO Resolve duplication in ExploreIslandControlMode
-	protected boolean isInternal(Seesaw seesaw) {
-		Tile lowTile = getMaze().getBarcodeTile(seesaw.getLowestBarcode());
-		Tile highTile = getMaze().getBarcodeTile(seesaw.getHighestBarcode());
+	public static boolean isInternal(IMaze maze, Seesaw seesaw) {
+		Tile lowTile = maze.getBarcodeTile(seesaw.getLowestBarcode());
+		Tile highTile = maze.getBarcodeTile(seesaw.getHighestBarcode());
 		if (lowTile == null || highTile == null) {
 			return false;
 		}
-		return !getPathFinder().findTilePathWithoutSeesaws(lowTile, highTile).isEmpty();
+		PathFinder pf = new PathFinder(maze);
+		return !pf.findTilePathWithoutSeesaws(lowTile, highTile).isEmpty();
 	}
 
 }
