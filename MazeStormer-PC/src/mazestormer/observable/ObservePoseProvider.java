@@ -12,13 +12,17 @@ public class ObservePoseProvider implements PoseProvider {
 	}
 
 	@Override
-	public Pose getPose() {
-		return pose;
+	public synchronized Pose getPose() {
+		return clone(pose);
 	}
 
 	@Override
-	public void setPose(Pose pose) {
-		this.pose = pose;
+	public synchronized void setPose(Pose pose) {
+		this.pose = clone(pose);
+	}
+
+	private static Pose clone(Pose pose) {
+		return new Pose(pose.getX(), pose.getY(), pose.getHeading());
 	}
 
 }
