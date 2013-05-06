@@ -9,7 +9,6 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PoseTransform;
-import mazestormer.maze.Seesaw;
 import mazestormer.observable.ObservableRobot;
 import mazestormer.player.AbsolutePlayer;
 import mazestormer.player.Player;
@@ -194,8 +193,7 @@ public class WorldSimulator {
 
 		public void unlockedSeesaw(String playerID, int playerNumber, int barcode) {
 			// Flip this seesaw
-			Seesaw seesaw = getWorld().getMaze().getOrCreateSeesaw((byte) barcode);
-			seesaw.flip();
+			getWorld().getMaze().flipSeesaw((byte) barcode);
 		}
 
 	}

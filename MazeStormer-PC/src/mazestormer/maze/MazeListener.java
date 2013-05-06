@@ -60,4 +60,12 @@ public interface MazeListener {
 	 * Invoked when the maze has been cleared.
 	 */
 	void mazeCleared();
+
+	/**
+	 * Invoked when the given seesaw is flipped.
+	 * 
+	 * @param seesaw
+	 *            The seesaw being flipped
+	 */
+	void seesawFlipped(Seesaw seesaw);
 }

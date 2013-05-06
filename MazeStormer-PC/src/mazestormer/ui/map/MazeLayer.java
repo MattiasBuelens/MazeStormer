@@ -14,6 +14,7 @@ import mazestormer.maze.Edge;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.MazeListener;
 import mazestormer.maze.Orientation;
+import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.util.CoordUtils;
 import mazestormer.util.LongPoint;
@@ -228,6 +229,11 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 				SVGUtils.removeChildNodes(overlayGroup);
 			}
 		});
+	}
+	
+	@Override
+	public void seesawFlipped(Seesaw seesaw) {
+		// do nothing, tileChanged is used instead for this cause
 	}
 
 	@Override

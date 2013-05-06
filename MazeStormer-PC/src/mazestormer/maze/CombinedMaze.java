@@ -448,6 +448,16 @@ public class CombinedMaze implements IMaze {
 	public Tile getSeesawTile(Barcode barcode) {
 		return getTotalMaze().getSeesawTile(barcode);
 	}
+	
+	@Override
+	public void flipSeesaw(Barcode barcode) {
+		getTotalMaze().flipSeesaw(barcode);
+	}
+	
+	@Override
+	public void flipSeesaw(byte barcode) {
+		getTotalMaze().flipSeesaw(barcode);
+	}
 
 	@Override
 	public void setExplored(LongPoint position) {
