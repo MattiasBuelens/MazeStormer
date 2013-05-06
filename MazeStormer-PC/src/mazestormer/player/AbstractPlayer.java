@@ -23,7 +23,7 @@ public abstract class AbstractPlayer implements Player {
 
 	public void setPlayerID(String playerID) {
 		String previousID = getPlayerID();
-		if (!previousID.equals(playerID)) {
+		if (previousID==null || !previousID.equals(playerID)) {
 			this.playerID = playerID;
 			for (PlayerListener listener : listeners) {
 				listener.playerRenamed(this, previousID, playerID);
