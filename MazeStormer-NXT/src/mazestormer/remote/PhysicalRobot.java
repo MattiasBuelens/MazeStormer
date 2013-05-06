@@ -21,8 +21,7 @@ import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
 
-public class PhysicalRobot extends NXTComponent implements ControllableRobot,
-		MessageListener<Command> {
+public class PhysicalRobot extends NXTComponent implements ControllableRobot, MessageListener<Command> {
 
 	private final PhysicalPilot pilot;
 	private final PoseProvider poseProvider;
@@ -31,7 +30,6 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 
 	private final PhysicalLightSensor light;
 	private final PhysicalRangeScanner scanner;
-	private final PhysicalIRSensor infrared;
 
 	private final PhysicalSoundPlayer soundPlayer;
 
@@ -48,18 +46,18 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		light = new PhysicalLightSensor(communicator, SensorPort.S1);
 
 		// Scanner
-		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S4);
-		RegulatedMotor headMotor = Motor.C;
-		float gearRatio = ControllableRobot.sensorGearRatio;
-		ObservableRangeScanner headScanner = new RotatingRangeScanner(
-				headMotor, ultrasonicSensor, gearRatio);
-		scanner = new PhysicalRangeScanner(communicator, headScanner);
-
-		// Infrared
-		infrared = new PhysicalIRSensor(communicator, SensorPort.S3);
+		// RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S4);
+		// RegulatedMotor headMotor = Motor.C;
+		// float gearRatio = ControllableRobot.sensorGearRatio;
+		// ObservableRangeScanner headScanner = new
+		// RotatingRangeScanner(headMotor, ultrasonicSensor, gearRatio);
+		// scanner = new PhysicalRangeScanner(communicator, headScanner);
+		// TODO Ultrasonic sensor broken?
+		scanner = null;
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
+		// soundPlayer = null;
 
 		// Command listener
 		addMessageListener(this);
@@ -102,9 +100,12 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 		return null;
 	}
 
+	/**
+	 * Not implemented on NXT.
+	 */
 	@Override
 	public IRSensor getIRSensor() {
-		return infrared;
+		return null;
 	}
 
 	@Override

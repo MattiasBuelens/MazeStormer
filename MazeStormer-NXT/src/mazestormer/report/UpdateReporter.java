@@ -6,8 +6,7 @@ import mazestormer.remote.NXTCommunicator;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.RobotUpdate;
 
-public class UpdateReporter extends MessageSender<Report<?>> implements
-		Runnable {
+public class UpdateReporter extends MessageSender<Report<?>> implements Runnable {
 
 	private final ControllableRobot robot;
 

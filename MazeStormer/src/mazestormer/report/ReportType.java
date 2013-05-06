@@ -48,17 +48,6 @@ public enum ReportType implements MessageType<Report<?>> {
 	},
 
 	/*
-	 * IR sensor
-	 */
-
-	IR_VALUE {
-		@Override
-		public Report<float[]> build() {
-			return new IRReadReport(this);
-		}
-	},
-
-	/*
 	 * Ultrasonic sensor
 	 */
 
