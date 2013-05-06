@@ -16,7 +16,8 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderState> implements
+public class LineFinder extends
+		StateMachine<LineFinder, LineFinder.LineFinderState> implements
 		StateListener<LineFinder.LineFinderState> {
 
 	/*
@@ -66,12 +67,14 @@ public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderSt
 	}
 
 	private Future<Void> onLine() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
+		Condition condition = new LightCompareCondition(
+				ConditionType.LIGHT_GREATER_THAN, threshold);
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> offLine() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, threshold);
+		Condition condition = new LightCompareCondition(
+				ConditionType.LIGHT_SMALLER_THAN, threshold);
 		return getRobot().when(condition).stop().build();
 	}
 
@@ -101,28 +104,32 @@ public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderSt
 		log("Off line, positioning robot on line edge.");
 
 		lineWidth = getPilot().getMovement().getDistanceTraveled();
-		double centerOffset = ControllableRobot.sensorOffset - getRobot().getLightSensor().getSensorRadius();
+		double centerOffset = ControllableRobot.sensorOffset
+				- getRobot().getLightSensor().getSensorRadius();
 		log("Line width: " + lineWidth);
 		log("Offset from center: " + centerOffset);
 
 		// Travel forward to center robot on end of line
 		getPilot().setTravelSpeed(fastTravelSpeed);
-		bindTransition(getPilot().travelComplete(centerOffset), LineFinderState.ROTATE_FIXED);
+		bindTransition(getPilot().travelComplete(centerOffset),
+				LineFinderState.ROTATE_FIXED);
 	}
 
 	protected void rotateFixed() {
 		// Rotate fixed angle
 		getPilot().setRotateSpeed(fastRotateSpeed);
-		bindTransition(getPilot().rotateComplete(fastRotateAngle), LineFinderState.ROTATE_UNTIL_LINE);
+		bindTransition(getPilot().rotateComplete(fastRotateAngle),
+				LineFinderState.ROTATE_UNTIL_LINE);
 	}
 
 	protected void rotateUntilLine() {
 		// Rotate until on line again
 		log("Start looking for line again.");
 		getPilot().setRotateSpeed(slowRotateSpeed);
-		getPilot().rotateRight();
+		// getPilot().rotateRight();
 
 		bindTransition(onLine(), LineFinderState.POSITION_PERPENDICULAR);
+		bindTransition(getPilot().rotateComplete(-360), LineFinderState.FAILED);
 	}
 
 	protected void positionPerpendicular() {
@@ -135,14 +142,22 @@ public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderSt
 		// Position perpendicular to line
 		double angle = 90d + sensorAngle;
 		getPilot().setRotateSpeed(fastRotateSpeed);
-		bindTransition(getPilot().rotateComplete(angle), LineFinderState.POSITION_CENTER);
+		bindTransition(getPilot().rotateComplete(angle),
+				LineFinderState.POSITION_CENTER);
 	}
 
 	protected void positionCenter() {
 		// Position robot center on center of line
 		log("Positioning on center of line.");
 		double offset = -lineWidth / 2;
-		bindTransition(getPilot().travelComplete(offset), LineFinderState.FINISH);
+		bindTransition(getPilot().travelComplete(offset),
+				LineFinderState.FINISH);
+	}
+
+	protected void failed() {
+		log("Failed to find line.");
+		// TODO Go back and try again?
+		stop();
 	}
 
 	/**
@@ -168,7 +183,8 @@ public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderSt
 	 * </p>
 	 */
 	private double getSensorAngle() {
-		return 2 * Math.asin(getRobot().getLightSensor().getSensorRadius() / (2 * ControllableRobot.sensorOffset));
+		return 2 * Math.asin(getRobot().getLightSensor().getSensorRadius()
+				/ (2 * ControllableRobot.sensorOffset));
 	}
 
 	@Override
@@ -251,6 +267,12 @@ public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderSt
 			@Override
 			public void execute(LineFinder finder) {
 				finder.finish();
+			}
+		},
+		FAILED {
+			@Override
+			public void execute(LineFinder finder) {
+				finder.failed();
 			}
 		};
 	}

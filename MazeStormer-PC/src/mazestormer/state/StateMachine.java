@@ -256,14 +256,10 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		// Listen for future completion
 		future.addFutureListener(new FutureListener<Object>() {
 			@Override
-			public void futureResolved(Future<? extends Object> future, Object result) {
-				if (result instanceof Boolean && !((Boolean) result).booleanValue()) {
-					// Interrupt, retry needed
-					pause();
-				} else {
-					// Successfully completed, transition
-					transition(nextState);
-				}
+			public void futureResolved(Future<? extends Object> future,
+					Object result) {
+				// Successfully completed, transition
+				transition(nextState);
 			}
 
 			@Override
@@ -354,7 +350,8 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 		return (M) this;
 	}
 
-	public static class StateFuture<T extends State<?, ?>> extends AbstractFuture<Boolean> implements StateListener<T> {
+	public static class StateFuture<T extends State<?, ?>> extends
+			AbstractFuture<Boolean> implements StateListener<T> {
 
 		private final T checkState;
 
@@ -396,8 +393,8 @@ public abstract class StateMachine<M extends StateMachine<M, S>, S extends State
 
 	}
 
-	public static abstract class FinishFuture<T extends State<?, ?>> extends AbstractFuture<Void> implements
-			StateListener<T> {
+	public static abstract class FinishFuture<T extends State<?, ?>> extends
+			AbstractFuture<Void> implements StateListener<T> {
 
 		@Override
 		public void stateStarted() {
