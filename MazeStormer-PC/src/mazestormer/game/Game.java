@@ -426,7 +426,7 @@ public class Game {
 		public void teamPosition(long x, long y, double angle) {
 			if (hasPartner()) {
 				// Transform tile position to absolute maze position
-				Point relativePosition = getPartner().getMaze().fromTile(new LongPoint(x, y).toPoint());
+				Point relativePosition = getPartner().getMaze().getTileCenter(new LongPoint(x, y));
 				Point absolutePosition = getPartner().getMaze().toAbsolute(relativePosition);
 				Pose pose = new Pose();
 				pose.setLocation(absolutePosition);
