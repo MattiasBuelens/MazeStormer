@@ -132,10 +132,6 @@ public class Game {
 		}
 	}
 
-	public void pause() throws IllegalStateException, IOException {
-		client.pause();
-	}
-
 	public void stop() throws IllegalStateException, IOException {
 		client.stop();
 	}
@@ -369,13 +365,6 @@ public class Game {
 		}
 
 		@Override
-		public void gamePaused() {
-			for (GameListener listener : listeners) {
-				listener.onGamePaused();
-			}
-		}
-
-		@Override
 		public void gameWon(int teamNumber) {
 			for (GameListener listener : listeners) {
 				listener.onGameWon(teamNumber);
@@ -393,10 +382,6 @@ public class Game {
 
 		@Override
 		public void playerDisconnected(String playerID, DisconnectReason reason) {
-			if (isPartner(playerID)) {
-				// Partner disconnected
-				removePartner();
-			}
 		}
 
 		@Override
@@ -416,6 +401,11 @@ public class Game {
 		@Override
 		public void teamConnected(String partnerID) {
 			createPartner(partnerID);
+		}
+
+		@Override
+		public void teamDisconnected(String partnerID) {
+			removePartner();
 		}
 
 		@Override
