@@ -38,6 +38,10 @@ public class LeaveIslandControlMode extends ControlMode {
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) getPlayer().getRobot();
 	}
+	
+	private GameRunner getGameRunner() {
+		return (GameRunner) getCommander();
+	}
 
 	/*
 	 * ControlMode Management
@@ -94,7 +98,7 @@ public class LeaveIslandControlMode extends ControlMode {
 
 			// Cross the seesaw if open
 			if (canDriveOverSeesaw()) {
-				return driveOverSeesaw();
+				return driveOverSeesaw(getGameRunner().getGame());
 			}
 
 			// Try to go around seesaw

@@ -1,8 +1,10 @@
 package mazestormer.command.game;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
@@ -24,6 +26,11 @@ public class DriveToPartnerControlMode extends ControlMode {
 	 * Mapping
 	 */
 	private final BarcodeMapping mapping = new DriveToPartnerMapping();
+
+	/*
+	 * Seesaws to avoid, because they're closed
+	 */
+	private final Set<Seesaw> seesawsToAvoid = new HashSet<>();
 
 	/*
 	 * Constructor
@@ -65,7 +72,8 @@ public class DriveToPartnerControlMode extends ControlMode {
 
 		Player absolutePartner = getAbsolutePartner();
 		// Partner position in own coordinate system
-		Pose partnerPose = absolutePartner.getRobot().getPoseProvider().getPose();
+		Pose partnerPose = absolutePartner.getRobot().getPoseProvider()
+				.getPose();
 		// Partner tile
 		Tile partnerTile = getPathFinder().getTileAt(partnerPose.getLocation());
 		if (currentTile.isNeighbourTo(partnerTile)) {
@@ -75,7 +83,10 @@ public class DriveToPartnerControlMode extends ControlMode {
 		}
 
 		// Go to the first tile of the shortest path
-		List<Tile> path = createPath(currentTile, partnerTile);
+		List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
+				currentTile, partnerTile, seesawsToAvoid);
+		if (path.isEmpty())
+			return null;
 		return path.get(0);
 	}
 
@@ -134,40 +145,34 @@ public class DriveToPartnerControlMode extends ControlMode {
 		private final Barcode seesawBarcode;
 
 		protected SeesawAction(Barcode seesawBarcode) {
-			super(DriveToPartnerControlMode.this.getPlayer(), DriveToPartnerControlMode.this.getCommander().getDriver());
+			super(DriveToPartnerControlMode.this.getPlayer(),
+					DriveToPartnerControlMode.this.getCommander().getDriver());
 			this.seesawBarcode = seesawBarcode;
 		}
 
 		@Override
 		public Future<?> performAction(Player player) {
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
-			if (meantToCrossSeesaw()) {
-				// Check if seesaw is open
+			if (isInternal(getMaze(), seesaw)) {
 				if (canDriveOverSeesaw()) {
 					// Drive over seesaw
 					log("Drive over seesaw");
 					seesaw.setOpen(seesawBarcode);
-					return driveOverSeesaw();
+					return driveOverSeesaw(getGame());
 				} else {
 					// Drive around
 					log("Go around seesaw");
 					seesaw.setClosed(seesawBarcode);
 					// Go around seesaw
-					List<Tile> pathAroundSeesaw = getPathWithoutSeesaw(seesaw);
-					return redirect(pathAroundSeesaw);
+					seesawsToAvoid.add(getMaze().getSeesaw(seesawBarcode));
 				}
-			} else {
-				// Not trying to cross
-				log("Not trying to cross seesaw, skip to next tile");
 			}
+			
+			// TODO if not internal -> trainspotting?
 
 			// Skip seesaw tile
 			skipToNextTile();
 			return null;
-		}
-
-		private boolean meantToCrossSeesaw() {
-			return !(getDriver().getCurrentTile().equals(getDriver().getStartTile()));
 		}
 
 		private void skipToNextTile() {

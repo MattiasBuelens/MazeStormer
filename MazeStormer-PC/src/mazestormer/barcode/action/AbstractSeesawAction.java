@@ -3,6 +3,7 @@ package mazestormer.barcode.action;
 import java.util.List;
 
 import mazestormer.command.Driver;
+import mazestormer.game.Game;
 import mazestormer.infrared.IRRobot;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.PathFinder;
@@ -70,7 +71,8 @@ public abstract class AbstractSeesawAction implements IAction {
 	/**
 	 * Drive over the seesaw.
 	 */
-	protected final Future<?> driveOverSeesaw() {
+	protected final Future<?> driveOverSeesaw(final Game game) {
+		game.lockSeesaw(getDriver().getCurrentTile().getBarcode().getValue());
 		Future<?> future = new DriveOverSeesawAction().performAction(getPlayer());
 		future.addFutureListener(new FutureListener<Object>() {
 			@Override
@@ -81,6 +83,7 @@ public abstract class AbstractSeesawAction implements IAction {
 				getDriver().forceLineAdjust();
 				// Recalculate from new current tile
 				getDriver().recalculateAndFollowPath();
+				game.unlockSeesaw();
 			}
 
 			@Override
