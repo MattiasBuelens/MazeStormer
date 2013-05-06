@@ -528,5 +528,4 @@ public interface IMaze {
 	 *            The start orientation.
 	 */
 	public void setStartPose(int playerNumber, LongPoint tilePosition, Orientation orientation);
-
 }

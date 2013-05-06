@@ -1,6 +1,8 @@
 package mazestormer.command.game;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,8 @@ import mazestormer.barcode.action.BarcodeMapping;
 import mazestormer.barcode.action.IAction;
 import mazestormer.barcode.action.NoAction;
 import mazestormer.command.ControlMode;
+import mazestormer.maze.IMaze;
+import mazestormer.maze.Maze;
 import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
@@ -20,15 +24,15 @@ import mazestormer.util.Future;
 public class LeaveIslandControlMode extends ControlMode {
 
 	private LinkedList<Tile> reachableSeesawQueue;
-	private final BarcodeMapping leaveBarcodeMapping = new LeaveIslandBarcodeMapping();
+	private final LeaveIslandBarcodeMapping leaveBarcodeMapping = new LeaveIslandBarcodeMapping();
 
 	/*
-	 * Constructor 
+	 * Constructor
 	 */
-	
+
 	public LeaveIslandControlMode(Player player, GameRunner gameRunner) {
 		super(player, gameRunner);
-		// make a list of inter island seesaws. 
+		// make a list of inter island seesaws.
 	}
 
 	/*
@@ -38,7 +42,7 @@ public class LeaveIslandControlMode extends ControlMode {
 	private ControllableRobot getRobot() {
 		return (ControllableRobot) getPlayer().getRobot();
 	}
-	
+
 	private GameRunner getGameRunner() {
 		return (GameRunner) getCommander();
 	}
@@ -50,6 +54,7 @@ public class LeaveIslandControlMode extends ControlMode {
 	@Override
 	public void takeControl() {
 		// TODO Auto-generated method stub
+		log("Leaving island");
 
 	}
 
@@ -62,11 +67,12 @@ public class LeaveIslandControlMode extends ControlMode {
 	/*
 	 * Driver support
 	 */
-	
+
 	@Override
 	public Tile nextTile(Tile currentTile) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO: niet af!!
+		log("Requesting next tile from LeaveIslandCM");
+		return getClosestSeesawBarcodeTile(currentTile);
 	}
 
 	@Override
@@ -79,6 +85,75 @@ public class LeaveIslandControlMode extends ControlMode {
 		return true;
 	}
 
+	/**
+	 * @return null if there is no reachable seesaw barcode tile
+	 */
+	private Tile getClosestSeesawBarcodeTile(Tile currentTile) {
+		Collection<Tile> reachableSeesawBarcodeTiles = reachableSeesawBarcodeTiles(currentTile);
+		Tile shortestTile = null;
+		int shortestPathLength = Integer.MAX_VALUE;
+		for (Tile tile : reachableSeesawBarcodeTiles) {
+			List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
+					currentTile, tile);
+			if (path.size() < shortestPathLength)
+				shortestTile = tile;
+		}
+		return shortestTile;
+
+	}
+
+	/**
+	 * @return A collection with barcode tiles belonging to a seesaw, to which
+	 *         you can go without crossing the seesaw you're currently standing
+	 *         at.
+	 */
+	private Collection<Tile> reachableSeesawBarcodeTiles(Tile currentTile) {
+
+		Collection<Tile> tiles = new HashSet<>();
+		IMaze maze = getMaze();
+
+		Collection<Tile> seesawBarcodeTiles = getSeesawBarcodeTiles(maze);
+
+		for (Tile tile : seesawBarcodeTiles) {
+			List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
+					currentTile, tile);
+			if (!path.isEmpty()){
+				log("Adding bc tile value: " + tile.getBarcode().getValue());
+				tiles.add(tile);
+			}
+		}
+
+		return tiles;
+	}
+
+	private Collection<Tile> getSeesawBarcodeTiles(IMaze maze) {
+		Collection<Tile> barcodeTiles = maze.getBarcodeTiles();
+		Collection<Tile> seesawBarcodeTiles = new HashSet<Tile>();
+
+		Barcode currentBarcode;
+		for (Tile currentTile : barcodeTiles) {
+			currentBarcode = currentTile.getBarcode();
+
+			if (leaveBarcodeMapping.isSeesawBarcode(currentBarcode)) {
+				seesawBarcodeTiles.add(currentTile);
+			}
+		}
+
+		return seesawBarcodeTiles;
+	}
+
+	private Barcode[] getCurrentSeesawBarcodes(Tile currentTile) {
+		if (!currentTile.hasBarcode())
+			return null;
+		Barcode barcode = currentTile.getBarcode();
+
+		if (!leaveBarcodeMapping.isSeesawBarcode(barcode))
+			return null;
+		Barcode otherBarcode = leaveBarcodeMapping
+				.getOtherSeesawBarcode(barcode);
+		return new Barcode[] { barcode, otherBarcode };
+	}
+
 	/*
 	 * Utilities
 	 */
@@ -88,7 +163,8 @@ public class LeaveIslandControlMode extends ControlMode {
 		private Barcode seesawBarcode;
 
 		private SeesawAction(Barcode seesawBarcode) {
-			super(LeaveIslandControlMode.this.getPlayer(), LeaveIslandControlMode.this.getCommander().getDriver());
+			super(LeaveIslandControlMode.this.getPlayer(),
+					LeaveIslandControlMode.this.getCommander().getDriver());
 			this.seesawBarcode = seesawBarcode;
 		}
 
@@ -139,6 +215,14 @@ public class LeaveIslandControlMode extends ControlMode {
 				return barcodeMapping.get(barcode);
 			}
 			return new NoAction();
+		}
+
+		public boolean isSeesawBarcode(Barcode barcode) {
+			return Seesaw.isSeesawBarcode(barcode);
+		}
+
+		public Barcode getOtherSeesawBarcode(Barcode barcode) {
+			return Seesaw.getOtherBarcode(barcode);
 		}
 
 	}

@@ -24,7 +24,8 @@ public abstract class PointVisibility {
 
 	public static final double TOLERANCE = 1e-5d;
 
-	protected PointVisibility(GeometryFactory factory, Coordinate viewCoord) throws IllegalArgumentException {
+	protected PointVisibility(GeometryFactory factory, Coordinate viewCoord)
+			throws IllegalArgumentException {
 		this.factory = checkNotNull(factory);
 		this.viewCoord = checkNotNull(viewCoord);
 	}
@@ -37,7 +38,8 @@ public abstract class PointVisibility {
 	 * @return All line segments of the polygon.
 	 */
 	protected List<LineSegment> collect(Polygon polygon) {
-		List<LineSegment> segments = new ArrayList<LineSegment>(polygon.getNumPoints());
+		List<LineSegment> segments = new ArrayList<LineSegment>(
+				polygon.getNumPoints());
 		// Exterior shell
 		segments.addAll(collect(polygon.getExteriorRing()));
 		// Interior holes
@@ -126,12 +128,17 @@ public abstract class PointVisibility {
 	 * @return The projected line strings.
 	 * @see #project(Polygon, LineSegment)
 	 */
-	protected MultiLineString getProjections(Geometry polygons, LineSegment screen) {
+	protected MultiLineString getProjections(Geometry polygons,
+			LineSegment screen) {
 		int numGeometries = polygons.getNumGeometries();
 		MultiFractionSegment projectedSegments = new MultiFractionSegment();
 		// Iterate over polygons
 		for (int i = 0; i < numGeometries; ++i) {
-			Polygon polygon = (Polygon) polygons.getGeometryN(i);
+			Geometry geometry = polygons.getGeometryN(i);
+			// Dirty fix
+			if (!(geometry instanceof Polygon))
+				continue;
+			Polygon polygon = (Polygon) geometry;
 			// Ignore empty polygons
 			if (polygon.isEmpty())
 				continue;
@@ -141,7 +148,8 @@ public abstract class PointVisibility {
 			projectedSegments.addSegments(projected);
 		}
 		// Create line segments along screen
-		List<LineSegment> projections = projectedSegments.combine().segmentsAlong(screen);
+		List<LineSegment> projections = projectedSegments.combine()
+				.segmentsAlong(screen);
 		// Make line strings
 		LineString[] projectedLines = new LineString[projections.size()];
 		for (int i = 0; i < projectedLines.length; ++i) {
@@ -162,13 +170,16 @@ public abstract class PointVisibility {
 	 */
 	protected List<FractionSegment> project(Polygon polygon, LineSegment screen) {
 		// Only check exterior shell, interior holes don't matter for projection
-		List<LineSegment> segments = collect(toLinearRing(polygon.getExteriorRing()));
-		List<FractionSegment> projectedSegments = new ArrayList<FractionSegment>(segments.size());
+		List<LineSegment> segments = collect(toLinearRing(polygon
+				.getExteriorRing()));
+		List<FractionSegment> projectedSegments = new ArrayList<FractionSegment>(
+				segments.size());
 		for (LineSegment segment : segments) {
 			// Project vertex onto screen
 			double leftFraction = project(segment.getCoordinate(0), screen);
 			double rightFraction = project(segment.getCoordinate(1), screen);
-			FractionSegment projectedSegment = new FractionSegment(leftFraction, rightFraction);
+			FractionSegment projectedSegment = new FractionSegment(
+					leftFraction, rightFraction);
 			projectedSegments.add(projectedSegment);
 		}
 		return projectedSegments;
@@ -195,8 +206,10 @@ public abstract class PointVisibility {
 	 *            The right vertex of the edge.
 	 * @return A triangle connecting the view point to the two given vertices.
 	 */
-	protected Polygon getViewingTriangle(Coordinate leftVertex, Coordinate rightVertex) {
-		return factory.createPolygon(new Coordinate[] { viewCoord, leftVertex, rightVertex, viewCoord });
+	protected Polygon getViewingTriangle(Coordinate leftVertex,
+			Coordinate rightVertex) {
+		return factory.createPolygon(new Coordinate[] { viewCoord, leftVertex,
+				rightVertex, viewCoord });
 	}
 
 	/**
@@ -218,16 +231,20 @@ public abstract class PointVisibility {
 	 * @param multiLineString
 	 *            The {@link MultiLineString} to reduce.
 	 */
-	protected MultiLineString reduceMultiLineString(MultiLineString multiLineString) {
+	protected MultiLineString reduceMultiLineString(
+			MultiLineString multiLineString) {
 		// Union
 		Geometry reduced = multiLineString.union();
 		// Make appropriate result
 		if (reduced instanceof MultiLineString) {
 			return (MultiLineString) reduced;
 		} else if (reduced instanceof LineString) {
-			return factory.createMultiLineString(new LineString[] { (LineString) reduced });
+			return factory
+					.createMultiLineString(new LineString[] { (LineString) reduced });
 		} else {
-			throw new RuntimeException("Unexpected segments combination result type: " + reduced.getClass());
+			throw new RuntimeException(
+					"Unexpected segments combination result type: "
+							+ reduced.getClass());
 		}
 	}
 
