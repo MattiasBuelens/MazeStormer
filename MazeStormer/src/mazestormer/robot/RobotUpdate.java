@@ -34,7 +34,7 @@ public class RobotUpdate implements Transmittable {
 		return movement;
 	}
 
-	protected final void setMovement(Move movement) {
+	public final void setMovement(Move movement) {
 		this.movement = movement;
 	}
 
@@ -42,7 +42,7 @@ public class RobotUpdate implements Transmittable {
 		return lightValue;
 	}
 
-	protected final void setLightValue(int lightValue) {
+	public final void setLightValue(int lightValue) {
 		this.lightValue = lightValue;
 	}
 
@@ -50,7 +50,7 @@ public class RobotUpdate implements Transmittable {
 		return infraredAngle;
 	}
 
-	protected final void setInfraredAngle(float infraredAngle) {
+	public final void setInfraredAngle(float infraredAngle) {
 		this.infraredAngle = infraredAngle;
 	}
 
@@ -83,9 +83,14 @@ public class RobotUpdate implements Transmittable {
 		}
 
 		// Sensor readings
-		int lightValue = robot.getLightSensor().getLightValue();
-		// float infraredAngle = robot.getIRSensor().getAngle();
+		int lightValue = -1;
+		if (robot.getLightSensor() != null) {
+			lightValue = robot.getLightSensor().getLightValue();
+		}
 		float infraredAngle = Float.NaN;
+		if (robot.getIRSensor() != null) {
+			// infraredAngle = robot.getIRSensor().getAngle();
+		}
 
 		return new RobotUpdate(movement, lightValue, infraredAngle);
 	}

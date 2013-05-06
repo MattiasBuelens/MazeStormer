@@ -5,8 +5,8 @@ import java.util.List;
 
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
-import mazestormer.command.CommandType;
 import mazestormer.condition.Condition;
+import mazestormer.condition.ConditionFuture;
 import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 import mazestormer.detect.RangeScannerFeatureDetector;
@@ -23,6 +23,9 @@ import mazestormer.robot.Pilot;
 import mazestormer.robot.RobotUpdate;
 import mazestormer.robot.RobotUpdateListener;
 import mazestormer.robot.SoundPlayer;
+import mazestormer.simulator.VirtualCommandBuilder;
+import mazestormer.simulator.VirtualConditionResolvers;
+import mazestormer.simulator.VirtualLightSensor;
 import mazestormer.simulator.VirtualRobotIRSensor;
 import mazestormer.simulator.VirtualSeesawIRSensor;
 import mazestormer.world.ModelType;
@@ -40,7 +43,7 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 	private final double width = robotWidth;
 	private final double height = robotHeight;
 
-	private final PhysicalLightSensor light;
+	private final CalibratedLightSensor light;
 	private final ObservableRangeScanner rangeScanner;
 	private final RangeScannerFeatureDetector rangeDetector;
 	private final IRSensor infrared;
@@ -50,6 +53,8 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 
 	private final UpdateReceiver updateReceiver;
 	private final List<RobotUpdateListener> updateListeners = new ArrayList<RobotUpdateListener>();
+
+	private final VirtualConditionResolvers conditionResolvers;
 
 	private final Envelope envelope;
 
@@ -66,7 +71,8 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 		poseProvider = new OdometryPoseProvider(pilot);
 
 		// Light sensor
-		light = new PhysicalLightSensor(communicator);
+		// light = new PhysicalLightSensor(communicator);
+		light = new VirtualLightSensor(world);
 
 		// Range scanner
 		rangeScanner = new PhysicalRangeScanner(communicator);
@@ -80,6 +86,9 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
+
+		// Conditional commands
+		conditionResolvers = new VirtualConditionResolvers(this);
 
 		this.envelope = new RectangularEnvelope(width, height, DETECTION_RADIUS);
 	}
@@ -152,16 +161,21 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 
 	@Override
 	public CommandBuilder when(Condition condition) {
-		PhysicalCommandBuilder builder = new PhysicalCommandBuilder(getCommunicator(), CommandType.WHEN, condition);
-		addMessageListener(builder);
-		return builder;
+		// PhysicalCommandBuilder builder = new
+		// PhysicalCommandBuilder(getCommunicator(), CommandType.WHEN,
+		// condition);
+		// addMessageListener(builder);
+		// return builder;
+		ConditionFuture future = conditionResolvers.resolve(condition);
+		return new VirtualCommandBuilder(this, future);
+
 	}
 
 	@Override
 	public void terminate() {
 		// Terminate components
 		getPilot().terminate();
-		light.terminate();
+		// light.terminate();
 		// Stop all communications
 		getCommunicator().stop();
 		// Remove registered message listeners
@@ -173,7 +187,9 @@ public class PhysicalRobot extends PhysicalComponent implements ControllablePCRo
 		@Override
 		public void messageReceived(Report<?> message) {
 			if (message instanceof UpdateReport) {
-				updateReceived(((UpdateReport) message).getValue());
+				RobotUpdate update = ((UpdateReport) message).getValue();
+				update.setLightValue(getLightSensor().getLightValue());
+				updateReceived(update);
 			}
 		}
 

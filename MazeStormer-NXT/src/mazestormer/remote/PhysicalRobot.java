@@ -28,7 +28,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot, Me
 	private final double width = robotWidth;
 	private final double height = robotHeight;
 
-	private final PhysicalLightSensor light;
+	// private final PhysicalLightSensor light;
 	private final PhysicalRangeScanner scanner;
 
 	private final PhysicalSoundPlayer soundPlayer;
@@ -43,21 +43,17 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot, Me
 		poseProvider = new OdometryPoseProvider(getPilot());
 
 		// Light sensor
-		light = new PhysicalLightSensor(communicator, SensorPort.S1);
+		// light = new PhysicalLightSensor(communicator, SensorPort.S1);
 
 		// Scanner
-		// RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S4);
-		// RegulatedMotor headMotor = Motor.C;
-		// float gearRatio = ControllableRobot.sensorGearRatio;
-		// ObservableRangeScanner headScanner = new
-		// RotatingRangeScanner(headMotor, ultrasonicSensor, gearRatio);
-		// scanner = new PhysicalRangeScanner(communicator, headScanner);
-		// TODO Ultrasonic sensor broken?
-		scanner = null;
+		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S4);
+		RegulatedMotor headMotor = Motor.C;
+		float gearRatio = ControllableRobot.sensorGearRatio;
+		ObservableRangeScanner headScanner = new RotatingRangeScanner(headMotor, ultrasonicSensor, gearRatio);
+		scanner = new PhysicalRangeScanner(communicator, headScanner);
 
 		// Sound player
 		soundPlayer = new PhysicalSoundPlayer(communicator);
-		// soundPlayer = null;
 
 		// Command listener
 		addMessageListener(this);
@@ -84,7 +80,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot, Me
 
 	@Override
 	public CalibratedLightSensor getLightSensor() {
-		return light;
+		return null; // light;
 	}
 
 	@Override
@@ -148,7 +144,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot, Me
 		getCommunicator().stop();
 		// Release resources
 		pilot.terminate();
-		light.terminate();
+		// light.terminate();
 		scanner.terminate();
 		// Remove registered message listeners
 		super.terminate();
