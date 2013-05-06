@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import lejos.geom.Point;
 import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
 import lejos.robotics.navigation.MoveProvider;
@@ -17,6 +18,8 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.barcode.Barcode;
 import mazestormer.command.Commander;
 import mazestormer.command.ControlMode;
+import mazestormer.command.Driver;
+import mazestormer.command.Driver.ExplorerState;
 import mazestormer.game.DefaultGameListener;
 import mazestormer.game.Game;
 import mazestormer.maze.ClosestTileComparator;
@@ -28,6 +31,7 @@ import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
+import mazestormer.state.DefaultStateListener;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -65,8 +69,23 @@ public class GameRunner extends Commander {
 		this.game = game;
 		game.addGameListener(new GameListener());
 
+		// Position updates
+		getDriver().addStateListener(new DriverListener());
+
 		// Modes
 		setMode(new ExploreIslandControlMode(player, this));
+	}
+
+	private class DriverListener extends DefaultStateListener<Driver.ExplorerState> {
+
+		@Override
+		public void stateTransitioned(ExplorerState nextState) {
+			if (nextState == ExplorerState.BEFORE_TRAVEL) {
+				Tile nextTile = getDriver().getFacingTile();
+				float heading = getRobot().getPoseProvider().getPose().getHeading();
+				publishPosition(nextTile, heading);
+			}
+		}
 	}
 
 	/*
@@ -183,6 +202,18 @@ public class GameRunner extends Commander {
 		return false;
 	}
 
+	private void publishPosition(Point position, float heading) {
+		Pose pose = new Pose();
+		pose.setLocation(position);
+		pose.setHeading(heading);
+		getGame().updatePosition(pose);
+	}
+
+	private void publishPosition(Tile tile, float heading) {
+		Point position = getMaze().toAbsolute(getMaze().getTileCenter(tile.getPosition()));
+		publishPosition(position, heading);
+	}
+
 	public boolean isRunning() {
 		return getDriver().isRunning();
 	}
@@ -204,6 +235,7 @@ public class GameRunner extends Commander {
 	private class PositionReporter implements MoveListener {
 
 		private ScheduledFuture<?> task;
+		private boolean wasMoving = true;
 
 		@Override
 		public void moveStarted(Move event, MoveProvider mp) {
@@ -214,7 +246,15 @@ public class GameRunner extends Commander {
 			task = positionExecutor.scheduleWithFixedDelay(new Runnable() {
 				@Override
 				public void run() {
-					game.updatePosition(getRobot().getPoseProvider().getPose());
+					boolean isMoving = getRobot().getPilot().isMoving();
+					// When not moving for two cycles
+					if (!wasMoving && !isMoving) {
+						// Publish current tile
+						Tile tile = getDriver().getCurrentTile();
+						float heading = getRobot().getPoseProvider().getPose().getHeading();
+						publishPosition(tile, heading);
+					}
+					wasMoving = isMoving;
 				}
 			}, 0, updateFrequency, TimeUnit.MILLISECONDS);
 		}

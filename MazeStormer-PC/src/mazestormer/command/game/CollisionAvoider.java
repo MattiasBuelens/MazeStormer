@@ -97,8 +97,7 @@ public class CollisionAvoider extends StateMachine<CollisionAvoider, CollisionAv
 
 		// Get current and blocked tile
 		Tile currentTile = getDriver().getCurrentTile();
-		Orientation heading = getDriver().getRobotHeading();
-		Tile blockedTile = getMaze().getOrCreateNeighbor(currentTile, heading);
+		Tile blockedTile = getDriver().getFacingTile();
 
 		// Find path to corridor
 		List<Tile> path = null;

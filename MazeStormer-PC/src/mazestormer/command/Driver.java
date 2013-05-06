@@ -648,6 +648,13 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	/**
+	 * Get the tile the robot is currently looking towards.
+	 */
+	public Tile getFacingTile() {
+		return getMaze().getOrCreateNeighbor(getCurrentTile(), getRobotHeading());
+	}
+
+	/**
 	 * Get the next tile to which the robot is navigating.
 	 */
 	public Tile getGoalTile() {
