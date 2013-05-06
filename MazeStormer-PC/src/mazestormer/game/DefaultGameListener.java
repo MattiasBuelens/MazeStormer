@@ -21,10 +21,6 @@ public class DefaultGameListener implements GameListener {
 	}
 
 	@Override
-	public void onGamePaused() {
-	}
-
-	@Override
 	public void onGameStopped() {
 	}
 

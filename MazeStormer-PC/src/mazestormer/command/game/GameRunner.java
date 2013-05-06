@@ -257,22 +257,11 @@ public class GameRunner extends Commander {
 		@Override
 		public void onGameStarted() {
 			// Reset player pose
-			// TODO Do not reset when resuming from paused game?
 			getRobot().getPoseProvider().setPose(new Pose());
 			// Start reporting
 			startReporting();
 			// Start explorer
 			start();
-		}
-
-		@Override
-		public void onGamePaused() {
-			// Pause explorer
-			getDriver().pause();
-			// Stop pilot
-			getRobot().getPilot().stop();
-			// Stop reporting
-			stopReporting();
 		}
 
 		@Override
