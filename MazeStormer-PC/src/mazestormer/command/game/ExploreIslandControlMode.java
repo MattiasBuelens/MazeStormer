@@ -224,12 +224,12 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 					if (canDriveOverSeesaw()) {
 						// Drive over seesaw
 						log("Drive over internal seesaw");
-						seesaw.setOpen(seesawBarcode);
+						//seesaw.setOpen(seesawBarcode);
 						return driveOverSeesaw(getGameRunner().getGame());
 					} else {
 						// Drive around
 						log("Go around internal seesaw");
-						seesaw.setClosed(seesawBarcode);
+						//seesaw.setClosed(seesawBarcode);
 						// Go around seesaw
 						List<Tile> pathAroundSeesaw = getPathWithoutSeesaws();
 						return redirect(pathAroundSeesaw);
