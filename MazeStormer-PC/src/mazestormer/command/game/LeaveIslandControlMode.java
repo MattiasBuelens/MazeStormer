@@ -23,7 +23,11 @@ import mazestormer.util.Future;
 
 public class LeaveIslandControlMode extends ControlMode {
 
-	private LinkedList<Tile> reachableSeesawQueue;
+	// TODO: remove ID shizzle
+
+	public static int UID = 0;
+	public int id;
+	private LinkedList<Tile> visitedSeesawTiles;
 	private final LeaveIslandBarcodeMapping leaveBarcodeMapping = new LeaveIslandBarcodeMapping();
 
 	/*
@@ -32,6 +36,7 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	public LeaveIslandControlMode(Player player, GameRunner gameRunner) {
 		super(player, gameRunner);
+		id = UID++;
 		// make a list of inter island seesaws.
 	}
 
@@ -70,9 +75,26 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	@Override
 	public Tile nextTile(Tile currentTile) {
+		log("LeaveIslandControlModeID: " + id);
 		// TODO: niet af!!
 		log("Requesting next tile from LeaveIslandCM");
-		return getClosestSeesawBarcodeTile(currentTile);
+
+		Tile nextTile = getClosestSeesawBarcodeTile(currentTile,visitedSeesawTiles);
+		
+		log("1");
+		System.out.println("Test 1");
+		
+		if(nextTile == null){
+			log("2");
+			visitedSeesawTiles.clear();
+			nextTile = getClosestSeesawBarcodeTile(currentTile,null);
+		}
+		log("3");
+		visitedSeesawTiles.add(nextTile);
+		log("4");
+		log("Returning (" + nextTile.getX() +"," + nextTile.getY() + ")");
+		
+		return nextTile;
 	}
 
 	@Override
@@ -88,18 +110,19 @@ public class LeaveIslandControlMode extends ControlMode {
 	/**
 	 * @return null if there is no reachable seesaw barcode tile
 	 */
-	private Tile getClosestSeesawBarcodeTile(Tile currentTile) {
+	private Tile getClosestSeesawBarcodeTile(Tile currentTile, List<Tile> ignore) {
 		Collection<Tile> reachableSeesawBarcodeTiles = reachableSeesawBarcodeTiles(currentTile);
 		Tile shortestTile = null;
 		int shortestPathLength = Integer.MAX_VALUE;
 		for (Tile tile : reachableSeesawBarcodeTiles) {
-			List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
-					currentTile, tile);
-			if (path.size() < shortestPathLength)
-				shortestTile = tile;
+			if (ignore == null || !ignore.contains(tile)) {
+				List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
+						currentTile, tile);
+				if (path.size() < shortestPathLength && path.size() > 0)
+					shortestTile = tile;
+			}
 		}
 		return shortestTile;
-
 	}
 
 	/**
@@ -117,7 +140,7 @@ public class LeaveIslandControlMode extends ControlMode {
 		for (Tile tile : seesawBarcodeTiles) {
 			List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
 					currentTile, tile);
-			if (!path.isEmpty()){
+			if (!path.isEmpty()) {
 				log("Adding bc tile value: " + tile.getBarcode().getValue());
 				tiles.add(tile);
 			}
