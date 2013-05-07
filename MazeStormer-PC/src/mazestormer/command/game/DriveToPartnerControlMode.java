@@ -165,7 +165,7 @@ public class DriveToPartnerControlMode extends ControlMode {
 
 			// Skip seesaw tile
 			skipCurrentBarcode(true);
-			return null;
+			return new NoAction().performAction(player);
 			// }
 		}
 
