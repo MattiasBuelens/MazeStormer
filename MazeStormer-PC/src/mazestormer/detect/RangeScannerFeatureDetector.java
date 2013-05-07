@@ -24,14 +24,14 @@ import com.google.common.util.concurrent.Futures;
  */
 public class RangeScannerFeatureDetector extends AbstractFeatureDetector implements RangeFeatureDetector {
 
-	private final AsyncRangeScanner scanner;
+	private final ObservableRangeScanner scanner;
 	private final Point offset;
 	private float maxDistance;
 	private PoseProvider pp = null;
 	private final List<RangeFeatureListener> listeners = new ArrayList<RangeFeatureListener>();
 	private final ReadingTransformer readingTransformer = new ReadingTransformer();
 
-	public RangeScannerFeatureDetector(AsyncRangeScanner scanner, float maxDistance, Point offset) {
+	public RangeScannerFeatureDetector(ObservableRangeScanner scanner, float maxDistance, Point offset) {
 		this.scanner = checkNotNull(scanner);
 		this.maxDistance = maxDistance;
 		this.offset = offset;
@@ -40,7 +40,7 @@ public class RangeScannerFeatureDetector extends AbstractFeatureDetector impleme
 	/**
 	 * Get the range scanner used by this feature detector.
 	 */
-	public AsyncRangeScanner getScanner() {
+	public ObservableRangeScanner getScanner() {
 		return scanner;
 	}
 

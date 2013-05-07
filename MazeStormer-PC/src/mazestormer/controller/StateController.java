@@ -11,7 +11,7 @@ import mazestormer.connect.ConnectEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.detect.RangeFeatureListener;
 import mazestormer.player.RelativePlayer;
-import mazestormer.robot.ControllableRobot;
+import mazestormer.robot.ControllablePCRobot;
 import mazestormer.robot.MoveEvent;
 import mazestormer.robot.RangeScannerListener;
 import mazestormer.robot.RobotUpdate;
@@ -38,7 +38,7 @@ public class StateController extends SubController implements IStateController {
 		return getPlayer().getLogger();
 	}
 
-	private ControllableRobot getRobot() {
+	private ControllablePCRobot getRobot() {
 		return getMainController().getControllableRobot();
 	}
 

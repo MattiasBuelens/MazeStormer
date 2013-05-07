@@ -1,8 +1,8 @@
 package mazestormer.robot;
 
 import lejos.geom.Point;
+import lejos.robotics.RangeScanner;
 import mazestormer.command.ConditionalCommandBuilder;
-import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
 
 public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
@@ -88,7 +88,7 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	/**
 	 * Get the range scanner of this robot.
 	 */
-	public ObservableRangeScanner getRangeScanner();
+	public RangeScanner getRangeScanner();
 
 	/**
 	 * Get the range feature detector of this robot.
@@ -99,11 +99,6 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	 * Get the infrared sensor of this robot.
 	 */
 	public IRSensor getIRSensor();
-
-	/**
-	 * Get the sound player of this robot.
-	 */
-	public SoundPlayer getSoundPlayer();
 
 	/**
 	 * Add a robot update listener.

@@ -61,12 +61,6 @@ public enum CommandType implements MessageType<Command> {
 			return new LightReadCommand(this);
 		}
 	},
-	LIGHT_FLOODLIGHT {
-		@Override
-		public Command build() {
-			return new LightFloodlightCommand(this);
-		}
-	},
 	LIGHT_SET_LOW {
 		@Override
 		public Command build() {
@@ -79,7 +73,7 @@ public enum CommandType implements MessageType<Command> {
 			return new LightCalibrateCommand(this);
 		}
 	},
-	
+
 	/*
 	 * IR sensor
 	 */
@@ -99,17 +93,6 @@ public enum CommandType implements MessageType<Command> {
 		@Override
 		public Command build() {
 			return new ScanCommand(this);
-		}
-	},
-
-	/*
-	 * Sound player
-	 */
-
-	PLAY_SOUND {
-		@Override
-		public Command build() {
-			return new PlaySoundCommand(this);
 		}
 	},
 

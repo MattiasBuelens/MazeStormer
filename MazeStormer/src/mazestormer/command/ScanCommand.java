@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import lejos.robotics.RangeReadings;
-import mazestormer.util.CommandUtils;
 
 public class ScanCommand extends RequestCommand<RangeReadings> {
 
@@ -31,13 +30,29 @@ public class ScanCommand extends RequestCommand<RangeReadings> {
 	@Override
 	public void read(DataInputStream dis) throws IOException {
 		super.read(dis);
-		setAngles(CommandUtils.readArray(dis));
+		setAngles(readArray(dis));
 	}
 
 	@Override
 	public void write(DataOutputStream dos) throws IOException {
 		super.write(dos);
-		CommandUtils.writeArray(dos, getAngles());
+		writeArray(dos, getAngles());
+	}
+
+	public static float[] readArray(DataInputStream dis) throws IOException {
+		int length = dis.readInt();
+		float[] array = new float[length];
+		for (int i = 0; i < length; ++i) {
+			array[i] = dis.readFloat();
+		}
+		return array;
+	}
+
+	public static void writeArray(DataOutputStream dos, float[] array) throws IOException {
+		dos.writeInt(array.length);
+		for (float value : array) {
+			dos.writeFloat(value);
+		}
 	}
 
 }
