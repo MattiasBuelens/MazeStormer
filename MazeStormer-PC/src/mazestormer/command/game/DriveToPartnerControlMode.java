@@ -153,30 +153,25 @@ public class DriveToPartnerControlMode extends ControlMode {
 		@Override
 		public Future<?> performAction(Player player) {
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
-			if (isInternal(getMaze(), seesaw)) {
-				if (canDriveOverSeesaw()) {
-					// Drive over seesaw
-					log("Drive over seesaw");
-					seesaw.setOpen(seesawBarcode);
-					return driveOverSeesaw(getGame());
-				} else {
-					// Drive around
-					log("Go around seesaw");
-					seesaw.setClosed(seesawBarcode);
-					// Go around seesaw
-					seesawsToAvoid.add(getMaze().getSeesaw(seesawBarcode));
-				}
-			}
-			
-			// TODO if not internal -> trainspotting?
+			if (canDriveOverSeesaw()) {
+				log("Drive over seesaw");
+				seesaw.setOpen(seesawBarcode);
+				return driveOverSeesaw(getGame());
+			} else {
+				// Drive around
+				log("Go around seesaw");
+				seesaw.setClosed(seesawBarcode);
+				// Go around seesaw
+				seesawsToAvoid.add(getMaze().getSeesaw(seesawBarcode));
 
-			// Skip seesaw tile
-			skipToNextTile();
-			return null;
+				// Skip seesaw tile
+				skipCurrentBarcode(true);
+				return null;
+			}
 		}
 
-		private void skipToNextTile() {
-			getCommander().getDriver().skipToNextTile();
+		protected void skipCurrentBarcode(boolean skip) {
+			getCommander().getDriver().skipCurrentBarcode(skip);
 		}
 
 	}

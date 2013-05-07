@@ -135,14 +135,19 @@ public class DriveToRandomTileControlMode extends ControlMode {
 			}
 
 			// Skip seesaw tile
-			skipToNextTile();
+			skipCurrentBarcode(true);
 			return null;
 		}
 
-		private void skipToNextTile() {
-			getCommander().getDriver().skipToNextTile();
+
+		protected void skipCurrentBarcode(boolean skip) {
+			getCommander().getDriver().skipCurrentBarcode(skip);
 		}
 
+	}
+
+	protected void skipCurrentBarcode(boolean skip) {
+		getCommander().getDriver().skipCurrentBarcode(skip);
 	}
 
 }
