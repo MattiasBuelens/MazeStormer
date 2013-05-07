@@ -68,7 +68,7 @@ public class CalibrationController extends SubController implements ICalibration
 	@Subscribe
 	public void onConnected(ConnectEvent e) {
 		if (e.isConnected()) {
-			if (getHighValue() <= 0) {
+			if (getHighValue() >= 1000) {
 				setHighValue(580);
 			}
 			if (getLowValue() <= 0) {
