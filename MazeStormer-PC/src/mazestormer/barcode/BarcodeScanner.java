@@ -128,6 +128,10 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 				Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
+	
+	private Future<Boolean> traveledTooMuch() {
+		return getRobot().getPilot().travelComplete(30);
+	}
 
 	protected void findStart() {
 		// Save original speed
@@ -158,10 +162,10 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	protected void strokeStart() {
 		// At begin of barcode
 		strokeStart = getMovement().getDistanceTraveled();
+		// Go forward
+		bindTransition(traveledTooMuch(), BarcodeState.GO_BACK);
 		// Find white stroke
 		transition(BarcodeState.FIND_STROKE_WHITE);
-		// Go forward
-		getRobot().getPilot().forward();
 	}
 
 	protected void findWhiteStroke() {
@@ -201,6 +205,10 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			// Completed
 			transition(BarcodeState.FINISH);
 		}
+	}
+	
+	protected void goBack() {
+		bindTransition(getRobot().getPilot().travelComplete(-35), BarcodeState.FIND_START);
 	}
 
 	private int readBarcode(List<Float> distances) {
@@ -327,6 +335,12 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			@Override
 			public void execute(BarcodeScanner scanner) {
 				scanner.finish();
+			}
+		},
+		GO_BACK {
+			@Override
+			public void execute(BarcodeScanner scanner) {
+				scanner.goBack();
 			}
 		}
 
