@@ -97,6 +97,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * ignored.
 	 */
 	private AtomicBoolean skipCurrentBarcode = new AtomicBoolean(false);
+	
+	private boolean shouldBarcode = true;
 
 	public Driver(Player player, Commander commander) {
 		this.player = checkNotNull(player);
@@ -178,6 +180,10 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	public boolean isBarcodeActionEnabled() {
 		return getMode().isBarcodeActionEnabled();
+	}
+	
+	public void disableBarcodeScanner() {
+		shouldBarcode = false;
 	}
 
 	/**
@@ -382,7 +388,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		lineFinder.stop();
 
 		// Start barcode scanner if necessary
-		if (shouldBarcode(navigator.getCurrentTarget())) {
+		if (shouldBarcode(navigator.getCurrentTarget()) && shouldBarcode) {
 			barcodeScanner.start();
 		}
 

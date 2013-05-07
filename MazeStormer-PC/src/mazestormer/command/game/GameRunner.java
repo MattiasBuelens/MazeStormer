@@ -144,9 +144,8 @@ public class GameRunner extends Commander {
 
 	private void driveToPartner() {
 		// TODO Is it allowed to switch modes asynchronously?
-		getDriver().pause();
+		getDriver().disableBarcodeScanner();
 		setMode(new DriveToPartnerControlMode(getPlayer(), this));
-		getDriver().followPathToTile(nextTile(getDriver().getCurrentTile()));
 	}
 
 	/*
