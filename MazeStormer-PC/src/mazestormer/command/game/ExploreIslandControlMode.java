@@ -60,13 +60,16 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 
 	@Override
 	public List<Tile> createPath(Tile startTile, Tile goalTile) {
-		return getPathFinder().findTilePath(startTile, goalTile, new Predicate<Tile>() {
-			@Override
-			public boolean apply(Tile tile) {
-				// Only allow internal seesaws in paths
-				return !tile.isSeesaw() || AbstractSeesawAction.isInternal(getMaze(), tile.getSeesaw());
-			}
-		});
+		return getPathFinder().findTilePath(startTile, goalTile,
+				new Predicate<Tile>() {
+					@Override
+					public boolean apply(Tile tile) {
+						// Only allow internal seesaws in paths
+						return !tile.isSeesaw()
+								|| AbstractSeesawAction.isInternal(getMaze(),
+										tile.getSeesaw());
+					}
+				});
 	}
 
 	/*
@@ -82,7 +85,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			return false;
 
 		// Make next tile a dead end
-		getMaze().setTileShape(nextTile.getPosition(), new TileShape(TileType.DEAD_END, heading));
+		getMaze().setTileShape(nextTile.getPosition(),
+				new TileShape(TileType.DEAD_END, heading));
 		// Mark as explored
 		getMaze().setExplored(nextTile.getPosition());
 		return true;
@@ -104,7 +108,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		return objectBarcode.getValue() / 4;
 	}
 
-	private class ObjectAction extends ObjectFoundAction implements FutureListener<Object> {
+	private class ObjectAction extends ObjectFoundAction implements
+			FutureListener<Object> {
 
 		private Barcode barcode;
 
@@ -139,7 +144,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		}
 
 		@Override
-		public void futureResolved(Future<? extends Object> future, Object result) {
+		public void futureResolved(Future<? extends Object> future,
+				Object result) {
 			// Skip dead end tile
 			skipCurrentBarcode(true);
 			skipToNextTile();
@@ -199,7 +205,8 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		private final Barcode seesawBarcode;
 
 		protected SeesawAction(Barcode seesawBarcode) {
-			super(ExploreIslandControlMode.this.getPlayer(), ExploreIslandControlMode.this.getCommander().getDriver());
+			super(ExploreIslandControlMode.this.getPlayer(),
+					ExploreIslandControlMode.this.getCommander().getDriver());
 			this.seesawBarcode = seesawBarcode;
 		}
 
@@ -212,7 +219,7 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
 			if (isInternal(getMaze(), seesaw)) {
 				// Check if actually trying to cross
-				if (meantToCrossSeesaw()) {
+				if (nextPathCrossesSeesaw()) {
 					// Check if seesaw is open
 					if (canDriveOverSeesaw()) {
 						// Drive over seesaw
@@ -242,13 +249,28 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 			return null;
 		}
 
-		private boolean meantToCrossSeesaw() {
-			/*
+		/*private boolean meantToCrossSeesaw() {
 			 * If the current (seesaw barcode) tile is equal to the start tile
 			 * of the drivers new cycle, the driver was simply exploring it. It
 			 * didn't have the intention to cross the seesaw.
-			 */
-			return !(getDriver().getCurrentTile().equals(getDriver().getStartTile()));
+			return !(getDriver().getCurrentTile().equals(getDriver()
+					.getStartTile()));
+		} This method is changed by the following.*/ 
+
+		/**
+		 * @pre The robot stands on a seesaw barcode tile
+		 */
+		private boolean nextPathCrossesSeesaw() {
+			Tile currentTile = getDriver().getCurrentTile();
+			List<Tile> path = getPathFinder().findTilePath(currentTile,
+					nextTile(currentTile));
+			Barcode barcode = currentTile.getBarcode();
+			Seesaw seesaw = getMaze().getSeesaw(barcode);
+			for (Tile tile : path) {
+				if (tile.isSeesaw() && tile.getSeesaw().equals(seesaw))
+					return true;
+			}
+			return false;
 		}
 	}
 

@@ -375,7 +375,7 @@ public class Maze implements IMaze {
 		checkNotNull(barcode);
 		Seesaw seesaw = getSeesaw(barcode);
 		if (seesaw != null)
-			seesaw.flip();
+			seesaw.setClosed(barcode);
 		Tile[] tiles = { getSeesawTile(barcode),
 				getSeesawTile(Seesaw.getOtherBarcode(barcode)) };
 		fireSeesawChanged(seesaw, tiles);
