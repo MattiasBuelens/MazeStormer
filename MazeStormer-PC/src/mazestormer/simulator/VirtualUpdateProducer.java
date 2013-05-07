@@ -41,7 +41,7 @@ public class VirtualUpdateProducer {
 
 	protected void produce() {
 		// Create update
-		RobotUpdate update = RobotUpdate.create(robot);
+		RobotUpdate update = RobotUpdate.create(robot, true, false);
 		// Call listeners
 		for (RobotUpdateListener listener : listeners) {
 			listener.updateReceived(update);

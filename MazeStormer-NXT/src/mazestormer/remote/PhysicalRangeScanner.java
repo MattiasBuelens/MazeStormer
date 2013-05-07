@@ -1,67 +1,72 @@
 package mazestormer.remote;
 
+import java.io.IOException;
+
 import lejos.robotics.RangeFinder;
 import lejos.robotics.RangeReading;
 import lejos.robotics.RangeReadings;
+import lejos.robotics.RegulatedMotor;
+import lejos.util.Delay;
 import mazestormer.command.Command;
 import mazestormer.command.CommandReplier;
 import mazestormer.command.ScanCommand;
-import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.report.RangeReadingReport;
 import mazestormer.report.Report;
 import mazestormer.report.ReportType;
-import mazestormer.robot.RangeScannerListener;
-import mazestormer.util.Future;
-import mazestormer.util.ImmediateFuture;
 
-public class PhysicalRangeScanner extends NXTComponent implements
-		ObservableRangeScanner, RangeScannerListener {
+public class PhysicalRangeScanner extends lejos.robotics.RotatingRangeScanner {
 
-	private final ObservableRangeScanner scanner;
-
+	private final NXTCommunicator communicator;
 	private final ScanReplier scanReplier;
 
-	public PhysicalRangeScanner(NXTCommunicator communicator,
-			ObservableRangeScanner scanner) {
-		super(communicator);
-		this.scanner = scanner;
+	protected float gearRatio;
+
+	public PhysicalRangeScanner(NXTCommunicator communicator, RegulatedMotor head, RangeFinder rangeFinder,
+			float gearRatio) {
+		super(head, rangeFinder);
+		this.gearRatio = gearRatio;
+		this.communicator = communicator;
 
 		// Reply to scan commands
-		scanReplier = new ScanReplier(getCommunicator());
+		scanReplier = new ScanReplier(communicator);
 		communicator.addListener(scanReplier);
+	}
 
-		// Report readings
-		addListener(this);
+	/**
+	 * Set the gear ratio.
+	 * 
+	 * @param gearRatio
+	 *            the gear ratio
+	 */
+	public void setGearRatio(float gearRatio) {
+		this.gearRatio = gearRatio;
 	}
 
 	@Override
 	public RangeReadings getRangeValues() {
-		return scanner.getRangeValues();
-	}
+		if (readings == null || readings.getNumReadings() != angles.length) {
+			readings = new RangeReadings(angles.length);
+		}
 
-	@Override
-	public Future<RangeReadings> getRangeValuesAsync() {
-		return new ImmediateFuture<RangeReadings>(getRangeValues());
-	}
+		for (int i = 0; i < angles.length; i++) {
+			// Rotate and scan
+			final float angle = angles[i];
+			head.rotateTo((int) (angle * gearRatio));
+			Delay.msDelay(50);
+			float range = rangeFinder.getRange() + ZERO;
+			if (range > MAX_RELIABLE_RANGE_READING) {
+				range = -1;
+			}
+			// Make reading and trigger listeners
+			final RangeReading reading = new RangeReading(angle, range);
+			readings.set(i, reading);
+			// Publish reading
+			publishReading(reading);
+		}
+		// Reset head
+		head.rotateTo(0);
 
-	@Override
-	public void setAngles(float[] angles) {
-		scanner.setAngles(angles);
-	}
-
-	@Override
-	public RangeFinder getRangeFinder() {
-		return scanner.getRangeFinder();
-	}
-
-	@Override
-	public void addListener(RangeScannerListener listener) {
-		scanner.addListener(listener);
-	}
-
-	@Override
-	public void removeListener(RangeScannerListener listener) {
-		scanner.removeListener(listener);
+		return readings;
 	}
 
 	/**
@@ -90,8 +95,7 @@ public class PhysicalRangeScanner extends NXTComponent implements
 		}
 
 		@Override
-		protected MessageType<Report<?>> getResponseType(
-				MessageType<Command> requestType) {
+		protected MessageType<Report<?>> getResponseType(MessageType<Command> requestType) {
 			return ReportType.SCAN;
 		}
 	}
@@ -99,9 +103,12 @@ public class PhysicalRangeScanner extends NXTComponent implements
 	/**
 	 * Report range readings.
 	 */
-	@Override
-	public void readingReceived(RangeReading reading) {
-		send(new RangeReadingReport(ReportType.RANGE_READING, reading));
+	public void publishReading(RangeReading reading) {
+		try {
+			communicator.send(new RangeReadingReport(ReportType.RANGE_READING, reading));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		}
 	}
 
 }

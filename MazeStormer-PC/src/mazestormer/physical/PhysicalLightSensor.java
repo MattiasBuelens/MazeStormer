@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 import mazestormer.command.Command;
 import mazestormer.command.CommandType;
 import mazestormer.command.LightCalibrateCommand;
-import mazestormer.command.LightFloodlightCommand;
 import mazestormer.robot.AbstractCalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
@@ -65,7 +64,8 @@ public class PhysicalLightSensor extends AbstractCalibratedLightSensor {
 
 	@Override
 	public void setFloodlight(boolean floodlight) {
-		send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT, floodlight));
+		// send(new LightFloodlightCommand(CommandType.LIGHT_FLOODLIGHT,
+		// floodlight));
 	}
 
 	@Override

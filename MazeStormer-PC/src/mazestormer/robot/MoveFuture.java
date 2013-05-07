@@ -43,9 +43,7 @@ public class MoveFuture extends AbstractFuture<Boolean> implements
 				isStarted = true;
 			} else if (isStarted) {
 				// Started a different move
-				// TODO What does this break?
-				// resolve(false);
-				cancel();
+				resolve(false);
 			}
 		}
 	}
@@ -56,13 +54,7 @@ public class MoveFuture extends AbstractFuture<Boolean> implements
 			// Check if the move matches
 			// and the pilot is no longer moving
 			boolean success = matchesMove(event) && !event.isMoving();
-			// TODO What does this break?
-			// resolve(success);
-			if (success) {
-				resolve(true);
-			} else {
-				cancel();
-			}
+			resolve(success);
 		}
 	}
 

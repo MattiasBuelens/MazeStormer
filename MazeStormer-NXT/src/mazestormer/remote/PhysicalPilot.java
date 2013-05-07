@@ -1,29 +1,30 @@
 package mazestormer.remote;
 
+import java.io.IOException;
+
 import lejos.nxt.Motor;
 import lejos.robotics.navigation.DifferentialPilot;
-import lejos.robotics.navigation.Move.MoveType;
+import lejos.robotics.navigation.Move;
 import lejos.robotics.navigation.MoveListener;
+import lejos.robotics.navigation.MoveProvider;
 import mazestormer.command.Command;
 import mazestormer.command.PilotParameterCommand;
 import mazestormer.command.RotateCommand;
 import mazestormer.command.StopCommand;
 import mazestormer.command.TravelCommand;
-import mazestormer.report.MoveReporter;
+import mazestormer.report.MoveReport;
+import mazestormer.report.ReportType;
 import mazestormer.robot.ControllableRobot;
-import mazestormer.robot.MoveFuture;
 import mazestormer.robot.Pilot;
 import mazestormer.util.Future;
 
-public class PhysicalPilot extends DifferentialPilot implements Pilot,
-		MessageListener<Command> {
+public class PhysicalPilot extends DifferentialPilot implements Pilot, MessageListener<Command>, MoveListener {
 
 	private final NXTCommunicator communicator;
 
 	public PhysicalPilot(NXTCommunicator communicator) {
-		super(ControllableRobot.leftWheelDiameter,
-				ControllableRobot.rightWheelDiameter,
-				ControllableRobot.trackWidth, Motor.B, Motor.A, false);
+		super(ControllableRobot.leftWheelDiameter, ControllableRobot.rightWheelDiameter, ControllableRobot.trackWidth,
+				Motor.B, Motor.A, false);
 
 		this.communicator = communicator;
 		setup();
@@ -34,21 +35,17 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 		addMessageListener(this);
 
 		// Move listener
-		addMoveListener(new MoveReporter(communicator));
+		addMoveListener(this);
 	}
 
 	@Override
 	public Future<Boolean> travelComplete(double distance) {
-		MoveFuture future = new MoveFuture(this, MoveType.TRAVEL);
-		travel(distance, true);
-		return future;
+		return null;
 	}
 
 	@Override
 	public Future<Boolean> rotateComplete(double angle) {
-		MoveFuture future = new MoveFuture(this, MoveType.ROTATE);
-		rotate(angle, true);
-		return future;
+		return null;
 	}
 
 	private void addMessageListener(MessageListener<Command> listener) {
@@ -117,6 +114,24 @@ public class PhysicalPilot extends DifferentialPilot implements Pilot,
 			break;
 		default:
 			break;
+		}
+	}
+
+	@Override
+	public void moveStarted(Move event, MoveProvider mp) {
+		try {
+			communicator.send(new MoveReport(ReportType.MOVE_STARTED, event));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		}
+	}
+
+	@Override
+	public void moveStopped(Move event, MoveProvider mp) {
+		try {
+			communicator.send(new MoveReport(ReportType.MOVE_STOPPED, event));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 		}
 	}
 

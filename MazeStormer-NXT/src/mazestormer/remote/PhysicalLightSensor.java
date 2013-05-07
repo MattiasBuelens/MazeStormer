@@ -11,7 +11,6 @@ import mazestormer.command.CommandReplier;
 import mazestormer.command.CommandType;
 import mazestormer.command.ConditionalCommandListener;
 import mazestormer.command.LightCalibrateCommand;
-import mazestormer.command.LightFloodlightCommand;
 import mazestormer.command.LightReadCommand;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
@@ -20,11 +19,11 @@ import mazestormer.report.ReportType;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 
-public class PhysicalLightSensor extends LightSensor implements
-		CalibratedLightSensor, SensorPortListener, MessageListener<Command> {
+public class PhysicalLightSensor extends LightSensor implements CalibratedLightSensor, SensorPortListener,
+		MessageListener<Command> {
 
 	private final SensorPort port;
-	private List<LightValueListener> lightListeners = new ArrayList<LightValueListener>();
+	private List<LightConditionFuture> lightListeners = new ArrayList<LightConditionFuture>();
 
 	private final NXTCommunicator communicator;
 
@@ -73,20 +72,20 @@ public class PhysicalLightSensor extends LightSensor implements
 		communicator.addListener(listener);
 	}
 
-	public void addLightListener(LightValueListener listener) {
+	public void addLightListener(LightConditionFuture listener) {
 		lightListeners.add(listener);
 	}
 
-	public void removeLightListener(LightValueListener listener) {
+	public void removeLightListener(LightConditionFuture listener) {
 		lightListeners.remove(listener);
 	}
 
 	protected void callLightListeners(final int normalizedLightValue) {
 		// Clone listeners array for safe iteration
-		final LightValueListener[] listeners = lightListeners
-				.toArray(new LightValueListener[lightListeners.size()]);
+		final LightConditionFuture[] listeners = lightListeners
+				.toArray(new LightConditionFuture[lightListeners.size()]);
 		// Call listeners
-		for (LightValueListener listener : listeners) {
+		for (LightConditionFuture listener : listeners) {
 			listener.lightValueChanged(normalizedLightValue);
 		}
 	}
@@ -107,7 +106,7 @@ public class PhysicalLightSensor extends LightSensor implements
 		SensorPortListeners.get(port).removeSensorPortListener(this);
 
 		// Remove registered light listeners
-		for (LightValueListener listener : lightListeners) {
+		for (LightConditionFuture listener : lightListeners) {
 			removeLightListener(listener);
 		}
 
@@ -119,9 +118,9 @@ public class PhysicalLightSensor extends LightSensor implements
 
 	@Override
 	public void messageReceived(Command command) {
-		if (command instanceof LightFloodlightCommand) {
-			onFloodLightCommand((LightFloodlightCommand) command);
-		}
+		// if (command instanceof LightFloodlightCommand) {
+		// onFloodLightCommand((LightFloodlightCommand) command);
+		// }
 		if (command instanceof LightCalibrateCommand) {
 			onCalibrateCommand((LightCalibrateCommand) command);
 		}
@@ -130,9 +129,9 @@ public class PhysicalLightSensor extends LightSensor implements
 	/**
 	 * Handles flood light commands.
 	 */
-	private void onFloodLightCommand(LightFloodlightCommand command) {
-		setFloodlight(command.isFloodlight());
-	}
+	// private void onFloodLightCommand(LightFloodlightCommand command) {
+	// setFloodlight(command.isFloodlight());
+	// }
 
 	/**
 	 * Handles calibration commands.
@@ -192,8 +191,7 @@ public class PhysicalLightSensor extends LightSensor implements
 			switch (condition.getType()) {
 			case LIGHT_GREATER_THAN:
 			case LIGHT_SMALLER_THAN:
-				return new LightConditionFuture(
-						(LightCompareCondition) condition);
+				return new LightConditionFuture((LightCompareCondition) condition);
 			default:
 				return null;
 			}
@@ -204,8 +202,7 @@ public class PhysicalLightSensor extends LightSensor implements
 	/**
 	 * Resolves a light value condition.
 	 */
-	private class LightConditionFuture extends ConditionFuture implements
-			LightValueListener {
+	private class LightConditionFuture extends ConditionFuture {
 
 		public LightConditionFuture(LightCompareCondition condition) {
 			super(condition);
@@ -217,7 +214,6 @@ public class PhysicalLightSensor extends LightSensor implements
 			return (LightCompareCondition) super.getCondition();
 		}
 
-		@Override
 		public void lightValueChanged(int normalizedLightValue) {
 			int lightValue = getLightValue(normalizedLightValue);
 			if (matches(lightValue)) {

@@ -225,7 +225,9 @@ public class StatePanel extends ViewPanel {
 		// Infrared
 		float infraredAngle = update.getInfraredAngle();
 		String infraredText = null;
-		if (!Float.isNaN(infraredAngle)) {
+		if (Float.isNaN(infraredAngle)) {
+			infraredText = "--";
+		} else {
 			infraredText = String.format("%.0f", infraredAngle);
 		}
 		infraredValue.setText(infraredText);

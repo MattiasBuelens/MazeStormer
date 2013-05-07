@@ -4,25 +4,25 @@ import lejos.nxt.Motor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.RangeFinder;
+import lejos.robotics.RangeScanner;
 import lejos.robotics.RegulatedMotor;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.localization.PoseProvider;
+import lejos.util.Delay;
 import mazestormer.command.Command;
 import mazestormer.command.ShutdownCommand;
 import mazestormer.condition.Condition;
-import mazestormer.detect.ObservableRangeScanner;
 import mazestormer.detect.RangeFeatureDetector;
-import mazestormer.detect.RotatingRangeScanner;
-import mazestormer.report.UpdateReporter;
+import mazestormer.report.ReportType;
+import mazestormer.report.UpdateReport;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.IRSensor;
 import mazestormer.robot.Pilot;
+import mazestormer.robot.RobotUpdate;
 import mazestormer.robot.RobotUpdateListener;
-import mazestormer.robot.SoundPlayer;
 
-public class PhysicalRobot extends NXTComponent implements ControllableRobot,
-		MessageListener<Command> {
+public class PhysicalRobot extends NXTComponent implements ControllableRobot, MessageListener<Command>, Runnable {
 
 	private final PhysicalPilot pilot;
 	private final PoseProvider poseProvider;
@@ -33,9 +33,8 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 	private final PhysicalRangeScanner scanner;
 	private final PhysicalIRSensor infrared;
 
-	private final PhysicalSoundPlayer soundPlayer;
-
-	private final UpdateReporter updateReporter;
+	private Thread thread;
+	private boolean isRunning = false;
 
 	public PhysicalRobot(NXTCommunicator communicator) {
 		super(communicator);
@@ -46,27 +45,22 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 
 		// Light sensor
 		light = new PhysicalLightSensor(communicator, SensorPort.S1);
+		light.setFloodlight(true);
 
 		// Scanner
 		RangeFinder ultrasonicSensor = new UltrasonicSensor(SensorPort.S4);
 		RegulatedMotor headMotor = Motor.C;
 		float gearRatio = ControllableRobot.sensorGearRatio;
-		ObservableRangeScanner headScanner = new RotatingRangeScanner(
-				headMotor, ultrasonicSensor, gearRatio);
-		scanner = new PhysicalRangeScanner(communicator, headScanner);
+		scanner = new PhysicalRangeScanner(communicator, headMotor, ultrasonicSensor, gearRatio);
 
 		// Infrared
 		infrared = new PhysicalIRSensor(communicator, SensorPort.S3);
-
-		// Sound player
-		soundPlayer = new PhysicalSoundPlayer(communicator);
 
 		// Command listener
 		addMessageListener(this);
 
 		// Start reporting updates
-		updateReporter = new UpdateReporter(communicator, this);
-		updateReporter.start();
+		startReporting();
 	}
 
 	@Override
@@ -90,7 +84,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 	}
 
 	@Override
-	public ObservableRangeScanner getRangeScanner() {
+	public RangeScanner getRangeScanner() {
 		return scanner;
 	}
 
@@ -110,11 +104,6 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 	@Override
 	public PoseProvider getPoseProvider() {
 		return poseProvider;
-	}
-
-	@Override
-	public SoundPlayer getSoundPlayer() {
-		return soundPlayer;
 	}
 
 	/**
@@ -142,13 +131,12 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 	@Override
 	public void terminate() {
 		// Stop reporting updates
-		updateReporter.stop();
+		stopReporting();
 		// Stop all communications
 		getCommunicator().stop();
 		// Release resources
 		pilot.terminate();
 		light.terminate();
-		scanner.terminate();
 		// Remove registered message listeners
 		super.terminate();
 	}
@@ -159,6 +147,36 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot,
 			// Shut down
 			terminate();
 		}
+	}
+
+	/*
+	 * Update reporting
+	 */
+
+	public void startReporting() {
+		if (isRunning)
+			return;
+
+		isRunning = true;
+		thread = new Thread(this);
+		thread.start();
+	}
+
+	public void stopReporting() {
+		isRunning = false;
+		thread = null;
+	}
+
+	@Override
+	public void run() {
+		while (isRunning) {
+			reportUpdate();
+			Delay.msDelay(ControllableRobot.updateReportDelay);
+		}
+	}
+
+	public void reportUpdate() {
+		send(new UpdateReport(ReportType.UPDATE, RobotUpdate.create(this, true, true)));
 	}
 
 }
