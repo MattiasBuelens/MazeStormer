@@ -3,18 +3,20 @@ package mazestormer.remote;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public abstract class MessageTypeReader<M extends Message> implements
-		MessageReader<M> {
+public abstract class MessageTypeReader<M extends Message> implements MessageReader<M> {
 
 	@Override
-	public M read(DataInputStream dis) throws UnsupportedOperationException,
-			IOException {
+	public M read(DataInputStream dis) throws UnsupportedOperationException, IOException {
 		// Read message type
 		int typeId = dis.readInt();
-		MessageType<? extends M> type = getType(typeId);
+		MessageType<? extends M> type;
+		try {
+			type = getType(typeId);
+		} catch (Exception e) {
+			type = null;
+		}
 		if (type == null) {
-			throw new UnsupportedOperationException(
-					"Unknown message type identifier: " + typeId);
+			throw new UnsupportedOperationException("Unk msg " + typeId);
 		}
 
 		// Read message
