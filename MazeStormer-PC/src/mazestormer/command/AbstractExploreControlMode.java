@@ -62,6 +62,8 @@ public abstract class AbstractExploreControlMode extends ControlMode {
 
 		// Find the next unexplored tile
 		Tile nextTile = queue.peekFirst();
+		if(nextTile.equals(currentTile))
+			nextTile.setExplored();
 		while (nextTile.isExplored()) {
 			// Remove explored tile
 			queue.pollFirst();
