@@ -16,20 +16,19 @@ import net.miginfocom.swing.MigLayout;
 
 public class BarcodeScanParameterPanel extends ViewPanel {
 	private static final long serialVersionUID = 1L;
-	
+
 	private final IBarcodeController controller;
-	
+
 	private SpinnerNumberModel bwModel;
 	private SpinnerNumberModel wbModel;
 	private SpinnerNumberModel scanSpeedModel;
 
 	private JPanel container;
-	
+
 	public BarcodeScanParameterPanel(IBarcodeController controller) {
 		this.controller = controller;
 
-		setBorder(new TitledBorder(null, "Barcode scan parameters",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		setBorder(new TitledBorder(null, "Barcode scan parameters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.container = new JPanel();
@@ -42,7 +41,7 @@ public class BarcodeScanParameterPanel extends ViewPanel {
 		if (!Beans.isDesignTime())
 			registerController();
 	}
-	
+
 	private void registerController() {
 		registerEventBus(this.controller.getEventBus());
 
@@ -50,12 +49,12 @@ public class BarcodeScanParameterPanel extends ViewPanel {
 		this.wbModel.setValue((int) controller.getWBThreshold());
 		this.bwModel.setValue((int) controller.getBWThreshold());
 	}
-	
+
 	private void createTresholdSpinners() {
 		JLabel lblBW = new JLabel("Black \u2192 White");
 		this.container.add(lblBW, "cell 0 0");
 		JSpinner spinBW = new JSpinner();
-		this.bwModel = new SpinnerNumberModel(50, 0, 100, 1);
+		this.bwModel = new SpinnerNumberModel(0, 0, null, 1);
 		spinBW.setModel(this.bwModel);
 		this.container.add(spinBW, "cell 1 0,growx");
 		this.bwModel.addChangeListener(new BWChangeListener());
@@ -66,11 +65,11 @@ public class BarcodeScanParameterPanel extends ViewPanel {
 		JLabel lblWB = new JLabel("White \u2192 Black");
 		this.container.add(lblWB, "cell 0 1");
 		JSpinner spinWB = new JSpinner();
-		this.wbModel = new SpinnerNumberModel(50, 0, 100, 1);
+		this.wbModel = new SpinnerNumberModel(0, 0, null, 1);
 		spinWB.setModel(this.wbModel);
 		this.container.add(spinWB, "cell 1 1,growx");
 		this.wbModel.addChangeListener(new WBChangeListener());
-		
+
 		JLabel lblWBUnit = new JLabel("%");
 		container.add(lblWBUnit, "cell 2 1");
 	}
@@ -88,7 +87,7 @@ public class BarcodeScanParameterPanel extends ViewPanel {
 		container.add(lblSpeedUnit, "cell 2 2");
 		this.scanSpeedModel.addChangeListener(new scanSpeedChangeListener());
 	}
-	
+
 	private class WBChangeListener implements ChangeListener {
 		@Override
 		public void stateChanged(ChangeEvent e) {

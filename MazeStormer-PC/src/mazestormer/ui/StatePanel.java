@@ -107,7 +107,7 @@ public class StatePanel extends ViewPanel {
 		lightValue.setEditable(false);
 		sensorPanel.add(lightValue, "cell 1 0,alignx right");
 
-		JLabel lblUnitLight = new JLabel("%");
+		JLabel lblUnitLight = new JLabel("");
 		sensorPanel.add(lblUnitLight, "cell 2 0");
 	}
 
