@@ -74,7 +74,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Flag indicating if the driver should periodically adjust the robot's
 	 * position by running the line finder.
 	 */
-	private boolean lineAdjustEnabled = true;
+	private boolean lineAdjustEnabled = false;
 	/**
 	 * The amount of tiles between two line finder adjustment runs.
 	 */
