@@ -75,7 +75,7 @@ public class RobotUpdate implements Transmittable {
 		setInfraredAngle(dis.readFloat());
 	}
 
-	public static RobotUpdate create(ControllableRobot robot) {
+	public static RobotUpdate create(ControllableRobot robot, boolean light, boolean infrared) {
 		// Movement
 		Move movement = null;
 		if (robot.getPilot().isMoving()) {
@@ -83,9 +83,14 @@ public class RobotUpdate implements Transmittable {
 		}
 
 		// Sensor readings
-		int lightValue = robot.getLightSensor().getLightValue();
-		// float infraredAngle = robot.getIRSensor().getAngle();
+		int lightValue = -1;
+		if (light) {
+			lightValue = robot.getLightSensor().getLightValue();
+		}
 		float infraredAngle = Float.NaN;
+		if (infrared) {
+			infraredAngle = robot.getIRSensor().getAngle();
+		}
 
 		return new RobotUpdate(movement, lightValue, infraredAngle);
 	}

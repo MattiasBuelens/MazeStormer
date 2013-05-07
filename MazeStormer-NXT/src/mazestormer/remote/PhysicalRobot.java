@@ -176,7 +176,7 @@ public class PhysicalRobot extends NXTComponent implements ControllableRobot, Me
 	}
 
 	public void reportUpdate() {
-		send(new UpdateReport(ReportType.UPDATE, RobotUpdate.create(this)));
+		send(new UpdateReport(ReportType.UPDATE, RobotUpdate.create(this, true, true)));
 	}
 
 }
