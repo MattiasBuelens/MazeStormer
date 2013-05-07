@@ -259,7 +259,7 @@ public class LeaveIslandControlMode extends ControlMode {
 		for (Tile tile : seesawBarcodeTiles) {
 			List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
 					currentTile, tile);
-			if (!path.isEmpty()) {
+			if (!path.isEmpty()) { //TODO: CHECK EXPLORER OTHER SIDE 
 				log("Adding bc tile value: " + tile.getBarcode().getValue());
 				tiles.add(tile);
 			}
