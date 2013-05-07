@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import com.google.common.base.Predicate;
 
 import mazestormer.barcode.Barcode;
 import mazestormer.barcode.action.AbstractSeesawAction;
@@ -16,6 +19,8 @@ import mazestormer.command.ControlMode;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
+import mazestormer.maze.path.FindCorridorAStar;
+import mazestormer.maze.path.MazeAStar;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.util.Future;
@@ -24,11 +29,18 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	// TODO: remove ID shizzle
 
+	public static final int MINIMUM_TIMEOUT = 5;
+	public static final int MAXIMUM_TIMEOUT = 15;
+	
 	public static int UID = 0;
 	public int id;
 	private List<Tile> visitedSeesawTiles = new ArrayList<>();
 	private final LeaveIslandBarcodeMapping leaveBarcodeMapping = new LeaveIslandBarcodeMapping();
 
+	private boolean droveOverSeesaw = false;
+	private boolean isInCorridor = false;
+	private boolean firstTile = true;
+	
 	/*
 	 * Constructor
 	 */
@@ -77,11 +89,22 @@ public class LeaveIslandControlMode extends ControlMode {
 
 		Tile nextTile = null;
 
+		if(droveOverSeesaw){
+			droveOverSeesaw = false;
+			return null;
+		}
+		
 		boolean moreThanOneReachableSeesaws = reachableSeesawBarcodeTiles(
 				currentTile).size() > 1;
 
 		if (moreThanOneReachableSeesaws) {
-			log("More than one rechable seesaw");
+			log("More than one reachable seesaw");
+			
+			if(firstTile && leaveBarcodeMapping.isSeesawBarcode(currentTile.getBarcode())){
+				firstTile = false;
+				return currentTile;
+			}
+			
 			nextTile = getClosestSeesawBarcodeTile(currentTile,
 					visitedSeesawTiles);
 			if (nextTile == null) {
@@ -92,23 +115,41 @@ public class LeaveIslandControlMode extends ControlMode {
 			visitedSeesawTiles.add(nextTile);
 		} else {
 			log("One reachable seesaw");
+			
+			if(isInCorridor){
+				isInCorridor = false;
+				try {
+					int timeout = getRandomTimeout() * 1000;
+					log("Waiting " + timeout + " ms");
+					Thread.sleep(timeout);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			} 
+			
 			if (leaveBarcodeMapping.isSeesawBarcode(currentTile.getBarcode())) {
 				log("Standing on seesaw barcode tile");
 				if (visitedSeesawTiles.contains(currentTile)) {
+					log("Already visited, evacuate!");
 					visitedSeesawTiles.clear();
-					log("Evacuate!");
+					
+					nextTile = evacuate(currentTile);
+					
 					// TODO: EVACUATE!!!!!!
 				} else {
-					log("Visiting current tile");
+					log("Didn't visit this tile yet, visiting current tile now");
 					visitedSeesawTiles.add(currentTile);
+					firstTile = false;
 					return currentTile;
 				}
 			} else {
 				log("Not standing on seesaw barcode tile");
+				firstTile = false;
 				return getClosestSeesawBarcodeTile(currentTile, null);
 			}
 		}
 		log("Returning tile: " + nextTile);
+		firstTile = false;
 		return nextTile;
 
 		// if(leaveBarcodeMapping.isSeesawBarcode(currentTile.getBarcode())){
@@ -140,6 +181,41 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	}
 
+	private Tile evacuate(Tile currentTile) {
+		isInCorridor = true;
+		log("Lookin' for corridor");
+		Tile facingTile = getCommander().getDriver().getFacingTile();
+		List<Tile> pathToCorridor = findPathToCorridor(currentTile, facingTile);
+		log("Found corridor, returning tile!");
+		return pathToCorridor.get(pathToCorridor.size()-1);
+	}
+
+	private List<Tile> findPathToCorridor(final Tile startTile, final Tile blockedTile) {
+		// Get path of tiles
+		MazeAStar astar = new FindCorridorAStar(getMaze(), startTile, new Predicate<Tile>() {
+			@Override
+			public boolean apply(Tile tile) {
+				// Ignore blocked tile
+				if (tile.getPosition().equals(blockedTile.getPosition()))
+					return false;
+				// Ignore seesaws
+				if (tile.isSeesaw())
+					return false;
+				return true;
+			}
+		});
+		List<Tile> tilePath = astar.findPath();
+		// Skip starting tile
+		if (tilePath == null || tilePath.size() <= 1)
+			return new ArrayList<Tile>();
+		else
+			return tilePath.subList(1, tilePath.size());
+	}
+
+	private int getRandomTimeout() {
+		return MINIMUM_TIMEOUT + new Random().nextInt(MAXIMUM_TIMEOUT - MINIMUM_TIMEOUT + 1);
+	}
+	
 	@Override
 	public IAction getAction(Barcode barcode) {
 		return leaveBarcodeMapping.getAction(barcode);
@@ -236,28 +312,13 @@ public class LeaveIslandControlMode extends ControlMode {
 
 		@Override
 		public Future<?> performAction(Player player) {
-			// TODO Check whether we're trying to cross the seesaw?
-
 			// Cross the seesaw if open
 			if (canDriveOverSeesaw()) {
+				droveOverSeesaw = true;
 				return driveOverSeesaw(getGameRunner().getGame());
 			}
 
-			// Try to go around seesaw
-			List<Tile> pathAroundSeesaw = getPathWithoutSeesaws();
-			if (!pathAroundSeesaw.isEmpty()) {
-				return redirect(pathAroundSeesaw);
-			}
-
-			// Try to go over another seesaw
-			Seesaw seesaw = getMaze().getSeesaw(seesawBarcode);
-			List<Tile> pathWithoutSeesaw = getPathWithoutSeesaw(seesaw);
-			if (!pathWithoutSeesaw.isEmpty()) {
-				return redirect(pathWithoutSeesaw);
-			}
-
-			// TODO Train spotting
-			return null;
+			return new NoAction().performAction(player);
 		}
 	}
 
