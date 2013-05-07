@@ -1,7 +1,8 @@
 package mazestormer.command;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionFuture;
@@ -14,17 +15,10 @@ import mazestormer.report.RequestReport;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
 
-@SuppressWarnings("deprecation")
-public abstract class ConditionalCommandListener extends
-		MessageSender<Report<?>> implements MessageListener<Command>,
+public abstract class ConditionalCommandListener extends MessageSender<Report<?>> implements MessageListener<Command>,
 		FutureListener<Void> {
 
-	// Commands by request identifier
-	private final Map<Integer, ConditionalCommand> commandsById = new HashMap<Integer, ConditionalCommand>();
-
-	// Bidirectional map between commands and futures
-	private final Map<ConditionFuture, ConditionalCommand> commandsByFuture = new HashMap<ConditionFuture, ConditionalCommand>();
-	private final Map<ConditionalCommand, ConditionFuture> futuresByCommand = new HashMap<ConditionalCommand, ConditionFuture>();
+	private final List<Entry> entries = new ArrayList<Entry>();
 
 	public ConditionalCommandListener(NXTCommunicator communicator) {
 		super(communicator);
@@ -65,10 +59,16 @@ public abstract class ConditionalCommandListener extends
 	 * the conditional command.
 	 * </p>
 	 * 
-	 * @param command
-	 *            The conditional command to execute.
+	 * @param index
+	 *            The entry index of the command to execute.
 	 */
-	protected void resolve(ConditionalCommand command) {
+	protected void resolve(int index) {
+		if (index < 0 || index >= entries.size())
+			return;
+
+		Entry entry = entries.get(index);
+		ConditionalCommand command = entry.getCommand();
+
 		// Send report
 		send(createReport(command));
 		// Execute linked commands
@@ -82,12 +82,11 @@ public abstract class ConditionalCommandListener extends
 			break;
 		}
 		// Unregister
-		unregister(command);
+		unregisterInternal(index);
 	}
 
 	private Report<?> createReport(ConditionalCommand command) {
-		RequestReport<?> report = (RequestReport<?>) ReportType.CONDITION_RESOLVED
-				.build();
+		RequestReport<?> report = (RequestReport<?>) ReportType.CONDITION_RESOLVED.build();
 		report.setRequestId(command.getRequestId());
 		return report;
 	}
@@ -98,24 +97,25 @@ public abstract class ConditionalCommandListener extends
 	 * @param requestId
 	 *            The conditional command request identifier.
 	 */
-	protected void cancel(int requestId) {
-		cancel(commandsById.get(requestId));
+	private void cancel(int requestId) {
+		cancelInternal(findById(requestId));
 	}
 
 	/**
 	 * Cancels the given conditional command.
 	 * 
-	 * @param command
-	 *            The conditional command.
+	 * @param index
+	 *            The entry index of the conditional command.
 	 */
-	protected void cancel(ConditionalCommand command) {
-		if (command == null)
+	private void cancelInternal(int index) {
+		if (index < 0 || index >= entries.size())
 			return;
 
-		ConditionFuture future = futuresByCommand.get(command);
+		Entry entry = entries.get(index);
+		ConditionFuture future = entry.getFuture();
 		if (future != null)
 			future.cancel();
-		unregister(command);
+		unregisterInternal(index);
 	}
 
 	/**
@@ -134,9 +134,9 @@ public abstract class ConditionalCommandListener extends
 			return;
 		future.addFutureListener(this);
 
-		commandsById.put(command.getRequestId(), command);
-		commandsByFuture.put(future, command);
-		futuresByCommand.put(command, future);
+		// Add
+		Entry entry = new Entry(future, command);
+		entries.add(entry);
 	}
 
 	/**
@@ -146,28 +146,80 @@ public abstract class ConditionalCommandListener extends
 	 *            The conditional command.
 	 */
 	protected void unregister(ConditionalCommand command) {
-		if (command == null)
+		unregisterInternal(findByCommand(command));
+	}
+
+	protected void unregisterInternal(int index) {
+		if (index < 0 || index >= entries.size())
 			return;
 
-		ConditionFuture future = futuresByCommand.get(command);
-
-		commandsById.remove(command.getRequestId());
-		commandsByFuture.remove(future);
-		futuresByCommand.remove(command);
+		entries.remove(index);
 	}
 
 	@Override
 	public void futureResolved(Future<? extends Void> future, Void result) {
-		if (commandsByFuture.containsKey(future)) {
-			resolve(commandsByFuture.get(future));
-		}
+		resolve(findByFuture(future));
 	}
 
 	@Override
 	public void futureCancelled(Future<? extends Void> future) {
-		if (commandsByFuture.containsKey(future)) {
-			cancel(commandsByFuture.get(future));
+		cancelInternal(findByFuture(future));
+	}
+
+	private int findById(int requestId) {
+		ListIterator<Entry> it = entries.listIterator();
+		while (it.hasNext()) {
+			int i = it.nextIndex();
+			Entry entry = it.next();
+			if (entry.getCommand().getRequestId() == requestId) {
+				return i;
+			}
 		}
+		return -1;
+	}
+
+	private int findByCommand(ConditionalCommand command) {
+		ListIterator<Entry> it = entries.listIterator();
+		while (it.hasNext()) {
+			int i = it.nextIndex();
+			Entry entry = it.next();
+			if (entry.getCommand().equals(command)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private int findByFuture(Future<?> future) {
+		ListIterator<Entry> it = entries.listIterator();
+		while (it.hasNext()) {
+			int i = it.nextIndex();
+			Entry entry = it.next();
+			if (entry.getFuture().equals(future)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private static class Entry {
+
+		private final ConditionFuture future;
+		private final ConditionalCommand command;
+
+		public Entry(ConditionFuture future, ConditionalCommand command) {
+			this.future = future;
+			this.command = command;
+		}
+
+		public ConditionFuture getFuture() {
+			return future;
+		}
+
+		public ConditionalCommand getCommand() {
+			return command;
+		}
+
 	}
 
 }
