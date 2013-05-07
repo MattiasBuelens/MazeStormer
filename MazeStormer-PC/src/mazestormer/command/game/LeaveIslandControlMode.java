@@ -74,26 +74,70 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	@Override
 	public Tile nextTile(Tile currentTile) {
-		log("LeaveIslandControlModeID: " + id);
-		// TODO: niet af!!
-		log("Requesting next tile from LeaveIslandCM");
 
-		Tile nextTile = getClosestSeesawBarcodeTile(currentTile,visitedSeesawTiles);
-		
-		log("1");
-		System.out.println("Test 1");
-		
-		if(nextTile == null){
-			log("2");
-			visitedSeesawTiles.clear();
-			nextTile = getClosestSeesawBarcodeTile(currentTile,null);
+		Tile nextTile = null;
+
+		boolean moreThanOneReachableSeesaws = reachableSeesawBarcodeTiles(
+				currentTile).size() > 1;
+
+		if (moreThanOneReachableSeesaws) {
+			log("More than one rechable seesaw");
+			nextTile = getClosestSeesawBarcodeTile(currentTile,
+					visitedSeesawTiles);
+			if (nextTile == null) {
+				log("Visited every seesaw tile, clearing list, starting over");
+				visitedSeesawTiles.clear();
+				nextTile = getClosestSeesawBarcodeTile(currentTile, null);
+			}
+			visitedSeesawTiles.add(nextTile);
+		} else {
+			log("One reachable seesaw");
+			if (leaveBarcodeMapping.isSeesawBarcode(currentTile.getBarcode())) {
+				log("Standing on seesaw barcode tile");
+				if (visitedSeesawTiles.contains(currentTile)) {
+					visitedSeesawTiles.clear();
+					log("Evacuate!");
+					// TODO: EVACUATE!!!!!!
+				} else {
+					log("Visiting current tile");
+					visitedSeesawTiles.add(currentTile);
+					return currentTile;
+				}
+			} else {
+				log("Not standing on seesaw barcode tile");
+				return getClosestSeesawBarcodeTile(currentTile, null);
+			}
 		}
-		log("3");
-		visitedSeesawTiles.add(nextTile);
-		log("4");
-		log("Returning (" + nextTile.getX() +"," + nextTile.getY() + ")");
-		log("5");
+		log("Returning tile: " + nextTile);
 		return nextTile;
+
+		// if(leaveBarcodeMapping.isSeesawBarcode(currentTile.getBarcode())){
+		// return currentTile;
+		// }
+		//
+		// log("LeaveIslandControlModeID: " + id);
+		// // TODO: niet af!!
+		// log("Requesting next tile from LeaveIslandCM");
+		//
+		// Tile nextTile =
+		// getClosestSeesawBarcodeTile(currentTile,visitedSeesawTiles);
+		//
+		// log("1");
+		//
+		// // if(nextTile == null){
+		// // log("2");
+		// // visitedSeesawTiles.clear();
+		// // nextTile = getClosestSeesawBarcodeTile(currentTile,null);
+		// // }
+		// log("3");
+		// //visitedSeesawTiles.add(nextTile);
+		// log("4");
+		// System.out.println(nextTile);
+		// if(nextTile == null){
+		// nextTile = currentTile;
+		// }
+		// log("5");
+
 	}
 
 	@Override
