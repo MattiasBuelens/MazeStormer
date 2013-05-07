@@ -5,8 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.robot.CalibratedLightSensor;
 
-public class CalibrationController extends SubController implements
-		ICalibrationController {
+public class CalibrationController extends SubController implements ICalibrationController {
 
 	public CalibrationController(MainController mainController) {
 		super(mainController);
@@ -69,8 +68,12 @@ public class CalibrationController extends SubController implements
 	@Subscribe
 	public void onConnected(ConnectEvent e) {
 		if (e.isConnected()) {
-			setHighValue(580);
-			setLowValue(360);
+			if (getHighValue() <= 0) {
+				setHighValue(580);
+			}
+			if (getLowValue() <= 0) {
+				setLowValue(360);
+			}
 		}
 	}
 

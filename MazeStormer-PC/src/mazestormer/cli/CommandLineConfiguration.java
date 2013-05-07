@@ -72,6 +72,11 @@ public class CommandLineConfiguration {
 			String rotateSpeed = line.getOptionValue("rotate-speed");
 			controller.manualControl().parameters().setRotateSpeed(Double.parseDouble(rotateSpeed));
 		}
+		if (line.hasOption("calibrate")) {
+			String[] calibrate = line.getOptionValues("calibrate");
+			controller.calibration().setLowValue(Integer.parseInt(calibrate[0]));
+			controller.calibration().setHighValue(Integer.parseInt(calibrate[1]));
+		}
 		if (line.hasOption("ttt")) {
 			Properties tttProps = line.getOptionProperties("ttt");
 			String modeString = tttProps.getProperty("server", tttServerDefault);
@@ -169,6 +174,10 @@ public class CommandLineConfiguration {
 		// rotate speed
 		options.addOption(OptionBuilder.withLongOpt("rotate-speed").hasArgs(1).withArgName("deg/s")
 				.withDescription("Sets the rotate speed.").create("rs"));
+
+		// calibration
+		options.addOption(OptionBuilder.withLongOpt("calibrate").hasArgs(2).withArgName("low> <high")
+				.withDescription("Calibrate the light sensor").create("cal"));
 
 		// ttt
 		String tttServers = Joiner.on('|').join(ConnectionMode.getNames()).toLowerCase()
