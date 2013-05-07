@@ -206,7 +206,8 @@ public interface IMaze {
 	 * @param type
 	 *            The edge type.
 	 */
-	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type);
+	public void setEdge(LongPoint tilePosition, Orientation orientation,
+			Edge.EdgeType type);
 
 	/**
 	 * Set the walls and openings of a tile.
@@ -233,7 +234,8 @@ public interface IMaze {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException;
+	public void setBarcode(LongPoint position, Barcode barcode)
+			throws IllegalStateException;
 
 	/**
 	 * Set the barcode of a tile.
@@ -246,7 +248,8 @@ public interface IMaze {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException;
+	public void setBarcode(LongPoint position, byte barcode)
+			throws IllegalStateException;
 
 	/**
 	 * Find the tile with the given barcode.
@@ -297,6 +300,24 @@ public interface IMaze {
 	 *            The seesaw barcode.
 	 */
 	public Seesaw getOrCreateSeesaw(byte barcode);
+
+	/**
+	 * Flips the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The barcode which was read IN FRONT OF the seesaw, so it first
+	 *            read this barcode, then traversed the seesaw
+	 */
+	public void flipSeesaw(Barcode barcode);
+
+	/**
+	 * Flips the seesaw corresponding to the given seesaw barcode.
+	 * 
+	 * @param barcode
+	 *            The barcode which was read IN FRONT OF the seesaw, so it first
+	 *            read this barcode, then traversed the seesaw
+	 */
+	public void flipSeesaw(byte barcode);
 
 	public Set<Tile> getBarcodeTiles();
 

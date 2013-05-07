@@ -124,11 +124,11 @@ public class GameRunner extends Commander {
 			if (otherIslands()) {
 				return new LeaveIslandControlMode(getPlayer(), this);
 			} else {
-				return new DriveToCenterControlMode(getPlayer(), this);
+				return new DriveToRandomTileControlMode(getPlayer(), this);
 			}
 		} else if (currentMode instanceof LeaveIslandControlMode) {
 			return new ExploreIslandControlMode(getPlayer(), this);
-		} else if (currentMode instanceof DriveToCenterControlMode) {
+		} else if (currentMode instanceof DriveToRandomTileControlMode) {
 			// should never happen
 			log("Fatal error: drive to center ran out of tiles");
 			return null;

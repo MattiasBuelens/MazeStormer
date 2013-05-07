@@ -28,4 +28,8 @@ public class DefaultMazeListener implements MazeListener {
 	public void mazeCleared() {
 	}
 
+	@Override
+	public void seesawFlipped(Seesaw seesaw) {
+	}
+
 }
