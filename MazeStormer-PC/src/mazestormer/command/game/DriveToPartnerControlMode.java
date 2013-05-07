@@ -84,7 +84,10 @@ public class DriveToPartnerControlMode extends ControlMode {
 
 		// Go to the first tile of the shortest path
 		List<Tile> path = getPathFinder().findTilePathWithoutSeesaws(
-				currentTile, partnerTile, seesawsToAvoid);
+				currentTile, partnerTile);
+		if (path.isEmpty())
+			path = getPathFinder().findTilePathWithoutSeesaws(currentTile,
+					partnerTile, seesawsToAvoid);
 		if (path.isEmpty())
 			return null;
 		return path.get(0);
