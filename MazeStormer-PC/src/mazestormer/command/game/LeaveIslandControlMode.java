@@ -1,9 +1,9 @@
 package mazestormer.command.game;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +14,6 @@ import mazestormer.barcode.action.IAction;
 import mazestormer.barcode.action.NoAction;
 import mazestormer.command.ControlMode;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Maze;
 import mazestormer.maze.Seesaw;
 import mazestormer.maze.Tile;
 import mazestormer.player.Player;
@@ -27,7 +26,7 @@ public class LeaveIslandControlMode extends ControlMode {
 
 	public static int UID = 0;
 	public int id;
-	private LinkedList<Tile> visitedSeesawTiles;
+	private List<Tile> visitedSeesawTiles = new ArrayList<>();
 	private final LeaveIslandBarcodeMapping leaveBarcodeMapping = new LeaveIslandBarcodeMapping();
 
 	/*
@@ -93,7 +92,7 @@ public class LeaveIslandControlMode extends ControlMode {
 		visitedSeesawTiles.add(nextTile);
 		log("4");
 		log("Returning (" + nextTile.getX() +"," + nextTile.getY() + ")");
-		
+		log("5");
 		return nextTile;
 	}
 
