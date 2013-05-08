@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.logging.Level;
 
+import mazestormer.barcode.Threshold;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
@@ -31,11 +32,6 @@ public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderSt
 	private final static double maxAttackAngle = 20.0;
 	private final static double safetyAngle = 10.0;
 	private final static double fastRotateAngle = -(90 - maxAttackAngle - safetyAngle);
-
-	/**
-	 * Normalized light value between white and brown
-	 */
-	private final static int threshold = 530;
 
 	/*
 	 * Settings
@@ -69,12 +65,14 @@ public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderSt
 	}
 
 	private Future<Void> onLine() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
+				Threshold.WHITE_BROWN.getThresholdValue());
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> offLine() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, threshold);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
+				Threshold.WHITE_BROWN.getThresholdValue());
 		return getRobot().when(condition).stop().build();
 	}
 

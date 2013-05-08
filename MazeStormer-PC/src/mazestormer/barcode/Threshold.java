@@ -2,7 +2,7 @@ package mazestormer.barcode;
 
 public enum Threshold {
 	// TODO Thresholds need tweaking for virtual light sensor
-	BLACK_WHITE(400), WHITE_BLACK(400);
+	BLACK_WHITE(530), WHITE_BLACK(400), BLACK_BROWN(450), WHITE_BROWN(530);
 
 	private Threshold(int thresholdValue) {
 		setThresholdValue(thresholdValue);

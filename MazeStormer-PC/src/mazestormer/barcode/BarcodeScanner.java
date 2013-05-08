@@ -32,7 +32,6 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 	// private static final double START_BAR_LENGTH = 1.8; // [cm]
 	// private static final double BAR_LENGTH = 1.85; // [cm]
-	private static final int BLACK_THRESHOLD = 400;
 	private static final float BACKUP_DISTANCE = 5f; // cm
 	private static final float NOISE_LENGTH = 0.65f;
 
@@ -114,12 +113,14 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	}
 
 	private Future<Void> onFirstBlack() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
+				Threshold.BLACK_BROWN.getThresholdValue());
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> onSecondBlack() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
+				Threshold.BLACK_BROWN.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
 
@@ -132,6 +133,12 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	private Future<Void> onBlackToWhite() {
 		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
 				Threshold.BLACK_WHITE.getThresholdValue());
+		return getRobot().when(condition).build();
+	}
+
+	private Future<Void> onBlackToBrown() {
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_BETWEEN,
+				Threshold.BLACK_BROWN.getThresholdValue(), Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
 
@@ -177,6 +184,7 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 	protected void findWhiteStroke() {
 		bindTransition(onBlackToWhite(), BarcodeState.STROKE_WHITE);
+		// bindTransition(onBlackToBrown(), BarcodeState.BLACK_TO_BROWN);
 	}
 
 	protected void findBlackStroke() {
@@ -184,11 +192,47 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	}
 
 	protected void stroke(boolean foundBlack) {
+		boolean nextStrokeBlack = addStroke(foundBlack);
+
+		if (isCompleted()) {
+			// Completed
+			transition(BarcodeState.FINISH);
+		} else {
+			// Iterate
+			if (nextStrokeBlack) {
+				transition(BarcodeState.FIND_STROKE_BLACK);
+			} else {
+				transition(BarcodeState.FIND_STROKE_WHITE);
+			}
+		}
+	}
+
+	protected void blackToBrown() {
+		// Came from a black stroke
+		boolean foundBlack = false;
+		// Add last stroke
+		addStroke(foundBlack);
+
+		if (isCompleted()) {
+			// Completed
+			transition(BarcodeState.FINISH);
+		} else {
+			// Failed
+			transition(BarcodeState.FAILED);
+		}
+	}
+
+	protected void failed() {
+		log("Barcode scanner failed");
+		// TODO Restart barcode scanner?
+		stop();
+	}
+
+	private boolean addStroke(boolean foundBlack) {
 		// Get stroke width
 		strokeEnd = getMovement().getDistanceTraveled();
 		log(strokeStart + " - " + strokeEnd);
 		float strokeWidth = Math.abs(strokeEnd - strokeStart);
-		boolean nextStrokeBlack;
 
 		if (strokeWidth >= NOISE_LENGTH) {
 			// Store width
@@ -197,24 +241,16 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			strokeStart = strokeEnd;
 			log("Found " + (foundBlack ? "white" : "black") + " stroke of " + strokeWidth + " cm");
 			// Find next stroke
-			nextStrokeBlack = !foundBlack;
+			return !foundBlack;
 		} else {
 			log("Noise: " + strokeWidth);
 			// Noise detected, retry same stroke
-			nextStrokeBlack = foundBlack;
+			return foundBlack;
 		}
+	}
 
-		if (getTotalSum(distances) <= (Barcode.getNbBars() - 1) * getBarLength()) {
-			// Iterate
-			if (nextStrokeBlack) {
-				transition(BarcodeState.FIND_STROKE_BLACK);
-			} else {
-				transition(BarcodeState.FIND_STROKE_WHITE);
-			}
-		} else {
-			// Completed
-			transition(BarcodeState.FINISH);
-		}
+	private boolean isCompleted() {
+		return getTotalSum(distances) >= (Barcode.getNbBars() - 1) * getBarLength();
 	}
 
 	private int readBarcode(List<Float> distances) {
@@ -341,13 +377,24 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 				scanner.stroke(false);
 			}
 		},
+		BLACK_TO_BROWN {
+			@Override
+			public void execute(BarcodeScanner scanner) {
+				scanner.blackToBrown();
+			}
+		},
 		FINISH {
 			@Override
 			public void execute(BarcodeScanner scanner) {
 				scanner.finish();
 			}
+		},
+		FAILED {
+			@Override
+			public void execute(BarcodeScanner scanner) {
+				scanner.failed();
+			}
 		}
-
 	}
 
 }
