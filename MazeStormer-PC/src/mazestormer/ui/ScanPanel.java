@@ -63,7 +63,7 @@ public class ScanPanel extends ViewPanel {
 		add(lblScanRange, "cell 0 0,grow");
 
 		JSpinner spinRange = new JSpinner();
-		rangeModel = new SpinnerNumberModel(60, 0, 180, 1);
+		rangeModel = new SpinnerNumberModel(60, 0, 360, 1);
 		spinRange.setModel(rangeModel);
 		add(spinRange, "cell 1 0,grow");
 

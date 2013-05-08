@@ -38,10 +38,15 @@ import mazestormer.state.State;
 import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
-import mazestormer.util.FutureListener;
+import mazestormer.util.GuavaFutures;
 import mazestormer.world.ModelType;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import com.google.common.primitives.Floats;
+import com.google.common.util.concurrent.AsyncFunction;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 
 /**
  * Drives the robot in an unknown maze.
@@ -471,39 +476,129 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 *            The tile to update.
 	 */
 	private Future<?> scanAndUpdate(final Tile tile) {
-		// Read from scanner
-		final Future<RangeFeature> future = getRobot().getRangeDetector().scanAsync(getScanAngles(tile));
-		// Process when received
-		future.addFutureListener(new FutureListener<RangeFeature>() {
+		final List<Float> angles = getScanAngles(tile);
+		// Scan in front first
+		ListenableFuture<List<Orientation>> front = scanFront(tile, angles);
+		// Set up a chain to scan behind afterwards
+		ListenableFuture<List<Orientation>> behind = Futures.transform(front,
+				new AsyncFunction<List<Orientation>, List<Orientation>>() {
+					@Override
+					public ListenableFuture<List<Orientation>> apply(List<Orientation> input) throws Exception {
+						return scanBehind(tile, angles);
+					}
+				});
+		// Combine results
+		@SuppressWarnings("unchecked")
+		ListenableFuture<List<List<Orientation>>> frontAndBehind = Futures.allAsList(front, behind);
+		// Place edges afterwards
+		ListenableFuture<Void> walls = Futures.transform(frontAndBehind, new Function<List<List<Orientation>>, Void>() {
 			@Override
-			public void futureResolved(Future<? extends RangeFeature> future, RangeFeature feature) {
-				updateTileEdges(tile, feature);
-			}
-
-			@Override
-			public void futureCancelled(Future<? extends RangeFeature> future) {
-				// Ignore
+			public Void apply(List<List<Orientation>> input) {
+				placeTileWalls(tile, Iterables.concat(input));
+				return null;
 			}
 		});
-		return future;
+		return GuavaFutures.fromGuava(walls);
+	}
+
+	private ListenableFuture<List<Orientation>> scanEdges(final Tile tile, final List<Float> angles) {
+		log("Scan at " + angles.toString());
+		// Read from scanner
+		final Future<RangeFeature> future = getRobot().getRangeDetector().scanAsync(Floats.toArray(angles));
+		// Get tile edges afterwards
+		return Futures.transform(future, new Function<RangeFeature, List<Orientation>>() {
+			@Override
+			public List<Orientation> apply(RangeFeature feature) {
+				return getTileEdges(tile, feature);
+			}
+		});
+	}
+
+	private ListenableFuture<List<Orientation>> scanFront(final Tile tile, List<Float> angles) {
+		log("Scan in front");
+		// Get angles in front of robot
+		final List<Float> anglesFront = new ArrayList<Float>();
+		for (Float angle : angles) {
+			if (isInFront(angle)) {
+				anglesFront.add(angle);
+			}
+		}
+		// Exit if nothing to scan
+		if (anglesFront.isEmpty()) {
+			return Futures.immediateFuture(Collections.<Orientation> emptyList());
+		}
+		return scanEdges(tile, anglesFront);
+	}
+
+	private ListenableFuture<List<Orientation>> scanBehind(final Tile tile, List<Float> angles) {
+		// Get angles behind robot
+		final List<Float> anglesBehind = new ArrayList<Float>();
+		for (Float angle : angles) {
+			if (!isInFront(angle)) {
+				// Rotate angle
+				anglesBehind.add(angle - 180f);
+			}
+		}
+		// Exit if nothing to scan
+		if (anglesBehind.isEmpty()) {
+			return Futures.immediateFuture(Collections.<Orientation> emptyList());
+		}
+		// Rotate robot
+		Future<?> rotate = getRobot().getPilot().rotateComplete(180f);
+		// Scan afterwards
+		return Futures.transform(rotate, new AsyncFunction<Object, List<Orientation>>() {
+			@Override
+			public ListenableFuture<List<Orientation>> apply(Object input) throws Exception {
+				log("Scan behind");
+				return scanEdges(tile, anglesBehind);
+			}
+		});
 	}
 
 	/**
-	 * Update the edges of a tile using the given detected features.
+	 * Check if the given relative angle is in front of the robot.
+	 * 
+	 * @param angle
+	 *            The angle to check.
+	 */
+	private boolean isInFront(float angle) {
+		angle = normalize(angle);
+		return angle <= 135 && angle >= -135;
+	}
+
+	/**
+	 * Get the new edges of a tile using the given detected features.
 	 * 
 	 * @param tile
 	 *            The tile to update.
 	 * @param feature
 	 *            The detected features.
 	 */
-	private void updateTileEdges(Tile tile, RangeFeature feature) {
-		// Place walls
+	private List<Orientation> getTileEdges(Tile tile, RangeFeature feature) {
+		List<Orientation> edges = new ArrayList<Orientation>();
 		if (feature != null) {
 			float relativeHeading = getMaze().toRelative(feature.getPose().getHeading());
 			for (RangeReading reading : feature.getRangeReadings()) {
 				Orientation orientation = angleToOrientation(reading.getAngle() + relativeHeading);
-				getMaze().setEdge(tile.getPosition(), orientation, EdgeType.WALL);
+				edges.add(orientation);
 			}
+		}
+		return edges;
+	}
+
+	/**
+	 * Place the edges of a tile, filling the remaining edges with openings.
+	 * 
+	 * @param tile
+	 *            The tile to update.
+	 * @param edges
+	 *            The wall edges.
+	 */
+	private void placeTileWalls(Tile tile, Iterable<Orientation> edges) {
+		log("Place walls at " + tile.getPosition() + ": " + edges);
+		// Place walls
+		for (Orientation edge : edges) {
+			getMaze().setEdge(tile.getPosition(), edge, EdgeType.WALL);
 		}
 		// Replace unknown edges with openings
 		for (Orientation orientation : tile.getUnknownSides()) {
@@ -514,7 +609,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	/**
 	 * Get the angles towards <strong>unknown</strong> edges to scan.
 	 */
-	private float[] getScanAngles(Tile tile) {
+	private List<Float> getScanAngles(Tile tile) {
 		List<Float> list = new ArrayList<Float>();
 		// TODO: pas heading vastzetten als we linefinder gedaan hebben.
 		float heading = getPose().getHeading();
@@ -527,7 +622,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 		// Sort angles
 		Collections.sort(list);
-		return Floats.toArray(list);
+		return list;
 	}
 
 	/**
