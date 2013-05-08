@@ -189,6 +189,7 @@ public class PhysicalLightSensor extends LightSensor implements CalibratedLightS
 		@Override
 		public ConditionFuture createFuture(Condition condition) {
 			switch (condition.getType()) {
+			case LIGHT_BETWEEN:
 			case LIGHT_GREATER_THAN:
 			case LIGHT_SMALLER_THAN:
 				return new LightConditionFuture((LightCompareCondition) condition);
@@ -232,15 +233,8 @@ public class PhysicalLightSensor extends LightSensor implements CalibratedLightS
 		}
 
 		public boolean matches(int normalizedLightValue) {
-			int threshold = getCondition().getThreshold();
-			switch (getCondition().getType()) {
-			case LIGHT_GREATER_THAN:
-				return normalizedLightValue >= threshold;
-			case LIGHT_SMALLER_THAN:
-				return normalizedLightValue <= threshold;
-			default:
-				return false;
-			}
+			return normalizedLightValue >= getCondition().getMinThreshold()
+					&& normalizedLightValue <= getCondition().getMaxThreshold();
 		}
 
 		@Override

@@ -17,6 +17,7 @@ public class VirtualConditionResolvers {
 	public VirtualConditionResolvers(ControllableRobot robot) {
 		// Light value comparing
 		LightCompareConditionResolver lightResolver = new LightCompareConditionResolver(robot);
+		resolvers.put(ConditionType.LIGHT_BETWEEN, lightResolver);
 		resolvers.put(ConditionType.LIGHT_GREATER_THAN, lightResolver);
 		resolvers.put(ConditionType.LIGHT_SMALLER_THAN, lightResolver);
 	}

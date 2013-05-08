@@ -19,15 +19,8 @@ public class LightCompareConditionResolver extends VirtualConditionResolver<Ligh
 
 	@Override
 	public boolean matches(LightCompareCondition condition, Integer normalizedLightValue) {
-		int threshold = condition.getThreshold();
-		switch (condition.getType()) {
-		case LIGHT_GREATER_THAN:
-			return normalizedLightValue >= threshold;
-		case LIGHT_SMALLER_THAN:
-			return normalizedLightValue <= threshold;
-		default:
-			return false;
-		}
+		return normalizedLightValue >= condition.getMinThreshold()
+				&& normalizedLightValue <= condition.getMaxThreshold();
 	}
 
 }

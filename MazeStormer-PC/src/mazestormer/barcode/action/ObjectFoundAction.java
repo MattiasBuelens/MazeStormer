@@ -10,13 +10,15 @@ import mazestormer.state.State;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class ObjectFoundAction extends
-		StateMachine<ObjectFoundAction, ObjectFoundAction.ObjectFoundState>
-		implements IAction {
+public class ObjectFoundAction extends StateMachine<ObjectFoundAction, ObjectFoundAction.ObjectFoundState> implements
+		IAction {
 
 	private Player player;
 
-	private static int threshold = 85;
+	/**
+	 * Normalized light value between white and brown
+	 */
+	private final static int threshold = 530;
 
 	private ControllableRobot getControllableRobot() {
 		return (ControllableRobot) player.getRobot();
@@ -27,8 +29,7 @@ public class ObjectFoundAction extends
 	}
 
 	private Future<Void> onLine() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_GREATER_THAN, threshold);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
 		return getControllableRobot().when(condition).stop().build();
 	}
 
@@ -58,14 +59,12 @@ public class ObjectFoundAction extends
 
 	protected void firstLine() {
 		// Turn 180°
-		bindTransition(getPilot().rotateComplete(180),
-				ObjectFoundState.BACKWARDS);
+		bindTransition(getPilot().rotateComplete(180), ObjectFoundState.BACKWARDS);
 	}
 
 	protected void backwards() {
 		// Travel backwards
-		bindTransition(getPilot().travelComplete(-28),
-				ObjectFoundState.GOT_OBJECT);
+		bindTransition(getPilot().travelComplete(-28), ObjectFoundState.GOT_OBJECT);
 	}
 
 	protected void gotObject() {
@@ -84,8 +83,7 @@ public class ObjectFoundAction extends
 		finish();
 	}
 
-	public enum ObjectFoundState implements
-			State<ObjectFoundAction, ObjectFoundAction.ObjectFoundState> {
+	public enum ObjectFoundState implements State<ObjectFoundAction, ObjectFoundAction.ObjectFoundState> {
 		OWN_OBJECT {
 			@Override
 			public void execute(ObjectFoundAction objectFoundAction) {

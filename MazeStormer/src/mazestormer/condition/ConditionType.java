@@ -8,6 +8,13 @@ public enum ConditionType implements MessageType<Condition> {
 	 * Light sensor
 	 */
 
+	LIGHT_BETWEEN {
+		@Override
+		public Condition build() {
+			return new LightCompareCondition(this);
+		}
+	},
+
 	LIGHT_GREATER_THAN {
 		@Override
 		public Condition build() {
@@ -21,4 +28,5 @@ public enum ConditionType implements MessageType<Condition> {
 			return new LightCompareCondition(this);
 		}
 	};
+
 }
