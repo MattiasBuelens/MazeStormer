@@ -18,8 +18,7 @@ import mazestormer.util.FutureListener;
  * move.
  * </p>
  */
-public class MoveFuture extends AbstractFuture<Boolean> implements
-		MoveListener, FutureListener<Boolean> {
+public class MoveFuture extends AbstractFuture<Boolean> implements MoveListener, FutureListener<Boolean> {
 
 	private final Pilot pilot;
 	private final MoveType moveType;
@@ -43,7 +42,8 @@ public class MoveFuture extends AbstractFuture<Boolean> implements
 				isStarted = true;
 			} else if (isStarted) {
 				// Started a different move
-				resolve(false);
+				// resolve(false);
+				cancel();
 			}
 		}
 	}
@@ -54,7 +54,12 @@ public class MoveFuture extends AbstractFuture<Boolean> implements
 			// Check if the move matches
 			// and the pilot is no longer moving
 			boolean success = matchesMove(event) && !event.isMoving();
-			resolve(success);
+			// resolve(success);
+			if (success) {
+				resolve(true);
+			} else {
+				cancel();
+			}
 		}
 	}
 
