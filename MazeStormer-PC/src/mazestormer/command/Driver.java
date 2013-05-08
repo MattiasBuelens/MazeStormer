@@ -536,7 +536,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		for (Float angle : angles) {
 			if (!isInFront(angle)) {
 				// Rotate angle
-				anglesBehind.add(angle - 180f);
+				anglesBehind.add(normalize(angle - 180f));
 			}
 		}
 		// Exit if nothing to scan
