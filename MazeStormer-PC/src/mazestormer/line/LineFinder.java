@@ -16,8 +16,7 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 
-public class LineFinder extends
-		StateMachine<LineFinder, LineFinder.LineFinderState> implements
+public class LineFinder extends StateMachine<LineFinder, LineFinder.LineFinderState> implements
 		StateListener<LineFinder.LineFinderState> {
 
 	/*
@@ -33,7 +32,10 @@ public class LineFinder extends
 	private final static double safetyAngle = 10.0;
 	private final static double fastRotateAngle = -(90 - maxAttackAngle - safetyAngle);
 
-	private final static int threshold = 85;
+	/**
+	 * Normalized light value between white and brown
+	 */
+	private final static int threshold = 530;
 
 	/*
 	 * Settings
@@ -67,14 +69,12 @@ public class LineFinder extends
 	}
 
 	private Future<Void> onLine() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_GREATER_THAN, threshold);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN, threshold);
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> offLine() {
-		Condition condition = new LightCompareCondition(
-				ConditionType.LIGHT_SMALLER_THAN, threshold);
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, threshold);
 		return getRobot().when(condition).stop().build();
 	}
 
@@ -104,22 +104,19 @@ public class LineFinder extends
 		log("Off line, positioning robot on line edge.");
 
 		lineWidth = getPilot().getMovement().getDistanceTraveled();
-		double centerOffset = ControllableRobot.sensorOffset
-				- getRobot().getLightSensor().getSensorRadius();
+		double centerOffset = ControllableRobot.sensorOffset - getRobot().getLightSensor().getSensorRadius();
 		log("Line width: " + lineWidth);
 		log("Offset from center: " + centerOffset);
 
 		// Travel forward to center robot on end of line
 		getPilot().setTravelSpeed(fastTravelSpeed);
-		bindTransition(getPilot().travelComplete(centerOffset),
-				LineFinderState.ROTATE_FIXED);
+		bindTransition(getPilot().travelComplete(centerOffset), LineFinderState.ROTATE_FIXED);
 	}
 
 	protected void rotateFixed() {
 		// Rotate fixed angle
 		getPilot().setRotateSpeed(fastRotateSpeed);
-		bindTransition(getPilot().rotateComplete(fastRotateAngle),
-				LineFinderState.ROTATE_UNTIL_LINE);
+		bindTransition(getPilot().rotateComplete(fastRotateAngle), LineFinderState.ROTATE_UNTIL_LINE);
 	}
 
 	protected void rotateUntilLine() {
@@ -142,16 +139,14 @@ public class LineFinder extends
 		// Position perpendicular to line
 		double angle = 90d + sensorAngle;
 		getPilot().setRotateSpeed(fastRotateSpeed);
-		bindTransition(getPilot().rotateComplete(angle),
-				LineFinderState.POSITION_CENTER);
+		bindTransition(getPilot().rotateComplete(angle), LineFinderState.POSITION_CENTER);
 	}
 
 	protected void positionCenter() {
 		// Position robot center on center of line
 		log("Positioning on center of line.");
 		double offset = -lineWidth / 2;
-		bindTransition(getPilot().travelComplete(offset),
-				LineFinderState.FINISH);
+		bindTransition(getPilot().travelComplete(offset), LineFinderState.FINISH);
 	}
 
 	protected void failed() {
@@ -183,8 +178,7 @@ public class LineFinder extends
 	 * </p>
 	 */
 	private double getSensorAngle() {
-		return 2 * Math.asin(getRobot().getLightSensor().getSensorRadius()
-				/ (2 * ControllableRobot.sensorOffset));
+		return 2 * Math.asin(getRobot().getLightSensor().getSensorRadius() / (2 * ControllableRobot.sensorOffset));
 	}
 
 	@Override

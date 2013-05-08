@@ -144,6 +144,7 @@ public class GameRunner extends Commander {
 
 	private void driveToPartner() {
 		// TODO Is it allowed to switch modes asynchronously?
+		getDriver().disableBarcodeScanner();
 		setMode(new DriveToPartnerControlMode(getPlayer(), this));
 	}
 

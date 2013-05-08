@@ -4,8 +4,7 @@ import mazestormer.condition.LightCompareCondition;
 import mazestormer.robot.CalibratedLightSensor;
 import mazestormer.robot.ControllableRobot;
 
-public class LightCompareConditionResolver extends
-		VirtualConditionResolver<LightCompareCondition, Integer> {
+public class LightCompareConditionResolver extends VirtualConditionResolver<LightCompareCondition, Integer> {
 
 	private final CalibratedLightSensor light;
 
@@ -15,17 +14,17 @@ public class LightCompareConditionResolver extends
 
 	@Override
 	protected Integer getValue() {
-		return light.getLightValue();
+		return light.getNormalizedLightValue();
 	}
 
 	@Override
-	public boolean matches(LightCompareCondition condition, Integer lightValue) {
+	public boolean matches(LightCompareCondition condition, Integer normalizedLightValue) {
 		int threshold = condition.getThreshold();
 		switch (condition.getType()) {
 		case LIGHT_GREATER_THAN:
-			return lightValue >= threshold;
+			return normalizedLightValue >= threshold;
 		case LIGHT_SMALLER_THAN:
-			return lightValue <= threshold;
+			return normalizedLightValue <= threshold;
 		default:
 			return false;
 		}

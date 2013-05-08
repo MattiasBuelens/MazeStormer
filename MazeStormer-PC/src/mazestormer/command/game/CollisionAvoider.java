@@ -6,7 +6,6 @@ import java.util.Random;
 
 import mazestormer.command.Driver;
 import mazestormer.maze.IMaze;
-import mazestormer.maze.Orientation;
 import mazestormer.maze.Tile;
 import mazestormer.maze.path.FindCorridorAStar;
 import mazestormer.maze.path.MazeAStar;

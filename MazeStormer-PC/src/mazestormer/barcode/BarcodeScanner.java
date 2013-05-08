@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Level;
 
-import lejos.robotics.navigation.Pose;
+import lejos.robotics.navigation.Move;
 import mazestormer.condition.Condition;
 import mazestormer.condition.ConditionType;
 import mazestormer.condition.LightCompareCondition;
@@ -32,7 +32,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 	// private static final double START_BAR_LENGTH = 1.8; // [cm]
 	// private static final double BAR_LENGTH = 1.85; // [cm]
-	private static final int BLACK_THRESHOLD = 50;
+	private static final int BLACK_THRESHOLD = 400;
+	private static final float BACKUP_DISTANCE = 5f; // cm
 	private static final float NOISE_LENGTH = 0.65f;
 
 	/*
@@ -47,8 +48,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	 * State
 	 */
 
-	private volatile Pose strokeStart;
-	private volatile Pose strokeEnd;
+	private volatile float strokeStart;
+	private volatile float strokeEnd;
 	private final List<Float> distances = new ArrayList<Float>();
 
 	private final List<BarcodeScannerListener> listeners = new ArrayList<BarcodeScannerListener>();
@@ -76,8 +77,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 		this.scanSpeed = scanSpeed;
 	}
 
-	protected Pose getPose() {
-		return getRobot().getPoseProvider().getPose();
+	protected Move getMovement() {
+		return getRobot().getPilot().getMovement();
 	}
 
 	protected double getBarLength() {
@@ -117,6 +118,11 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 		return getRobot().when(condition).stop().build();
 	}
 
+	private Future<Void> onSecondBlack() {
+		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN, BLACK_THRESHOLD);
+		return getRobot().when(condition).build();
+	}
+
 	private Future<Void> onWhiteToBlack() {
 		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
 				Threshold.WHITE_BLACK.getThresholdValue());
@@ -133,8 +139,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 		// Save original speed
 		originalTravelSpeed = getRobot().getPilot().getTravelSpeed();
 		// Reset state
-		strokeStart = null;
-		strokeEnd = null;
+		strokeStart = 0f;
+		strokeEnd = 0f;
 		distances.clear();
 
 		// Find first black line
@@ -150,18 +156,23 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 		log("Go to the begin of the barcode zone.");
 		getRobot().getPilot().setTravelSpeed(getScanSpeed());
-		// TODO Check with start offset
-		// travel(- START_BAR_LENGTH / 2);
-		bindTransition(getRobot().getPilot().travelComplete(-getStartOffset()), BarcodeState.STROKE_START);
+		bindTransition(getRobot().getPilot().travelComplete(-BACKUP_DISTANCE), BarcodeState.FIND_START_AGAIN);
+	}
+
+	protected void findStartAgain() {
+		log("Find start of barcode again.");
+		// Go forward
+		getRobot().getPilot().forward();
+		// Find first black stroke again
+		bindTransition(onSecondBlack(), BarcodeState.STROKE_START);
 	}
 
 	protected void strokeStart() {
+		log("Found start of barcode.");
 		// At begin of barcode
-		strokeStart = getPose();
+		strokeStart = getMovement().getDistanceTraveled();
 		// Find white stroke
 		transition(BarcodeState.FIND_STROKE_WHITE);
-		// Go forward
-		getRobot().getPilot().forward();
 	}
 
 	protected void findWhiteStroke() {
@@ -174,8 +185,9 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 	protected void stroke(boolean foundBlack) {
 		// Get stroke width
-		strokeEnd = getPose();
-		float strokeWidth = getPoseDiff(strokeStart, strokeEnd);
+		strokeEnd = getMovement().getDistanceTraveled();
+		log(strokeStart + " - " + strokeEnd);
+		float strokeWidth = Math.abs(strokeEnd - strokeStart);
 		boolean nextStrokeBlack;
 
 		if (strokeWidth >= NOISE_LENGTH) {
@@ -183,9 +195,11 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			distances.add(strokeWidth);
 			// Set start of next stroke
 			strokeStart = strokeEnd;
+			log("Found " + (foundBlack ? "white" : "black") + " stroke of " + strokeWidth + " cm");
 			// Find next stroke
 			nextStrokeBlack = !foundBlack;
 		} else {
+			log("Noise: " + strokeWidth);
 			// Noise detected, retry same stroke
 			nextStrokeBlack = foundBlack;
 		}
@@ -216,10 +230,8 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			double at;
 			if (i == 0) {
 				// First bar
-				// TODO Check with start offset
-				// at = Math.max((distance - START_BAR_LENGTH) / barLength,
-				// 0);
-				at = Math.max((distance - getStartOffset() - barLength) / barLength, 0);
+				// Cut off first black stroke
+				at = Math.max((distance - barLength) / barLength, 0);
 			} else {
 				at = Math.max(distance / barLength, 1);
 			}
@@ -234,12 +246,6 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			}
 		}
 		return result;
-	}
-
-	private static float getPoseDiff(Pose one, Pose two) {
-		float diffX = Math.abs(one.getX() - two.getX());
-		float diffY = Math.abs(one.getY() - two.getY());
-		return Math.max(diffX, diffY);
 	}
 
 	private static float getTotalSum(Iterable<Float> values) {
@@ -297,6 +303,12 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 			@Override
 			public void execute(BarcodeScanner scanner) {
 				scanner.goToStart();
+			}
+		},
+		FIND_START_AGAIN {
+			@Override
+			public void execute(BarcodeScanner scanner) {
+				scanner.findStartAgain();
 			}
 		},
 		STROKE_START {

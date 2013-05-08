@@ -39,6 +39,7 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
+import mazestormer.world.ModelType;
 
 import com.google.common.primitives.Floats;
 
@@ -74,7 +75,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * Flag indicating if the driver should periodically adjust the robot's
 	 * position by running the line finder.
 	 */
-	private boolean lineAdjustEnabled = true;
+	private boolean lineAdjustEnabled = false;
 	/**
 	 * The amount of tiles between two line finder adjustment runs.
 	 */
@@ -98,6 +99,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 */
 	private AtomicBoolean skipCurrentBarcode = new AtomicBoolean(false);
 
+	private boolean shouldBarcode = true;
+
 	public Driver(Player player, Commander commander) {
 		this.player = checkNotNull(player);
 		this.pathFinder = new PathFinder(getMaze());
@@ -114,6 +117,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		this.lineAdjuster = new LineAdjuster(player);
 		this.lineAdjuster.bind(lineFinder);
 		this.lineFinder.addStateListener(new LineFinderListener());
+		// Only for physical robots
+		setLineAdjustEnabled(getRobot().getModelType() == ModelType.PHYSICAL);
 
 		// Barcode scanner
 		this.barcodeScanner = new BarcodeScanner(player);
@@ -178,6 +183,10 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 
 	public boolean isBarcodeActionEnabled() {
 		return getMode().isBarcodeActionEnabled();
+	}
+
+	public void disableBarcodeScanner() {
+		shouldBarcode = false;
 	}
 
 	/**
@@ -382,7 +391,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		lineFinder.stop();
 
 		// Start barcode scanner if necessary
-		if (shouldBarcode(navigator.getCurrentTarget())) {
+		if (shouldBarcode(navigator.getCurrentTarget()) && shouldBarcode) {
 			barcodeScanner.start();
 		}
 

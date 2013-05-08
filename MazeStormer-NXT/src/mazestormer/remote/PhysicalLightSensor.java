@@ -215,8 +215,7 @@ public class PhysicalLightSensor extends LightSensor implements CalibratedLightS
 		}
 
 		public void lightValueChanged(int normalizedLightValue) {
-			int lightValue = getLightValue(normalizedLightValue);
-			if (matches(lightValue)) {
+			if (matches(normalizedLightValue)) {
 				// Remove as light listener
 				removeLightListener(this);
 				/*
@@ -232,13 +231,13 @@ public class PhysicalLightSensor extends LightSensor implements CalibratedLightS
 			}
 		}
 
-		public boolean matches(int lightValue) {
+		public boolean matches(int normalizedLightValue) {
 			int threshold = getCondition().getThreshold();
 			switch (getCondition().getType()) {
 			case LIGHT_GREATER_THAN:
-				return lightValue >= threshold;
+				return normalizedLightValue >= threshold;
 			case LIGHT_SMALLER_THAN:
-				return lightValue <= threshold;
+				return normalizedLightValue <= threshold;
 			default:
 				return false;
 			}

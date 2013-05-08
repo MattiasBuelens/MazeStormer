@@ -85,7 +85,7 @@ public class RobotUpdate implements Transmittable {
 		// Sensor readings
 		int lightValue = -1;
 		if (light) {
-			lightValue = robot.getLightSensor().getLightValue();
+			lightValue = robot.getLightSensor().getNormalizedLightValue();
 		}
 		float infraredAngle = Float.NaN;
 		if (infrared) {
