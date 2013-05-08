@@ -39,6 +39,7 @@ import mazestormer.state.StateListener;
 import mazestormer.state.StateMachine;
 import mazestormer.util.Future;
 import mazestormer.util.FutureListener;
+import mazestormer.world.ModelType;
 
 import com.google.common.primitives.Floats;
 
@@ -97,7 +98,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 * ignored.
 	 */
 	private AtomicBoolean skipCurrentBarcode = new AtomicBoolean(false);
-	
+
 	private boolean shouldBarcode = true;
 
 	public Driver(Player player, Commander commander) {
@@ -116,6 +117,8 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		this.lineAdjuster = new LineAdjuster(player);
 		this.lineAdjuster.bind(lineFinder);
 		this.lineFinder.addStateListener(new LineFinderListener());
+		// Only for physical robots
+		setLineAdjustEnabled(getRobot().getModelType() == ModelType.PHYSICAL);
 
 		// Barcode scanner
 		this.barcodeScanner = new BarcodeScanner(player);
@@ -181,7 +184,7 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	public boolean isBarcodeActionEnabled() {
 		return getMode().isBarcodeActionEnabled();
 	}
-	
+
 	public void disableBarcodeScanner() {
 		shouldBarcode = false;
 	}
