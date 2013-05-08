@@ -502,7 +502,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	private ListenableFuture<List<Orientation>> scanEdges(final Tile tile, final List<Float> angles) {
-		log("Scan at " + angles.toString());
 		// Read from scanner
 		final Future<RangeFeature> future = getRobot().getRangeDetector().scanAsync(Floats.toArray(angles));
 		// Get tile edges afterwards
@@ -515,7 +514,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	}
 
 	private ListenableFuture<List<Orientation>> scanFront(final Tile tile, List<Float> angles) {
-		log("Scan in front");
 		// Get angles in front of robot
 		final List<Float> anglesFront = new ArrayList<Float>();
 		for (Float angle : angles) {
@@ -549,7 +547,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 		return Futures.transform(rotate, new AsyncFunction<Object, List<Orientation>>() {
 			@Override
 			public ListenableFuture<List<Orientation>> apply(Object input) throws Exception {
-				log("Scan behind");
 				return scanEdges(tile, anglesBehind);
 			}
 		});
@@ -595,7 +592,6 @@ public class Driver extends StateMachine<Driver, Driver.ExplorerState> implement
 	 *            The wall edges.
 	 */
 	private void placeTileWalls(Tile tile, Iterable<Orientation> edges) {
-		log("Place walls at " + tile.getPosition() + ": " + edges);
 		// Place walls
 		for (Orientation edge : edges) {
 			getMaze().setEdge(tile.getPosition(), edge, EdgeType.WALL);
