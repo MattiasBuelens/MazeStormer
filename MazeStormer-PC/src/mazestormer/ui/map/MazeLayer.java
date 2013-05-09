@@ -121,19 +121,34 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 		return maze;
 	}
 
-	private void addTile(Tile tile) {
-		final TileElement tileElement = new TileElement(tile);
-		tilesGroup.appendChild(tileElement.get());
-		tiles.put(tile.getPosition(), tileElement);
+	private void updateTile(final Tile tile) {
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				if (tiles.containsKey(tile.getPosition())) {
+					TileElement tileElement = tiles.get(tile.getPosition());
+					tileElement.update();
+				} else {
+					TileElement tileElement = new TileElement(tile);
+					tiles.put(tile.getPosition(), tileElement);
+					tilesGroup.appendChild(tileElement.get());
+				}
+			}
+		});
 	}
 
-	private void setEdge(Edge edge) {
-		for (LongPoint tilePosition : edge.getTouching()) {
-			TileElement tileElement = tiles.get(tilePosition);
-			if (tileElement != null) {
-				tileElement.setEdge(edge.getOrientationFrom(tilePosition), edge.getType());
+	private void setEdge(final Edge edge) {
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				for (LongPoint tilePosition : edge.getTouching()) {
+					TileElement tileElement = tiles.get(tilePosition);
+					if (tileElement != null) {
+						tileElement.setEdge(edge.getOrientationFrom(tilePosition), edge.getType());
+					}
+				}
 			}
-		}
+		});
 	}
 
 	private void setOrigin(Pose origin) {
@@ -178,23 +193,13 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	}
 
 	@Override
-	public void tileAdded(final Tile tile) {
-		invokeDOMChange(new Runnable() {
-			@Override
-			public void run() {
-				addTile(tile);
-			}
-		});
+	public void tileAdded(Tile tile) {
+		updateTile(tile);
 	}
 
 	@Override
-	public void tileChanged(final Tile tile) {
-		invokeDOMChange(new Runnable() {
-			@Override
-			public void run() {
-				tiles.get(tile.getPosition()).update();
-			}
-		});
+	public void tileChanged(Tile tile) {
+		updateTile(tile);
 	}
 
 	@Override
@@ -202,13 +207,8 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 	}
 
 	@Override
-	public void edgeChanged(final Edge edge) {
-		invokeDOMChange(new Runnable() {
-			@Override
-			public void run() {
-				setEdge(edge);
-			}
-		});
+	public void edgeChanged(Edge edge) {
+		setEdge(edge);
 	}
 
 	@Override
@@ -230,7 +230,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			}
 		});
 	}
-	
+
 	@Override
 	public void seesawFlipped(Seesaw seesaw) {
 		// do nothing, tileChanged is used instead for this cause
