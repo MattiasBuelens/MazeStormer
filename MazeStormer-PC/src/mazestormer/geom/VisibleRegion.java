@@ -144,8 +144,11 @@ public class VisibleRegion extends PointVisibility {
 	}
 
 	private Geometry produceResult(Geometry blocked) {
+		// Set precision
+		blocked = GeometryPrecisionReducer.reduce(blocked, new PrecisionModel(1e3));
 		// Return non-obscured portions of subject
 		Geometry result = subject.difference(blocked);
+		// Set precision
 		result = GeometryPrecisionReducer.reduce(result, new PrecisionModel(1e3));
 		return result;
 	}
