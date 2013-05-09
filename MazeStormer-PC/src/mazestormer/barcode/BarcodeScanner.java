@@ -114,13 +114,13 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 	private Future<Void> onFirstBlack() {
 		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
-				Threshold.BLACK_BROWN.getThresholdValue());
+				Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).stop().build();
 	}
 
 	private Future<Void> onSecondBlack() {
 		Condition condition = new LightCompareCondition(ConditionType.LIGHT_SMALLER_THAN,
-				Threshold.BLACK_BROWN.getThresholdValue());
+				Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
 
@@ -133,12 +133,6 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 	private Future<Void> onBlackToWhite() {
 		Condition condition = new LightCompareCondition(ConditionType.LIGHT_GREATER_THAN,
 				Threshold.BLACK_WHITE.getThresholdValue());
-		return getRobot().when(condition).build();
-	}
-
-	private Future<Void> onBlackToBrown() {
-		Condition condition = new LightCompareCondition(ConditionType.LIGHT_BETWEEN,
-				Threshold.BLACK_BROWN.getThresholdValue(), Threshold.BLACK_WHITE.getThresholdValue());
 		return getRobot().when(condition).build();
 	}
 
@@ -184,7 +178,6 @@ public class BarcodeScanner extends StateMachine<BarcodeScanner, BarcodeScanner.
 
 	protected void findWhiteStroke() {
 		bindTransition(onBlackToWhite(), BarcodeState.STROKE_WHITE);
-		// bindTransition(onBlackToBrown(), BarcodeState.BLACK_TO_BROWN);
 	}
 
 	protected void findBlackStroke() {
