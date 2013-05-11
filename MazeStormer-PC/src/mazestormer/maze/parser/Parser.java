@@ -134,7 +134,7 @@ public class Parser {
 		if (tile.getSeesawOrientation() != null) {
 			// Write seesaw token
 			token.append(TileType.SEESAW.getName());
-			token.append('.').append(tile.getSeesawOrientation());
+			token.append('.').append(tile.getSeesawOrientation().getShortName());
 		} else {
 			// Write shape
 			TileShape shape = tile.getShape();
