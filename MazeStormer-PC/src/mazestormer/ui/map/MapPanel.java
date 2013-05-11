@@ -47,7 +47,15 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	private JPopupMenu menuLayers;
 	private Map<MapLayer, JMenuItem> layerMenuItems = new HashMap<MapLayer, JMenuItem>();
 
+	/**
+	 * Zoom factor for zoom in and zoom out actions.
+	 */
 	public static final double zoomFactor = 1.5d;
+
+	/**
+	 * Minimum time between (complete) repaints.
+	 */
+	private static final int minRepaintTime = 1000;
 
 	public MapPanel(IMapController controller) {
 		this.controller = controller;
@@ -222,6 +230,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	public void requestDOMChange(Runnable request) {
 		UpdateManager updateManager = canvas.getUpdateManager();
 		if (updateManager != null) {
+			updateManager.setMinRepaintTime(minRepaintTime);
 			updateManager.getUpdateRunnableQueue().invokeLater(request);
 		}
 	}
