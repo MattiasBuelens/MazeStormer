@@ -33,6 +33,7 @@ public class Tile {
 	 */
 	private Seesaw seesaw;
 	private Barcode seesawBarcode;
+	private Orientation seesawOrientation;
 
 	public Tile(LongPoint position) {
 		this.position = new LongPoint(position);
@@ -121,6 +122,14 @@ public class Tile {
 
 	public Barcode getSeesawBarcode() {
 		return seesawBarcode;
+	}
+
+	public Orientation getSeesawOrientation() {
+		return seesawOrientation;
+	}
+
+	public void setSeesawOrientation(Orientation seesawOrientation) {
+		this.seesawOrientation = seesawOrientation;
 	}
 
 	public void setSeesaw(Seesaw seesaw, Barcode seesawBarcode) {

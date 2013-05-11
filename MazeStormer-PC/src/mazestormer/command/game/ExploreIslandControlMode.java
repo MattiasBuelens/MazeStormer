@@ -184,13 +184,13 @@ public class ExploreIslandControlMode extends AbstractExploreControlMode {
 		// Seesaw
 		LongPoint nextTilePosition = nextTile.getPosition();
 		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, seesawBarcode);
+		maze.setSeesaw(nextTilePosition, orientation.rotateClockwise(2));
 		maze.setExplored(nextTilePosition);
 
 		// Other seesaw
 		nextTilePosition = orientation.shift(nextTilePosition);
 		maze.setTileShape(nextTilePosition, tileShape);
-		maze.setSeesaw(nextTilePosition, otherBarcode);
+		maze.setSeesaw(nextTilePosition, orientation);
 		maze.setExplored(nextTilePosition);
 
 		// Other seesaw barcode

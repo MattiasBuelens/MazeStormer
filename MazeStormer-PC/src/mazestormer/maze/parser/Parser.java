@@ -3,10 +3,7 @@ package mazestormer.maze.parser;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
-import mazestormer.barcode.Barcode;
 import mazestormer.maze.Edge.EdgeType;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
@@ -18,7 +15,6 @@ import mazestormer.util.LongPoint;
 public class Parser {
 
 	private final IMaze maze;
-	private final List<PositionedToken> seesawTokens = new ArrayList<PositionedToken>();
 
 	/**
 	 * Create a new parser which outputs to the given maze.
@@ -50,9 +46,6 @@ public class Parser {
 		IMaze maze = getMaze();
 		Tokenizer tokenizer = new Tokenizer(source);
 
-		// Reset state
-		seesawTokens.clear();
-
 		// Read width and height
 		long width = tokenizer.getDimensionToken(true).getValue();
 		long height = tokenizer.getDimensionToken(false).getValue();
@@ -79,13 +72,10 @@ public class Parser {
 				}
 				// Store seesaw tokens for later handling
 				if (token.getType() == TileType.SEESAW) {
-					seesawTokens.add(new PositionedToken(position, token));
+					maze.setSeesaw(position, token.getOrientation());
 				}
 			}
 		}
-
-		// Link seesaws
-		linkSeesaws();
 
 		// Ensure end of file
 		tokenizer.getEOFToken();
@@ -122,50 +112,11 @@ public class Parser {
 		if (token.getOption() != null) {
 			token.getOption().apply(tile, token);
 		}
+		// Seesaw
+		if (token.getType() == TileType.SEESAW) {
+			tile.setSeesawOrientation(token.getOrientation());
+		}
 		return tile;
-	}
-
-	/**
-	 * Link seesaws to barcodes.
-	 */
-	private void linkSeesaws() {
-		IMaze maze = getMaze();
-
-		// Set seesaw barcodes
-		for (PositionedToken token : seesawTokens) {
-			// Find barcode tile next to seesaw
-			LongPoint position = token.getPosition();
-			Orientation orientation = token.getToken().getOrientation();
-			LongPoint barcodePosition = orientation.shift(position);
-			Barcode barcode = maze.getTileAt(barcodePosition).getBarcode();
-			// Set seesaw
-			maze.setSeesaw(position, barcode);
-		}
-	}
-
-	/**
-	 * A positioned token.
-	 * 
-	 * Helper class for post-processing parsed tiles.
-	 */
-	private class PositionedToken {
-
-		private final LongPoint position;
-		private final TileToken token;
-
-		public PositionedToken(LongPoint position, TileToken token) {
-			this.position = position;
-			this.token = token;
-		}
-
-		public LongPoint getPosition() {
-			return position;
-		}
-
-		public TileToken getToken() {
-			return token;
-		}
-
 	}
 
 	/**
@@ -180,13 +131,10 @@ public class Parser {
 		StringBuilder token = new StringBuilder();
 		Tile tile = maze.getTileAt(position);
 
-		if (tile.isSeesaw()) {
-			// Get orientation towards barcode tile
-			Tile barcodeTile = maze.getBarcodeTile(tile.getSeesawBarcode());
-			Orientation orientation = tile.orientationTo(barcodeTile);
+		if (tile.getSeesawOrientation() != null) {
 			// Write seesaw token
 			token.append(TileType.SEESAW.getName());
-			token.append('.').append(orientation.getShortName());
+			token.append('.').append(tile.getSeesawOrientation());
 		} else {
 			// Write shape
 			TileShape shape = tile.getShape();

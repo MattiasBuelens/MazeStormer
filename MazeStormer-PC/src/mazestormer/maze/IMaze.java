@@ -206,8 +206,7 @@ public interface IMaze {
 	 * @param type
 	 *            The edge type.
 	 */
-	public void setEdge(LongPoint tilePosition, Orientation orientation,
-			Edge.EdgeType type);
+	public void setEdge(LongPoint tilePosition, Orientation orientation, Edge.EdgeType type);
 
 	/**
 	 * Set the walls and openings of a tile.
@@ -234,8 +233,7 @@ public interface IMaze {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, Barcode barcode)
-			throws IllegalStateException;
+	public void setBarcode(LongPoint position, Barcode barcode) throws IllegalStateException;
 
 	/**
 	 * Set the barcode of a tile.
@@ -248,8 +246,7 @@ public interface IMaze {
 	 * @throws IllegalStateException
 	 *             If the tile at the given position does not accept barcodes.
 	 */
-	public void setBarcode(LongPoint position, byte barcode)
-			throws IllegalStateException;
+	public void setBarcode(LongPoint position, byte barcode) throws IllegalStateException;
 
 	/**
 	 * Find the tile with the given barcode.
@@ -326,10 +323,11 @@ public interface IMaze {
 	 * 
 	 * @param tilePosition
 	 *            The tile position.
-	 * @param seesawBarcode
-	 *            The seesaw barcode at the side of the tile.
+	 * @param seesawOrientation
+	 *            The orientation of the seesaw. The neighbor tile in this
+	 *            direction should be the seesaw barcode tile.
 	 */
-	public void setSeesaw(LongPoint tilePosition, Barcode seesawBarcode);
+	public void setSeesaw(LongPoint tilePosition, Orientation seesawOrientation);
 
 	/**
 	 * Find the seesaw tile facing the given seesaw barcode.
