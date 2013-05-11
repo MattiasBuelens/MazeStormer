@@ -23,7 +23,6 @@ import mazestormer.command.Driver.ExplorerState;
 import mazestormer.game.DefaultGameListener;
 import mazestormer.game.Game;
 import mazestormer.maze.ClosestTileComparator;
-import mazestormer.maze.DefaultMazeListener;
 import mazestormer.maze.IMaze;
 import mazestormer.maze.Orientation;
 import mazestormer.maze.PathFinder;
@@ -53,8 +52,8 @@ public class GameRunner extends Commander {
 	 */
 
 	private final PositionReporter positionReporter = new PositionReporter();
-	private final TileReporter tileReporter = new TileReporter();
-	private final ScheduledExecutorService positionExecutor = Executors.newSingleThreadScheduledExecutor(factory);
+	private final TileReporter tileReporter;
+	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(factory);
 
 	private static final ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("GameRunner-%d").build();
 
@@ -68,6 +67,10 @@ public class GameRunner extends Commander {
 		// Game
 		this.game = game;
 		game.addGameListener(new GameListener());
+
+		// Tile updates
+		tileReporter = new TileReporter(game, executor);
+		getMaze().addListener(tileReporter);
 
 		// Position updates
 		getDriver().addStateListener(new DriverListener());
@@ -244,7 +247,7 @@ public class GameRunner extends Commander {
 				return;
 
 			// Start publishing
-			task = positionExecutor.scheduleWithFixedDelay(new Runnable() {
+			task = executor.scheduleWithFixedDelay(new Runnable() {
 				@Override
 				public void run() {
 					boolean isMoving = getRobot().getPilot().isMoving();
@@ -268,15 +271,6 @@ public class GameRunner extends Commander {
 			// Stop publishing
 			task.cancel(false);
 			task = null;
-		}
-
-	}
-
-	private class TileReporter extends DefaultMazeListener {
-
-		@Override
-		public void tileExplored(Tile tile) {
-			game.sendTiles(tile);
 		}
 
 	}
@@ -317,12 +311,16 @@ public class GameRunner extends Commander {
 
 		@Override
 		public void onPartnerConnected(Player partner) {
+			// Start publishing tiles
+			tileReporter.start();
 			// Send own maze
-			game.sendOwnTiles();
+			tileReporter.offer(getGame().getOwnTiles());
 		}
 
 		@Override
 		public void onPartnerDisconnected(Player partner) {
+			// Stop publishing tiles
+			tileReporter.stop();
 			// TODO Stop driving to partner
 			// Revert to exploring the maze
 		}
