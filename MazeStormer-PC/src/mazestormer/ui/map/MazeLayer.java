@@ -503,22 +503,19 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 			}
 			seesawGroup.appendChild(currentSide);
 
-			// Orientation
-			Tile barcodeTile = maze.getBarcodeTile(tile.getSeesawBarcode());
-			if (barcodeTile != null) {
-				// Get rotation angle
-				Orientation orientation = tile.orientationTo(barcodeTile);
-				float angle = CoordUtils.toMapCoordinates(orientation.getAngle());
-				// Set rotation on current side
-				SVGTransform translate = new SVGOMTransform();
-				translate.setTranslate(0.5f, 0.5f);
-				SVGTransform rotate = new SVGOMTransform();
-				rotate.setRotate(angle, 0, 0);
-				SVGTransformList list = ((SVGTransformable) currentSide).getTransform().getBaseVal();
-				list.clear();
-				list.appendItem(translate);
-				list.appendItem(rotate);
-			}
+			// Get rotation angle
+			Orientation orientation = tile.getSeesawOrientation();
+			float angle = CoordUtils.toMapCoordinates(orientation.getAngle());
+
+			// Set rotation on current side
+			SVGTransform translate = new SVGOMTransform();
+			translate.setTranslate(0.5f, 0.5f);
+			SVGTransform rotate = new SVGOMTransform();
+			rotate.setRotate(angle, 0, 0);
+			SVGTransformList list = ((SVGTransformable) currentSide).getTransform().getBaseVal();
+			list.clear();
+			list.appendItem(translate);
+			list.appendItem(rotate);
 
 			// Tooltip
 			tooltip.setTextContent(getTooltipText(tile));
@@ -565,12 +562,7 @@ public class MazeLayer extends TransformLayer implements MazeListener {
 
 		public void setType(Edge.EdgeType type) {
 			this.type = type;
-			invokeDOMChange(new Runnable() {
-				@Override
-				public void run() {
-					update();
-				}
-			});
+			update();
 		}
 
 		private void update() {

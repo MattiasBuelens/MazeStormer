@@ -33,8 +33,7 @@ public class IRSeesaw implements IRSource {
 
 	private Pose getPose() {
 		Tile seesawTile = getMaze().getSeesawTile(getSeesaw().getClosedBarcode());
-		Tile barcodeTile = getMaze().getBarcodeTile(getSeesaw().getClosedBarcode());
-		Orientation orientation = seesawTile.orientationTo(barcodeTile);
+		Orientation orientation = seesawTile.getSeesawOrientation();
 		// Get center of infrared source
 		Point position = getMaze().getTileCenter(seesawTile.getPosition());
 		position = orientation.shift(position, getShiftFromCenter());

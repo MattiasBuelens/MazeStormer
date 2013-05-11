@@ -652,10 +652,9 @@ public class Maze implements IMaze {
 			// Get edge between closed seesaw tile and barcode tile
 			Barcode closedBarcode = seesaw.getClosedBarcode();
 			Tile closedSeesawTile = getSeesawTile(closedBarcode);
-			Tile closedBarcodeTile = getBarcodeTile(closedBarcode);
-			if (closedSeesawTile != null && closedBarcodeTile != null) {
+			if (closedSeesawTile != null) {
 				// Store edge
-				Edge closedEdge = closedSeesawTile.getEdgeAt(closedSeesawTile.orientationTo(closedBarcodeTile));
+				Edge closedEdge = closedSeesawTile.getEdgeAt(closedSeesawTile.getSeesawOrientation());
 				closedEdges.put(seesaw, closedEdge);
 			}
 		}
