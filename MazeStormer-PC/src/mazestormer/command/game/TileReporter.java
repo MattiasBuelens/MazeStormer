@@ -33,7 +33,7 @@ public class TileReporter extends DefaultMazeListener implements Runnable {
 
 	public void start() {
 		stop();
-		task = executor.schedule(this, delay, TimeUnit.MILLISECONDS);
+		task = executor.scheduleWithFixedDelay(this, 0, delay, TimeUnit.MILLISECONDS);
 	}
 
 	public void stop() {

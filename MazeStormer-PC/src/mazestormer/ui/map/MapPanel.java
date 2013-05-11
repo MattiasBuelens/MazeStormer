@@ -24,7 +24,6 @@ import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerRemoveEvent;
 import net.miginfocom.swing.MigLayout;
 
-import org.apache.batik.bridge.UpdateManager;
 import org.w3c.dom.svg.SVGDocument;
 
 import com.google.common.eventbus.Subscribe;
@@ -39,6 +38,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	protected JToolBar leftActionBar;
 	protected JToolBar rightActionBar;
 	protected MapCanvas canvas;
+	protected QueuedMapHandler queuedMapHandler;
 
 	private final Action zoomInAction = new ZoomInAction();
 	private final Action zoomOutAction = new ZoomOutAction();
@@ -51,11 +51,6 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	 * Zoom factor for zoom in and zoom out actions.
 	 */
 	public static final double zoomFactor = 1.5d;
-
-	/**
-	 * Minimum time between (complete) repaints.
-	 */
-	private static final int minRepaintTime = 1000;
 
 	public MapPanel(IMapController controller) {
 		this.controller = controller;
@@ -88,6 +83,7 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	private void createCanvas() {
 		canvas = new MapCanvas();
 		canvas.setDocumentState(MapCanvas.ALWAYS_DYNAMIC);
+		queuedMapHandler = new QueuedMapHandler(canvas);
 	}
 
 	private void createActionBar() {
@@ -228,10 +224,10 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 
 	@Override
 	public void requestDOMChange(Runnable request) {
-		UpdateManager updateManager = canvas.getUpdateManager();
-		if (updateManager != null) {
-			updateManager.setMinRepaintTime(minRepaintTime);
-			updateManager.getUpdateRunnableQueue().invokeLater(request);
+		if (queuedMapHandler != null) {
+			queuedMapHandler.requestDOMChange(request);
+		} else {
+			request.run();
 		}
 	}
 
