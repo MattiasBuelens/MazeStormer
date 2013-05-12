@@ -5,16 +5,14 @@
 ]>
 <svg version="1.1"
 	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 x="-210px" y="-327px" width="420px" height="654px" viewBox="0 0 420 654" enable-background="new 0 0 420 654" xml:space="preserve">
-<defs>
-</defs>
+	 x="-210px" y="-327px" width="460px" height="694px" viewBox="-20 -20 440 674" enable-background="new -20 -20 440 674" xml:space="preserve">
 <linearGradient id="Back_2_" gradientUnits="userSpaceOnUse" x1="12" y1="327" x2="410" y2="327">
 	<stop  offset="0" style="stop-color:#4D4D4D"/>
 	<stop  offset="0.15" style="stop-color:#808080"/>
 	<stop  offset="0.85" style="stop-color:#808080"/>
 	<stop  offset="1" style="stop-color:#4D4D4D"/>
 </linearGradient>
-<path id="Back_1_" fill="url(#Back_2_)" d="M410,642c0,6.627-5.373,12-12,12H24c-6.627,0-12-5.373-12-12V12c0-6.627,5.373-12,12-12
+<path id="Back_1_" fill="url(#Back_2_)" class="outline" d="M410,642c0,6.627-5.373,12-12,12H24c-6.627,0-12-5.373-12-12V12c0-6.627,5.373-12,12-12
 	h374c6.627,0,12,5.373,12,12V642z"/>
 <linearGradient id="Front_2_" gradientUnits="userSpaceOnUse" x1="0" y1="327" x2="420" y2="327">
 	<stop  offset="0" style="stop-color:#B3B3B3"/>
@@ -22,7 +20,7 @@
 	<stop  offset="0.8" style="stop-color:#E6E6E6"/>
 	<stop  offset="1" style="stop-color:#B3B3B3"/>
 </linearGradient>
-<path id="Front_1_" fill="url(#Front_2_)" d="M420,595c0,6.627-5.373,12-12,12H12c-6.627,0-12-5.373-12-12V59
+<path id="Front_1_" fill="url(#Front_2_)" class="outline" d="M420,595c0,6.627-5.373,12-12,12H12c-6.627,0-12-5.373-12-12V59
 	c0-6.627,5.373-12,12-12h396c6.627,0,12,5.373,12,12V595z"/>
 <path id="Inset_5_" fill="none" stroke="#808080" stroke-width="2" stroke-miterlimit="10" d="M212,292h118c6.627,0,12-5.373,12-12
 	V123c0-6.627-5.373-12-12-12H86c-6.627,0-12,5.373-12,12v157c0,6.627,5.373,12,12,12h120v54c0,0,0.333,6-5,6s-17,0-17,0
