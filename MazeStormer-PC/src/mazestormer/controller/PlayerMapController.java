@@ -4,6 +4,7 @@ import lejos.robotics.navigation.Pose;
 import mazestormer.connect.ConnectEvent;
 import mazestormer.detect.RangeFeatureDetectEvent;
 import mazestormer.player.Player;
+import mazestormer.player.PlayerListener;
 import mazestormer.ui.map.RangesLayer;
 
 import com.google.common.eventbus.Subscribe;
@@ -19,6 +20,7 @@ public class PlayerMapController extends MapController implements IPlayerMapCont
 		// Player
 		this.player = player;
 		addPlayer(player);
+		player.addPlayerListener(new Listener());
 
 		// Discovered maze
 		addMaze(player.getMaze(), "Discovered maze", 2);
@@ -61,6 +63,15 @@ public class PlayerMapController extends MapController implements IPlayerMapCont
 
 	public void terminate() {
 		// Nothing to do here
+	}
+
+	private class Listener implements PlayerListener {
+
+		@Override
+		public void playerRenamed(Player player, String previousID, String newID) {
+			renamePlayer(player);
+		}
+
 	}
 
 }

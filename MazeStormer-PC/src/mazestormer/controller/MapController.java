@@ -17,6 +17,7 @@ import mazestormer.ui.map.MazeLayer;
 import mazestormer.ui.map.RobotLayer;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerRemoveEvent;
+import mazestormer.ui.map.event.MapLayerRenameEvent;
 import mazestormer.ui.map.event.MapRobotPoseChangeEvent;
 import mazestormer.util.CoordUtils;
 
@@ -63,6 +64,16 @@ public abstract class MapController extends SubController implements IMapControl
 		if (robotLayer != null) {
 			removeLayer(robotLayer);
 			robotLayers.remove(player);
+		}
+	}
+
+	protected void renamePlayer(Player player) {
+		RobotLayer robotLayer = robotLayers.get(player);
+		if (robotLayer == null) {
+			addPlayer(player);
+		} else {
+			robotLayer.setName("Robot " + player.getPlayerID());
+			postEvent(new MapLayerRenameEvent(this, robotLayer));
 		}
 	}
 

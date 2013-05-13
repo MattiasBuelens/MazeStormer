@@ -33,7 +33,7 @@ public class WorldMapController extends MapController implements IWorldMapContro
 
 		@Override
 		public void playerRenamed(Player player) {
-			// Ignore
+			renamePlayer(player);
 		}
 
 	}

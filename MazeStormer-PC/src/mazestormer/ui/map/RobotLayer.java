@@ -19,25 +19,41 @@ public class RobotLayer extends TransformLayer {
 	private static final String outlineStrokeWidth = "20";
 
 	private Element element;
-	private final String color;
+	private String color;
 
 	public RobotLayer(String name, double height) {
-		this(name, height, getTeamColor(name));
-	}
-
-	public RobotLayer(String name, double height, String color) {
 		super(name);
 		setHeight(height);
 		setRotationCenter(0, 0);
-
-		if (color == null) {
-			color = getRandomColor();
-		}
-		this.color = color;
 	}
 
 	public RobotLayer(String name) {
 		this(name, defaultHeight);
+	}
+
+	@Override
+	public void setName(String name) {
+		super.setName(name);
+		updateColor(name);
+	}
+
+	private void updateColor(String name) {
+		// Get color
+		String teamColor = getTeamColor(name);
+		if (teamColor != null) {
+			color = teamColor;
+		} else if (color == null) {
+			color = getRandomColor();
+		}
+
+		// Update color
+		invokeDOMChange(new Runnable() {
+			@Override
+			public void run() {
+				Element element = getTransformElement();
+				applyOutlines(element);
+			}
+		});
 	}
 
 	@Override
@@ -98,7 +114,7 @@ public class RobotLayer extends TransformLayer {
 	static {
 		teamColors.put(teamPattern("paars"), CSS_VIOLET_VALUE);
 		teamColors.put(teamPattern("blauw"), CSS_BLUE_VALUE);
-		teamColors.put(teamPattern("rood"), CSS_BLUE_VALUE);
+		teamColors.put(teamPattern("rood"), CSS_RED_VALUE);
 		teamColors.put(teamPattern("groen"), CSS_GREEN_VALUE);
 		teamColors.put(teamPattern("wit"), CSS_WHITE_VALUE);
 		teamColors.put(teamPattern("geel"), CSS_YELLOW_VALUE);

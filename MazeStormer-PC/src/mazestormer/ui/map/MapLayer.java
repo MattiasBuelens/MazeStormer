@@ -17,7 +17,7 @@ import org.w3c.dom.svg.SVGDescElement;
 
 public abstract class MapLayer extends MapElement implements SVGConstants, CSSConstants {
 
-	private final String name;
+	private String name;
 
 	private Element element;
 	private boolean isVisible;
@@ -29,12 +29,16 @@ public abstract class MapLayer extends MapElement implements SVGConstants, CSSCo
 	private MapLayerHandler mapLayerHandler;
 
 	public MapLayer(String name) {
-		this.name = name;
+		setName(name);
 		setVisible(true);
 	}
 
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	protected Element getElement() {

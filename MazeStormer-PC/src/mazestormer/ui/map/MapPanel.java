@@ -22,6 +22,7 @@ import mazestormer.ui.SplitButton;
 import mazestormer.ui.ViewPanel;
 import mazestormer.ui.map.event.MapLayerAddEvent;
 import mazestormer.ui.map.event.MapLayerRemoveEvent;
+import mazestormer.ui.map.event.MapLayerRenameEvent;
 import net.miginfocom.swing.MigLayout;
 
 import org.w3c.dom.svg.SVGDocument;
@@ -164,6 +165,13 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 		}
 	}
 
+	private void renameLayerMenuItem(final MapLayer layer) {
+		JMenuItem menuItem = layerMenuItems.get(layer);
+		if (menuItem != null) {
+			layerMenuItems.get(layer).setText(layer.getName());
+		}
+	}
+
 	@Subscribe
 	public void onMapLayerAdded(MapLayerAddEvent event) {
 		if (event.getOwner().equals(controller)) {
@@ -175,6 +183,13 @@ public class MapPanel extends ViewPanel implements MapLayerHandler {
 	public void onMapLayerRemoved(MapLayerRemoveEvent event) {
 		if (event.getOwner().equals(controller)) {
 			removeLayerMenuItem(event.getLayer());
+		}
+	}
+
+	@Subscribe
+	public void onMapLayerRenamed(MapLayerRenameEvent event) {
+		if (event.getOwner().equals(controller)) {
+			renameLayerMenuItem(event.getLayer());
 		}
 	}
 
