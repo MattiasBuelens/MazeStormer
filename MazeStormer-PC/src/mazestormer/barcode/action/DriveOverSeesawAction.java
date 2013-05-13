@@ -1,6 +1,8 @@
 package mazestormer.barcode.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import lejos.geom.Point;
+import lejos.robotics.navigation.Pose;
 import mazestormer.player.Player;
 import mazestormer.robot.ControllableRobot;
 import mazestormer.robot.Pilot;
@@ -12,6 +14,7 @@ public class DriveOverSeesawAction extends StateMachine<DriveOverSeesawAction, D
 		implements IAction {
 
 	private Player player;
+	private Pose destinationPose;
 
 	@Override
 	public Future<?> performAction(Player player) {
@@ -58,11 +61,22 @@ public class DriveOverSeesawAction extends StateMachine<DriveOverSeesawAction, D
 	 */
 
 	protected void onwards() {
-		bindTransition(getPilot().travelComplete(122), // TODO 122 juist?
-				SeesawState.RESUME_EXPLORING);
+		float distance = 120f; // TODO 120 juist?
+
+		// Assume robot drives perfect over seesaw
+		Pose pose = getControllableRobot().getPoseProvider().getPose();
+		Point destination = pose.getLocation().pointAt(distance, pose.getHeading());
+		destinationPose = new Pose();
+		destinationPose.setLocation(destination);
+		destinationPose.setHeading(pose.getHeading());
+
+		bindTransition(getPilot().travelComplete(distance), SeesawState.RESUME_EXPLORING);
 	}
 
 	protected void resumeExploring() {
+		// Force target pose
+		getControllableRobot().getPoseProvider().setPose(destinationPose);
+		// Done
 		finish();
 	}
 
