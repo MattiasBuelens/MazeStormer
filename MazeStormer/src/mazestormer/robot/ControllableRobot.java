@@ -30,7 +30,7 @@ public interface ControllableRobot extends ConditionalCommandBuilder, Robot {
 	/**
 	 * Distance between center of wheels, in centimeters.
 	 */
-	public final static float trackWidth = 16.5f;// 14.3f;
+	public final static float trackWidth = 16.15f;// 14.3f;
 
 	/**
 	 * Default travel speed, in centimeters per seconds.
