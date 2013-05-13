@@ -18,6 +18,7 @@ import mazestormer.connect.ControlMode;
 import mazestormer.connect.ControlModeChangeEvent;
 import mazestormer.controller.IMainController;
 import mazestormer.controller.InitializeEvent;
+import mazestormer.controller.LocalPlayerRenameEvent;
 import mazestormer.util.EventSource;
 import net.miginfocom.swing.MigLayout;
 
@@ -60,6 +61,7 @@ public class MainView extends JFrame implements EventSource {
 	private void registerController() {
 		registerEventBus(this.controller.getEventBus());
 		setControlMode(this.controller.configuration().getControlMode());
+		updateTitle(this.controller.getPlayer().getPlayerID());
 	}
 
 	private void initialize() {
@@ -170,6 +172,15 @@ public class MainView extends JFrame implements EventSource {
 	public void onControlModeChanged(ControlModeChangeEvent e) {
 		setControlMode(e.getControlMode());
 		updateVisible();
+	}
+
+	private void updateTitle(String playerID) {
+		setTitle("MazeStormer - " + playerID);
+	}
+
+	@Subscribe
+	public void onLocalPlayerRenamed(LocalPlayerRenameEvent e) {
+		updateTitle(e.getNewID());
 	}
 
 	private boolean isHorizontalVisible() {

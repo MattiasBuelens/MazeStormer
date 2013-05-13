@@ -15,6 +15,8 @@ import mazestormer.connect.ConnectionProvider;
 import mazestormer.connect.Connector;
 import mazestormer.maze.CombinedMaze;
 import mazestormer.maze.IMaze;
+import mazestormer.player.Player;
+import mazestormer.player.PlayerListener;
 import mazestormer.player.RelativePlayer;
 import mazestormer.robot.ControllablePCRobot;
 import mazestormer.simulator.VirtualRobot;
@@ -106,6 +108,7 @@ public class MainController implements IMainController {
 		// Player and world
 		IMaze personalMaze = new CombinedMaze();
 		this.personalPlayer = new RelativePlayer(defaultPlayerName, null, personalMaze);
+		personalPlayer.addPlayerListener(new PersonalPlayerListener());
 		this.world = new World(personalPlayer);
 		gameControl().addPlayer(personalPlayer);
 
@@ -355,6 +358,13 @@ public class MainController implements IMainController {
 	@Override
 	public World getWorld() {
 		return world;
+	}
+	
+	private class PersonalPlayerListener implements PlayerListener {
+		@Override
+		public void playerRenamed(Player player, String previousID, String newID) {
+			postEvent(new LocalPlayerRenameEvent(previousID, newID));
+		}
 	}
 
 }
